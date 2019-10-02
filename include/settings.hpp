@@ -1,189 +1,325 @@
 #ifndef settings_hpp
 #define settings_hpp
 
-#include <boost/mpi/datatype.hpp>
-#include <ginkgo/ginkgo.hpp>
-#include <mpi.h>
 
 #include <memory>
 #include <string>
 #include <tuple>
 #include <vector>
 
+
+#include <mpi.h>
+#include <boost/mpi/datatype.hpp>
+#include <ginkgo/ginkgo.hpp>
+
+
 #include <exception_helpers.hpp>
 #include <gather_scatter.hpp>
 
+
 #define MINIMAL_OVERLAP 2
 
+
 namespace SchwarzWrappers {
+
+
+/**
+ * The struct that contains the solver settings and the parameters to be set by
+ * the user.
+ */
 struct Settings {
-  std::string executor_string;
+    /**
+     * The string that contains the executor paradigm.
+     */
+    std::string executor_string;
 
-  std::shared_ptr<gko::Executor> executor = gko::ReferenceExecutor::create();
+    /**
+     * The ginkgo executor the code is to be executed on.
+     */
+    std::shared_ptr<gko::Executor> executor = gko::ReferenceExecutor::create();
 
-  enum partition_settings {
-    partition_naive = 0x0,
-    partition_metis = 0x1,
-    partition_auto = 0x2,
-    partition_zoltan = 0x3,
-    partition_custom = 0x4
-  };
 
-  partition_settings partition = partition_settings::partition_naive;
+    /**
+     * The partition algorithm to be used for partitioning the matrix.
+     */
+    enum partition_settings {
+        partition_naive = 0x0,
+        partition_metis = 0x1,
+        partition_auto = 0x2,
+        partition_zoltan = 0x3,
+        partition_custom = 0x4
+    };
+    partition_settings partition = partition_settings::partition_naive;
 
-  gko::int32 overlap = MINIMAL_OVERLAP;
+    /**
+     * The overlap between the subdomains.
+     */
+    gko::int32 overlap = MINIMAL_OVERLAP;
 
-  bool explicit_laplacian = false;
+    /**
+     * Flag if the laplcian matrix should be generated within the library. If
+     * false, an external matrix and rhs needs to be provided
+     */
+    bool explicit_laplacian = true;
 
-  bool enable_random_rhs = false;
+    /**
+     * Flag to enable a random rhs.
+     */
+    bool enable_random_rhs = false;
 
-  bool print_matrices = false;
+    /**
+     * Flag to enable printing of matrices.
+     */
+    bool print_matrices = false;
 
-  enum local_solver_settings {
-    direct_solver_cholmod = 0x0,
-    direct_solver_ginkgo = 0x1,
-    iterative_solver_ginkgo = 0x2,
-    iterative_solver_dealii = 0x3,
-    solver_custom = 0x4
-  };
+    /**
+     * The local solver algorithm for the local subdomain solves.
+     */
+    enum local_solver_settings {
+        direct_solver_cholmod = 0x0,
+        direct_solver_ginkgo = 0x1,
+        iterative_solver_ginkgo = 0x2,
+        iterative_solver_dealii = 0x3,
+        solver_custom = 0x4
+    };
+    local_solver_settings local_solver =
+        local_solver_settings::iterative_solver_ginkgo;
 
-  local_solver_settings local_solver =
-      local_solver_settings::direct_solver_cholmod;
+    /**
+     * Disables the re-ordering of the matrix before computing the triangular
+     * factors during the CHOLMOD factorization
+     *
+     * @note This is mainly to allow compatibility with GPU solution.
+     */
+    bool naturally_ordered_factor = false;
 
-  bool naturally_ordered_factor = false;
+    /**
+     * The settings for the various available communication paradigms.
+     */
+    struct comm_settings {
+        /**
+         * Enable one-sided communication
+         */
+        bool enable_onesided = false;
 
-  struct comm_settings {
-    bool enable_onesided = false;
-    bool enable_overlap = false;
-    bool enable_push = true;
-    bool enable_push_one_by_one = false;
-    bool enable_flush_local = false;
-    bool enable_flush_all = true;
-  };
+        /**
+         * Enable explicit overlap between communication and computation.
+         */
+        bool enable_overlap = false;
 
-  comm_settings comm_settings;
+        /**
+         * Push the data to the window to use MPI_Put rather than get.
+         */
+        bool enable_push = true;
 
-  struct convergence_settings {
-    bool put_all_local_residual_norms = true;
-    bool enable_global_simple_tree = true;
-    bool enable_global_check = true;
-    bool enable_accumulate = false;
+        /**
+         * Push each element separately.
+         */
+        bool enable_push_one_by_one = false;
 
-    enum local_convergence_crit { residual_based = 0x0, solution_based = 0x1 };
+        /**
+         * Use local flush.
+         */
+        bool enable_flush_local = false;
 
-    local_convergence_crit convergence_crit =
-        local_convergence_crit::solution_based;
-  };
+        /**
+         * Use flush all.
+         */
+        bool enable_flush_all = true;
+    };
+    comm_settings comm_settings;
 
-  convergence_settings convergence_settings;
+    /**
+     * The various convergence settings available.
+     */
+    struct convergence_settings {
+        bool put_all_local_residual_norms = true;
+        bool enable_global_simple_tree = true;
+        bool enable_global_check = true;
+        bool enable_accumulate = false;
 
-  Settings(std::string executor_string = "reference")
-      : executor_string(executor_string) {}
+        enum local_convergence_crit {
+            residual_based = 0x0,
+            solution_based = 0x1
+        };
+
+        local_convergence_crit convergence_crit =
+            local_convergence_crit::solution_based;
+    };
+    convergence_settings convergence_settings;
+
+    Settings(std::string executor_string = "reference")
+        : executor_string(executor_string)
+    {}
 };
 
-template <typename ValueType, typename IndexType> struct Metadata {
-  MPI_Comm mpi_communicator;
 
-  IndexType global_size = 0;
+/**
+ * The solver metadata struct.
+ *
+ * @tparam ValueType  The type of the floating point values.
+ * @tparam IndexType  The type of the index type values.
+ */
+template <typename ValueType, typename IndexType>
+struct Metadata {
+    /**
+     * The MPI communicator
+     */
+    MPI_Comm mpi_communicator;
 
-  IndexType local_size = 0;
+    /**
+     * The size of the global matrix.
+     */
+    IndexType global_size = 0;
 
-  IndexType local_size_x = 0;
+    /**
+     * The size of the local subdomain matrix.
+     */
+    IndexType local_size = 0;
 
-  IndexType local_size_o = 0;
+    /**
+     * The size of the local subdomain matrix + the overlap.
+     */
+    IndexType local_size_x = 0;
 
-  IndexType overlap_size = 0;
+    /**
+     * The size of the local subdomain matrix + the overlap.
+     */
+    IndexType local_size_o = 0;
 
-  IndexType num_subdomains = 1;
+    /**
+     * The size of the overlap between the subdomains.
+     */
+    IndexType overlap_size = 0;
 
-  int my_rank;
+    /**
+     * The number of subdomains used within the solver.
+     */
+    IndexType num_subdomains = 1;
 
-  int comm_size;
 
-  int num_threads;
+    /**
+     * The local rank of the subdomain.
+     */
+    int my_rank;
 
-  IndexType iter_count = 10;
+    /**
+     * The number of subdomains used within the solver, size of the
+     * communicator.
+     */
+    int comm_size;
 
-  ValueType tolerance = 1e-6;
+    /**
+     * The number of threads used within the solver for each subdomain.
+     */
+    int num_threads;
 
-  ValueType local_solver_tolerance = 1e-12;
+    /**
+     * The iteration count of the solver.
+     */
+    IndexType iter_count = 10;
 
-  IndexType max_iters;
+    /**
+     * The tolerance of the complete solver. The residual norm reduction
+     * required.
+     */
+    ValueType tolerance = 1e-6;
 
-  ValueType current_residual_norm = -1.0;
+    /**
+     * The tolerance of the local solver in case of an iterative solve. The
+     * residual norm reduction required.
+     */
+    ValueType local_solver_tolerance = 1e-12;
 
-  ValueType min_residual_norm = -1.0;
+    /**
+     * The maximum iteration count of the solver.
+     */
+    IndexType max_iters;
 
-  std::vector<std::tuple<int, int, int, std::string, std::vector<ValueType>>>
-      time_struct;
+    /**
+     * The current residual norm of the subdomain.
+     */
+    ValueType current_residual_norm = -1.0;
 
-  std::shared_ptr<gko::Array<IndexType>> global_to_local;
+    /**
+     * The minimum residual norm of the subdomain.
+     */
+    ValueType min_residual_norm = -1.0;
 
-  std::shared_ptr<gko::Array<IndexType>> local_to_global;
+    /**
+     * The struct used to measure the timings of each function within the solver
+     * loop.
+     */
+    std::vector<std::tuple<int, int, int, std::string, std::vector<ValueType>>>
+        time_struct;
 
-  std::shared_ptr<gko::Array<IndexType>> overlap_row;
+    /**
+     * The mapping containing the global to local indices.
+     */
+    std::shared_ptr<gko::Array<IndexType>> global_to_local;
 
-  std::shared_ptr<gko::Array<IndexType>> first_row;
+    /**
+     * The mapping containing the local to global indices.
+     */
+    std::shared_ptr<gko::Array<IndexType>> local_to_global;
 
-  std::shared_ptr<gko::Array<IndexType>> permutation;
+    /**
+     * The overlap row indices.
+     */
+    std::shared_ptr<gko::Array<IndexType>> overlap_row;
 
-  std::shared_ptr<gko::Array<IndexType>> i_permutation;
+    /**
+     * The starting row of each subdomain in the matrix.
+     */
+    std::shared_ptr<gko::Array<IndexType>> first_row;
+
+    /**
+     * The permutation used for the re-ordering.
+     */
+    std::shared_ptr<gko::Array<IndexType>> permutation;
+
+    /**
+     * The inverse permutation used for the re-ordering.
+     */
+    std::shared_ptr<gko::Array<IndexType>> i_permutation;
 };
 
-#define MEASURE_ELAPSED_FUNC_TIME(_func, _id, _rank, _name, _iter)             \
-  {                                                                            \
-    auto start_time = std::chrono::steady_clock::now();                        \
-    _func;                                                                     \
-    auto elapsed_time = std::chrono::duration<ValueType>(                      \
-        std::chrono::steady_clock::now() - start_time);                        \
-    if (_iter == 0) {                                                          \
-      std::vector<ValueType> temp_vec(1, elapsed_time.count());                \
-      metadata.time_struct.push_back(                                          \
-          std::make_tuple(_id, _rank, _iter, #_name, temp_vec));               \
-    } else {                                                                   \
-      std::get<2>(metadata.time_struct[_id]) = _iter;                          \
-      (std::get<4>(metadata.time_struct[_id]))                                 \
-          .push_back(elapsed_time.count());                                    \
-    }                                                                          \
-  }
-// if (!settings.comm_settings.enable_onesided)                    \
-  //   {                                                                \
-  // }                                                                  \
-  // else                                                               \
-  //   {                                                                \
-  //     _func;                                                         \
-  //     if (_iter == 0)                                                \
-  //       {                                                            \
-  //         std::vector<ValueType> temp_vec(1, -1.0);                  \
-  //         metadata.time_struct.push_back(                            \
-  //           std::make_tuple(_id, _rank, _iter, #_name, temp_vec));   \
-  //       }                                                            \
-  //   }                                                                \
+
+/**
+ * This macro helps to measure the time of each of the functions.
+ */
+#define MEASURE_ELAPSED_FUNC_TIME(_func, _id, _rank, _name, _iter)     \
+    {                                                                  \
+        auto start_time = std::chrono::steady_clock::now();            \
+        _func;                                                         \
+        auto elapsed_time = std::chrono::duration<ValueType>(          \
+            std::chrono::steady_clock::now() - start_time);            \
+        if (_iter == 0) {                                              \
+            std::vector<ValueType> temp_vec(1, elapsed_time.count());  \
+            metadata.time_struct.push_back(                            \
+                std::make_tuple(_id, _rank, _iter, #_name, temp_vec)); \
+        } else {                                                       \
+            std::get<2>(metadata.time_struct[_id]) = _iter;            \
+            (std::get<4>(metadata.time_struct[_id]))                   \
+                .push_back(elapsed_time.count());                      \
+        }                                                              \
+    }
 
 
-#define INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro)                      \
-  template _macro(float, gko::int32);                                          \
-  template _macro(double, gko::int32);                                         \
-  template _macro(float, gko::int64);                                          \
-  template _macro(double, gko::int64);
-
-// #define INSTANTIATE_FOR_EACH_TYPE(_macro)      \
-//   template _macro(float, gko::int32);          \
-//   template _macro(double, gko::int32);         \
-//   template _macro(float, gko::int64);          \
-//   template _macro(double, gko::int64);
-// template _macro(gko::int32, gko::int64);     \
-  // template _macro(gko::int64, gko::int64);     \
-  // template _macro(gko::int64, gko::int32);     \
-  // template _macro(gko::int32, gko::int32);
+#define INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
+    template _macro(float, gko::int32);                   \
+    template _macro(double, gko::int32);                  \
+    template _macro(float, gko::int64);                   \
+    template _macro(double, gko::int64);
 
 // explicit instantiations for SchwarzWrappers
-#define DECLARE_METADATA(ValueType, IndexType)                                 \
-  struct Metadata<ValueType, IndexType>
+#define DECLARE_METADATA(ValueType, IndexType) \
+    struct Metadata<ValueType, IndexType>
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_METADATA);
 #undef DECLARE_METADATA
 
-} // namespace SchwarzWrappers
 
-#endif
-/*----------------------------   settings.hpp ---------------------------*/
+}  // namespace SchwarzWrappers
+
+
+#endif  // settings.hpp

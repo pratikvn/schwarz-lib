@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# TAGS
+GTAGS
+GRTAGS
+GPATH
+
+# build
+build/

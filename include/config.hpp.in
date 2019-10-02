@@ -1,0 +1,20 @@
+#ifndef SCHWARZ_INCLUDE_CONFIG_H
+#define SCHWARZ_INCLUDE_CONFIG_H
+
+// clang-format off
+#define SCHWARZ_USE_METIS @SCHWARZ_BUILD_METIS@
+// clang-format on
+
+// clang-format off
+#define SCHWARZ_USE_CHOLMOD @SCHWARZ_BUILD_CHOLMOD@
+// clang-format on
+
+// clang-format off
+#define SCHWARZ_USE_DEALII @SCHWARZ_BUILD_DEALII@
+// clang-format on
+
+// clang-format off
+#define SCHWARZ_BUILD_CUDA @SCHWARZ_BUILD_CUDA@
+// clang-format on
+
+#endif // SCHWARZ_INCLUDE_CONFIG_H

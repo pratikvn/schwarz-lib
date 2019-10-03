@@ -9,6 +9,7 @@ option(SCHWARZ_BUILD_CHOLMOD "Use the CHOLMOD direct solver" OFF)
 option(SCHWARZ_BUILD_CLANG_TIDY "Use clang-tidy for static checks of code." OFF)
 option(SCHWARZ_BUILD_CUDA "Build the CUDA kernels" OFF)
 option(SCHWARZ_BUILD_DEALII "Build with deal.ii support" OFF)
+option(SCHWARZ_WITH_HWLOC "Build with hwloc support" ON)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -44,7 +45,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/include)
 
-ADD_LIBRARY(schwarz SHARED)
+ADD_LIBRARY(${TARGET} SHARED)
 
 if(SCHWARZ_BUILD_CUDA)
   enable_language(CUDA)
@@ -62,7 +63,7 @@ if(SCHWARZ_BUILD_CUDA)
   
 endif()
 
-TARGET_SOURCES(schwarz PRIVATE 
+TARGET_SOURCES(${TARGET} PRIVATE 
   source/initialization.cpp
   source/communicate.cpp
   source/utils.cpp
@@ -75,7 +76,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.hpp.in
     ${CMAKE_CURRENT_BINARY_DIR}/include/schwarz/config.hpp @ONLY)
 
 if(SCHWARZ_BUILD_CUDA)
-  target_sources(schwarz PRIVATE
+  target_sources(${TARGET} PRIVATE
     source/cuda_gather.cu)
 endif()
 
@@ -101,12 +102,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Mo
 
 find_package(easy_profiler)
 
-find_package(HWLOC)
+if(SCHWARZ_WITH_HWLOC)
+  find_package(HWLOC)
+endif()
 
-# target_compile_options(schwarz PRIVATE "-fext-numeric-literals")
 
 set_target_properties(
-  schwarz PROPERTIES
+  ${TARGET} PROPERTIES
   CXX_STANDARD 14
   CXX_STANDARD_REQUIRED ON
   COMPILE_FLAGS "${WARNING_FLAGS}"
@@ -114,7 +116,7 @@ set_target_properties(
 
 if(CLANG_TIDY_EXE)
   set_target_properties(
-    schwarz PROPERTIES
+    ${TARGET} PROPERTIES
     CXX_CLANG_TIDY "${DO_CLANG_TIDY}"
   )
 endif()
@@ -122,28 +124,34 @@ endif()
 find_package(Ginkgo REQUIRED)
 
 if(SCHWARZ_BUILD_DEALII)
-  TARGET_LINK_LIBRARIES(schwarz dealii)
+  TARGET_LINK_LIBRARIES(${TARGET} dealii)
 endif()
 
 
 if(SCHWARZ_BUILD_METIS)
-TARGET_LINK_LIBRARIES(schwarz metis)
+TARGET_LINK_LIBRARIES(${TARGET} metis)
 endif()
 if(SCHWARZ_BUILD_CHOLMOD)
-  TARGET_LINK_LIBRARIES(schwarz cholmod)
+  TARGET_LINK_LIBRARIES(${TARGET} cholmod)
 endif()
 
-TARGET_LINK_LIBRARIES(schwarz Ginkgo::ginkgo gflags )
+TARGET_LINK_LIBRARIES(${TARGET} Ginkgo::ginkgo gflags )
 
-TARGET_LINK_LIBRARIES(schwarz ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES})
+TARGET_LINK_LIBRARIES(${TARGET} ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES})
 if(SCHWARZ_BUILD_CUDA)
-  target_include_directories(schwarz
+  target_include_directories(${TARGET}
     SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
-  target_link_libraries(schwarz ${CUDA_RUNTIME_LIBS} ${CUBLAS} ${CUSPARSE})
+  target_link_libraries(${TARGET} ${CUDA_RUNTIME_LIBS} ${CUBLAS} ${CUSPARSE})
 endif()
-if(HWLOC_FOUND)
-  TARGET_INCLUDE_DIRECTORIES(schwarz PRIVATE ${HWLOC_INCLUDE_DIRS})
-  TARGET_LINK_LIBRARIES(schwarz ${HWLOC_LIBRARIES})
+
+find_package(OpenMP REQUIRED)
+target_link_libraries(${TARGET} ${OpenMP_CXX_LIBRARIES})
+
+if(SCHWARZ_WITH_HWLOC)
+  if(HWLOC_FOUND)
+    TARGET_INCLUDE_DIRECTORIES(${TARGET} PRIVATE ${HWLOC_INCLUDE_DIRS})
+    TARGET_LINK_LIBRARIES(${TARGET} ${HWLOC_LIBRARIES})
+  endif()
 endif()
 
 if(SCHWARZ_BUILD_BENCHMARKING)
@@ -151,5 +159,5 @@ if(SCHWARZ_BUILD_BENCHMARKING)
 endif()
 
 if(easy_profiler_FOUND)
-  TARGET_LINK_LIBRARIES(schwarz easy_profiler)
+  TARGET_LINK_LIBRARIES(${TARGET} easy_profiler)
 endif()

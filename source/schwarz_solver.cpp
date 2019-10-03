@@ -631,23 +631,11 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
         if (num_recv > 0) {
             this->comm_struct.recv_buffer =
                 vec_vtype::create(settings.executor, gko::dim<2>(num_recv, 1));
-            // for (auto j = 0; j < num_recv; j++)
-            //   {
-            //     this->comm_struct.recv_buffer->get_values()[j] = 0.0;
-            //   }
 
             MPI_Win_create(this->comm_struct.recv_buffer->get_values(),
                            num_recv * sizeof(ValueType), sizeof(ValueType),
                            MPI_INFO_NULL, MPI_COMM_WORLD,
                            &(this->comm_struct.window_buffer));
-            // auto recv_buffer = this->comm_struct.recv_buffer->get_values();
-            // auto recv_buffer_cpu =
-            //   vec_vtype::create(settings.executor->get_master(),
-            //                     gko::dim<2>(num_recv, 1));
-            // comm_struct.neighbors_out = std::shared_ptr<vec_itype>(
-            //   new vec_itype(settings.executor->get_master(),
-            //                 comm_struct.num_neighbors_out),
-            //   std::default_delete<vec_itype>());
             this->comm_struct.windows_from = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
                               this->comm_struct.num_neighbors_in),
@@ -686,14 +674,6 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
         if (num_send > 0) {
             this->comm_struct.send_buffer =
                 vec_vtype::create(settings.executor, gko::dim<2>(num_send, 1));
-            // auto send_buffer = this->comm_struct.send_buffer->get_values();
-            // auto send_buffer_cpu =
-            //   vec_vtype::create(settings.executor->get_master(),
-            //                     gko::dim<2>(num_send, 1));
-            // comm_struct.neighbors_out = std::shared_ptr<vec_itype>(
-            //   new vec_itype(settings.executor->get_master(),
-            //                 comm_struct.num_neighbors_out),
-            //   std::default_delete<vec_itype>());
             this->comm_struct.windows_to = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
                               this->comm_struct.num_neighbors_out),
@@ -738,11 +718,6 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
     auto global_get = comm_struct.global_get->get_data();
 
     // set displacement for the MPI buffer
-    // comm_struct.get_displacements =
-    //   std::shared_ptr<vec_itype>(new
-    //   vec_itype(settings.executor->get_master(),
-    //                                            num_subdomains),
-    //                              std::default_delete<vec_itype>());
     auto get_displacements = comm_struct.get_displacements->get_data();
     get_displacements[0] = 0;
     for (auto j = 0; j < comm_struct.num_neighbors_in; j++) {
@@ -755,11 +730,6 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
         get_displacements[j] += get_displacements[j - 1];
     }
 
-    // comm_struct.put_displacements =
-    //   std::shared_ptr<vec_itype>(new
-    //   vec_itype(settings.executor->get_master(),
-    //                                            num_subdomains),
-    //                              std::default_delete<vec_itype>());
     auto put_displacements = comm_struct.put_displacements->get_data();
     auto mpi_itype = boost::mpi::get_mpi_datatype(get_displacements[0]);
     MPI_Alltoall(get_displacements, 1, mpi_itype, put_displacements, 1,
@@ -775,20 +745,11 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
                        &comm_struct.window_x);
     } else {
         // Twosided
-        // for gpu ? TODO
     }
 
-    // auto local_residual_vector  = this->local_residual_vector;
-    // auto window_residual_vector = this->window_residual_vector;
-    // auto convergence_vector     = this->convergence_vector;
-    // auto convergence_sent       = this->convergence_sent;
-    // auto convergence_local      = this->convergence_local;
-    // auto window_convergence     = this->window_convergence;
 
     if (settings.comm_settings.enable_onesided) {
         // MPI_Alloc_mem ? Custom allocator ?  TODO
-        // residual_vector = vec_vtype::create(settings.executor,
-        // gko::dim<2>(num_subdomains, 1));
         MPI_Win_create(this->local_residual_vector->get_values(),
                        (num_subdomains) * sizeof(ValueType), sizeof(ValueType),
                        MPI_INFO_NULL, MPI_COMM_WORLD,
@@ -811,8 +772,6 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
                        &(this->window_convergence));
     } else {
         // Twosided
-        // residual_vector = vec_vtype::create(settings.executor,
-        // gko::dim<2>(num_subdomains, 1));
     }
 
     if (settings.comm_settings.enable_onesided && num_subdomains > 1) {
@@ -847,9 +806,8 @@ void exchange_boundary_onesided(
     auto local_get = comm_struct.local_get->get_data();
     auto remote_get = comm_struct.remote_get->get_data();
     auto recv_buffer = comm_struct.recv_buffer->get_values();
-
-    auto mpi_vtype =
-        boost::mpi::get_mpi_datatype(local_solution->get_values()[0]);
+    ValueType dummy = 1.0;
+    auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
     if (settings.comm_settings.enable_push) {
         if (settings.comm_settings.enable_push_one_by_one) {
             for (auto p = 0; p < num_neighbors_out; p++) {

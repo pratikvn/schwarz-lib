@@ -5,10 +5,13 @@
 #include <fstream>
 #include <memory>
 
+#include<omp.h>
+
 #include <communicate.hpp>
 #include <initialization.hpp>
 #include <schwarz/config.hpp>
 #include <solve.hpp>
+
 
 #if SCHWARZ_USE_DEALII
 #include <deal.II/lac/sparse_matrix.h>

@@ -1,0 +1,15 @@
+#+TODO: TODO RUNNING PAUSED IDEA QUESTION README WATCHME | DONE CANCELED
+#+ARCHIVE: archive.org::
+
+* MAIN SCHWARZ.
+** General.
+*** TODO Setup the push_one_by_one window to push directly from the solution vector.
+** GPU onesided:
+*** TODO Local_solution needs to be copied to the CPU send buffer and MPI_Put. Use Gather and Scatter operations for the accumulation in exachange_onesided. 
+** CPU threading:
+*** TODO Use threading with pthreads to setup the 1 MPI rank per node and multiple node.
+** Setting affinities:
+*** TODO Setup a HWLOC interface similar to MGPU/Ginkgo to set GPU/CPU affinities.
+
+* EVENT BASED.
+** ? 

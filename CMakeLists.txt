@@ -3,6 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.8)
 
 PROJECT(${TARGET} LANGUAGES C CXX)
 
+option(SCHWARZ_BUILD_BENCHMARKING "Build an example to benchmark the library" ON)
 option(SCHWARZ_BUILD_METIS "Use the METIS partition library" OFF)
 option(SCHWARZ_BUILD_CHOLMOD "Use the CHOLMOD direct solver" OFF)
 option(SCHWARZ_BUILD_CLANG_TIDY "Use clang-tidy for static checks of code." OFF)
@@ -143,6 +144,10 @@ endif()
 if(HWLOC_FOUND)
   TARGET_INCLUDE_DIRECTORIES(schwarz PRIVATE ${HWLOC_INCLUDE_DIRS})
   TARGET_LINK_LIBRARIES(schwarz ${HWLOC_LIBRARIES})
+endif()
+
+if(SCHWARZ_BUILD_BENCHMARKING)
+  add_subdirectory(benchmarking)
 endif()
 
 if(easy_profiler_FOUND)

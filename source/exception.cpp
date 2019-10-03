@@ -1,19 +1,25 @@
-#include <exception.hpp>
-
-#include <schwarz/config.hpp>
 
 #if SCHWARZ_BUILD_CUDA
 #include <cuda_runtime.h>
 #include <cusparse.h>
 #endif
 
+
+#include <schwarz/config.hpp>
+
+
+#include <exception.hpp>
+
+
 #if SCHWARZ_BUILD_CUDA
+
 
 std::string CudaError::get_error(int error_code) {
   std::string name = cudaGetErrorName(static_cast<cudaError>(error_code));
   std::string message = cudaGetErrorString(static_cast<cudaError>(error_code));
   return name + ": " + message;
 }
+
 
 std::string CusparseError::get_error(int error_code) {
 #define SCHWARZ_REGISTER_CUSPARSE_ERROR(error_name)                            \
@@ -32,13 +38,18 @@ std::string CusparseError::get_error(int error_code) {
   return "Unknown error";
 }
 
+
 #else
+
 
 std::string CudaError::get_error(int error_code) {
   return "CUDA not being built.";
 }
 
+
 std::string CusparseError::get_error(int error_code) {
   return "CUDA not being built.";
 }
+
+
 #endif

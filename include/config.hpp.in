@@ -2,19 +2,23 @@
 #define SCHWARZ_INCLUDE_CONFIG_H
 
 // clang-format off
-#define SCHWARZ_USE_METIS @SCHWARZ_BUILD_METIS@
+#define SCHW_HAVE_METIS @SCHWARZ_HAVE_METIS@
 // clang-format on
 
 // clang-format off
-#define SCHWARZ_USE_CHOLMOD @SCHWARZ_BUILD_CHOLMOD@
+#define SCHW_HAVE_CHOLMOD @SCHWARZ_HAVE_CHOLMOD@
 // clang-format on
 
 // clang-format off
-#define SCHWARZ_USE_DEALII @SCHWARZ_BUILD_DEALII@
+#define SCHW_HAVE_DEALII @SCHWARZ_HAVE_DEALII@
 // clang-format on
 
 // clang-format off
-#define SCHWARZ_BUILD_CUDA @SCHWARZ_BUILD_CUDA@
+#define SCHW_HAVE_CUDA @SCHWARZ_HAVE_CUDA@
 // clang-format on
 
-#endif // SCHWARZ_INCLUDE_CONFIG_H
+// clang-format off
+#define SCHW_HAVE_HWLOC @SCHWARZ_HAVE_HWLOC@
+// clang-format on
+
+#endif  // SCHWARZ_INCLUDE_CONFIG_H

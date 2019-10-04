@@ -12,7 +12,7 @@
 #include <schwarz/config.hpp>
 
 
-#if SCHWARZ_USE_DEALII
+#if SCHW_HAVE_DEALII
 #include <deal.II/lac/sparse_matrix.h>
 #endif
 
@@ -54,7 +54,7 @@ public:
      */
     void generate_rhs(std::vector<ValueType> &rhs);
 
-#if SCHWARZ_USE_DEALII
+#if SCHW_HAVE_DEALII
     void setup_global_matrix(
         const dealii::SparseMatrix<ValueType> &matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix);

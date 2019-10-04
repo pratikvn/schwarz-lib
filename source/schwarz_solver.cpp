@@ -1,6 +1,8 @@
 
 #include <schwarz/config.hpp>
 
+
+#include <exception_helpers.hpp>
 #include <process_topology.hpp>
 #include <schwarz_solver.hpp>
 #include <utils.hpp>
@@ -31,7 +33,7 @@ SolverBase<ValueType, IndexType>::SolverBase(
         settings.executor = gko::OmpExecutor::create();
     } else if (settings.executor_string == "cuda") {
         int num_devices = 0;
-#if SCHWARZ_BUILD_CUDA
+#if SCHW_HAVE_CUDA
         SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaGetDeviceCount(&num_devices));
 #endif
         if (metadata.my_rank == 0) {
@@ -91,7 +93,7 @@ SolverBase<ValueType, IndexType>::SolverBase(
 }
 
 
-#if SCHWARZ_USE_DEALII
+#if SCHW_HAVE_DEALII
 template <typename ValueType, typename IndexType>
 void SolverBase<ValueType, IndexType>::initialize(
     const dealii::SparseMatrix<ValueType> &matrix,
@@ -113,7 +115,7 @@ void SolverBase<ValueType, IndexType>::initialize()
     if (settings.enable_random_rhs) {
         Initialize<ValueType, IndexType>::generate_rhs(rhs);
     }
-#if SCHWARZ_USE_DEALII
+#if SCHW_HAVE_DEALII
     if (metadata.my_rank == 0 && !settings.explicit_laplacian) {
         std::copy(system_rhs.begin(), system_rhs.begin() + metadata.global_size,
                   rhs.begin());
@@ -124,7 +126,7 @@ void SolverBase<ValueType, IndexType>::initialize()
     if (settings.explicit_laplacian) {
         Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
             metadata.global_size, this->global_matrix);
-#if SCHWARZ_USE_DEALII
+#if SCHW_HAVE_DEALII
     } else {
         Initialize<ValueType, IndexType>::setup_global_matrix(
             matrix, this->global_matrix);
@@ -629,8 +631,8 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     // one-sided
     if (settings.comm_settings.enable_onesided) {
         if (num_recv > 0) {
-            this->comm_struct.recv_buffer =
-                vec_vtype::create(settings.executor, gko::dim<2>(num_recv, 1));
+            this->comm_struct.recv_buffer = vec_vtype::create(
+                settings.executor->get_master(), gko::dim<2>(num_recv, 1));
 
             MPI_Win_create(this->comm_struct.recv_buffer->get_values(),
                            num_recv * sizeof(ValueType), sizeof(ValueType),
@@ -645,8 +647,8 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
                 this->comm_struct.windows_from->get_data()[j] = j;
             }
         } else {
-            this->comm_struct.recv_buffer =
-                vec_vtype::create(settings.executor, gko::dim<2>(1, 1));
+            this->comm_struct.recv_buffer = vec_vtype::create(
+                settings.executor->get_master(), gko::dim<2>(1, 1));
         }
     }
     // two-sided
@@ -672,8 +674,8 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     // one-sided
     if (settings.comm_settings.enable_onesided) {
         if (num_send > 0) {
-            this->comm_struct.send_buffer =
-                vec_vtype::create(settings.executor, gko::dim<2>(num_send, 1));
+            this->comm_struct.send_buffer = vec_vtype::create(
+                settings.executor->get_master(), gko::dim<2>(num_send, 1));
             this->comm_struct.windows_to = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
                               this->comm_struct.num_neighbors_out),
@@ -683,8 +685,8 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
                     j;  // j-th neighbor maped to j-th window
             }
         } else {
-            this->comm_struct.send_buffer =
-                vec_vtype::create(settings.executor, gko::dim<2>(1, 1));
+            this->comm_struct.send_buffer = vec_vtype::create(
+                settings.executor->get_master(), gko::dim<2>(1, 1));
         }
     }
     // two-sided
@@ -738,7 +740,7 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
     // setup windows
     if (settings.comm_settings.enable_onesided) {
         // Onesided
-        // for gpu ? TODO
+        // for gpu ? TODO (DONE) To improve: Win_create on a gpu buffer ?
         MPI_Win_create(main_buffer->get_values(),
                        main_buffer->get_size()[0] * sizeof(ValueType),
                        sizeof(ValueType), MPI_INFO_NULL, MPI_COMM_WORLD,
@@ -790,8 +792,10 @@ void exchange_boundary_onesided(
     struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
+    using vec_vtype = gko::matrix::Dense<ValueType>;
+    using arr = gko::Array<IndexType>;
     // TODO: NOT SETUP FOR GPU, copies from local solution is needs to be copied
-    // to gpu memory.
+    // to gpu memory. (DONE)
     auto num_neighbors_out = comm_struct.num_neighbors_out;
     auto neighbors_out = comm_struct.neighbors_out->get_data();
     auto global_put = comm_struct.global_put->get_data();
@@ -833,9 +837,34 @@ void exchange_boundary_onesided(
             for (auto p = 0; p < num_neighbors_out; p++) {
                 // send
                 if ((global_put[p])[0] > 0) {
-                    for (auto i = 1; i <= (global_put[p])[0]; i++) {
-                        send_buffer[num_put + i - 1] =
-                            local_solution->get_values()[(local_put[p])[i]];
+                    // Evil. Change this. TODO
+                    if (settings.executor_string == "cuda") {
+                        auto tmp_send_buf = vec_vtype::create(
+                            settings.executor,
+                            gko::dim<2>((global_put[p])[0], 1));
+                        auto tmp_idx_s =
+                            arr(settings.executor,
+                                arr::view(settings.executor->get_master(),
+                                          ((global_put)[p])[0],
+                                          &((local_put[p])[1])));
+                        settings.executor->run(
+                            GatherScatter<ValueType, IndexType>(
+                                true, (global_put[p])[0], tmp_idx_s.get_data(),
+                                local_solution->get_values(),
+                                tmp_send_buf->get_values()));
+                        auto cpu_send_buf =
+                            vec_vtype::create(settings.executor->get_master(),
+                                              gko::dim<2>((global_put[p])[0]));
+                        cpu_send_buf->copy_from(tmp_send_buf.get());
+                        for (auto i = 1; i <= (global_put[p])[0]; i++) {
+                            send_buffer[num_put + i - 1] =
+                                cpu_send_buf->get_values()[i - 1];
+                        }
+                    } else {
+                        for (auto i = 1; i <= (global_put[p])[0]; i++) {
+                            send_buffer[num_put + i - 1] =
+                                local_solution->get_values()[(local_put[p])[i]];
+                        }
                     }
                     // use same window for all neighbors
                     MPI_Put(&send_buffer[num_put], (global_put[p])[0],
@@ -857,9 +886,34 @@ void exchange_boundary_onesided(
             int num_get = 0;
             for (auto p = 0; p < num_neighbors_in; p++) {
                 if ((global_get[p])[0] > 0) {
-                    for (auto i = 1; i <= (global_get[p])[0]; i++) {
-                        local_solution->get_values()[(local_get[p])[i]] =
-                            recv_buffer[num_get + i - 1];
+                    // Evil. Change this. TODO
+                    if (settings.executor_string == "cuda") {
+                        auto cpu_recv_buf =
+                            vec_vtype::create(settings.executor->get_master(),
+                                              gko::dim<2>((global_get[p])[0]));
+                        for (auto i = 1; i <= (global_get[p])[0]; i++) {
+                            cpu_recv_buf->get_values()[i - 1] =
+                                recv_buffer[num_get + i - 1];
+                        }
+                        auto tmp_recv_buf = vec_vtype::create(
+                            settings.executor,
+                            gko::dim<2>((global_get[p])[0], 1));
+                        tmp_recv_buf->copy_from(cpu_recv_buf.get());
+                        auto tmp_idx_r =
+                            arr(settings.executor,
+                                arr::view(settings.executor->get_master(),
+                                          ((global_get)[p])[0],
+                                          &((local_get[p])[1])));
+                        settings.executor->run(
+                            GatherScatter<ValueType, IndexType>(
+                                false, (global_get[p])[0], tmp_idx_r.get_data(),
+                                tmp_recv_buf->get_values(),
+                                local_solution->get_values()));
+                    } else {
+                        for (auto i = 1; i <= (global_get[p])[0]; i++) {
+                            local_solution->get_values()[(local_get[p])[i]] =
+                                recv_buffer[num_get + i - 1];
+                        }
                     }
                     num_get += (global_get[p])[0];
                 }

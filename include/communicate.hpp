@@ -14,13 +14,13 @@
 namespace SchwarzWrappers {
 
 
-  /**
-   * The communication class that provides the methods for the communication
-   * between the subdomains.
-   *
-   * @tparam ValueType  The type of the floating point values.
-   * @tparam IndexType  The type of the index type values.
-   */
+/**
+ * The communication class that provides the methods for the communication
+ * between the subdomains.
+ *
+ * @tparam ValueType  The type of the floating point values.
+ * @tparam IndexType  The type of the index type values.
+ */
 template <typename ValueType, typename IndexType>
 class Communicate {
 public:

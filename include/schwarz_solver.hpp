@@ -13,7 +13,7 @@
 #include <solve.hpp>
 
 
-#if SCHWARZ_USE_DEALII
+#if SCHW_HAVE_DEALII
 #include <deal.II/lac/sparse_matrix.h>
 #endif
 
@@ -48,7 +48,7 @@ public:
      */
     SolverBase(Settings &settings, Metadata<ValueType, IndexType> &metadata);
 
-#if SCHWARZ_USE_DEALII
+#if SCHW_HAVE_DEALII
     void initialize(const dealii::SparseMatrix<ValueType> &matrix,
                     const dealii::Vector<ValueType> &system_rhs);
 #else

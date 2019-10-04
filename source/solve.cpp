@@ -63,7 +63,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
          Settings::local_solver_settings::direct_solver_cholmod) ||
         (solver_settings ==
          Settings::local_solver_settings::direct_solver_ginkgo)) {
-#if SCHWARZ_USE_CHOLMOD
+#if SCHW_HAVE_CHOLMOD
         if (metadata.my_rank == 0)
             std::cout << " Local direct factorization with CHOLMOD "
                       << std::endl;
@@ -215,7 +215,7 @@ void Solve<ValueType, IndexType>::local_solve(
         settings.local_solver;
     if (solver_settings ==
         Settings::local_solver_settings::direct_solver_cholmod) {
-#if SCHWARZ_USE_CHOLMOD
+#if SCHW_HAVE_CHOLMOD
         SolverTools::solve_direct_cholmod(settings, metadata, cholmod.settings,
                                           cholmod.L_factor, cholmod.rhs,
                                           local_solution);
@@ -520,7 +520,7 @@ void Solve<ValueType, IndexType>::clear(Settings &settings)
 
     if (settings.local_solver ==
         Settings::local_solver_settings::direct_solver_cholmod) {
-#if SCHWARZ_USE_CHOLMOD
+#if SCHW_HAVE_CHOLMOD
         cholmod_finish(&cholmod.settings);
 #endif
     }

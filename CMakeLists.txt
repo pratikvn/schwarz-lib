@@ -2,6 +2,8 @@ SET(TARGET "schwarz")
 CMAKE_MINIMUM_REQUIRED(VERSION 3.8)
 
 PROJECT(${TARGET} LANGUAGES C CXX)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(SCHWARZ_BUILD_BENCHMARKING "Build an example to benchmark the library" ON)
 option(SCHWARZ_BUILD_METIS "Use the METIS partition library" OFF)
@@ -11,9 +13,12 @@ option(SCHWARZ_BUILD_CUDA "Build the CUDA kernels" OFF)
 option(SCHWARZ_BUILD_DEALII "Build with deal.ii support" OFF)
 option(SCHWARZ_WITH_HWLOC "Build with hwloc support" ON)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# Optional packages
+include(cmake/package_helpers.cmake)
+ginkgo_find_package(gflags gflags FALSE 2.2.2)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
+set(SCHWARZ_HAVE_CHOLMOD 0)
 if(SCHWARZ_BUILD_CHOLMOD)
   if(NOT DEFINED ENV{CHOLMOD_DIR})
     message(SEND_ERROR "Please specify where CHOLMOD has been installed.")
@@ -22,8 +27,10 @@ if(SCHWARZ_BUILD_CHOLMOD)
   set(CHOLMOD_LIBRARY_DIR $ENV{CHOLMOD_DIR}/lib)
   include_directories(${CHOLMOD_INCLUDE_DIR})
   link_directories(${CHOLMOD_LIBRARY_DIR})
+  set(SCHWARZ_HAVE_CHOLMOD 1)
 endif()
 
+set(SCHWARZ_HAVE_METIS 0)
 if(SCHWARZ_BUILD_METIS)
   if(NOT DEFINED ENV{METIS_DIR})
     message(SEND_ERROR "Please specify where METIS has been installed.")
@@ -32,21 +39,22 @@ if(SCHWARZ_BUILD_METIS)
   set(METIS_LIBRARY_DIR $ENV{METIS_DIR}/lib)
   include_directories(${METIS_INCLUDE_DIR})
   link_directories(${METIS_LIBRARY_DIR})
+  set(SCHWARZ_HAVE_METIS 1)
 endif()
 
+set(SCHWARZ_HAVE_DEALII 0)
+if(SCHWARZ_BUILD_DEALII)
+  find_package(dealii)
+  set(SCHWARZ_HAVE_DEALII 1)
+endif()
 
-find_package(MPI REQUIRED)
-include_directories(SYSTEM ${MPI_C_INCLUDE_PATH} ${MPI_CXX_INCLUDE_PATH})
+set(SCHWARZ_HAVE_HWLOC 0)
+if(SCHWARZ_WITH_HWLOC)
+  find_package(HWLOC)
+  set(SCHWARZ_HAVE_HWLOC 1)
+endif()
 
-set(BOOST_ROOT $ENV{BOOST_DIR})
-find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-
-INCLUDE_DIRECTORIES(include)
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/include)
-
-ADD_LIBRARY(${TARGET} SHARED)
-
+set(SCHWARZ_HAVE_CUDA 0)
 if(SCHWARZ_BUILD_CUDA)
   enable_language(CUDA)
   set(CUDA_INCLUDE_DIRS ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
@@ -60,10 +68,27 @@ if(SCHWARZ_BUILD_CUDA)
     HINT ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
   find_library(CUSPARSE cusparse
     HINT ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
-  
+  set(SCHWARZ_HAVE_CUDA 1)
 endif()
 
-TARGET_SOURCES(${TARGET} PRIVATE 
+# Required packages
+
+find_package(Ginkgo REQUIRED)
+
+find_package(MPI REQUIRED)
+include_directories(SYSTEM ${MPI_C_INCLUDE_PATH} ${MPI_CXX_INCLUDE_PATH})
+
+set(BOOST_ROOT $ENV{BOOST_DIR})
+find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+
+INCLUDE_DIRECTORIES(include)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/include)
+
+ADD_LIBRARY(${TARGET} SHARED)
+
+
+TARGET_SOURCES(${TARGET} PRIVATE
   source/initialization.cpp
   source/communicate.cpp
   source/utils.cpp
@@ -80,7 +105,7 @@ if(SCHWARZ_BUILD_CUDA)
     source/cuda_gather.cu)
 endif()
 
-if(USE_CLANG_TIDY)
+if(SCHWARZ_BUILD_CLANG_TIDY)
   find_program(
     CLANG_TIDY_EXE
     NAMES "clang-tidy"
@@ -95,19 +120,9 @@ else()
   set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-checks=*,-fuchsia-default-arguments,-clang-analyzer-alpha.*")
 endif()
 
-include(cmake/package_helpers.cmake)
-ginkgo_find_package(gflags gflags FALSE 2.2.2)
-add_subdirectory(third_party)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
+ADD_SUBDIRECTORY(third_party)
 
-find_package(easy_profiler)
-
-if(SCHWARZ_WITH_HWLOC)
-  find_package(HWLOC)
-endif()
-
-
-set_target_properties(
+SET_TARGET_PROPERTIES(
   ${TARGET} PROPERTIES
   CXX_STANDARD 14
   CXX_STANDARD_REQUIRED ON
@@ -115,37 +130,20 @@ set_target_properties(
   )
 
 if(CLANG_TIDY_EXE)
-  set_target_properties(
+  SET_TARGET_PROPERTIES(
     ${TARGET} PROPERTIES
     CXX_CLANG_TIDY "${DO_CLANG_TIDY}"
   )
 endif()
 
-find_package(Ginkgo REQUIRED)
-
-if(SCHWARZ_BUILD_DEALII)
-  TARGET_LINK_LIBRARIES(${TARGET} dealii)
-endif()
-
-
+# Link optional packages
 if(SCHWARZ_BUILD_METIS)
-TARGET_LINK_LIBRARIES(${TARGET} metis)
+  TARGET_LINK_LIBRARIES(${TARGET} metis)
 endif()
+
 if(SCHWARZ_BUILD_CHOLMOD)
   TARGET_LINK_LIBRARIES(${TARGET} cholmod)
 endif()
-
-TARGET_LINK_LIBRARIES(${TARGET} Ginkgo::ginkgo gflags )
-
-TARGET_LINK_LIBRARIES(${TARGET} ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES})
-if(SCHWARZ_BUILD_CUDA)
-  target_include_directories(${TARGET}
-    SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
-  target_link_libraries(${TARGET} ${CUDA_RUNTIME_LIBS} ${CUBLAS} ${CUSPARSE})
-endif()
-
-find_package(OpenMP REQUIRED)
-target_link_libraries(${TARGET} ${OpenMP_CXX_LIBRARIES})
 
 if(SCHWARZ_WITH_HWLOC)
   if(HWLOC_FOUND)
@@ -154,10 +152,32 @@ if(SCHWARZ_WITH_HWLOC)
   endif()
 endif()
 
-if(SCHWARZ_BUILD_BENCHMARKING)
-  add_subdirectory(benchmarking)
+if(SCHWARZ_BUILD_DEALII)
+  TARGET_LINK_LIBRARIES(${TARGET} dealii)
 endif()
 
-if(easy_profiler_FOUND)
-  TARGET_LINK_LIBRARIES(${TARGET} easy_profiler)
+if(SCHWARZ_BUILD_CUDA)
+  TARGET_INCLUDE_DIRECTORIES(${TARGET}
+    SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
+  TARGET_LINK_LIBRARIES(${TARGET} ${CUDA_RUNTIME_LIBS} ${CUBLAS} ${CUSPARSE})
 endif()
+
+# Link the required packages
+TARGET_LINK_LIBRARIES(${TARGET} Ginkgo::ginkgo)
+
+TARGET_LINK_LIBRARIES(${TARGET} ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES})
+
+find_package(OpenMP REQUIRED)
+TARGET_LINK_LIBRARIES(${TARGET} ${OpenMP_CXX_LIBRARIES})
+
+
+if(SCHWARZ_BUILD_BENCHMARKING)
+  ADD_SUBDIRECTORY(benchmarking)
+  TARGET_LINK_LIBRARIES(${TARGET} gflags)
+endif()
+
+# Set this up properly. TODO
+# find_package(easy_profiler)
+# if(easy_profiler_FOUND)
+#   TARGET_LINK_LIBRARIES(${TARGET} easy_profiler)
+# endif()

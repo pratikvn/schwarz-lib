@@ -6,7 +6,6 @@
 #define process_topology_hpp
 
 #include <errno.h>
-#include <hwloc.h>
 #include <mpi.h>
 #include <omp.h>
 #include <stdio.h>
@@ -16,17 +15,25 @@
 #include <schwarz/config.hpp>
 
 
-#if SCHWARZ_BUILD_CUDA
+#if SCHW_HAVE_HWLOC
+#include <hwloc.h>
+#endif
+
+
+#if SCHW_HAVE_CUDA
 #include <cuda_runtime.h>
 #endif
 
 
 namespace ProcessTopology {
 
-
+#if SCHW_HAVE_HWLOC == 0
+struct hwloc_topology_t;
+#endif
 static void print_children(hwloc_topology_t topology, hwloc_obj_t obj,
                            int depth)
 {
+#if SCHW_HAVE_HWLOC
     char type[32], attr[1024];
     unsigned i;
     hwloc_obj_type_snprintf(type, sizeof(type), obj, 0);
@@ -38,11 +45,13 @@ static void print_children(hwloc_topology_t topology, hwloc_obj_t obj,
     for (i = 0; i < obj->arity; i++) {
         print_children(topology, obj->children[i], depth + 1);
     }
+#endif
 }
 
 void bind_threads_to_process(int local_rank, int local_num_procs,
                              int num_threads)
 {
+#if SCHW_HAVE_HWLOC
     int depth;
     unsigned i, n;
     unsigned long size;
@@ -93,13 +102,14 @@ void bind_threads_to_process(int local_rank, int local_num_procs,
     }
     /* Destroy topology object. */
     hwloc_topology_destroy(topology);
+#endif
 }
 
 
 void bind_gpus_to_process(int &local_rank, int &local_num_procs,
                           int &num_threads)
 {
-#if SCHWARZ_BUILD_CUDA
+#if SCHW_HAVE_CUDA
     SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaSetDevice(local_rank));
     SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaGetLastError());
 #endif

@@ -129,7 +129,6 @@ void PoissonRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
 {
     gko::int32 set_psize =
         FLAGS_set_1d_laplacian_size * FLAGS_set_1d_laplacian_size;
-    // auto executor_string                      = FLAGS_executor;
     SchwarzWrappers::Settings settings(FLAGS_executor);
     SchwarzWrappers::Metadata<ValueType, IndexType> metadata;
     metadata.mpi_communicator = mpi_communicator;

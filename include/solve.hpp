@@ -231,7 +231,7 @@ private:
      */
     std::shared_ptr<gko::solver::UpperTrs<ValueType, IndexType>> U_solver;
 
-#if SCHWARZ_USE_CHOLMOD
+#if SCHW_HAVE_CHOLMOD
     struct cholmod {
         int num_nonzeros;
         int num_rows;

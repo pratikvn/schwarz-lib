@@ -29,7 +29,7 @@ namespace SchwarzWrappers {
  */
 struct Settings {
     /**
-     * The string that contains the executor paradigm.
+     * The string that contains the ginkgo executor paradigm.
      */
     std::string executor_string;
 

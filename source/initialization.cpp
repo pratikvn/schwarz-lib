@@ -43,7 +43,7 @@ void Initialize<ValueType, IndexType>::generate_rhs(std::vector<ValueType> &rhs)
 }
 
 
-#if SCHWARZ_USE_DEALII
+#if SCHW_HAVE_DEALII
 
 
 template <typename ValueType, typename IndexType>

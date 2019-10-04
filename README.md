@@ -43,7 +43,7 @@ Currently implemented features
 
 2. Solving paradigm:
   * Direct:
-  + [ ] Ginkgo (To Fix).
+  + [x] Ginkgo.
   + [x] CHOLMOD.
   * Iterative:
   + [x] Ginkgo.

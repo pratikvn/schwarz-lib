@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define settings_hpp
 
 
+#include <map>
 #include <memory>
 #include <string>
 #include <tuple>
@@ -79,9 +80,8 @@ struct Settings {
     enum partition_settings {
         partition_naive = 0x0,
         partition_metis = 0x1,
-        partition_auto = 0x2,
-        partition_zoltan = 0x3,
-        partition_custom = 0x4
+        partition_zoltan = 0x2,
+        partition_custom = 0x3
     };
     partition_settings partition = partition_settings::partition_naive;
 
@@ -168,7 +168,7 @@ struct Settings {
      */
     struct convergence_settings {
         bool put_all_local_residual_norms = true;
-        bool enable_global_simple_tree = true;
+        bool enable_global_simple_tree = false;
         bool enable_global_check = true;
         bool enable_accumulate = false;
 
@@ -204,33 +204,37 @@ struct Metadata {
     /**
      * The size of the global matrix.
      */
-    IndexType global_size = 0;
+    gko::size_type global_size = 0;
+
+    /**
+     * The size of the 1 dimensional laplacian grid.
+     */
+    gko::size_type oned_laplacian_size = 0;
 
     /**
      * The size of the local subdomain matrix.
      */
-    IndexType local_size = 0;
+    gko::size_type local_size = 0;
 
     /**
      * The size of the local subdomain matrix + the overlap.
      */
-    IndexType local_size_x = 0;
+    gko::size_type local_size_x = 0;
 
     /**
      * The size of the local subdomain matrix + the overlap.
      */
-    IndexType local_size_o = 0;
+    gko::size_type local_size_o = 0;
 
     /**
      * The size of the overlap between the subdomains.
      */
-    IndexType overlap_size = 0;
+    gko::size_type overlap_size = 0;
 
     /**
      * The number of subdomains used within the solver.
      */
-    IndexType num_subdomains = 1;
-
+    gko::size_type num_subdomains = 1;
 
     /**
      * The local rank of the subdomain.
@@ -321,6 +325,12 @@ struct Metadata {
 
 /**
  * This macro helps to measure the time of each of the functions.
+ *
+ * @param _func  The function call to be measured.
+ * @param _id  A unique id for the function.
+ * @parama _rank  The process calling the function.
+ * @param _name  The name of the function as it should appear when printed.
+ * @param _iter  The current iteration number.
  */
 #define MEASURE_ELAPSED_FUNC_TIME(_func, _id, _rank, _name, _iter)     \
     {                                                                  \

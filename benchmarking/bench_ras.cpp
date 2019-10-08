@@ -44,10 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <solve.hpp>
 
 
-DEFINE_uint32(num_iters, 10, "Number of Schwarz iterations");
+DEFINE_uint32(num_iters, 100, "Number of Schwarz iterations");
 DEFINE_double(set_tol, 1e-6, "Tolerance for the Schwarz solver");
 DEFINE_double(local_tol, 1e-12, "Tolerance for the local solver");
-DEFINE_uint32(set_1d_laplacian_size, 0,
+DEFINE_uint32(set_1d_laplacian_size, 16,
               "Problem size for explicit laplacian problem without deal.ii");
 DEFINE_uint32(
     num_refine_cycles, 1,
@@ -65,7 +65,7 @@ DEFINE_bool(enable_comm_overlap, false,
 DEFINE_bool(enable_global_check, false,
             "Use the global convergence check for twosided");
 DEFINE_bool(enable_global_tree_check, false,
-            "Use the global convergence check for twosided");
+            "Use the global convergence tree check for onesided");
 DEFINE_bool(explicit_laplacian, false,
             "Use the explicit laplacian instead of deal.ii's matrix");
 DEFINE_bool(enable_random_rhs, false,
@@ -98,23 +98,23 @@ void initialize_argument_parsing(int *argc, char **argv[])
 
 
 template <typename ValueType, typename IndexType>
-class PoissonRas {
+class BenchRas {
 public:
     void run();
 
 private:
     void solve(MPI_Comm mpi_communicator);
     void write_timings(
-        std::vector<std::tuple<int, int, int, std::string, std::vector<double>>>
-            &time_struct,
+        std::vector<std::tuple<int, int, int, std::string,
+                               std::vector<ValueType>>> &time_struct,
         std::string filename);
     int get_local_rank(MPI_Comm mpi_communicator);
 };
 
 
 template <typename ValueType, typename IndexType>
-void PoissonRas<ValueType, IndexType>::write_timings(
-    std::vector<std::tuple<int, int, int, std::string, std::vector<double>>>
+void BenchRas<ValueType, IndexType>::write_timings(
+    std::vector<std::tuple<int, int, int, std::string, std::vector<ValueType>>>
         &time_struct,
     std::string filename)
 {
@@ -125,7 +125,7 @@ void PoissonRas<ValueType, IndexType>::write_timings(
                   std::get<4>(time_struct[id]).end());
     file << "func,total,avg,min,med,max\n";
     for (auto id = 0; id < time_struct.size(); id++) {
-        double total_time =
+        ValueType total_time =
             std::accumulate(std::get<4>(time_struct[id]).begin(),
                             std::get<4>(time_struct[id]).end(), 0.0);
         file << std::get<3>(time_struct[id]) << "," << total_time << ","
@@ -145,7 +145,7 @@ void PoissonRas<ValueType, IndexType>::write_timings(
 
 
 template <typename ValueType, typename IndexType>
-int PoissonRas<ValueType, IndexType>::get_local_rank(MPI_Comm mpi_communicator)
+int BenchRas<ValueType, IndexType>::get_local_rank(MPI_Comm mpi_communicator)
 {
     MPI_Comm local_comm;
     int rank;
@@ -155,26 +155,50 @@ int PoissonRas<ValueType, IndexType>::get_local_rank(MPI_Comm mpi_communicator)
     return rank;
 }
 
+
 template <typename ValueType, typename IndexType>
-void PoissonRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
+void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
 {
-    gko::int32 set_psize =
-        FLAGS_set_1d_laplacian_size * FLAGS_set_1d_laplacian_size;
-    SchwarzWrappers::Settings settings(FLAGS_executor);
     SchwarzWrappers::Metadata<ValueType, IndexType> metadata;
+    SchwarzWrappers::Settings settings(FLAGS_executor);
+
+    // Set solver metadata from command line args.
     metadata.mpi_communicator = mpi_communicator;
+    MPI_Comm_rank(metadata.mpi_communicator, &metadata.my_rank);
+    MPI_Comm_size(metadata.mpi_communicator, &metadata.comm_size);
+    metadata.local_solver_tolerance = FLAGS_local_tol;
+    metadata.tolerance = FLAGS_set_tol;
+    metadata.max_iters = FLAGS_num_iters;
+    metadata.num_subdomains = metadata.comm_size;
+    metadata.num_threads = FLAGS_num_threads;
+    metadata.oned_laplacian_size = FLAGS_set_1d_laplacian_size;
+    metadata.global_size = metadata.oned_laplacian_size * metadata.oned_laplacian_size;
+
+    // Set solver settings from command line args.
+    // Comm settings
     settings.comm_settings.enable_onesided = FLAGS_enable_onesided;
     settings.comm_settings.enable_push_one_by_one =
         FLAGS_enable_push_one_by_one;
     settings.comm_settings.enable_overlap = FLAGS_enable_comm_overlap;
-    metadata.local_solver_tolerance = FLAGS_local_tol;
-    settings.executor_string = FLAGS_executor;
     if (FLAGS_enable_flush == "flush_all") {
         settings.comm_settings.enable_flush_all = true;
     } else if (FLAGS_enable_flush == "flush_local") {
         settings.comm_settings.enable_flush_all = false;
         settings.comm_settings.enable_flush_local = true;
     }
+    // Convergence settings
+    settings.convergence_settings.put_all_local_residual_norms =
+        FLAGS_enable_put_all_local_residual_norms;
+    settings.convergence_settings.enable_global_check =
+        FLAGS_enable_global_check;
+    settings.convergence_settings.enable_global_simple_tree =
+        FLAGS_enable_global_tree_check;
+
+    // General solver settings
+    settings.explicit_laplacian = FLAGS_explicit_laplacian;
+    settings.enable_random_rhs = FLAGS_enable_random_rhs;
+    settings.overlap = FLAGS_overlap;
+    settings.naturally_ordered_factor = FLAGS_factor_ordering_natural;
     if (FLAGS_partition == "metis") {
         settings.partition =
             SchwarzWrappers::Settings::partition_settings::partition_metis;
@@ -192,35 +216,13 @@ void PoissonRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
         settings.local_solver = SchwarzWrappers::Settings::
             local_solver_settings::direct_solver_ginkgo;
     }
-    settings.convergence_settings.put_all_local_residual_norms =
-        FLAGS_enable_put_all_local_residual_norms;
-    settings.explicit_laplacian = FLAGS_explicit_laplacian;
-    settings.enable_random_rhs = FLAGS_enable_random_rhs;
-    settings.convergence_settings.enable_global_check =
-        FLAGS_enable_global_check;
-    settings.convergence_settings.enable_global_simple_tree =
-        FLAGS_enable_global_tree_check;
-    metadata.tolerance = FLAGS_set_tol;
-    metadata.max_iters = FLAGS_num_iters;
-    MPI_Comm_rank(metadata.mpi_communicator, &metadata.my_rank);
-    MPI_Comm_size(metadata.mpi_communicator, &metadata.comm_size);
-    settings.overlap = FLAGS_overlap;
-    settings.naturally_ordered_factor = FLAGS_factor_ordering_natural;
-    metadata.num_subdomains = metadata.comm_size;
-    metadata.num_threads = FLAGS_num_threads;
-    if (set_psize == 0) {
-        SCHWARZ_NOT_IMPLEMENTED;
-    } else {
-        metadata.global_size = set_psize;
-    }
 
+    // The global solution vector to be passed in to the RAS solver.
     std::shared_ptr<gko::matrix::Dense<ValueType>> explicit_laplacian_solution =
         gko::matrix::Dense<ValueType>::create(
             settings.executor->get_master(),
             gko::dim<2>(metadata.global_size, 1));
 
-    auto mpi_itype = boost::mpi::get_mpi_datatype(metadata.global_size);
-    MPI_Bcast(&metadata.global_size, 1, mpi_itype, 0, MPI_COMM_WORLD);
     if (metadata.my_rank == 0) {
         std::cout << " Running on the " << FLAGS_executor << " executor on "
                   << metadata.num_subdomains << " ranks with "
@@ -239,18 +241,9 @@ void PoissonRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
 
 
 template <typename ValueType, typename IndexType>
-void PoissonRas<ValueType, IndexType>::run()
+void BenchRas<ValueType, IndexType>::run()
 {
-    MPI_Init(NULL, NULL);
-
-    int num_cycles = FLAGS_num_refine_cycles;
-    int mpi_size, mpi_rank;
-    MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
-    MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
-
     solve(MPI_COMM_WORLD);
-
-    MPI_Finalize();
 }
 
 
@@ -258,8 +251,10 @@ int main(int argc, char *argv[])
 {
     try {
         initialize_argument_parsing(&argc, &argv);
-        PoissonRas<double, int> laplace_problem_2d;
+        BenchRas<double, int> laplace_problem_2d;
+        MPI_Init(&argc, &argv);
         laplace_problem_2d.run();
+        MPI_Finalize();
     } catch (std::exception &exc) {
         std::cerr << std::endl
                   << std::endl

@@ -17,10 +17,10 @@ The executable is run in the following fashion:
 
 Where `[FLAGS]` are the options below with the template [`flag_name [type][default_value]`]. For example, to set the number of iterations of the RAS solver to 100 one would add `--num_iters=100` to the executable command above.
 
-* `num_iters` [uint32][10] : The number of outer iterations for the RAS solver.
+* `num_iters` [uint32][100] : The number of outer iterations for the RAS solver.
 * `set_tol` [double][1e-6] : The Outer tolerance for the RAS solver.
 * `local_tol` [double][1e-12] : The Inner tolerance for the local iterative solver.
-* `set_1d_laplacian_size`[uint32][0] : The number of grid points in one dimension for the 2D laplacian problem.
+* `set_1d_laplacian_size`[uint32][16] : The number of grid points in one dimension for the 2D laplacian problem.
 * `num_refine_cycles` [uint32][1][disabled] : The number of refinement cycles when used with `deal.ii`.
 * `enable_onesided` [bool][false] : Enable the onesided asynchronous communication.
 * `enable_twosided` [bool][true] : Enable the twosided asynchronous communication. A dummy flag.

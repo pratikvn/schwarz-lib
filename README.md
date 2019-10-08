@@ -73,3 +73,6 @@ Any of the implemented features can be permuted and tested.
 
 
 For installing and building, please check the [Installation page](./INSTALL.md)
+
+
+Credits: This code is a refactoring(rewritten in C++, with additions) of the code from Ichitaro Yamazaki, ICL, UTK.

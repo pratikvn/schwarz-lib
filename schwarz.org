@@ -4,8 +4,14 @@
 * MAIN SCHWARZ.
 ** General.
 *** TODO Setup the push_one_by_one window to push directly from the solution vector.
+*** TODO MPI_Init_thread ? 
+*** BUGS: 
+**** TODO onesided global tree checking has a bug.
+*** OPTI:
+**** TODO See if it is possible to directly communicate from the local vectors instead of gathering to the sol vec using the local_to_global function.
+**** TODO GPU: Local_solution needs to be copied to the CPU send buffer and MPI_Put. Use Gather and Scatter operations for the accumulation in exachange_onesided. 
 ** GPU onesided:
-*** TODO Local_solution needs to be copied to the CPU send buffer and MPI_Put. Use Gather and Scatter operations for the accumulation in exachange_onesided. 
+*** TODO Check the tolerance checking if the squared tolerance needs to be passed in, especially in one-sided. 
 ** CPU threading:
 *** TODO Use threading with pthreads to setup the 1 MPI rank per node and multiple node.
 ** Setting affinities:

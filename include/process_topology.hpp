@@ -39,10 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define process_topology_hpp
 
 #include <errno.h>
-#include <mpi.h>
-#include <omp.h>
 #include <stdio.h>
 #include <string.h>
+
+
+#include <mpi.h>
+#include <omp.h>
 
 
 #include <schwarz/config.hpp>
@@ -60,9 +62,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace ProcessTopology {
 
+
 #if SCHW_HAVE_HWLOC == 0
 struct hwloc_topology_t;
 #endif
+
 static void print_children(hwloc_topology_t topology, hwloc_obj_t obj,
                            int depth)
 {

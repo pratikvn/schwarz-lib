@@ -1,6 +1,46 @@
 
 
+/*******************************<SCHWARZ LIB LICENSE>***********************
+Copyright (c) 2019, the SCHWARZ LIB authors
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+******************************<SCHWARZ LIB LICENSE>*************************/
+
+
 #include <schwarz/config.hpp>
+
+
+#include <map>
+#include <vector>
+
+
+#include <mpi.h>
 
 
 #include <exception_helpers.hpp>
@@ -144,105 +184,71 @@ void Initialize<ValueType, IndexType>::setup_global_matrix(
 #endif
 
 
+inline gko::size_type linearize_index(const gko::size_type row,
+                                      const gko::size_type col,
+                                      const gko::size_type num_rows)
+{
+    return (row)*num_rows + col;
+}
+
+
 template <typename ValueType, typename IndexType>
 void Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
-    const IndexType &global_size,
+    const gko::size_type &oned_laplacian_size,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix)
 {
     using index_type = IndexType;
     using value_type = ValueType;
     using mtx = gko::matrix::Csr<value_type, index_type>;
-    auto metadata = this->metadata;
+    gko::size_type global_size = oned_laplacian_size * oned_laplacian_size;
 
     global_matrix = mtx::create(settings.executor->get_master(),
                                 gko::dim<2>(global_size), 5 * global_size);
-    std::shared_ptr<mtx> global_matrix_compute;
-    global_matrix_compute =
-        mtx::create(settings.executor->get_master(), gko::dim<2>(global_size),
-                    5 * global_size);
-    value_type *val = global_matrix_compute->get_values();
-    index_type *row = global_matrix_compute->get_row_ptrs();
-    index_type *col = global_matrix_compute->get_col_idxs();
+    value_type *values = global_matrix->get_values();
+    index_type *row_ptrs = global_matrix->get_row_ptrs();
+    index_type *col_idxs = global_matrix->get_col_idxs();
 
-    index_type nx = std::sqrt(global_size);
-    auto ny = nx;
-    auto nnz = 0;
-    row[0] = 0;
-    for (auto i = 0; i < nx; i++) {
-        /* diagonal */
-        val[nnz] = 4.0;
-        col[nnz] = i * ny;
-        nnz++;
-        /* next-neighbor */
-        val[nnz] = -1.0;
-        col[nnz] = i * ny + 1;
-        nnz++;
-        /* down-neighbor */
-        if (i < nx - 1) {
-            val[nnz] = -1.0;
-            col[nnz] = i * ny + ny;
-            nnz++;
+    std::vector<gko::size_type> exclusion_set;
+
+    std::map<IndexType, ValueType> stencil_map = {
+        {-oned_laplacian_size, -1}, {-1, -1}, {0, 4}, {1, -1},
+        {oned_laplacian_size, -1},
+    };
+    for (auto i = 2; i < global_size; ++i) {
+        gko::size_type index = (i - 1) * oned_laplacian_size;
+        if (index * index < global_size * global_size) {
+            exclusion_set.push_back(
+                linearize_index(index, index - 1, global_size));
+            exclusion_set.push_back(
+                linearize_index(index - 1, index, global_size));
         }
-        /* up-neighbor */
-        if (i > 0) {
-            val[nnz] = -1.0;
-            col[nnz] = i * ny - ny;
-            nnz++;
-        }
-        /* update ptr */
-        row[i * ny + 1] = nnz;
-        for (auto j = 1; j < ny - 1; j++) {
-            /* diagonal */
-            val[nnz] = 4.0;
-            col[nnz] = i * ny + j;
-            nnz++;
-            /* prev-neighbor */
-            val[nnz] = -1.0;
-            col[nnz] = i * ny + j - 1;
-            nnz++;
-            /* next-neighbor */
-            val[nnz] = -1.0;
-            col[nnz] = i * ny + j + 1;
-            nnz++;
-            /* down-neighbor */
-            if (i < nx - 1) {
-                val[nnz] = -1.0;
-                col[nnz] = i * ny + j + ny;
-                nnz++;
-            }
-            /* up-neighbor */
-            if (i > 0) {
-                val[nnz] = -1.0;
-                col[nnz] = i * ny + j - ny;
-                nnz++;
-            }
-            /* update ptr */
-            row[i * ny + j + 1] = nnz;
-        }
-        /* diagonal */
-        val[nnz] = 4.0;
-        col[nnz] = i * ny + ny - 1;
-        nnz++;
-        /* prev-neighbor */
-        val[nnz] = -1.0;
-        col[nnz] = i * ny + ny - 2;
-        nnz++;
-        /* down-neighbor */
-        if (i < nx - 1) {
-            val[nnz] = -1.0;
-            col[nnz] = i * ny + ny + ny - 1;
-            nnz++;
-        }
-        /* up-neighbor */
-        if (i > 0) {
-            val[nnz] = -1.0;
-            col[nnz] = i * ny - 1;
-            nnz++;
-        }
-        /* update ptr */
-        row[i * ny + ny] = nnz;
     }
-    global_matrix->copy_from(global_matrix_compute.get());
+
+    std::sort(exclusion_set.begin(),
+              exclusion_set.begin() + exclusion_set.size());
+
+    IndexType pos = 0;
+    IndexType col_idx = 0;
+    row_ptrs[0] = pos;
+    gko::size_type cur_idx = 0;
+    for (IndexType i = 0; i < global_size; ++i) {
+        for (auto ofs : stencil_map) {
+            auto in_exclusion_flag =
+                (exclusion_set[cur_idx] ==
+                 linearize_index(i, i + ofs.first, global_size));
+            if (0 <= i + ofs.first && i + ofs.first < global_size &&
+                !in_exclusion_flag) {
+                values[pos] = ofs.second;
+                col_idxs[pos] = i + ofs.first;
+                ++pos;
+            }
+            if (in_exclusion_flag) {
+                cur_idx++;
+            }
+            col_idx = row_ptrs[i + 1] - pos;
+        }
+        row_ptrs[i + 1] = pos;
+    }
 }
 
 
@@ -259,8 +265,7 @@ void Initialize<ValueType, IndexType>::partition(
             (Settings::partition_settings::partition_zoltan |
              Settings::partition_settings::partition_metis |
              Settings::partition_settings::partition_naive |
-             Settings::partition_settings::partition_custom |
-             Settings::partition_settings::partition_auto) &
+             Settings::partition_settings::partition_custom) &
             settings.partition;
 
         if (partition_settings ==
@@ -268,16 +273,23 @@ void Initialize<ValueType, IndexType>::partition(
             SCHWARZ_NOT_IMPLEMENTED;
         } else if (partition_settings ==
                    Settings::partition_settings::partition_metis) {
+            if (metadata.my_rank == 0) {
+                std::cout << " METIS partition" << std::endl;
+            }
             PartitionTools::PartitionMetis(global_matrix, this->cell_weights,
                                            metadata.num_subdomains,
                                            partition_indices);
         } else if (partition_settings ==
                    Settings::partition_settings::partition_naive) {
+            if (metadata.my_rank == 0) {
+                std::cout << " 1D even partition" << std::endl;
+            }
             PartitionTools::PartitionNaive(
                 global_matrix, metadata.num_subdomains, partition_indices);
         } else if (partition_settings ==
                    Settings::partition_settings::partition_custom) {
             // User partitions mesh manually
+            SCHWARZ_NOT_IMPLEMENTED;
         } else {
             SCHWARZ_NOT_IMPLEMENTED;
         }
@@ -297,23 +309,24 @@ void Initialize<ValueType, IndexType>::setup_vectors(
     using vec = gko::matrix::Dense<ValueType>;
     auto my_rank = metadata.my_rank;
     auto first_row = metadata.first_row->get_data()[my_rank];
-    auto global_size = static_cast<gko::size_type>(metadata.global_size);
-    auto local_size_x = static_cast<gko::size_type>(metadata.local_size_x);
 
+    // Copy the global rhs vector to the required executor.
     gko::Array<ValueType> temp_rhs{settings.executor->get_master(), rhs.begin(),
                                    rhs.end()};
-    global_rhs = vec::create(settings.executor, gko::dim<2>{global_size, 1},
-                             temp_rhs, 1);
+    global_rhs = vec::create(settings.executor,
+                             gko::dim<2>{metadata.global_size, 1}, temp_rhs, 1);
     global_solution = vec::create(settings.executor->get_master(),
-                                  gko::dim<2>(global_size, 1));
+                                  gko::dim<2>(metadata.global_size, 1));
 
-    local_rhs = vec::create(settings.executor, gko::dim<2>(local_size_x, 1));
-
+    local_rhs =
+        vec::create(settings.executor, gko::dim<2>(metadata.local_size_x, 1));
+    // Extract the local rhs from the global rhs. Also takes into account the
+    // overlap.
     SolverTools::extract_local_vector(settings, metadata, local_rhs, global_rhs,
                                       first_row);
 
     local_solution =
-        vec::create(settings.executor, gko::dim<2>(local_size_x, 1));
+        vec::create(settings.executor, gko::dim<2>(metadata.local_size_x, 1));
 }
 
 

@@ -58,7 +58,8 @@ namespace SchwarzWrappers {
 
 
 /**
- * The initialization class that provides methods for initialization of the solver.
+ * The initialization class that provides methods for initialization of the
+ * solver.
  *
  * @tparam ValueType  The type of the floating point values.
  * @tparam IndexType  The type of the index type values.
@@ -96,11 +97,11 @@ public:
     /**
      * Generates the 2D global laplacian matrix.
      *
-     * @param global_size  The size of the matrix.
+     * @param oned_laplacian_size  The size of the one d laplacian grid.
      * @param global_matrix  The global matrix.
      */
     void setup_global_matrix_laplacian(
-        const IndexType &global_size,
+        const gko::size_type &oned_laplacian_size,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix);
 
     /**

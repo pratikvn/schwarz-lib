@@ -156,7 +156,7 @@ protected:
             &local_matrix,
         ValueType &local_residual_norm, ValueType &local_residual_norm0,
         ValueType &global_residual_norm, ValueType &global_residual_norm0,
-        IndexType &num_converged_procs);
+        int &num_converged_procs);
 
     /**
      * Checks if global convergence has been achieved.

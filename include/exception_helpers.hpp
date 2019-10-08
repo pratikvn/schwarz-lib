@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /**
- * Asserts that a feature or module has not yet been imeplemented.
+ * Asserts that a feature or module has not yet been implemented.
  *
  * @param _cuda_call  a library call expression
  */

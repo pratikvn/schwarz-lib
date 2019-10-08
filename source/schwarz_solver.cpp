@@ -51,6 +51,9 @@ SolverBase<ValueType, IndexType>::SolverBase(
       settings(settings),
       metadata(metadata)
 {
+    using vec_itype = gko::Array<IndexType>;
+    using vec_vecshared = gko::Array<IndexType *>;
+
     auto local_rank =
         Utils<ValueType, IndexType>::get_local_rank(metadata.mpi_communicator);
     auto local_num_procs = Utils<ValueType, IndexType>::get_local_num_procs(
@@ -62,16 +65,25 @@ SolverBase<ValueType, IndexType>::SolverBase(
         ProcessTopology::bind_gpus_to_process(local_rank, local_num_procs,
                                               metadata.num_threads);
     }
+
     if (settings.executor_string == "omp") {
         settings.executor = gko::OmpExecutor::create();
     } else if (settings.executor_string == "cuda") {
         int num_devices = 0;
 #if SCHW_HAVE_CUDA
         SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaGetDeviceCount(&num_devices));
+#else
+        SCHWARZ_NOT_IMPLEMENTED;
 #endif
-        if (metadata.my_rank == 0) {
-            std::cout << " Number of available devices: " << num_devices
-                      << std::endl;
+        if (num_devices > 0) {
+            if (metadata.my_rank == 0) {
+                std::cout << " Number of available devices: " << num_devices
+                          << std::endl;
+            }
+        } else {
+            std::cout << " No CUDA devices available for rank "
+                      << metadata.my_rank << std::endl;
+            std::exit(-1);
         }
         settings.executor =
             gko::CudaExecutor::create(local_rank, gko::OmpExecutor::create());
@@ -85,16 +97,20 @@ SolverBase<ValueType, IndexType>::SolverBase(
         settings.executor = gko::ReferenceExecutor::create();
     }
 
-    using vec_itype = gko::Array<IndexType>;
-    using vec_vecshared = gko::Array<IndexType *>;
-
     auto my_rank = this->metadata.my_rank;
     auto comm_size = this->metadata.comm_size;
     auto num_subdomains = this->metadata.num_subdomains;
     auto global_size = this->metadata.global_size;
 
+    // Some arrays for partitioning and local matrix creation.
     metadata.first_row = std::shared_ptr<vec_itype>(
         new vec_itype(settings.executor->get_master(), num_subdomains + 1),
+        std::default_delete<vec_itype>());
+    metadata.permutation = std::shared_ptr<vec_itype>(
+        new vec_itype(settings.executor->get_master(), global_size),
+        std::default_delete<vec_itype>());
+    metadata.i_permutation = std::shared_ptr<vec_itype>(
+        new vec_itype(settings.executor->get_master(), global_size),
         std::default_delete<vec_itype>());
     metadata.global_to_local = std::shared_ptr<vec_itype>(
         new vec_itype(settings.executor->get_master(), global_size),
@@ -102,6 +118,8 @@ SolverBase<ValueType, IndexType>::SolverBase(
     metadata.local_to_global = std::shared_ptr<vec_itype>(
         new vec_itype(settings.executor->get_master(), global_size),
         std::default_delete<vec_itype>());
+
+    // Some arrays for communication.
     comm_struct.neighbors_in = std::shared_ptr<vec_itype>(
         new vec_itype(settings.executor->get_master(), num_subdomains),
         std::default_delete<vec_itype>());
@@ -114,6 +132,7 @@ SolverBase<ValueType, IndexType>::SolverBase(
     comm_struct.global_put = std::shared_ptr<vec_vecshared>(
         new vec_vecshared(settings.executor->get_master(), num_subdomains),
         std::default_delete<vec_vecshared>());
+    // Need this to initialize the arrays with zeros.
     std::vector<IndexType> temp(num_subdomains + 1, 0);
     comm_struct.get_displacements = std::shared_ptr<vec_itype>(
         new vec_itype(settings.executor->get_master(), temp.begin(),
@@ -138,15 +157,16 @@ void SolverBase<ValueType, IndexType>::initialize()
 {
 #endif
     using vec_vtype = gko::matrix::Dense<ValueType>;
-    MPI_Comm_rank(metadata.mpi_communicator, &metadata.my_rank);
-    MPI_Comm_size(metadata.mpi_communicator, &metadata.comm_size);
-    metadata.num_subdomains = metadata.comm_size;
 
-    auto mpi_itype = boost::mpi::get_mpi_datatype(metadata.global_size);
-    MPI_Bcast(&metadata.global_size, 1, mpi_itype, 0, MPI_COMM_WORLD);
+    // Setup the right hand side vector.
     std::vector<ValueType> rhs(metadata.global_size, 1.0);
-    if (settings.enable_random_rhs) {
-        Initialize<ValueType, IndexType>::generate_rhs(rhs);
+    if (settings.enable_random_rhs && settings.explicit_laplacian) {
+        if (metadata.my_rank == 0) {
+            Initialize<ValueType, IndexType>::generate_rhs(rhs);
+        }
+        auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
+        MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
+                  MPI_COMM_WORLD);
     }
 #if SCHW_HAVE_DEALII
     if (metadata.my_rank == 0 && !settings.explicit_laplacian) {
@@ -154,23 +174,26 @@ void SolverBase<ValueType, IndexType>::initialize()
                   rhs.begin());
     }
 #endif
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
-    MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0, MPI_COMM_WORLD);
+
+    // Setup the global matrix
     if (settings.explicit_laplacian) {
         Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
-            metadata.global_size, this->global_matrix);
+            metadata.oned_laplacian_size, this->global_matrix);
 #if SCHW_HAVE_DEALII
     } else {
         Initialize<ValueType, IndexType>::setup_global_matrix(
             matrix, this->global_matrix);
 #endif
     }
+    // Partition the global matrix.
     Initialize<ValueType, IndexType>::partition(
         settings, metadata, this->global_matrix, this->partition_indices);
 
+    // Setup the local matrices on each of the subddomains.
     this->setup_local_matrices(this->settings, this->metadata,
                                this->partition_indices, this->global_matrix,
                                this->local_matrix, this->interface_matrix);
+    // Debug to print matrices.
     if (settings.print_matrices && settings.executor_string != "cuda") {
         Utils<ValueType, IndexType>::print_matrix(
             this->local_matrix.get(), metadata.my_rank, "local_mat");
@@ -178,13 +201,17 @@ void SolverBase<ValueType, IndexType>::initialize()
                                                   metadata.my_rank, "int_mat");
     }
 
+    // Setup the local vectors on each of the subddomains.
     Initialize<ValueType, IndexType>::setup_vectors(
         this->settings, this->metadata, rhs, this->local_rhs, this->global_rhs,
         this->local_solution, this->global_solution);
 
+    // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
         this->settings, metadata, this->local_matrix, this->triangular_factor,
         this->local_rhs);
+
+    // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
 
@@ -194,14 +221,16 @@ void SolverBase<ValueType, IndexType>::run(
     std::shared_ptr<gko::matrix::Dense<ValueType>> &solution)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
-
+    // The main solution vector
     std::shared_ptr<vec_vtype> solution_vector = vec_vtype::create(
         settings.executor, gko::dim<2>(metadata.global_size, 1));
+    // A temp local solution
     std::shared_ptr<vec_vtype> temp_loc_solution =
         vec_vtype::create(settings.executor, this->local_solution->get_size());
+    // A global gathered solution of the previous iteration.
     std::shared_ptr<vec_vtype> global_old_solution = vec_vtype::create(
         settings.executor, gko::dim<2>(metadata.global_size, 1));
-
+    // Setup the windows for the onesided communication.
     this->setup_windows(settings, metadata, solution_vector);
 
     const auto solver_settings =
@@ -215,17 +244,23 @@ void SolverBase<ValueType, IndexType>::run(
               global_residual_norm = 0.0, global_residual_norm0 = -1.0;
     metadata.iter_count = 0;
     auto start_time = std::chrono::steady_clock::now();
-    IndexType num_converged_procs = 0;
+    int num_converged_procs = 0;
 
     for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
+        // Exchange the boundary values. The communication part.
         MEASURE_ELAPSED_FUNC_TIME(
             this->exchange_boundary(settings, metadata, solution_vector), 0,
             metadata.my_rank, boundary_exchange, metadata.iter_count);
+
+        // Update the boundary and interior values after the exchanging from
+        // other processes.
         MEASURE_ELAPSED_FUNC_TIME(
             this->update_boundary(settings, metadata, this->local_solution,
                                   this->local_rhs, solution_vector,
                                   global_old_solution, this->interface_matrix),
             1, metadata.my_rank, boundary_update, metadata.iter_count);
+
+        // Check for the convergence of the solver.
         num_converged_procs = 0;
         MEASURE_ELAPSED_FUNC_TIME(
             (Solve<ValueType, IndexType>::check_convergence(
@@ -234,6 +269,9 @@ void SolverBase<ValueType, IndexType>::run(
                 local_residual_norm, local_residual_norm0, global_residual_norm,
                 global_residual_norm0, num_converged_procs)),
             2, metadata.my_rank, convergence_check, metadata.iter_count);
+
+        // break if all processes detect that all other processes have converged
+        // otherwise continue iterations.
         if (num_converged_procs == metadata.num_subdomains) {
             std::cout << " Rank " << metadata.my_rank << " converged in "
                       << metadata.iter_count << " iters " << std::endl;
@@ -245,7 +283,8 @@ void SolverBase<ValueType, IndexType>::run(
                     settings, metadata, this->triangular_factor,
                     temp_loc_solution, this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
-
+            // Gather the local vector into the locally global vector for
+            // communication.
             MEASURE_ELAPSED_FUNC_TIME(
                 (Communicate<ValueType, IndexType>::local_to_global_vector(
                     settings, metadata, this->local_solution, solution_vector)),
@@ -257,6 +296,8 @@ void SolverBase<ValueType, IndexType>::run(
         std::chrono::steady_clock::now() - start_time);
     ValueType mat_norm = -1.0, rhs_norm = -1.0, sol_norm = -1.0,
               residual_norm = -1.0;
+    // Compute the final residual norm. Also gathers the solution from all
+    // subdomains.
     Solve<ValueType, IndexType>::compute_residual_norm(
         settings, metadata, global_matrix, global_rhs, solution_vector,
         mat_norm, rhs_norm, sol_norm, residual_norm);
@@ -315,12 +356,6 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     auto global_to_local = metadata.global_to_local->get_data();
     auto local_to_global = metadata.local_to_global->get_data();
 
-    metadata.permutation = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), global_size),
-        std::default_delete<vec_itype>());
-    metadata.i_permutation = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), global_size),
-        std::default_delete<vec_itype>());
     auto first_row = metadata.first_row->get_data();
     auto permutation = metadata.permutation->get_data();
     auto i_permutation = metadata.i_permutation->get_data();
@@ -329,16 +364,16 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     auto partition_settings = (Settings::partition_settings::partition_zoltan |
                                Settings::partition_settings::partition_metis |
                                Settings::partition_settings::partition_naive |
-                               Settings::partition_settings::partition_custom |
-                               Settings::partition_settings::partition_auto) &
+                               Settings::partition_settings::partition_custom) &
                               settings.partition;
+
+    // default local p size set for 1 subdomain.
+    first_row[0] = 0;
+    for (auto p = 0; p < num_subdomains; ++p) {
+        local_p_size[p] = std::min(global_size - first_row[p], nb);
+        first_row[p + 1] = first_row[p] + local_p_size[p];
+    }
     if (partition_settings == Settings::partition_settings::partition_metis) {
-        if (metadata.my_rank == 0) std::cout << " METIS partition" << std::endl;
-        first_row[0] = 0;
-        for (auto p = 0; p < num_subdomains; ++p) {
-            local_p_size[p] = std::min(global_size - first_row[p], nb);
-            first_row[p + 1] = first_row[p] + local_p_size[p];
-        }
         if (num_subdomains > 1) {
             for (auto p = 0; p < num_subdomains; p++) {
                 local_p_size[p] = 0;
@@ -365,15 +400,8 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
                 i_permutation[permutation[i]] = i;
             }
         }
-    } else {
-        if (metadata.my_rank == 0)
-            std::cout << " 1D even partition" << std::endl;
-        first_row[0] = 0;
-        for (auto p = 0; p < num_subdomains; ++p) {
-            local_p_size[p] = std::min(global_size - first_row[p], nb);
-            first_row[p + 1] = first_row[p] + local_p_size[p];
-        }
     }
+
     IndexType *gmat_row_ptrs = global_matrix->get_row_ptrs();
     IndexType *gmat_col_idxs = global_matrix->get_col_idxs();
     ValueType *gmat_values = global_matrix->get_values();
@@ -428,9 +456,6 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     auto local_size_x = metadata.local_size_x;
 
     metadata.overlap_size = num - metadata.local_size;
-    // TODO: GPU
-    // std::cout << " Here " <<__LINE__ << " rank " << metadata.my_rank <<
-    // std::endl;
     metadata.overlap_row = std::shared_ptr<vec_itype>(
         new vec_itype(gko::Array<IndexType>::view(
             settings.executor, metadata.overlap_size,
@@ -461,7 +486,6 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
         }
     }
 
-    // for gpu ?
     std::shared_ptr<mtx> local_matrix_compute;
     local_matrix_compute = mtx::create(settings.executor->get_master(),
                                        gko::dim<2>(local_size_x), nnz_local);
@@ -509,7 +533,6 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     // Interface matrix
     if (nnz_interface > 0) {
         nnz_interface = 0;
-        // imat_row_ptrs[0] = nnz_interface;
         for (auto k = 0; k < metadata.overlap_size; k++) {
             temp = metadata.overlap_row->get_data()[k];
             for (auto j = gmat_row_ptrs[temp]; j < gmat_row_ptrs[temp + 1];

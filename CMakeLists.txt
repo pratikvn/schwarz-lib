@@ -6,12 +6,12 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(SCHWARZ_BUILD_BENCHMARKING "Build an example to benchmark the library" ON)
-option(SCHWARZ_BUILD_METIS "Use the METIS partition library" OFF)
-option(SCHWARZ_BUILD_CHOLMOD "Use the CHOLMOD direct solver" OFF)
-option(SCHWARZ_BUILD_CLANG_TIDY "Use clang-tidy for static checks of code." OFF)
-option(SCHWARZ_BUILD_CUDA "Build the CUDA kernels" OFF)
-option(SCHWARZ_BUILD_DEALII "Build with deal.ii support" OFF)
+option(SCHWARZ_BUILD_METIS "Use the METIS partition library" ON)
+option(SCHWARZ_BUILD_CHOLMOD "Use the CHOLMOD direct solver" ON)
+option(SCHWARZ_BUILD_CUDA "Build the CUDA kernels" ON)
 option(SCHWARZ_WITH_HWLOC "Build with hwloc support" ON)
+option(SCHWARZ_BUILD_DEALII "Build with deal.ii support" OFF)
+option(SCHWARZ_BUILD_CLANG_TIDY "Use clang-tidy for static checks of code." OFF)
 
 # Optional packages
 include(cmake/package_helpers.cmake)

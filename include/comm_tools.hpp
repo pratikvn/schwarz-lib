@@ -58,9 +58,8 @@ void put_all_local_residual_norms(
     auto l_res_vec = local_residual_vector->get_values();
     auto iter = metadata.iter_count;
     auto mpi_vtype = boost::mpi::get_mpi_datatype(l_res_vec[my_rank]);
-    // TODO: Is this necessary ?
-    // l_res_vec[my_rank] = std::min(l_res_vec[my_rank], local_resnorm);
-    l_res_vec[my_rank] = local_resnorm;
+
+    l_res_vec[my_rank] = std::min(l_res_vec[my_rank], local_resnorm);
     for (auto j = 0; j < num_subdomains; j++) {
         if (j != my_rank && iter > 0 &&
             l_res_vec[my_rank] !=
@@ -95,9 +94,7 @@ void propagate_all_local_residual_norms(
     auto max_valtype = std::numeric_limits<ValueType>::max();
     auto mpi_vtype = boost::mpi::get_mpi_datatype(l_res_vec[my_rank]);
 
-    // TODO: Is this necessary ?
-    // l_res_vec[my_rank] = std::min(l_res_vec[my_rank], local_resnorm);
-    l_res_vec[my_rank] = local_resnorm;
+    l_res_vec[my_rank] = std::min(l_res_vec[my_rank], local_resnorm);
     for (auto i = 0; i < comm_s.num_neighbors_out; i++) {
         if ((global_put[i])[0] > 0) {
             auto p = neighbors_out[i];

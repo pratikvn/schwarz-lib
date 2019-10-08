@@ -93,6 +93,8 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         settings.executor->get_master(),
         gko::dim<2>(metadata.max_iters + 1, metadata.num_subdomains));
 
+    // If direct solver is chosen, then we need to compute a factorization as a
+    // first step. Only the triangular solves are done in the loop.
     if ((solver_settings ==
          Settings::local_solver_settings::direct_solver_cholmod) ||
         (solver_settings ==
@@ -101,7 +103,12 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         if (metadata.my_rank == 0)
             std::cout << " Local direct factorization with CHOLMOD "
                       << std::endl;
+        // CHOLMOD setup.
         cholmod_start(&(cholmod.settings));
+        // Option to not re-order the matrix. This is currently required as we
+        // dont know the ordering from CHOLMOD and if we are using a direct
+        // solver other than CHOLMOD, we need to explictly use the re-ordering
+        // for the rhs as well.
         if (settings.naturally_ordered_factor) {
             cholmod.settings.final_ll = 1;
             cholmod.settings.supernodal = 0;
@@ -115,6 +122,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             cholmod.settings.postorder = 0;
         }
         auto temp_local_matrix = mtx::create(settings.executor->get_master());
+        // Need to copy the matrix back to the CPU for the factorization.
         temp_local_matrix->copy_from(gko::lend(local_matrix));
         auto num_rows = temp_local_matrix->get_size()[0];
         auto num_nonzeros = temp_local_matrix->get_const_row_ptrs()[num_rows];
@@ -128,7 +136,6 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         const IndexType *col_idxs = temp_local_matrix->get_const_col_idxs();
         const ValueType *lmat_values = temp_local_matrix->get_const_values();
 
-        // IndexType *nz = static_cast<IndexType *>(cholmod.system_matrix->nz);
         IndexType *col_ptrs =
             static_cast<IndexType *>(cholmod.system_matrix->p);
         IndexType *row_idxs =
@@ -170,6 +177,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         }
         if (solver_settings ==
             Settings::local_solver_settings::direct_solver_ginkgo) {
+            // Copy the triangular factor to the current executor.
             triangular_factor = mtx::create(
                 settings.executor, gko::dim<2>(num_rows),
                 gko::Array<ValueType>(
@@ -186,6 +194,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             }
             using u_trs = gko::solver::UpperTrs<ValueType, IndexType>;
             using l_trs = gko::solver::LowerTrs<ValueType, IndexType>;
+            // Setup the Ginkgo triangular solver.
             this->U_solver = u_trs::build()
                                  .on(settings.executor)
                                  ->generate((triangular_factor));
@@ -209,6 +218,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             std::cout << " Local iterative solve with Ginkgo CG " << std::endl;
         }
         using cg = gko::solver::Cg<ValueType>;
+        // Setup the Ginkgo iterative CG solver.
         this->solver =
             cg::build()
                 .with_criteria(
@@ -286,7 +296,7 @@ bool Solve<ValueType, IndexType>::check_local_convergence(
     ValueType &local_resnorm, ValueType &local_resnorm0)
 {
     using vec = gko::matrix::Dense<ValueType>;
-    bool pass = false;
+    bool locally_converged = false;
     local_resnorm = -1.0;
     auto tolerance = metadata.tolerance;
     auto one = gko::initialize<vec>({1.0}, settings.executor);
@@ -317,13 +327,12 @@ bool Solve<ValueType, IndexType>::check_local_convergence(
         local_b->compute_norm2(gko::lend(temp));
         cpu_temp->copy_from(gko::lend(temp));
         local_resnorm = cpu_temp->at(0);
-        // local_resnorm = temp->at(0);
 
         if (local_resnorm0 < 0.0) local_resnorm0 = local_resnorm;
 
-        pass = (local_resnorm) / (local_resnorm0) < tolerance;
+        locally_converged = (local_resnorm) / (local_resnorm0) < tolerance;
     }
-    return pass;
+    return locally_converged;
 }
 
 
@@ -341,8 +350,7 @@ void Solve<ValueType, IndexType>::check_global_convergence(
     auto iter = metadata.iter_count;
     auto tolerance = metadata.tolerance;
     auto l_res_vec = this->local_residual_vector->get_values();
-    auto mpi_vtype =
-        boost::mpi::get_mpi_datatype(l_res_vec[0]);  // works for GPU buffers ?
+    auto mpi_vtype = boost::mpi::get_mpi_datatype(l_res_vec[0]);
 
     if (settings.convergence_settings.enable_global_check) {
         if (settings.comm_settings.enable_onesided) {
@@ -431,9 +439,9 @@ void Solve<ValueType, IndexType>::check_convergence(
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
     ValueType &local_residual_norm, ValueType &local_residual_norm0,
     ValueType &global_residual_norm, ValueType &global_residual_norm0,
-    IndexType &num_converged_procs)
+    int &num_converged_procs)
 {
-    auto num_converged_p = 0;
+    int num_converged_p = 0;
     auto tolerance = metadata.tolerance;
     auto iter = metadata.iter_count;
     if (check_local_convergence(settings, metadata, local_solution,
@@ -532,7 +540,6 @@ void Solve<ValueType, IndexType>::compute_residual_norm(
     auto neg_one = gko::initialize<vec>({-1.0}, settings.executor);
 
     global_matrix->apply(neg_one.get(),
-                         // gko::lend(global_sol),
                          gko::lend(solution_vector), one.get(),
                          gko::lend(global_rhs));
 

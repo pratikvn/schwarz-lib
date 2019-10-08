@@ -1,4 +1,3 @@
--
 /*******************************<SCHWARZ LIB LICENSE>***********************
 Copyright (c) 2019, the SCHWARZ LIB authors
 All rights reserved.

@@ -31,44 +31,66 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************<SCHWARZ LIB LICENSE>*************************/
 
-// This is a modified version of the topology example given in
-// the hwloc documentation
-// https://www.open-mpi.org/projects/hwloc/doc/v2.0.4/a00312.php#interface
 
-#ifndef process_topology_hpp
-#define process_topology_hpp
+#ifndef SCHWARZ_DEVICE_GUARD_HPP_
+#define SCHWARZ_DEVICE_GUARD_HPP_
 
 
-#include <mpi.h>
-#include <omp.h>
+#include <exception>
 
-
-#include <ginkgo/ginkgo.hpp>
 #include <schwarz/config.hpp>
-
 
 #if SCHW_HAVE_CUDA
 #include <cuda_runtime.h>
 #endif
 
 
-#include "device_guard.hpp"
+#include <exception_helpers.hpp>
 
 
-namespace ProcessTopology {
+namespace SchwarzWrappers {
 
 
+/**
+ * This class defines a device guard for the cuda functions and the cuda module.
+ * The guard is used to make sure that the device code is run on the correct
+ * cuda device, when run with multiple devices. The class records the current
+ * device id and uses `cudaSetDevice` to set the device id to the one being
+ * passed in. After the scope has been exited, the destructor sets the device_id
+ * back to the one before entering the scope.
+ */
+class device_guard {
+public:
+    device_guard(int device_id)
+    {
+        SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaGetDevice(&original_device_id));
+        SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaSetDevice(device_id));
+    }
 
-void bind_gpus_to_process(
-    std::shared_ptr<SchwarzWrappers::device_guard> &dev_guard, int &local_rank,
-    int &local_num_procs, int &num_threads)
-{
-    // SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaSetDevice(local_rank));
-    // SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaGetLastError());
-}
+    device_guard(device_guard &other) = delete;
+
+    device_guard &operator=(const device_guard &other) = delete;
+
+    device_guard(device_guard &&other) = delete;
+
+    device_guard const &operator=(device_guard &&other) = delete;
+
+    ~device_guard() noexcept(false)
+    {
+        /* Ignore the error during stack unwinding for this call */
+        if (std::uncaught_exception()) {
+            cudaSetDevice(original_device_id);
+        } else {
+            SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaSetDevice(original_device_id));
+        }
+    }
+
+private:
+    int original_device_id{};
+};
 
 
-}  // namespace ProcessTopology
+}  // namespace SchwarzWrappers
 
 
-#endif  // process_topology.hpp
+#endif  // SCHWARZ_DEVICE_GUARD_HPP_

@@ -172,7 +172,8 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     metadata.num_subdomains = metadata.comm_size;
     metadata.num_threads = FLAGS_num_threads;
     metadata.oned_laplacian_size = FLAGS_set_1d_laplacian_size;
-    metadata.global_size = metadata.oned_laplacian_size * metadata.oned_laplacian_size;
+    metadata.global_size =
+        metadata.oned_laplacian_size * metadata.oned_laplacian_size;
 
     // Set solver settings from command line args.
     // Comm settings
@@ -252,7 +253,15 @@ int main(int argc, char *argv[])
     try {
         initialize_argument_parsing(&argc, &argv);
         BenchRas<double, int> laplace_problem_2d;
-        MPI_Init(&argc, &argv);
+        int req_thread_support = MPI_THREAD_MULTIPLE;
+        int prov_thread_support = MPI_THREAD_MULTIPLE;
+
+        MPI_Init_thread(&argc, &argv, req_thread_support, &prov_thread_support);
+        if (prov_thread_support != req_thread_support) {
+            std::cout << "Required thread support is " << req_thread_support
+                      << " but provided thread support is only "
+                      << prov_thread_support << std::endl;
+        }
         laplace_problem_2d.run();
         MPI_Finalize();
     } catch (std::exception &exc) {

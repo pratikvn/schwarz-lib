@@ -58,16 +58,14 @@ SolverBase<ValueType, IndexType>::SolverBase(
         Utils<ValueType, IndexType>::get_local_rank(metadata.mpi_communicator);
     auto local_num_procs = Utils<ValueType, IndexType>::get_local_num_procs(
         metadata.mpi_communicator);
-    if (settings.executor_string != "cuda") {
-        ProcessTopology::bind_threads_to_process(local_rank, local_num_procs,
-                                                 metadata.num_threads);
-    } else {
-        ProcessTopology::bind_gpus_to_process(local_rank, local_num_procs,
-                                              metadata.num_threads);
-    }
 
     if (settings.executor_string == "omp") {
         settings.executor = gko::OmpExecutor::create();
+        auto exec_info =
+            static_cast<gko::OmpExecutor *>(settings.executor.get())
+                ->get_exec_info();
+        exec_info->bind_to_core(local_rank);
+
     } else if (settings.executor_string == "cuda") {
         int num_devices = 0;
 #if SCHW_HAVE_CUDA
@@ -87,6 +85,13 @@ SolverBase<ValueType, IndexType>::SolverBase(
         }
         settings.executor =
             gko::CudaExecutor::create(local_rank, gko::OmpExecutor::create());
+        auto exec_info =
+          static_cast<gko::OmpExecutor *>(settings.executor->get_master().get())
+                ->get_exec_info();
+        exec_info->bind_to_core(local_rank);
+        settings.cuda_device_guard =
+            std::make_shared<SchwarzWrappers::device_guard>(local_rank);
+
         std::cout << " Rank " << metadata.my_rank << " with local rank "
                   << local_rank << " has "
                   << (static_cast<gko::CudaExecutor *>(settings.executor.get()))
@@ -95,6 +100,10 @@ SolverBase<ValueType, IndexType>::SolverBase(
         MPI_Barrier(metadata.mpi_communicator);
     } else if (settings.executor_string == "reference") {
         settings.executor = gko::ReferenceExecutor::create();
+        auto exec_info =
+            static_cast<gko::ReferenceExecutor *>(settings.executor.get())
+                ->get_exec_info();
+        exec_info->bind_to_core(local_rank);
     }
 
     auto my_rank = this->metadata.my_rank;

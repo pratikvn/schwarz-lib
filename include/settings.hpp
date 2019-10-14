@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ginkgo/ginkgo.hpp>
 
 
+#include <device_guard.hpp>
 #include <exception_helpers.hpp>
 #include <gather_scatter.hpp>
 
@@ -73,6 +74,10 @@ struct Settings {
      */
     std::shared_ptr<gko::Executor> executor = gko::ReferenceExecutor::create();
 
+    /**
+     * The ginkgo executor the code is to be executed on.
+     */
+    std::shared_ptr<device_guard> cuda_device_guard;
 
     /**
      * The partition algorithm to be used for partitioning the matrix.

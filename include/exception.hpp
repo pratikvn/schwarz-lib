@@ -76,6 +76,22 @@ public:
 };
 
 
+class ModuleNotImplemented : public Error {
+public:
+    /**
+     * Initializes a NotImplemented error.
+     * @param file The name of the offending source file
+     * @param line The source code line number where the error occurred
+     * @param module The name of the not-yet implemented module
+     * @param func The name of the not-yet implemented function
+     */
+    ModuleNotImplemented(const std::string &file, int line,
+                         const std::string &module, const std::string &func)
+        : Error(file, line, module + " in " + func + " is not implemented")
+    {}
+};
+
+
 /**
  * BadDimension is thrown if an operation is being applied to a LinOp
  * with bad dimensions.

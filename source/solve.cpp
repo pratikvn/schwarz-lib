@@ -99,6 +99,10 @@ void Solve<ValueType, IndexType>::setup_local_solver(
          Settings::local_solver_settings::direct_solver_cholmod) ||
         (solver_settings ==
          Settings::local_solver_settings::direct_solver_ginkgo)) {
+#if !SCHW_HAVE_CHOLMOD
+        SCHWARZ_MODULE_NOT_IMPLEMENTED("cholmod");
+#endif
+
 #if SCHW_HAVE_CHOLMOD
         if (metadata.my_rank == 0)
             std::cout << " Local direct factorization with CHOLMOD "
@@ -539,8 +543,7 @@ void Solve<ValueType, IndexType>::compute_residual_norm(
     auto one = gko::initialize<vec>({1.0}, settings.executor);
     auto neg_one = gko::initialize<vec>({-1.0}, settings.executor);
 
-    global_matrix->apply(neg_one.get(),
-                         gko::lend(solution_vector), one.get(),
+    global_matrix->apply(neg_one.get(), gko::lend(solution_vector), one.get(),
                          gko::lend(global_rhs));
 
     global_rhs->compute_norm2(rnorm.get());

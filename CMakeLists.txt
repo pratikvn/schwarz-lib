@@ -103,6 +103,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.hpp.in
 if(SCHWARZ_BUILD_CUDA)
   target_sources(${TARGET} PRIVATE
     source/cuda_gather.cu)
+else()
+  target_sources(${TARGET} PRIVATE
+    source/cuda_dummy_gather.cpp)
 endif()
 
 if(SCHWARZ_BUILD_CLANG_TIDY)

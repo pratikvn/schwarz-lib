@@ -63,8 +63,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace ProcessTopology {
 
 
-#if SCHW_HAVE_HWLOC == 0
-struct hwloc_topology_t;
+#if !SCHW_HAVE_HWLOC
+struct hwloc_topology_t {};
+struct hwloc_obj_t {};
 #endif
 
 static void print_children(hwloc_topology_t topology, hwloc_obj_t obj,

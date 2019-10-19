@@ -37,9 +37,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <exception.hpp>
 
+/**
+ * Asserts that a module has not yet been implemented.
+ *
+ * @param _cuda_call  a library call expression
+ */
+#define SCHWARZ_MODULE_NOT_IMPLEMENTED(module_)                              \
+    {                                                                        \
+        throw ::ModuleNotImplemented(__FILE__, __LINE__, module_, __func__); \
+    }
 
 /**
- * Asserts that a feature or module has not yet been implemented.
+ * Asserts that a feature has not yet been implemented.
  *
  * @param _cuda_call  a library call expression
  */
@@ -53,11 +62,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *@throw BadDimension if _val1 is different from _val2.
  */
-#define SCHWARZ_ASSERT_EQ(_val1, _val2)                                     \
-  if (_val1 != _val2) {                                                 \
-    throw ::BadDimension(__FILE__, __LINE__, __func__, " Value ",  \
-                              _val1, _val2, "expected equal values");   \
-  }
+#define SCHWARZ_ASSERT_EQ(_val1, _val2)                                      \
+    if (_val1 != _val2) {                                                    \
+        throw ::BadDimension(__FILE__, __LINE__, __func__, " Value ", _val1, \
+                             _val2, "expected equal values");                \
+    }
 
 /**
  * Asserts that a cuSPARSE library call completed without errors.

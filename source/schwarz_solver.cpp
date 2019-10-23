@@ -985,7 +985,9 @@ void exchange_boundary_onesided(
                 }
             }
         }
-    } else {
+    }
+    //Get is not relevant for event-triggered
+    else {
         // TODO: needs to be updated and create window on the sender
         for (auto p = 0; p < num_neighbors_in; p++) {
             if ((global_put[p])[0] > 0) {

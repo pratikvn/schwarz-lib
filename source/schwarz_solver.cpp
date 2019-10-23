@@ -881,7 +881,7 @@ void exchange_boundary_onesided(
     if (settings.comm_settings.enable_push) {
         if (settings.comm_settings.enable_push_one_by_one) {
             for (auto p = 0; p < num_neighbors_out; p++) {
-                if ((global_put[p])[0] > 0) {
+                if ((global_put[p])[0] > 0) { //no of elements
                     // push
                     for (auto i = 1; i <= (global_put[p])[0]; i++) {
                         MPI_Put(

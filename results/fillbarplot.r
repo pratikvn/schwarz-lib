@@ -23,9 +23,10 @@ fancy_scientific <- function(l) {
 
 solver="direct_ginkgo"
 cpu_gpu="cuda"
-num_procs=18
+num_procs=24
 partition="naive"
-comm="onesided"
+comm="twosided"
+psize=512
 
 load_from_files_averaged <- function(my_path, compare){
     myFiles <- list.files(path=my_path, pattern=compare, full.names=F, recursive=FALSE)
@@ -56,7 +57,8 @@ load_from_files <- function(my_path, compare){
     return(ldf)
 }
 num_procs_dir=sprintf("%d",num_procs)
-ldf <- load_from_files(sprintf("./%s/%s/%sdomains/%s/%s/512local/",cpu_gpu, comm, num_procs_dir,solver,partition) , "^subd_*")
+size_var=sprintf("%d",psize)
+ldf <- load_from_files(sprintf("./%s/%s/%sdomains/%s/%s/%slocal/",cpu_gpu, comm, num_procs_dir,solver,partition,size_var) , "^subd_*")
 fulldata2 <- rbind(ldf[[1]])
 for (k in 2:num_procs)
 {
@@ -70,6 +72,6 @@ bar_plot2 <- ggplot(data = fulldata2,
     scale_y_continuous()+
     labs(title = (TeX(sprintf("%s comm, $%d$ subdomains, %s partitioning, Number of rows $=2^{18}$",comm, num_procs, partition))), x = "Subdomain", y = "Time per iteration (s)", color = "Time spent in\n")
 
-ggsave(sprintf("%s_%s_%s_%d_%s_bar.pdf", comm,partition,cpu_gpu,num_procs,solver))
+ggsave(sprintf("%s_%s_%s_%d_%s_%s_bar.pdf", comm,partition,cpu_gpu,num_procs,solver,size_var))
 
 

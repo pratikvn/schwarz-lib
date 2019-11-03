@@ -279,6 +279,13 @@ void SolverBase<ValueType, IndexType>::run(
                 global_residual_norm0, num_converged_procs)),
             2, metadata.my_rank, convergence_check, metadata.iter_count);
 
+        // break if the solution diverges.
+        if(isnan(global_residual_norm) || global_residual_norm > 1e12){
+          std::cout << " Rank " << metadata.my_rank << " diverged in "
+                    << metadata.iter_count << " iters " << std::endl;
+          std::exit(-1);
+        }
+
         // break if all processes detect that all other processes have converged
         // otherwise continue iterations.
         if (num_converged_procs == metadata.num_subdomains) {

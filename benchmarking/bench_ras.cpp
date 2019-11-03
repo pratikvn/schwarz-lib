@@ -253,15 +253,18 @@ int main(int argc, char *argv[])
     try {
         initialize_argument_parsing(&argc, &argv);
         BenchRas<double, int> laplace_problem_2d;
-        int req_thread_support = MPI_THREAD_MULTIPLE;
-        int prov_thread_support = MPI_THREAD_MULTIPLE;
 
-        MPI_Init_thread(&argc, &argv, req_thread_support, &prov_thread_support);
-        if (prov_thread_support != req_thread_support) {
-            std::cout << "Required thread support is " << req_thread_support
-                      << " but provided thread support is only "
-                      << prov_thread_support << std::endl;
-        }
+        MPI_Init(&argc, &argv);
+        // int req_thread_support = MPI_THREAD_MULTIPLE;
+        // int prov_thread_support = MPI_THREAD_MULTIPLE;
+
+        // MPI_Init_thread(&argc, &argv, req_thread_support,
+        // &prov_thread_support); if (prov_thread_support != req_thread_support)
+        // {
+        //     std::cout << "Required thread support is " << req_thread_support
+        //               << " but provided thread support is only "
+        //               << prov_thread_support << std::endl;
+        // }
         laplace_problem_2d.run();
         MPI_Finalize();
     } catch (std::exception &exc) {

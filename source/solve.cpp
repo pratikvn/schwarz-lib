@@ -356,25 +356,22 @@ void Solve<ValueType, IndexType>::check_global_convergence(
     auto l_res_vec = this->local_residual_vector->get_values();
     auto mpi_vtype = boost::mpi::get_mpi_datatype(l_res_vec[0]);
 
-    if (settings.convergence_settings.enable_global_check) {
-        if (settings.comm_settings.enable_onesided) {
-            if (settings.convergence_settings.put_all_local_residual_norms) {
-                ConvergenceTools::put_all_local_residual_norms(
-                    settings, metadata, local_resnorm,
-                    this->local_residual_vector,
-                    this->global_residual_vector_out,
-                    this->window_residual_vector);
-            } else {
-                ConvergenceTools::propagate_all_local_residual_norms(
-                    settings, metadata, comm_struct, local_resnorm,
-                    this->local_residual_vector,
-                    this->global_residual_vector_out,
-                    this->window_residual_vector);
-            }
+    if (settings.comm_settings.enable_onesided) {
+        if (settings.convergence_settings.put_all_local_residual_norms) {
+            ConvergenceTools::put_all_local_residual_norms(
+                settings, metadata, local_resnorm, this->local_residual_vector,
+                this->global_residual_vector_out, this->window_residual_vector);
         } else {
-            MPI_Allgather(&local_resnorm, 1, mpi_vtype, l_res_vec, 1, mpi_vtype,
-                          MPI_COMM_WORLD);
+            ConvergenceTools::propagate_all_local_residual_norms(
+                settings, metadata, comm_struct, local_resnorm,
+                this->local_residual_vector, this->global_residual_vector_out,
+                this->window_residual_vector);
         }
+    }
+    if (settings.convergence_settings.enable_global_check &&
+        !settings.comm_settings.enable_onesided) {
+        MPI_Allgather(&local_resnorm, 1, mpi_vtype, l_res_vec, 1, mpi_vtype,
+                      MPI_COMM_WORLD);
 
         // compute the global residual norm by summing the local residual
         // norms
@@ -395,7 +392,7 @@ void Solve<ValueType, IndexType>::check_global_convergence(
             if ((global_resnorm) / (global_resnorm0) <= tolerance)
                 (converged_all_local)++;
         }
-    } else {
+    } else if (settings.comm_settings.enable_onesided) {
         if (local_resnorm / local_resnorm0 <= tolerance)
             (converged_all_local)++;
 

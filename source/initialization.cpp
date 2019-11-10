@@ -327,6 +327,10 @@ void Initialize<ValueType, IndexType>::setup_vectors(
 
     local_solution =
         vec::create(settings.executor, gko::dim<2>(metadata.local_size_x, 1));
+    
+    //contains the solution at the boundaries. first dim ?
+    boundary_solution =
+        vec::create(settings.executor, gko::dim<2>(sqrt(metadata.local_size_x), 1));
 }
 
 

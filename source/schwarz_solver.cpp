@@ -60,26 +60,36 @@ SolverBase<ValueType, IndexType>::SolverBase(
     auto local_num_procs = Utils<ValueType, IndexType>::get_local_num_procs(
         metadata.mpi_communicator);
 
-    if (settings.executor_string == "omp") {
+    //executor string 'omp'
+    if (settings.executor_string == "omp")
+    {
         settings.executor = gko::OmpExecutor::create();
         auto exec_info =
             static_cast<gko::OmpExecutor *>(settings.executor.get())
                 ->get_exec_info();
         exec_info->bind_to_core(local_rank);
 
-    } else if (settings.executor_string == "cuda") {
+    }
+   
+    //executor string 'cuda'
+    else if (settings.executor_string == "cuda")
+    {
         int num_devices = 0;
 #if SCHW_HAVE_CUDA
         SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaGetDeviceCount(&num_devices));
 #else
         SCHWARZ_NOT_IMPLEMENTED;
 #endif
-        if (num_devices > 0) {
-            if (metadata.my_rank == 0) {
+        if (num_devices > 0) 
+        {
+            if (metadata.my_rank == 0) 
+            {
                 std::cout << " Number of available devices: " << num_devices
                           << std::endl;
             }
-        } else {
+        } 
+        else 
+        {
             std::cout << " No CUDA devices available for rank "
                       << metadata.my_rank << std::endl;
             std::exit(-1);
@@ -99,7 +109,11 @@ SolverBase<ValueType, IndexType>::SolverBase(
                          ->get_device_id()
                   << " id of gpu" << std::endl;
         MPI_Barrier(metadata.mpi_communicator);
-    } else if (settings.executor_string == "reference") {
+    }
+
+    //executor string 'reference' 
+    else if (settings.executor_string == "reference")
+    {
         settings.executor = gko::ReferenceExecutor::create();
         auto exec_info =
             static_cast<gko::ReferenceExecutor *>(settings.executor.get())
@@ -142,6 +156,7 @@ SolverBase<ValueType, IndexType>::SolverBase(
     comm_struct.global_put = std::shared_ptr<vec_vecshared>(
         new vec_vecshared(settings.executor->get_master(), num_subdomains),
         std::default_delete<vec_vecshared>());
+
     // Need this to initialize the arrays with zeros.
     std::vector<IndexType> temp(num_subdomains + 1, 0);
     comm_struct.get_displacements = std::shared_ptr<vec_itype>(
@@ -170,8 +185,10 @@ void SolverBase<ValueType, IndexType>::initialize()
 
     // Setup the right hand side vector.
     std::vector<ValueType> rhs(metadata.global_size, 1.0);
-    if (settings.enable_random_rhs && settings.explicit_laplacian) {
-        if (metadata.my_rank == 0) {
+    if (settings.enable_random_rhs && settings.explicit_laplacian) 
+    {
+        if (metadata.my_rank == 0) 
+        {
             Initialize<ValueType, IndexType>::generate_rhs(rhs);
         }
         auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
@@ -179,18 +196,22 @@ void SolverBase<ValueType, IndexType>::initialize()
                   MPI_COMM_WORLD);
     }
 #if SCHW_HAVE_DEALII
-    if (metadata.my_rank == 0 && !settings.explicit_laplacian) {
+    if (metadata.my_rank == 0 && !settings.explicit_laplacian) 
+    {
         std::copy(system_rhs.begin(), system_rhs.begin() + metadata.global_size,
                   rhs.begin());
     }
 #endif
 
     // Setup the global matrix
-    if (settings.explicit_laplacian) {
+    if (settings.explicit_laplacian) 
+    {
         Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
             metadata.oned_laplacian_size, this->global_matrix);
 #if SCHW_HAVE_DEALII
-    } else {
+    }
+    else 
+    {
         Initialize<ValueType, IndexType>::setup_global_matrix(
             matrix, this->global_matrix);
 #endif
@@ -204,7 +225,8 @@ void SolverBase<ValueType, IndexType>::initialize()
                                this->partition_indices, this->global_matrix,
                                this->local_matrix, this->interface_matrix);
     // Debug to print matrices.
-    if (settings.print_matrices && settings.executor_string != "cuda") {
+    if (settings.print_matrices && settings.executor_string != "cuda") 
+    {
         Utils<ValueType, IndexType>::print_matrix(
             this->local_matrix.get(), metadata.my_rank, "local_mat");
         Utils<ValueType, IndexType>::print_matrix(this->interface_matrix.get(),
@@ -256,7 +278,9 @@ void SolverBase<ValueType, IndexType>::run(
     auto start_time = std::chrono::steady_clock::now();
     int num_converged_procs = 0;
 
-    for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
+    //iteration loop
+    for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count))
+    {
         // Exchange the boundary values. The communication part.
         MEASURE_ELAPSED_FUNC_TIME(
             this->exchange_boundary(settings, metadata, solution_vector), 0,
@@ -282,11 +306,14 @@ void SolverBase<ValueType, IndexType>::run(
 
         // break if all processes detect that all other processes have converged
         // otherwise continue iterations.
-        if (num_converged_procs == metadata.num_subdomains) {
+        if (num_converged_procs == metadata.num_subdomains)
+        {
             std::cout << " Rank " << metadata.my_rank << " converged in "
                       << metadata.iter_count << " iters " << std::endl;
             break;
-        } else {
+        }
+        else
+        {
             temp_loc_solution->copy_from(this->local_solution.get());
             MEASURE_ELAPSED_FUNC_TIME(
                 (Solve<ValueType, IndexType>::local_solve(
@@ -301,11 +328,13 @@ void SolverBase<ValueType, IndexType>::run(
                 4, metadata.my_rank, expand_local_vec, metadata.iter_count);
         }
     }
+
     MPI_Barrier(MPI_COMM_WORLD);
     auto elapsed_time = std::chrono::duration<ValueType>(
         std::chrono::steady_clock::now() - start_time);
     ValueType mat_norm = -1.0, rhs_norm = -1.0, sol_norm = -1.0,
               residual_norm = -1.0;
+
     // Compute the final residual norm. Also gathers the solution from all
     // subdomains.
     Solve<ValueType, IndexType>::compute_residual_norm(
@@ -314,21 +343,22 @@ void SolverBase<ValueType, IndexType>::run(
 
     // clang-format off
     if (metadata.my_rank == 0)
-      {
+    {
         std::cout
               << " residual norm " << residual_norm << "\n"
               << " relative residual norm of solution " << residual_norm/rhs_norm << "\n"
               << " Time taken for solve " << elapsed_time.count()
               << std::endl;
         if (num_converged_procs < metadata.num_subdomains)
-          {
+        {
             std::cout << " Did not converge in " << metadata.iter_count
                       << " iterations."
                       << std::endl;
-          }
-      }
+        }
+    }
     // clang-format on
-    if (metadata.my_rank == 0) {
+    if (metadata.my_rank == 0) 
+    {
         solution->copy_from(solution_vector.get());
     }
 }
@@ -379,34 +409,43 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
 
     // default local p size set for 1 subdomain.
     first_row[0] = 0;
-    for (auto p = 0; p < num_subdomains; ++p) {
+    for (auto p = 0; p < num_subdomains; ++p)
+    {
         local_p_size[p] = std::min(global_size - first_row[p], nb);
         first_row[p + 1] = first_row[p] + local_p_size[p];
     }
-    if (partition_settings == Settings::partition_settings::partition_metis) {
-        if (num_subdomains > 1) {
-            for (auto p = 0; p < num_subdomains; p++) {
+    if (partition_settings == Settings::partition_settings::partition_metis) 
+    {
+        if (num_subdomains > 1) 
+        {
+            for (auto p = 0; p < num_subdomains; p++) 
+            {
                 local_p_size[p] = 0;
             }
-            for (auto i = 0; i < global_size; i++) {
+            for (auto i = 0; i < global_size; i++) 
+            {
                 local_p_size[partition_indices[i]]++;
             }
             first_row[0] = 0;
-            for (auto p = 0; p < num_subdomains; ++p) {
+            for (auto p = 0; p < num_subdomains; ++p) 
+            {
                 first_row[p + 1] = first_row[p] + local_p_size[p];
             }
             // permutation
-            for (auto i = 0; i < global_size; i++) {
+            for (auto i = 0; i < global_size; i++) 
+            {
                 permutation[first_row[partition_indices[i]]] = i;
                 first_row[partition_indices[i]]++;
             }
-            for (auto p = num_subdomains; p > 0; p--) {
+            for (auto p = num_subdomains; p > 0; p--) 
+            {
                 first_row[p] = first_row[p - 1];
             }
             first_row[0] = 0;
 
             // iperm
-            for (auto i = 0; i < global_size; i++) {
+            for (auto i = 0; i < global_size; i++) 
+            {
                 i_permutation[permutation[i]] = i;
             }
         }
@@ -415,15 +454,18 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     IndexType *gmat_row_ptrs = global_matrix->get_row_ptrs();
     IndexType *gmat_col_idxs = global_matrix->get_col_idxs();
     ValueType *gmat_values = global_matrix->get_values();
-    if (partition_settings == Settings::partition_settings::partition_metis) {
+    if (partition_settings == Settings::partition_settings::partition_metis) 
+    {
         auto gmat_temp = mtx::create(settings.executor->get_master(),
                                      global_matrix->get_size(),
                                      global_matrix->get_num_stored_elements());
         auto nnz = 0;
         gmat_temp->get_row_ptrs()[0] = 0;
-        for (auto row = 0; row < metadata.global_size; ++row) {
+        for (auto row = 0; row < metadata.global_size; ++row)
+        {
             for (auto col = gmat_row_ptrs[permutation[row]];
-                 col < gmat_row_ptrs[permutation[row] + 1]; ++col) {
+                 col < gmat_row_ptrs[permutation[row] + 1]; ++col)
+            {
                 gmat_temp->get_col_idxs()[nnz] =
                     i_permutation[gmat_col_idxs[col]];
                 gmat_temp->get_values()[nnz] = gmat_values[col];
@@ -433,24 +475,30 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
         }
         global_matrix->copy_from(gmat_temp.get());
     }
-    for (auto i = 0; i < global_size; i++) {
+    for (auto i = 0; i < global_size; i++) 
+    {
         global_to_local[i] = 0;
         local_to_global[i] = 0;
     }
     auto num = 0;
-    for (auto i = first_row[my_rank]; i < first_row[my_rank + 1]; i++) {
+    for (auto i = first_row[my_rank]; i < first_row[my_rank + 1]; i++) 
+    {
         global_to_local[i] = 1 + num;
         local_to_global[num] = i;
         num++;
     }
 
     IndexType old = 0;
-    for (auto k = 1; k < settings.overlap; k++) {
+    for (auto k = 1; k < settings.overlap; k++) 
+    {
         auto now = num;
-        for (auto i = old; i < now; i++) {
+        for (auto i = old; i < now; i++) 
+        {
             for (auto j = gmat_row_ptrs[local_to_global[i]];
-                 j < gmat_row_ptrs[local_to_global[i] + 1]; j++) {
-                if (global_to_local[gmat_col_idxs[j]] == 0) {
+                 j < gmat_row_ptrs[local_to_global[i] + 1]; j++) 
+            {
+                if (global_to_local[gmat_col_idxs[j]] == 0) 
+                {
                     local_to_global[num] = gmat_col_idxs[j];
                     global_to_local[gmat_col_idxs[j]] = 1 + num;
                     num++;
@@ -475,22 +523,32 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     auto nnz_local = 0;
     auto nnz_interface = 0;
 
-    for (auto i = first_row[my_rank]; i < first_row[my_rank + 1]; ++i) {
-        for (auto j = gmat_row_ptrs[i]; j < gmat_row_ptrs[i + 1]; j++) {
-            if (global_to_local[gmat_col_idxs[j]] != 0) {
+    for (auto i = first_row[my_rank]; i < first_row[my_rank + 1]; ++i) 
+    {
+        for (auto j = gmat_row_ptrs[i]; j < gmat_row_ptrs[i + 1]; j++) 
+        {
+            if (global_to_local[gmat_col_idxs[j]] != 0) 
+            {
                 nnz_local++;
-            } else {
+            }
+            else 
+            {
                 std::cout << " debug: invalid edge?" << std::endl;
             }
         }
     }
     auto temp = 0;
-    for (auto k = 0; k < metadata.overlap_size; k++) {
+    for (auto k = 0; k < metadata.overlap_size; k++) 
+    {
         temp = metadata.overlap_row->get_data()[k];
-        for (auto j = gmat_row_ptrs[temp]; j < gmat_row_ptrs[temp + 1]; j++) {
-            if (global_to_local[gmat_col_idxs[j]] != 0) {
+        for (auto j = gmat_row_ptrs[temp]; j < gmat_row_ptrs[temp + 1]; j++) 
+        {
+            if (global_to_local[gmat_col_idxs[j]] != 0) 
+            {
                 nnz_local++;
-            } else {
+            }
+            else 
+            {
                 nnz_interface++;
             }
         }
@@ -504,11 +562,14 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     ValueType *lmat_values = local_matrix_compute->get_values();
 
     std::shared_ptr<mtx> interface_matrix_compute;
-    if (nnz_interface > 0) {
+    if (nnz_interface > 0) 
+    {
         interface_matrix_compute =
             mtx::create(settings.executor->get_master(),
                         gko::dim<2>(local_size_x), nnz_interface);
-    } else {
+    }
+    else 
+    {
         interface_matrix_compute = mtx::create(settings.executor->get_master());
     }
 
@@ -520,20 +581,26 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     nnz_local = 0;
     auto nnz_interface_temp = 0;
     lmat_row_ptrs[0] = nnz_local;
-    if (nnz_interface > 0) {
-        imat_row_ptrs[0] = nnz_interface_temp;
+    if (nnz_interface > 0) 
+    {
+         imat_row_ptrs[0] = nnz_interface_temp;
     }
+
     // Local interior matrix
-    for (auto i = first_row[my_rank]; i < first_row[my_rank + 1]; ++i) {
-        for (auto j = gmat_row_ptrs[i]; j < gmat_row_ptrs[i + 1]; ++j) {
-            if (global_to_local[gmat_col_idxs[j]] != 0) {
+    for (auto i = first_row[my_rank]; i < first_row[my_rank + 1]; ++i) 
+    {
+        for (auto j = gmat_row_ptrs[i]; j < gmat_row_ptrs[i + 1]; ++j) 
+        {
+            if (global_to_local[gmat_col_idxs[j]] != 0) 
+            {
                 lmat_col_idxs[nnz_local] =
                     global_to_local[gmat_col_idxs[j]] - 1;
                 lmat_values[nnz_local] = gmat_values[j];
                 nnz_local++;
             }
         }
-        if (nnz_interface > 0) {
+        if (nnz_interface > 0) 
+        {
             imat_row_ptrs[num + 1] = nnz_interface_temp;
         }
         lmat_row_ptrs[num + 1] = nnz_local;
@@ -541,18 +608,24 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     }
 
     // Interface matrix
-    if (nnz_interface > 0) {
+    if (nnz_interface > 0) 
+    {
         nnz_interface = 0;
-        for (auto k = 0; k < metadata.overlap_size; k++) {
+        for (auto k = 0; k < metadata.overlap_size; k++) 
+        {
             temp = metadata.overlap_row->get_data()[k];
             for (auto j = gmat_row_ptrs[temp]; j < gmat_row_ptrs[temp + 1];
-                 j++) {
-                if (global_to_local[gmat_col_idxs[j]] != 0) {
+                 j++) 
+            {
+                if (global_to_local[gmat_col_idxs[j]] != 0) 
+                {
                     lmat_col_idxs[nnz_local] =
                         global_to_local[gmat_col_idxs[j]] - 1;
                     lmat_values[nnz_local] = gmat_values[j];
                     nnz_local++;
-                } else {
+                } 
+                else
+                {
                     imat_col_idxs[nnz_interface] = gmat_col_idxs[j];
                     imat_values[nnz_interface] = gmat_values[j];
                     nnz_interface++;
@@ -564,10 +637,13 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
         }
     }
     auto now = num;
-    for (auto i = old; i < now; i++) {
+    for (auto i = old; i < now; i++) 
+    {
         for (auto j = gmat_row_ptrs[local_to_global[i]];
-             j < gmat_row_ptrs[local_to_global[i] + 1]; j++) {
-            if (global_to_local[gmat_col_idxs[j]] == 0) {
+             j < gmat_row_ptrs[local_to_global[i] + 1]; j++) 
+        {
+            if (global_to_local[gmat_col_idxs[j]] == 0) 
+            {
                 local_to_global[num] = gmat_col_idxs[j];
                 global_to_local[gmat_col_idxs[j]] = 1 + num;
                 num++;
@@ -605,20 +681,27 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     this->comm_struct.num_neighbors_in = 0;
     int num_recv = 0;
     std::vector<int> recv(num_subdomains, 0);
-    for (auto p = 0; p < num_subdomains; p++) {
-        if (p != my_rank) {
+    for (auto p = 0; p < num_subdomains; p++) 
+    {
+        if (p != my_rank) 
+        {
             int count = 0;
-            for (auto i = first_row[p]; i < first_row[p + 1]; i++) {
-                if (global_to_local[i] != 0) {
+            for (auto i = first_row[p]; i < first_row[p + 1]; i++) 
+            {
+                if (global_to_local[i] != 0) 
+                {
                     count++;
                 }
             }
-            if (count > 0) {
+            if (count > 0) 
+            {
                 int pp = this->comm_struct.num_neighbors_in;
                 global_get[pp] = new IndexType[1 + count];
                 (global_get[pp])[0] = 0;
-                for (auto i = first_row[p]; i < first_row[p + 1]; i++) {
-                    if (global_to_local[i] != 0) {
+                for (auto i = first_row[p]; i < first_row[p + 1]; i++) 
+                {
+                    if (global_to_local[i] != 0) 
+                    {
                         // global index
                         (global_get[pp])[1 + (global_get[pp])[0]] = i;
                         (global_get[pp])[0]++;
@@ -642,15 +725,20 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     std::vector<int> send(num_subdomains, 0);
 
     auto mpi_itype = boost::mpi::get_mpi_datatype(global_get[pp][0]);
-    for (auto p = 0; p < num_subdomains; p++) {
-        if (p != my_rank) {
-            if (recv[p] != 0) {
+    for (auto p = 0; p < num_subdomains; p++) 
+    {
+        if (p != my_rank) 
+        {
+            if (recv[p] != 0) 
+            {
                 MPI_Isend((global_get[pp]), 1, mpi_itype, p, 1, MPI_COMM_WORLD,
                           &send_req1[p]);
                 MPI_Isend((global_get[pp]), 1 + (global_get[pp])[0], mpi_itype,
                           p, 2, MPI_COMM_WORLD, &send_req2[p]);
                 pp++;
-            } else {
+            }
+            else 
+            {
                 MPI_Isend(&zero, 1, mpi_itype, p, 1, MPI_COMM_WORLD,
                           &send_req1[p]);
             }
@@ -665,12 +753,15 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     int pflag = 0;
     pp = 0;
     int num_send = 0;
-    for (auto p = 0; p < num_subdomains; p++) {
-        if (p != my_rank) {
+    for (auto p = 0; p < num_subdomains; p++) 
+    {
+        if (p != my_rank) 
+        {
             MPI_Status status;
             MPI_Wait(&recv_req1[p], &status);
 
-            if (send[p] > 0) {
+            if (send[p] > 0) 
+            {
                 neighbors_out[pp] = p;
 
                 // global_put[pp] = std::make_shared<IndexType>(1 + send[p]);
@@ -686,7 +777,8 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
                 pp++;
             }
             MPI_Wait(&send_req1[p], &status);
-            if (recv[p] != 0) {
+            if (recv[p] != 0) 
+            {
                 MPI_Wait(&send_req2[p], &status);
             }
         }
@@ -695,8 +787,10 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
 
     // allocate MPI buffer
     // one-sided
-    if (settings.comm_settings.enable_onesided) {
-        if (num_recv > 0) {
+    if (settings.comm_settings.enable_onesided) 
+    {
+        if (num_recv > 0) 
+        {
             this->comm_struct.recv_buffer = vec_vtype::create(
                 settings.executor->get_master(), gko::dim<2>(num_recv, 1));
 
@@ -708,22 +802,29 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
                 new vec_itype(settings.executor->get_master(),
                               this->comm_struct.num_neighbors_in),
                 std::default_delete<vec_itype>());
-            for (auto j = 0; j < this->comm_struct.num_neighbors_in; j++) {
+            for (auto j = 0; j < this->comm_struct.num_neighbors_in; j++) 
+            {
                 // j-th neighbor mapped to j-th window
                 this->comm_struct.windows_from->get_data()[j] = j;
             }
-        } else {
+        }
+        else 
+        {
             this->comm_struct.recv_buffer = vec_vtype::create(
                 settings.executor->get_master(), gko::dim<2>(1, 1));
         }
     }
     // two-sided
-    else {
-        if (num_recv > 0) {
+    else 
+    {
+        if (num_recv > 0) 
+        {
             this->comm_struct.recv_buffer =
                 vec_vtype::create(settings.executor, gko::dim<2>(num_recv, 1));
             // for gpu ? TODO : DONE
-        } else {
+        }
+        else 
+        {
             this->comm_struct.recv_buffer = nullptr;
         }
 
@@ -738,30 +839,40 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     }
 
     // one-sided
-    if (settings.comm_settings.enable_onesided) {
-        if (num_send > 0) {
+    if (settings.comm_settings.enable_onesided) 
+    {
+        if (num_send > 0) 
+        {
             this->comm_struct.send_buffer = vec_vtype::create(
                 settings.executor->get_master(), gko::dim<2>(num_send, 1));
             this->comm_struct.windows_to = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
                               this->comm_struct.num_neighbors_out),
                 std::default_delete<vec_itype>());
-            for (auto j = 0; j < this->comm_struct.num_neighbors_out; j++) {
+            for (auto j = 0; j < this->comm_struct.num_neighbors_out; j++) 
+            {
                 this->comm_struct.windows_to->get_data()[j] =
                     j;  // j-th neighbor maped to j-th window
             }
-        } else {
+        }
+        else 
+        {
             this->comm_struct.send_buffer = vec_vtype::create(
                 settings.executor->get_master(), gko::dim<2>(1, 1));
         }
     }
+
     // two-sided
-    else {
-        if (num_send > 0) {
+    else 
+    {
+        if (num_send > 0) 
+        {
             this->comm_struct.send_buffer =
                 vec_vtype::create(settings.executor, gko::dim<2>(num_send, 1));
             // for gpu ? TODO : DONE
-        } else {
+        }
+        else 
+        {
             this->comm_struct.send_buffer = nullptr;
         }
     }
@@ -788,13 +899,16 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
     // set displacement for the MPI buffer
     auto get_displacements = comm_struct.get_displacements->get_data();
     get_displacements[0] = 0;
-    for (auto j = 0; j < comm_struct.num_neighbors_in; j++) {
-        if ((global_get[j])[0] > 0) {
+    for (auto j = 0; j < comm_struct.num_neighbors_in; j++) 
+    {
+        if ((global_get[j])[0] > 0) 
+        {
             int p = neighbors_in[j];
             get_displacements[p + 1] = (global_get[j])[0];
         }
     }
-    for (auto j = 1; j <= num_subdomains; j++) {
+    for (auto j = 1; j <= num_subdomains; j++) 
+    {
         get_displacements[j] += get_displacements[j - 1];
     }
 
@@ -804,19 +918,22 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
                  mpi_itype, MPI_COMM_WORLD);
 
     // setup windows
-    if (settings.comm_settings.enable_onesided) {
+    if (settings.comm_settings.enable_onesided) 
+    {
         // Onesided
         // for gpu ? TODO (DONE) To improve: Win_create on a gpu buffer ?
         MPI_Win_create(main_buffer->get_values(),
                        main_buffer->get_size()[0] * sizeof(ValueType),
                        sizeof(ValueType), MPI_INFO_NULL, MPI_COMM_WORLD,
                        &comm_struct.window_x);
-    } else {
+    }
+    else 
+    {
         // Twosided
     }
 
-
-    if (settings.comm_settings.enable_onesided) {
+    if (settings.comm_settings.enable_onesided) 
+    {
         // MPI_Alloc_mem ? Custom allocator ?  TODO
         MPI_Win_create(this->local_residual_vector->get_values(),
                        (num_subdomains) * sizeof(ValueType), sizeof(ValueType),
@@ -838,11 +955,14 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
                        (num_subdomains) * sizeof(IndexType), sizeof(IndexType),
                        MPI_INFO_NULL, MPI_COMM_WORLD,
                        &(this->window_convergence));
-    } else {
+    }
+    else 
+    {
         // Twosided
     }
 
-    if (settings.comm_settings.enable_onesided && num_subdomains > 1) {
+    if (settings.comm_settings.enable_onesided && num_subdomains > 1) 
+    {
         // Lock all windows.
         MPI_Win_lock_all(0, comm_struct.window_buffer);
         MPI_Win_lock_all(0, comm_struct.window_x);
@@ -878,33 +998,46 @@ void exchange_boundary_onesided(
     auto recv_buffer = comm_struct.recv_buffer->get_values();
     ValueType dummy = 1.0;
     auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
-    if (settings.comm_settings.enable_push) {
-        if (settings.comm_settings.enable_push_one_by_one) {
-            for (auto p = 0; p < num_neighbors_out; p++) {
-                if ((global_put[p])[0] > 0) { //no of elements
+    if (settings.comm_settings.enable_push) 
+    {
+        if (settings.comm_settings.enable_push_one_by_one) 
+        {
+            for (auto p = 0; p < num_neighbors_out; p++) 
+            {
+                if ((global_put[p])[0] > 0) //no of elements
+                {
                     // push
-                    for (auto i = 1; i <= (global_put[p])[0]; i++) {
+                    for (auto i = 1; i <= (global_put[p])[0]; i++) 
+                    {
                         MPI_Put(
                             &local_solution->get_values()[(local_put[p])[i]], 1,
                             mpi_vtype, neighbors_out[p], (remote_put[p])[i], 1,
                             mpi_vtype, comm_struct.window_x);
                     }
-                    if (settings.comm_settings.enable_flush_all) {
+                    if (settings.comm_settings.enable_flush_all) 
+                    {
                         MPI_Win_flush(neighbors_out[p], comm_struct.window_x);
-                    } else if (settings.comm_settings.enable_flush_local) {
+                    } 
+                    else if (settings.comm_settings.enable_flush_local) 
+                    {
                         MPI_Win_flush_local(neighbors_out[p],
                                             comm_struct.window_x);
                     }
                 }
             }
-        } else {
+        }
+        else 
+        {
             // accumulate
             int num_put = 0;
-            for (auto p = 0; p < num_neighbors_out; p++) {
+            for (auto p = 0; p < num_neighbors_out; p++) 
+            {
                 // send
-                if ((global_put[p])[0] > 0) {
+                if ((global_put[p])[0] > 0) 
+                {
                     // Evil. Change this. TODO
-                    if (settings.executor_string == "cuda") {
+                    if (settings.executor_string == "cuda") 
+                    {
                         auto tmp_send_buf = vec_vtype::create(
                             settings.executor,
                             gko::dim<2>((global_put[p])[0], 1));
@@ -922,12 +1055,16 @@ void exchange_boundary_onesided(
                             vec_vtype::create(settings.executor->get_master(),
                                               gko::dim<2>((global_put[p])[0]));
                         cpu_send_buf->copy_from(tmp_send_buf.get());
-                        for (auto i = 1; i <= (global_put[p])[0]; i++) {
+                        for (auto i = 1; i <= (global_put[p])[0]; i++) 
+                        {
                             send_buffer[num_put + i - 1] =
                                 cpu_send_buf->get_values()[i - 1];
                         }
-                    } else {
-                        for (auto i = 1; i <= (global_put[p])[0]; i++) {
+                    }
+                    else 
+                    {
+                        for (auto i = 1; i <= (global_put[p])[0]; i++) 
+                        {
                             send_buffer[num_put + i - 1] =
                                 local_solution->get_values()[(local_put[p])[i]];
                         }
@@ -938,10 +1075,13 @@ void exchange_boundary_onesided(
                             put_displacements[neighbors_out[p]],
                             (global_put[p])[0], mpi_vtype,
                             comm_struct.window_buffer);
-                    if (settings.comm_settings.enable_flush_all) {
+                    if (settings.comm_settings.enable_flush_all) 
+                    {
                         MPI_Win_flush(neighbors_out[p],
                                       comm_struct.window_buffer);
-                    } else if (settings.comm_settings.enable_flush_local) {
+                    }
+                    else if (settings.comm_settings.enable_flush_local) 
+                    {
                         MPI_Win_flush_local(neighbors_out[p],
                                             comm_struct.window_buffer);
                     }
@@ -950,14 +1090,18 @@ void exchange_boundary_onesided(
             }
             // unpack receive buffer
             int num_get = 0;
-            for (auto p = 0; p < num_neighbors_in; p++) {
-                if ((global_get[p])[0] > 0) {
+            for (auto p = 0; p < num_neighbors_in; p++) 
+            {
+                if ((global_get[p])[0] > 0) 
+                {
                     // Evil. Change this. TODO
-                    if (settings.executor_string == "cuda") {
+                    if (settings.executor_string == "cuda") 
+                    {
                         auto cpu_recv_buf =
                             vec_vtype::create(settings.executor->get_master(),
                                               gko::dim<2>((global_get[p])[0]));
-                        for (auto i = 1; i <= (global_get[p])[0]; i++) {
+                        for (auto i = 1; i <= (global_get[p])[0]; i++) 
+                        {
                             cpu_recv_buf->get_values()[i - 1] =
                                 recv_buffer[num_get + i - 1];
                         }
@@ -975,8 +1119,11 @@ void exchange_boundary_onesided(
                                 false, (global_get[p])[0], tmp_idx_r.get_data(),
                                 tmp_recv_buf->get_values(),
                                 local_solution->get_values()));
-                    } else {
-                        for (auto i = 1; i <= (global_get[p])[0]; i++) {
+                    }
+                    else 
+                    {
+                        for (auto i = 1; i <= (global_get[p])[0]; i++) 
+                        {
                             local_solution->get_values()[(local_get[p])[i]] =
                                 recv_buffer[num_get + i - 1];
                         }
@@ -989,17 +1136,23 @@ void exchange_boundary_onesided(
     //Get is not relevant for event-triggered
     else {
         // TODO: needs to be updated and create window on the sender
-        for (auto p = 0; p < num_neighbors_in; p++) {
-            if ((global_put[p])[0] > 0) {
+        for (auto p = 0; p < num_neighbors_in; p++) 
+        {
+            if ((global_put[p])[0] > 0) 
+            {
                 // pull
-                for (auto i = 1; i <= (global_get[p])[0]; i++) {
+                for (auto i = 1; i <= (global_get[p])[0]; i++) 
+                {
                     MPI_Get(&local_solution->get_values()[(local_get[p])[i]], 1,
                             mpi_vtype, neighbors_in[p], (remote_get[p])[i], 1,
                             mpi_vtype, comm_struct.window_x);
                 }
-                if (settings.comm_settings.enable_flush_all) {
+                if (settings.comm_settings.enable_flush_all) 
+                {
                     MPI_Win_flush(neighbors_in[p], comm_struct.window_x);
-                } else if (settings.comm_settings.enable_flush_local) {
+                } 
+                else if (settings.comm_settings.enable_flush_local) 
+                {
                     MPI_Win_flush_local(neighbors_in[p], comm_struct.window_x);
                 }
             }
@@ -1023,11 +1176,14 @@ void exchange_boundary_twosided(
     auto put_request = comm_struct.put_request->get_data();
     int num_put = 0;
     ValueType dummy = 0.0;
-    for (auto p = 0; p < num_neighbors_out; p++) {
+    for (auto p = 0; p < num_neighbors_out; p++) 
+    {
         // send
-        if ((global_put[p])[0] > 0) {
+        if ((global_put[p])[0] > 0) 
+        {
             if (settings.comm_settings.enable_overlap &&
-                metadata.iter_count > 1) {
+                metadata.iter_count > 1) 
+            {
                 // wait for the previous send
                 auto p_r = put_request[p];
                 MPI_Wait(&p_r, &status);
@@ -1051,10 +1207,13 @@ void exchange_boundary_twosided(
     auto neighbors_in = comm_struct.neighbors_in->get_data();
     auto global_get = comm_struct.global_get->get_data();
     auto local_get = comm_struct.local_get->get_data();
-    if (!settings.comm_settings.enable_overlap || metadata.iter_count == 0) {
-        for (auto p = 0; p < num_neighbors_in; p++) {
+    if (!settings.comm_settings.enable_overlap || metadata.iter_count == 0) 
+    {
+        for (auto p = 0; p < num_neighbors_in; p++) 
+        {
             // receive
-            if ((global_get[p])[0] > 0) {
+            if ((global_get[p])[0] > 0) 
+            {
                 auto recv_buffer = comm_struct.recv_buffer->get_values();
                 auto mpi_vtype = boost::mpi::get_mpi_datatype(
                     recv_buffer[0]);  // works for GPU buffers ?
@@ -1067,8 +1226,10 @@ void exchange_boundary_twosided(
 
     num_get = 0;
     // wait for receive
-    for (auto p = 0; p < num_neighbors_in; p++) {
-        if ((global_get[p])[0] > 0) {
+    for (auto p = 0; p < num_neighbors_in; p++) 
+    {
+        if ((global_get[p])[0] > 0) 
+        {
             // auto g_r = get_request[p];
             // MPI_Wait(&g_r, &status);
             auto recv_buffer = comm_struct.recv_buffer->get_values();
@@ -1079,7 +1240,8 @@ void exchange_boundary_twosided(
                 false, (global_get[p])[0], &((local_get[p])[1]),
                 &recv_buffer[num_get], solution_vector->get_values()));
 
-            if (settings.comm_settings.enable_overlap) {
+            if (settings.comm_settings.enable_overlap) 
+            {
                 // start the next receive
                 MPI_Irecv(&recv_buffer[num_get], (global_get[p])[0], mpi_vtype,
                           neighbors_in[p], 0, MPI_COMM_WORLD, &get_request[p]);
@@ -1089,9 +1251,12 @@ void exchange_boundary_twosided(
     }
 
     // wait for send
-    if (!settings.comm_settings.enable_overlap) {
-        for (auto p = 0; p < num_neighbors_out; p++) {
-            if ((global_put[p])[0] > 0) {
+    if (!settings.comm_settings.enable_overlap) 
+    {
+        for (auto p = 0; p < num_neighbors_out; p++) 
+        {
+            if ((global_put[p])[0] > 0) 
+            {
                 auto p_r = put_request[p];
                 MPI_Wait(&p_r, &status);
             }
@@ -1105,10 +1270,13 @@ void SolverRAS<ValueType, IndexType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector)
 {
-    if (settings.comm_settings.enable_onesided) {
+    if (settings.comm_settings.enable_onesided) 
+    {
         exchange_boundary_onesided<ValueType, IndexType>(
             settings, metadata, this->comm_struct, solution_vector);
-    } else {
+    }
+    else 
+    {
         exchange_boundary_twosided<ValueType, IndexType>(
             settings, metadata, this->comm_struct, solution_vector);
     }
@@ -1133,7 +1301,8 @@ void SolverRAS<ValueType, IndexType>::update_boundary(
     auto local_size_x = metadata.local_size_x;
     local_solution->copy_from(local_rhs.get());
     global_old_solution->copy_from(solution_vector.get());
-    if (metadata.num_subdomains > 1 && settings.overlap > 0) {
+    if (metadata.num_subdomains > 1 && settings.overlap > 0) 
+    {
         auto temp_solution = vec_vtype::create(
             settings.executor, local_solution->get_size(),
             gko::Array<ValueType>::view(

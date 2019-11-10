@@ -154,6 +154,11 @@ public:
     std::shared_ptr<gko::matrix::Dense<ValueType>> local_solution;
 
     /**
+     * The local boundary solution vector
+     */
+    std::shared_ptr<gko::matrix::Dense<ValueType>> boundary_solution;    
+
+    /**
      * The global solution vector.
      */
     std::shared_ptr<gko::matrix::Dense<ValueType>> global_solution;

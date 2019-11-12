@@ -85,9 +85,9 @@ SolverBase<ValueType, IndexType>::SolverBase(
         }
         settings.executor =
             gko::CudaExecutor::create(local_rank, gko::OmpExecutor::create());
-        auto exec_info =
-          static_cast<gko::OmpExecutor *>(settings.executor->get_master().get())
-                ->get_exec_info();
+        auto exec_info = static_cast<gko::OmpExecutor *>(
+                             settings.executor->get_master().get())
+                             ->get_exec_info();
         exec_info->bind_to_core(local_rank);
         settings.cuda_device_guard =
             std::make_shared<SchwarzWrappers::device_guard>(local_rank);
@@ -154,17 +154,9 @@ SolverBase<ValueType, IndexType>::SolverBase(
 }
 
 
-#if SCHW_HAVE_DEALII
-template <typename ValueType, typename IndexType>
-void SolverBase<ValueType, IndexType>::initialize(
-    const dealii::SparseMatrix<ValueType> &matrix,
-    const dealii::Vector<ValueType> &system_rhs)
-{
-#else
 template <typename ValueType, typename IndexType>
 void SolverBase<ValueType, IndexType>::initialize()
 {
-#endif
     using vec_vtype = gko::matrix::Dense<ValueType>;
 
     // Setup the right hand side vector.
@@ -177,22 +169,17 @@ void SolverBase<ValueType, IndexType>::initialize()
         MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
                   MPI_COMM_WORLD);
     }
-#if SCHW_HAVE_DEALII
-    if (metadata.my_rank == 0 && !settings.explicit_laplacian) {
-        std::copy(system_rhs.begin(), system_rhs.begin() + metadata.global_size,
-                  rhs.begin());
-    }
-#endif
 
     // Setup the global matrix
     if (settings.explicit_laplacian) {
         Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
             metadata.oned_laplacian_size, this->global_matrix);
-#if SCHW_HAVE_DEALII
     } else {
-        Initialize<ValueType, IndexType>::setup_global_matrix(
-            matrix, this->global_matrix);
-#endif
+        std::cerr << " Explicit laplacian needs to be enabled with the "
+                     "--explicit_laplacian flag or deal.ii support needs to be "
+                     "enabled to generate the matrices"
+                  << std::endl;
+        std::exit(-1);
     }
     // Partition the global matrix.
     Initialize<ValueType, IndexType>::partition(
@@ -223,6 +210,68 @@ void SolverBase<ValueType, IndexType>::initialize()
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
+
+#if SCHW_HAVE_DEALII
+template <typename ValueType, typename IndexType>
+void SolverBase<ValueType, IndexType>::initialize(
+    const dealii::SparseMatrix<ValueType> &matrix,
+    const dealii::Vector<ValueType> &system_rhs)
+{
+    using vec_vtype = gko::matrix::Dense<ValueType>;
+
+    // Setup the right hand side vector.
+    std::vector<ValueType> rhs(metadata.global_size, 1.0);
+    if (settings.enable_random_rhs && settings.explicit_laplacian) {
+        if (metadata.my_rank == 0) {
+            Initialize<ValueType, IndexType>::generate_rhs(rhs);
+        }
+        auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
+        MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
+                  MPI_COMM_WORLD);
+    }
+    if (metadata.my_rank == 0 && !settings.explicit_laplacian) {
+        std::copy(system_rhs.begin(), system_rhs.begin() + metadata.global_size,
+                  rhs.begin());
+    }
+
+    // Setup the global matrix
+    if (settings.explicit_laplacian) {
+        Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
+            metadata.oned_laplacian_size, this->global_matrix);
+    } else {
+        Initialize<ValueType, IndexType>::setup_global_matrix(
+            matrix, this->global_matrix);
+    }
+    // Partition the global matrix.
+    Initialize<ValueType, IndexType>::partition(
+        settings, metadata, this->global_matrix, this->partition_indices);
+
+    // Setup the local matrices on each of the subddomains.
+    this->setup_local_matrices(this->settings, this->metadata,
+                               this->partition_indices, this->global_matrix,
+                               this->local_matrix, this->interface_matrix);
+    // Debug to print matrices.
+    if (settings.print_matrices && settings.executor_string != "cuda") {
+        Utils<ValueType, IndexType>::print_matrix(
+            this->local_matrix.get(), metadata.my_rank, "local_mat");
+        Utils<ValueType, IndexType>::print_matrix(this->interface_matrix.get(),
+                                                  metadata.my_rank, "int_mat");
+    }
+
+    // Setup the local vectors on each of the subddomains.
+    Initialize<ValueType, IndexType>::setup_vectors(
+        this->settings, this->metadata, rhs, this->local_rhs, this->global_rhs,
+        this->local_solution, this->global_solution);
+
+    // Setup the local solver on each of the subddomains.
+    Solve<ValueType, IndexType>::setup_local_solver(
+        this->settings, metadata, this->local_matrix, this->triangular_factor,
+        this->local_rhs);
+
+    // Setup the communication buffers on each of the subddomains.
+    this->setup_comm_buffers();
+}
+#endif
 
 
 template <typename ValueType, typename IndexType>
@@ -280,10 +329,10 @@ void SolverBase<ValueType, IndexType>::run(
             2, metadata.my_rank, convergence_check, metadata.iter_count);
 
         // break if the solution diverges.
-        if(isnan(global_residual_norm) || global_residual_norm > 1e12){
-          std::cout << " Rank " << metadata.my_rank << " diverged in "
-                    << metadata.iter_count << " iters " << std::endl;
-          std::exit(-1);
+        if (isnan(global_residual_norm) || global_residual_norm > 1e12) {
+            std::cout << " Rank " << metadata.my_rank << " diverged in "
+                      << metadata.iter_count << " iters " << std::endl;
+            std::exit(-1);
         }
 
         // break if all processes detect that all other processes have converged

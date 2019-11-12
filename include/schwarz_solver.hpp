@@ -83,11 +83,20 @@ public:
     SolverBase(Settings &settings, Metadata<ValueType, IndexType> &metadata);
 
 #if SCHW_HAVE_DEALII
+    /**
+     * Initialize the matrix and vectors obtained from the deal.ii.
+     *
+     * @param matrix  The system matrix.
+     * @param system_rhs  The right hand side vector.
+     */
     void initialize(const dealii::SparseMatrix<ValueType> &matrix,
                     const dealii::Vector<ValueType> &system_rhs);
-#else
-    void initialize();
 #endif
+
+    /**
+     * Initialize the matrix and vectors.
+     */
+    void initialize();
 
     /**
      * The function that runs the actual solver and obtains the final solution.

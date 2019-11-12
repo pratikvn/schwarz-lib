@@ -231,6 +231,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
         std::cout << " Problem Size: " << metadata.global_size << std::endl;
     }
     SchwarzWrappers::SolverRAS<ValueType, IndexType> solver(settings, metadata);
+    
     solver.initialize();
     solver.run(explicit_laplacian_solution);
     if (FLAGS_timings_file != "null") {

@@ -960,7 +960,7 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
     {
         // Twosided
     }
-
+    
     if (settings.comm_settings.enable_onesided && num_subdomains > 1) 
     {
         // Lock all windows.
@@ -1009,10 +1009,23 @@ void exchange_boundary_onesided(
                     // push
                     for (auto i = 1; i <= (global_put[p])[0]; i++) 
                     {
-                        MPI_Put(
+                        curr_value = &local_solution->get_values()[(local_put[p])[i]];
+                        last_value = &local_last_solution->get_values()[(local_put[p])[i]];
+
+                        if(std::fabs(curr_value - last_value) > 0)
+                        {
+                            // CHANGED
+                            MPI_Win_lock(MPI_WIN_EXCLUSIVE, neighbors_out[p], 0, comm_struct.window_x)
+                            MPI_Put(
                             &local_solution->get_values()[(local_put[p])[i]], 1,
                             mpi_vtype, neighbors_out[p], (remote_put[p])[i], 1,
                             mpi_vtype, comm_struct.window_x);
+                            MPI_Win_unlock(neighbors_out[p], comm_struct.window_x);
+                            
+                            &local_last_solution->get_values()[(local_put[p])[i]] =
+                               &local_solution->get_values()[(local_put[p])[i]];
+                            //END CHANGED
+                        }
                     }
                     if (settings.comm_settings.enable_flush_all) 
                     {

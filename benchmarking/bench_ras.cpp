@@ -62,15 +62,15 @@ DEFINE_bool(enable_put_all_local_residual_norms, false,
             "Enable putting of all local residual norms");
 DEFINE_bool(enable_comm_overlap, false,
             "Enable overlap of communication and computation");
-DEFINE_bool(enable_global_check, false,
+DEFINE_bool(enable_global_check, true,
             "Use the global convergence check for twosided");
 DEFINE_bool(enable_global_tree_check, false,
             "Use the global convergence tree check for onesided");
-DEFINE_bool(explicit_laplacian, false,
+DEFINE_bool(explicit_laplacian, true,
             "Use the explicit laplacian instead of deal.ii's matrix");
 DEFINE_bool(enable_random_rhs, false,
             "Use a random rhs instead of the default 1.0's ");
-DEFINE_uint32(overlap, 2, "Overlap between the domains");
+DEFINE_uint32(overlap, 8, "Overlap between the domains");
 DEFINE_string(
     executor, "reference",
     "The executor used to run the solver, one of reference, cuda or omp");
@@ -83,7 +83,8 @@ DEFINE_string(local_solver, "direct_cholmod",
               "The local solver used in the local domains. The current choices "
               "include direct_cholmod , direct_ginkgo or iterative_ginkgo");
 DEFINE_uint32(num_threads, 1, "Number of threads to bind to a process");
-DEFINE_bool(factor_ordering_natural, false,
+DEFINE_uint32(num_doms_per_proc, 1, "Number of subdomains per process");
+DEFINE_bool(factor_ordering_natural, true,
             "If true uses natural ordering instead of the default optimized "
             "ordering. ");
 DEFINE_bool(enable_local_precond, false,
@@ -175,6 +176,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     metadata.max_iters = FLAGS_num_iters;
     metadata.num_subdomains = metadata.comm_size;
     metadata.num_threads = FLAGS_num_threads;
+    metadata.num_domains_per_proc = FLAGS_num_doms_per_proc;
     metadata.oned_laplacian_size = FLAGS_set_1d_laplacian_size;
     metadata.global_size =
         metadata.oned_laplacian_size * metadata.oned_laplacian_size;

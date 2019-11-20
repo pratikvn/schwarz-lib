@@ -57,14 +57,15 @@ SolverBase<ValueType, IndexType>::SolverBase(
         Utils<ValueType, IndexType>::get_local_rank(metadata.mpi_communicator);
     auto local_num_procs = Utils<ValueType, IndexType>::get_local_num_procs(
         metadata.mpi_communicator);
-
+    auto num_subdomains = local_num_procs * metadata.num_domains_per_proc;
     if (settings.executor_string == "omp") {
         settings.executor = gko::OmpExecutor::create();
         auto exec_info =
             static_cast<gko::OmpExecutor *>(settings.executor.get())
                 ->get_exec_info();
-        exec_info->bind_to_core(local_rank);
-
+        for (auto i = 0; i < metadata.num_threads; ++i) {
+            exec_info->bind_to_core(local_rank+i);
+        }
     } else if (settings.executor_string == "cuda") {
         int num_devices = 0;
 #if SCHW_HAVE_CUDA
@@ -102,12 +103,16 @@ SolverBase<ValueType, IndexType>::SolverBase(
         auto exec_info =
             static_cast<gko::ReferenceExecutor *>(settings.executor.get())
                 ->get_exec_info();
-        exec_info->bind_to_core(local_rank);
+        // exec_info->bind_to_core(local_rank);
+#pragma omp parallel
+        {
+            exec_info->bind_to_core(omp_get_thread_num());
+        }
     }
 
     auto my_rank = this->metadata.my_rank;
     auto comm_size = this->metadata.comm_size;
-    auto num_subdomains = this->metadata.num_subdomains;
+    // auto num_subdomains = this->metadata.num_subdomains;
     auto global_size = this->metadata.global_size;
 
     // Some arrays for partitioning and local matrix creation.
@@ -150,7 +155,7 @@ SolverBase<ValueType, IndexType>::SolverBase(
         new vec_itype(settings.executor->get_master(), temp.begin(),
                       temp.end()),
         std::default_delete<vec_itype>());
-}
+}  // namespace SchwarzWrappers
 
 
 template <typename ValueType, typename IndexType>

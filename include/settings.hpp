@@ -247,6 +247,11 @@ struct Metadata {
     gko::size_type num_subdomains = 1;
 
     /**
+     * The number of subdomains per proces.
+     */
+    gko::size_type num_domains_per_proc = 1;
+
+    /**
      * The local rank of the subdomain.
      */
     int my_rank;

@@ -304,6 +304,7 @@ void Initialize<ValueType, IndexType>::setup_vectors(
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_rhs,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_last_solution,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;

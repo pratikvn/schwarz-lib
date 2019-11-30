@@ -63,8 +63,10 @@ class device_guard {
 public:
     device_guard(int device_id)
     {
+#if SCHW_HAVE_CUDA
         SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaGetDevice(&original_device_id));
         SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaSetDevice(device_id));
+#endif
     }
 
     device_guard(device_guard &other) = delete;
@@ -79,9 +81,13 @@ public:
     {
         /* Ignore the error during stack unwinding for this call */
         if (std::uncaught_exception()) {
+#if SCHW_HAVE_CUDA
             cudaSetDevice(original_device_id);
+#endif
         } else {
+#if SCHW_HAVE_CUDA
             SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaSetDevice(original_device_id));
+#endif
         }
     }
 

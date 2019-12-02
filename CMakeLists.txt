@@ -17,6 +17,7 @@ option(SCHWARZ_DEVEL_TOOLS "Switch on some developer tools" ON)
 # Optional packages
 include(cmake/package_helpers.cmake)
 ginkgo_find_package(gflags gflags FALSE 2.2.2)
+ginkgo_find_package(ctpl ctpl FALSE )
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 set(SCHWARZ_HAVE_CHOLMOD 0)

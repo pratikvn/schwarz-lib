@@ -38,8 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <exception_helpers.hpp>
 #include <process_topology.hpp>
 #include <schwarz_solver.hpp>
+#include <task.hpp>
+#include <ctpl.hpp>
 #include <utils.hpp>
-
 
 namespace SchwarzWrappers {
 
@@ -64,7 +65,7 @@ SolverBase<ValueType, IndexType>::SolverBase(
             static_cast<gko::OmpExecutor *>(settings.executor.get())
                 ->get_exec_info();
         for (auto i = 0; i < metadata.num_threads; ++i) {
-            exec_info->bind_to_core(local_rank+i);
+            exec_info->bind_to_core(local_rank + i);
         }
     } else if (settings.executor_string == "cuda") {
         int num_devices = 0;

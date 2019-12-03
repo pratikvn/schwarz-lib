@@ -49,7 +49,8 @@ void Communicate<ValueType, IndexType>::setup_windows(
 template <typename ValueType, typename IndexType>
 void Communicate<ValueType, IndexType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution_vector)
     SCHWARZ_NOT_IMPLEMENTED;
 
 template <typename ValueType, typename IndexType>

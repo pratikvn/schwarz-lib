@@ -236,7 +236,7 @@ void SolverBase<ValueType, IndexType>::initialize()
     // Setup the local vectors on each of the subddomains.
     Initialize<ValueType, IndexType>::setup_vectors(
         this->settings, this->metadata, rhs, this->local_rhs, this->global_rhs,
-        this->local_solution, this->global_solution);
+        this->local_solution, this->local_last_solution, this->global_solution);
 
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
@@ -256,6 +256,13 @@ void SolverBase<ValueType, IndexType>::run(
     // The main solution vector
     std::shared_ptr<vec_vtype> solution_vector = vec_vtype::create(
         settings.executor, gko::dim<2>(metadata.global_size, 1));
+
+    //CHANGED
+    //The last communicated solution vector
+    std::shared_ptr<vec_vtype> last_solution_vector = vec_vtype::create(
+        settings.executor, gko::dim<2>(metadata.global_size, 1));
+    //END CHANGED
+
     // A temp local solution
     std::shared_ptr<vec_vtype> temp_loc_solution =
         vec_vtype::create(settings.executor, this->local_solution->get_size());
@@ -283,7 +290,7 @@ void SolverBase<ValueType, IndexType>::run(
     {
         // Exchange the boundary values. The communication part.
         MEASURE_ELAPSED_FUNC_TIME(
-            this->exchange_boundary(settings, metadata, solution_vector), 0,
+            this->exchange_boundary(settings, metadata, solution_vector, last_solution_vector), 0,
             metadata.my_rank, boundary_exchange, metadata.iter_count);
 
         // Update the boundary and interior values after the exchanging from
@@ -976,7 +983,8 @@ template <typename ValueType, typename IndexType>
 void exchange_boundary_onesided(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_last_solution)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using arr = gko::Array<IndexType>;
@@ -1006,27 +1014,29 @@ void exchange_boundary_onesided(
             {
                 if ((global_put[p])[0] > 0) //no of elements
                 {
+                    //CHANGED
                     // push
                     for (auto i = 1; i <= (global_put[p])[0]; i++) 
                     {
-                        curr_value = &local_solution->get_values()[(local_put[p])[i]];
-                        last_value = &local_last_solution->get_values()[(local_put[p])[i]];
+                        auto curr_value = &local_solution->get_values()[(local_put[p])[i]];
+                        auto last_value = &local_last_solution->get_values()[(local_put[p])[i]];
 
                         if(std::fabs(curr_value - last_value) > 0)
                         {
-                            // CHANGED
-                            MPI_Win_lock(MPI_WIN_EXCLUSIVE, neighbors_out[p], 0, comm_struct.window_x)
+                            MPI_Win_lock(MPI_LOCK_EXCLUSIVE, neighbors_out[p], 0, comm_struct.window_x);
                             MPI_Put(
                             &local_solution->get_values()[(local_put[p])[i]], 1,
                             mpi_vtype, neighbors_out[p], (remote_put[p])[i], 1,
                             mpi_vtype, comm_struct.window_x);
                             MPI_Win_unlock(neighbors_out[p], comm_struct.window_x);
-                            
+    
+                            //how to copy current solution to current?                        
                             &local_last_solution->get_values()[(local_put[p])[i]] =
                                &local_solution->get_values()[(local_put[p])[i]];
-                            //END CHANGED
                         }
                     }
+                    //END CHANGED
+
                     if (settings.comm_settings.enable_flush_all) 
                     {
                         MPI_Win_flush(neighbors_out[p], comm_struct.window_x);
@@ -1281,12 +1291,13 @@ void exchange_boundary_twosided(
 template <typename ValueType, typename IndexType>
 void SolverRAS<ValueType, IndexType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution_vector)
 {
     if (settings.comm_settings.enable_onesided) 
     {
         exchange_boundary_onesided<ValueType, IndexType>(
-            settings, metadata, this->comm_struct, solution_vector);
+            settings, metadata, this->comm_struct, solution_vector, last_solution_vector);
     }
     else 
     {

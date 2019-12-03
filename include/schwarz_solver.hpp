@@ -227,8 +227,9 @@ public:
 
     void exchange_boundary(const Settings &settings,
                            const Metadata<ValueType, IndexType> &metadata,
-                           std::shared_ptr<gko::matrix::Dense<ValueType>>
-                               &solution_vector) override;
+                           std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
+                           std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution_vector)
+                             override;
 
     void update_boundary(
         const Settings &settings,

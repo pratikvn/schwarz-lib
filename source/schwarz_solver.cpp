@@ -1031,8 +1031,8 @@ void exchange_boundary_onesided(
                             MPI_Win_unlock(neighbors_out[p], comm_struct.window_x);
     
                             //how to copy current solution to current?                        
-                            &local_last_solution->get_values()[(local_put[p])[i]] =
-                               &local_solution->get_values()[(local_put[p])[i]];
+                            local_last_solution->get_values()[(local_put[p])[i]] =
+                               local_solution->get_values()[(local_put[p])[i]];
                         }
                     }
                     //END CHANGED

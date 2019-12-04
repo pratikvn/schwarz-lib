@@ -255,8 +255,15 @@ int main(int argc, char *argv[])
         initialize_argument_parsing(&argc, &argv);
         BenchRas<double, int> laplace_problem_2d;
 
-        int req_thread_support = MPI_THREAD_MULTIPLE;
-        int prov_thread_support = MPI_THREAD_MULTIPLE;
+        int req_thread_support = MPI_THREAD_SINGLE;
+        int prov_thread_support = MPI_THREAD_SINGLE;
+        if (FLAGS_num_threads > 1) {
+            req_thread_support = MPI_THREAD_MULTIPLE;
+            prov_thread_support = MPI_THREAD_MULTIPLE;
+        } else {
+            req_thread_support = MPI_THREAD_SINGLE;
+            prov_thread_support = MPI_THREAD_SINGLE;
+        }
 
         MPI_Init_thread(&argc, &argv, req_thread_support, &prov_thread_support);
         if (prov_thread_support != req_thread_support) {

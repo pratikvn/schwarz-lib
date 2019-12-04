@@ -834,16 +834,15 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
 {
     using vec_itype = gko::Array<IndexType>;
     using vec_vtype = gko::matrix::Dense<ValueType>;
-    auto comm_struct = this->comm_struct;
     auto num_subdomains = metadata.num_subdomains;
     auto local_size_o = metadata.local_size_o;
-    auto neighbors_in = comm_struct.neighbors_in->get_data();
-    auto global_get = comm_struct.global_get->get_data();
+    auto neighbors_in = this->comm_struct.neighbors_in->get_data();
+    auto global_get = this->comm_struct.global_get->get_data();
 
     // set displacement for the MPI buffer
-    auto get_displacements = comm_struct.get_displacements->get_data();
+    auto get_displacements = this->comm_struct.get_displacements->get_data();
     get_displacements[0] = 0;
-    for (auto j = 0; j < comm_struct.num_neighbors_in; j++) {
+    for (auto j = 0; j < this->comm_struct.num_neighbors_in; j++) {
         if ((global_get[j])[0] > 0) {
             int p = neighbors_in[j];
             get_displacements[p + 1] = (global_get[j])[0];
@@ -853,7 +852,7 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
         get_displacements[j] += get_displacements[j - 1];
     }
 
-    auto put_displacements = comm_struct.put_displacements->get_data();
+    auto put_displacements = this->comm_struct.put_displacements->get_data();
     auto mpi_itype = boost::mpi::get_mpi_datatype(get_displacements[0]);
     MPI_Alltoall(get_displacements, 1, mpi_itype, put_displacements, 1,
                  mpi_itype, MPI_COMM_WORLD);
@@ -865,7 +864,7 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
         MPI_Win_create(main_buffer->get_values(),
                        main_buffer->get_size()[0] * sizeof(ValueType),
                        sizeof(ValueType), MPI_INFO_NULL, MPI_COMM_WORLD,
-                       &comm_struct.window_x);
+                       &(this->comm_struct.window_x));
     } else {
         // Twosided
     }
@@ -899,8 +898,8 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
 
     if (settings.comm_settings.enable_onesided && num_subdomains > 1) {
         // Lock all windows.
-        MPI_Win_lock_all(0, comm_struct.window_buffer);
-        MPI_Win_lock_all(0, comm_struct.window_x);
+        MPI_Win_lock_all(0, this->comm_struct.window_buffer);
+        MPI_Win_lock_all(0, this->comm_struct.window_x);
         MPI_Win_lock_all(0, this->window_residual_vector);
         MPI_Win_lock_all(0, this->window_convergence);
     }
@@ -960,6 +959,7 @@ void exchange_boundary_onesided(
                 if ((global_put[p])[0] > 0) {
                     // Evil. Change this. TODO
                     if (settings.executor_string == "cuda") {
+                        // TODO: Optimize this for GPU with GPU buffers.
                         auto tmp_send_buf = vec_vtype::create(
                             settings.executor,
                             gko::dim<2>((global_put[p])[0], 1));

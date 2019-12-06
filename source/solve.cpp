@@ -252,7 +252,7 @@ void Solve<ValueType, IndexType>::local_solve(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &triangular_factor,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &temp_loc_solution,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
     const auto solver_settings =
@@ -271,13 +271,12 @@ void Solve<ValueType, IndexType>::local_solve(
     } else if (solver_settings ==
                Settings::local_solver_settings::direct_solver_ginkgo) {
         SolverTools::solve_direct_ginkgo(settings, metadata, this->L_solver,
-                                         this->U_solver, temp_loc_solution,
-                                         local_solution);
+                                         this->U_solver, local_solution);
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
         SolverTools::solve_iterative_ginkgo(settings, metadata, this->solver,
-                                            temp_loc_solution, local_solution);
-        // local_solution->copy_from(temp_loc_solution.get());
+                                            local_solution, init_guess);
+        local_solution->copy_from(init_guess.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_dealii) {
         SCHWARZ_NOT_IMPLEMENTED

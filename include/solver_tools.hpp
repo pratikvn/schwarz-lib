@@ -51,12 +51,11 @@ void solve_direct_ginkgo(
         &L_solver,
     const std::shared_ptr<gko::solver::UpperTrs<ValueType, IndexType>>
         &U_solver,
-    const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;
     auto temp_rhs = vec::create(settings.executor, local_solution->get_size());
-    L_solver->apply(gko::lend(local_rhs), gko::lend(temp_rhs));
+    L_solver->apply(gko::lend(local_solution), gko::lend(temp_rhs));
 
     U_solver->apply(gko::lend(temp_rhs), gko::lend(local_solution));
 }

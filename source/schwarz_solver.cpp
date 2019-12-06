@@ -53,7 +53,6 @@ SolverBase<ValueType, IndexType>::SolverBase(
 {
     using vec_itype = gko::Array<IndexType>;
     using vec_vecshared = gko::Array<IndexType *>;
-
     auto local_rank =
         Utils<ValueType, IndexType>::get_local_rank(metadata.mpi_communicator);
     auto local_num_procs = Utils<ValueType, IndexType>::get_local_num_procs(
@@ -283,7 +282,7 @@ void SolverBase<ValueType, IndexType>::run(
     std::shared_ptr<vec_vtype> solution_vector = vec_vtype::create(
         settings.executor, gko::dim<2>(metadata.global_size, 1));
     // A temp local solution
-    std::shared_ptr<vec_vtype> temp_loc_solution =
+    std::shared_ptr<vec_vtype> init_guess =
         vec_vtype::create(settings.executor, this->local_solution->get_size());
     // A global gathered solution of the previous iteration.
     std::shared_ptr<vec_vtype> global_old_solution = vec_vtype::create(
@@ -342,12 +341,12 @@ void SolverBase<ValueType, IndexType>::run(
                       << metadata.iter_count << " iters " << std::endl;
             break;
         } else {
-            temp_loc_solution->copy_from(this->local_solution.get());
             MEASURE_ELAPSED_FUNC_TIME(
                 (Solve<ValueType, IndexType>::local_solve(
-                    settings, metadata, this->triangular_factor,
-                    temp_loc_solution, this->local_solution)),
+                    settings, metadata, this->triangular_factor, init_guess,
+                    this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
+            // init_guess->copy_from(this->local_solution.get());
             // Gather the local vector into the locally global vector for
             // communication.
             MEASURE_ELAPSED_FUNC_TIME(

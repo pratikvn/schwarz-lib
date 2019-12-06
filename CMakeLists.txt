@@ -12,6 +12,7 @@ option(SCHWARZ_BUILD_CUDA "Build the CUDA kernels" ON)
 option(SCHWARZ_WITH_HWLOC "Build with hwloc support" ON)
 option(SCHWARZ_BUILD_DEALII "Build with deal.ii support" OFF)
 option(SCHWARZ_BUILD_CLANG_TIDY "Use clang-tidy for static checks of code." OFF)
+option(SCHWARZ_DEVEL_TOOLS "Switch on some developer tools" ON)
 
 # Optional packages
 include(cmake/package_helpers.cmake)

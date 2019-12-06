@@ -328,7 +328,7 @@ void SolverBase<ValueType, IndexType>::run(
             2, metadata.my_rank, convergence_check, metadata.iter_count);
 
         // break if the solution diverges.
-        if (isnan(global_residual_norm) || global_residual_norm > 1e12) {
+        if (std::isnan(global_residual_norm) || global_residual_norm > 1e12) {
             std::cout << " Rank " << metadata.my_rank << " diverged in "
                       << metadata.iter_count << " iters " << std::endl;
             std::exit(-1);

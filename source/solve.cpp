@@ -222,18 +222,40 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             std::cout << " Local iterative solve with Ginkgo CG " << std::endl;
         }
         using cg = gko::solver::Cg<ValueType>;
+        using bj = gko::preconditioner::Jacobi<ValueType, IndexType>;
         // Setup the Ginkgo iterative CG solver.
-        this->solver =
-            cg::build()
-                .with_criteria(
-                    gko::stop::Iteration::build()
-                        .with_max_iters(local_matrix->get_size()[0])
-                        .on(settings.executor),
-                    gko::stop::ResidualNormReduction<>::build()
-                        .with_reduction_factor(metadata.local_solver_tolerance)
-                        .on(settings.executor))
-                .on(settings.executor)
-                ->generate(local_matrix);
+        if (settings.use_precond) {
+            this->solver =
+                cg::build()
+                    .with_criteria(
+                        gko::stop::Iteration::build()
+                            .with_max_iters(local_matrix->get_size()[0])
+                            .on(settings.executor),
+                        gko::stop::ResidualNormReduction<ValueType>::build()
+                            .with_reduction_factor(
+                                metadata.local_solver_tolerance)
+                            .on(settings.executor))
+                    .with_preconditioner(
+                        bj::build()
+                            .with_max_block_size(
+                                metadata.precond_max_block_size)
+                            .on(settings.executor))
+                    .on(settings.executor)
+                    ->generate(local_matrix);
+        } else {
+            this->solver =
+                cg::build()
+                    .with_criteria(
+                        gko::stop::Iteration::build()
+                            .with_max_iters(local_matrix->get_size()[0])
+                            .on(settings.executor),
+                        gko::stop::ResidualNormReduction<ValueType>::build()
+                            .with_reduction_factor(
+                                metadata.local_solver_tolerance)
+                            .on(settings.executor))
+                    .on(settings.executor)
+                    ->generate(local_matrix);
+        }
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_dealii) {
         SCHWARZ_NOT_IMPLEMENTED

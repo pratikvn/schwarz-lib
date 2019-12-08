@@ -157,6 +157,18 @@ public:
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> recv_buffer;
 
+        //CHANGED
+        /**
+         * Average of values in the send buffer for each of the out neighbors
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> curr_send_avg;
+
+        /**
+         * Average of values in the last send buffer for each of the out neighbors
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> last_send_avg;
+        //END CHANGED
+
         /**
          * The displacements for the receiving of the buffer.
          */

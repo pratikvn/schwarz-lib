@@ -12,6 +12,7 @@ option(SCHWARZ_BUILD_CUDA "Build the CUDA kernels" ON)
 option(SCHWARZ_WITH_HWLOC "Build with hwloc support" ON)
 option(SCHWARZ_BUILD_DEALII "Build with deal.ii support" OFF)
 option(SCHWARZ_BUILD_CLANG_TIDY "Use clang-tidy for static checks of code." OFF)
+option(SCHWARZ_DEVEL_TOOLS "Switch on some developer tools" ON)
 
 # Optional packages
 include(cmake/package_helpers.cmake)
@@ -44,8 +45,10 @@ endif()
 
 set(SCHWARZ_HAVE_DEALII 0)
 if(SCHWARZ_BUILD_DEALII)
-  find_package(dealii)
+  find_package(deal.II REQUIRED
+    HINTS ${DEAL_II_DIR} $ENV{DEAL_II_DIR})
   set(SCHWARZ_HAVE_DEALII 1)
+  DEAL_II_INITIALIZE_CACHED_VARIABLES()
 endif()
 
 set(SCHWARZ_HAVE_HWLOC 0)
@@ -156,7 +159,7 @@ if(SCHWARZ_WITH_HWLOC)
 endif()
 
 if(SCHWARZ_BUILD_DEALII)
-  TARGET_LINK_LIBRARIES(${TARGET} dealii)
+  DEAL_II_SETUP_TARGET(${TARGET})
 endif()
 
 if(SCHWARZ_BUILD_CUDA)

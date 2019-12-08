@@ -86,6 +86,11 @@ DEFINE_uint32(num_threads, 1, "Number of threads to bind to a process");
 DEFINE_bool(factor_ordering_natural, false,
             "If true uses natural ordering instead of the default optimized "
             "ordering. ");
+DEFINE_bool(enable_local_precond, false,
+            "If true uses the Block jacobi preconditioning for the local "
+            "iterative solver. ");
+DEFINE_uint32(precond_max_block_size, 16,
+              "Maximum size of the blocks for the block jacobi preconditioner");
 
 
 void initialize_argument_parsing(int *argc, char **argv[])
@@ -166,13 +171,13 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     metadata.mpi_communicator = mpi_communicator;
     MPI_Comm_rank(metadata.mpi_communicator, &metadata.my_rank);
     MPI_Comm_size(metadata.mpi_communicator, &metadata.comm_size);
-    metadata.local_solver_tolerance = FLAGS_local_tol;
     metadata.tolerance = FLAGS_set_tol;
     metadata.max_iters = FLAGS_num_iters;
     metadata.num_subdomains = metadata.comm_size;
     metadata.num_threads = FLAGS_num_threads;
     metadata.oned_laplacian_size = FLAGS_set_1d_laplacian_size;
-    metadata.global_size = metadata.oned_laplacian_size * metadata.oned_laplacian_size;
+    metadata.global_size =
+        metadata.oned_laplacian_size * metadata.oned_laplacian_size;
 
     // Set solver settings from command line args.
     // Comm settings
@@ -195,6 +200,9 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
         FLAGS_enable_global_tree_check;
 
     // General solver settings
+    metadata.local_solver_tolerance = FLAGS_local_tol;
+    settings.use_precond = FLAGS_enable_local_precond;
+    metadata.precond_max_block_size = FLAGS_precond_max_block_size;
     settings.explicit_laplacian = FLAGS_explicit_laplacian;
     settings.enable_random_rhs = FLAGS_enable_random_rhs;
     settings.overlap = FLAGS_overlap;
@@ -230,6 +238,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
         std::cout << " Problem Size: " << metadata.global_size << std::endl;
     }
     SchwarzWrappers::SolverRAS<ValueType, IndexType> solver(settings, metadata);
+
     solver.initialize();
     solver.run(explicit_laplacian_solution);
     if (FLAGS_timings_file != "null") {
@@ -252,7 +261,23 @@ int main(int argc, char *argv[])
     try {
         initialize_argument_parsing(&argc, &argv);
         BenchRas<double, int> laplace_problem_2d;
-        MPI_Init(&argc, &argv);
+
+        int req_thread_support = MPI_THREAD_SINGLE;
+        int prov_thread_support = MPI_THREAD_SINGLE;
+        if (FLAGS_num_threads > 1) {
+            req_thread_support = MPI_THREAD_MULTIPLE;
+            prov_thread_support = MPI_THREAD_MULTIPLE;
+        } else {
+            req_thread_support = MPI_THREAD_SINGLE;
+            prov_thread_support = MPI_THREAD_SINGLE;
+        }
+
+        MPI_Init_thread(&argc, &argv, req_thread_support, &prov_thread_support);
+        if (prov_thread_support != req_thread_support) {
+            std::cout << "Required thread support is " << req_thread_support
+                      << " but provided thread support is only "
+                      << prov_thread_support << std::endl;
+        }
         laplace_problem_2d.run();
         MPI_Finalize();
     } catch (std::exception &exc) {

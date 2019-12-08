@@ -133,6 +133,11 @@ struct Settings {
     bool naturally_ordered_factor = false;
 
     /**
+     * Enable the block jacobi local preconditioner for the local solver.
+     */
+    bool use_precond = false;
+
+    /**
      * The settings for the various available communication paradigms.
      */
     struct comm_settings {
@@ -260,24 +265,29 @@ struct Metadata {
     /**
      * The iteration count of the solver.
      */
-    IndexType iter_count = 10;
+    IndexType iter_count;
 
     /**
      * The tolerance of the complete solver. The residual norm reduction
      * required.
      */
-    ValueType tolerance = 1e-6;
+    ValueType tolerance;
 
     /**
      * The tolerance of the local solver in case of an iterative solve. The
      * residual norm reduction required.
      */
-    ValueType local_solver_tolerance = 1e-12;
+    ValueType local_solver_tolerance;
 
     /**
      * The maximum iteration count of the solver.
      */
     IndexType max_iters;
+
+    /**
+     * The maximum block size for the preconditioner.
+     */
+    unsigned int precond_max_block_size;
 
     /**
      * The current residual norm of the subdomain.

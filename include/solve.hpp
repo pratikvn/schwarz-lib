@@ -117,7 +117,7 @@ protected:
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.
      * @param triangular_factor  The triangular factor.
-     * @param temp_loc_solution The local solution vector in the subdomain.
+     * @param init_guess  The initial solution for the local iterative solver.
      * @param local_solution The local solution vector in the subdomain.
      */
     void local_solve(
@@ -125,7 +125,7 @@ protected:
         const Metadata<ValueType, IndexType> &metadata,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &triangular_factor,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &temp_loc_solution,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution);
 
     /**

@@ -24,7 +24,7 @@ Where `[FLAGS]` are the options below with the template [`flag_name [type][defau
 * `num_refine_cycles` [uint32][1][disabled] : The number of refinement cycles when used with `deal.ii`.
 * `enable_onesided` [bool][false] : Enable the onesided asynchronous communication.
 * `enable_twosided` [bool][true] : Enable the twosided asynchronous communication. A dummy flag.
-* `enable_push_one_by_one` [bool][false][FIXME] : Enable pushing of each element in onesided communication.
+* `enable_push_one_by_one` [bool][false] : Enable pushing of each element in onesided communication.
 * `enable_put_all_local_residual_norms`  [bool][false] : Enable putting of all local residual norms"
 * `enable_comm_overlap` [bool][false] : Enable overlap of communication and computation.
 * `enable_global_check` [bool][false] : Use the global convergence check for twosided.
@@ -39,4 +39,5 @@ Where `[FLAGS]` are the options below with the template [`flag_name [type][defau
 * `local_solver` [std::string][direct_cholmod] : The local solver used in the local domains. The current choices are `direct_cholmod` , `direct_ginkgo` or `iterative_ginkgo`.
 * `num_threads` [uint32][1], "Number of threads to bind to a process.
 * `factor_ordering_natural` [bool][false]: If true uses natural ordering instead of the default optimized ordering. This is needed for CUDA runs as the factorization ordering needs to be given to the solver.
-
+* `enable_local_precond` [bool][false], "If true uses the Block jacobi preconditioning for the local iterative solver. "
+* `precond_max_block_size` [uint32][16], "Maximum size of the blocks for the block jacobi preconditioner"

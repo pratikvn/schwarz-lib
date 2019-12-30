@@ -265,6 +265,7 @@ void Initialize<ValueType, IndexType>::partition(
             (Settings::partition_settings::partition_zoltan |
              Settings::partition_settings::partition_metis |
              Settings::partition_settings::partition_naive |
+             Settings::partition_settings::partition_naive2d |
              Settings::partition_settings::partition_custom) &
             settings.partition;
 
@@ -282,9 +283,16 @@ void Initialize<ValueType, IndexType>::partition(
         } else if (partition_settings ==
                    Settings::partition_settings::partition_naive) {
             if (metadata.my_rank == 0) {
-                std::cout << " 1D even partition" << std::endl;
+                std::cout << " Regular 1D partition" << std::endl;
             }
             PartitionTools::PartitionNaive(
+                global_matrix, metadata.num_subdomains, partition_indices);
+        } else if (partition_settings ==
+                   Settings::partition_settings::partition_naive2d) {
+            if (metadata.my_rank == 0) {
+                std::cout << " Regular 2D partition" << std::endl;
+            }
+            PartitionTools::PartitionNaive2D(
                 global_matrix, metadata.num_subdomains, partition_indices);
         } else if (partition_settings ==
                    Settings::partition_settings::partition_custom) {

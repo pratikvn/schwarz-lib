@@ -78,7 +78,7 @@ DEFINE_string(enable_flush, "flush_all",
               "The window flush. The choices are flush_local and flush_all");
 DEFINE_string(timings_file, "null", "The filename for the timings");
 DEFINE_string(partition, "naive",
-              "The partitioner used. The choices are metis or naive");
+              "The partitioner used. The choices are metis, naive, naive2d");
 DEFINE_string(local_solver, "direct_cholmod",
               "The local solver used in the local domains. The current choices "
               "include direct_cholmod , direct_ginkgo or iterative_ginkgo");
@@ -213,6 +213,9 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     } else if (FLAGS_partition == "naive") {
         settings.partition =
             SchwarzWrappers::Settings::partition_settings::partition_naive;
+    } else if (FLAGS_partition == "naive2d") {
+        settings.partition =
+            SchwarzWrappers::Settings::partition_settings::partition_naive2d;
     }
     if (FLAGS_local_solver == "iterative_ginkgo") {
         settings.local_solver = SchwarzWrappers::Settings::

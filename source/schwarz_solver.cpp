@@ -428,6 +428,7 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     auto partition_settings = (Settings::partition_settings::partition_zoltan |
                                Settings::partition_settings::partition_metis |
                                Settings::partition_settings::partition_naive |
+                               Settings::partition_settings::partition_naive2d |
                                Settings::partition_settings::partition_custom) &
                               settings.partition;
 

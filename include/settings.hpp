@@ -84,6 +84,7 @@ struct Settings {
      */
     enum partition_settings {
         partition_naive = 0x0,
+        partition_naive2d = 0x4,
         partition_metis = 0x1,
         partition_zoltan = 0x2,
         partition_custom = 0x3

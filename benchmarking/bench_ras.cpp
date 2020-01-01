@@ -77,6 +77,9 @@ DEFINE_string(
 DEFINE_string(enable_flush, "flush_all",
               "The window flush. The choices are flush_local and flush_all");
 DEFINE_string(timings_file, "null", "The filename for the timings");
+DEFINE_bool(write_comm_data, false,
+            "Write the number of elements sent and received by each subdomain "
+            "to a file.");
 DEFINE_string(partition, "naive",
               "The partitioner used. The choices are metis, naive, naive2d");
 DEFINE_string(local_solver, "direct_cholmod",
@@ -113,8 +116,55 @@ private:
         std::vector<std::tuple<int, int, int, std::string,
                                std::vector<ValueType>>> &time_struct,
         std::string filename);
+    void write_comm_data(
+        int num_subd, int my_rank,
+        std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
+                               std::vector<std::tuple<int, int>>, int, int>>
+            &comm_data_struct,
+        std::string filename_send, std::string filename_recv);
     int get_local_rank(MPI_Comm mpi_communicator);
 };
+
+
+template <typename ValueType, typename IndexType>
+void BenchRas<ValueType, IndexType>::write_comm_data(
+    int num_subd, int my_rank,
+    std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
+                           std::vector<std::tuple<int, int>>, int, int>>
+        &comm_data_struct,
+    std::string filename_send, std::string filename_recv)
+{
+    {
+        std::ofstream file;
+        file.open(filename_send);
+        file << "subdomain " << my_rank << " has "
+             << std::get<4>(comm_data_struct[my_rank]) << " neighbors\n";
+        file << "my_id,to_id,num_send\n";
+        for (auto i = 0; i < num_subd; ++i) {
+            file << my_rank << ","
+                 << std::get<0>(std::get<2>(comm_data_struct[my_rank])[i])
+                 << ","
+                 << std::get<1>(std::get<2>(comm_data_struct[my_rank])[i])
+                 << "\n";
+        }
+        file.close();
+    }
+    {
+        std::ofstream file;
+        file.open(filename_recv);
+        file << "subdomain " << my_rank << " has "
+             << std::get<3>(comm_data_struct[my_rank]) << " neighbors\n";
+        file << "my_id,from_id,num_recv\n";
+        for (auto i = 0; i < num_subd; ++i) {
+            file << my_rank << ","
+                 << std::get<0>(std::get<1>(comm_data_struct[my_rank])[i])
+                 << ","
+                 << std::get<1>(std::get<1>(comm_data_struct[my_rank])[i])
+                 << "\n";
+        }
+        file.close();
+    }
+}
 
 
 template <typename ValueType, typename IndexType>
@@ -248,6 +298,15 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
         std::string filename = FLAGS_timings_file + "_" +
                                std::to_string(metadata.my_rank) + ".csv";
         write_timings(metadata.time_struct, filename);
+    }
+    if (FLAGS_write_comm_data) {
+        std::string filename_send =
+            "num_send_" + std::to_string(metadata.my_rank) + ".csv";
+        std::string filename_recv =
+            "num_recv_" + std::to_string(metadata.my_rank) + ".csv";
+        write_comm_data(metadata.num_subdomains, metadata.my_rank,
+                        metadata.comm_data_struct, filename_send,
+                        filename_recv);
     }
 }
 

@@ -308,6 +308,14 @@ struct Metadata {
         time_struct;
 
     /**
+     * The struct used to measure the timings of each function within the solver
+     * loop.
+     */
+    std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
+                           std::vector<std::tuple<int, int>>, int, int>>
+        comm_data_struct;
+
+    /**
      * The mapping containing the global to local indices.
      */
     std::shared_ptr<gko::Array<IndexType>> global_to_local;

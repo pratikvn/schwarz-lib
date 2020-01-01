@@ -193,7 +193,8 @@ void SolverBase<ValueType, IndexType>::initialize()
     // Setup the local matrices on each of the subddomains.
     this->setup_local_matrices(this->settings, this->metadata,
                                this->partition_indices, this->global_matrix,
-                               this->local_matrix, this->interface_matrix);
+                               this->local_matrix, this->interface_matrix,
+                               this->local_perm);
     // Debug to print matrices.
     if (settings.print_matrices && settings.executor_string != "cuda") {
         Utils<ValueType, IndexType>::print_matrix(
@@ -255,7 +256,8 @@ void SolverBase<ValueType, IndexType>::initialize(
     // Setup the local matrices on each of the subddomains.
     this->setup_local_matrices(this->settings, this->metadata,
                                this->partition_indices, this->global_matrix,
-                               this->local_matrix, this->interface_matrix);
+                               this->local_matrix, this->interface_matrix,
+                               this->local_perm);
     // Debug to print matrices.
     if (settings.print_matrices && settings.executor_string != "cuda") {
         Utils<ValueType, IndexType>::print_matrix(
@@ -454,16 +456,65 @@ SolverRAS<ValueType, IndexType>::SolverRAS(
 {}
 
 
+template <typename IndexType>
+bool find_duplicates(IndexType val, std::size_t index, const IndexType *data,
+                     std::size_t length)
+{
+    auto count = 0;
+    for (auto i = 0; i < length; ++i) {
+        if (i != index && val == data[i]) {
+            count++;
+        }
+    }
+    if (count == 0) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+
+template <typename IndexType>
+bool assert_correct_permutation(
+    const gko::matrix::Permutation<IndexType> *input_perm)
+{
+    auto perm_data = input_perm->get_const_permutation();
+    auto perm_size = input_perm->get_permutation_size();
+
+    for (auto i = 0; i < perm_size; ++i) {
+        if (perm_data[i] >= perm_size) {
+            std::cout << "Here " << __LINE__ << ", perm[i] " << perm_data[i]
+                      << " at " << i << std::endl;
+            return false;
+        }
+        if (perm_data[i] < 0) {
+            std::cout << "Here " << __LINE__ << std::endl;
+            return false;
+        }
+        if (!find_duplicates(perm_data[i], i, perm_data, perm_size)) {
+            std::cout << "Here " << __LINE__ << std::endl;
+            return false;
+        }
+    }
+}
+
+
 template <typename ValueType, typename IndexType>
 void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     Settings &settings, Metadata<ValueType, IndexType> &metadata,
     std::vector<unsigned int> &partition_indices,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
-    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &interface_matrix)
+    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &interface_matrix,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm)
 {
     using mtx = gko::matrix::Csr<ValueType, IndexType>;
     using vec_itype = gko::Array<IndexType>;
+    using rcm_reorder_type = gko::reorder::Rcm<ValueType, IndexType>;
+    // Only instantiated for metis_indextype
+    using metis_reorder_type =
+        gko::reorder::MetisFillReduce<ValueType, metis_indextype>;
+    using perm_type = gko::matrix::Permutation<IndexType>;
     auto my_rank = metadata.my_rank;
     auto comm_size = metadata.comm_size;
     auto num_subdomains = metadata.num_subdomains;
@@ -694,6 +745,35 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     local_matrix->copy_from(gko::lend(local_matrix_compute));
     interface_matrix = mtx::create(settings.executor);
     interface_matrix->copy_from(gko::lend(interface_matrix_compute));
+
+    if (settings.reorder == "metis_reordering") {
+        auto reorder = metis_reorder_type::build()
+                           .on(settings.executor)
+                           ->generate(local_matrix);
+        auto lperm = reorder->get_permutation();
+        local_perm =
+            perm_type::create(settings.executor, local_matrix->get_size());
+        local_perm->copy_from(gko::lend(lperm));
+    } else if (settings.reorder == "rcm_reordering") {
+        auto reorder = rcm_reorder_type::build()
+                           .on(settings.executor)
+                           ->generate(local_matrix);
+        auto lperm = reorder->get_permutation();
+        local_perm->copy_from(gko::lend(lperm));
+    } else {
+        local_perm =
+            perm_type::create(settings.executor, local_matrix->get_size());
+    }
+
+    if (settings.debug_print) {
+        if (assert_correct_permutation(local_perm.get())) {
+            std::cout << " Rank " << metadata.my_rank
+                      << " Permutation is correct" << std::endl;
+        } else {
+            std::cout << " Rank " << metadata.my_rank
+                      << " Permutation is incorrect" << std::endl;
+        }
+    }
 }
 
 

@@ -151,6 +151,7 @@ public:
      * @param interface_matrix The interface matrix containing the interface and
      *                         the overlap data mainly used for exchanging
      *                         values between different sub-domains.
+     * @param local_perm  The local permutation, obtained through RCM or METIS.
      */
     virtual void setup_local_matrices(
         Settings &settings, Metadata<ValueType, IndexType> &metadata,
@@ -158,7 +159,8 @@ public:
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
-            &interface_matrix) = 0;
+            &interface_matrix,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm) = 0;
 
 private:
     Settings &settings;

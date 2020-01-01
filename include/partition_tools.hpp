@@ -122,11 +122,11 @@ void PartitionMetis(
     // simple, since METIS wants exactly our
     // compressed row storage format. we only
     // have to set up a few auxiliary arrays
-    idx_t n = static_cast<signed int>(global_matrix->get_size()[0]),
-          ncon = 1,  // number of balancing constraints (should be >0)
-        nparts =
-            static_cast<int>(n_partitions),  // number of subdomains to create
-        dummy;                               // the numbers of edges cut by the
+    idx_t n = static_cast<idx_t>(global_matrix->get_size()[0]);
+    idx_t ncon = 1;  // number of balancing constraints (should be >0)
+    idx_t nparts =
+        static_cast<idx_t>(n_partitions);  // number of subdomains to create
+    idx_t dummy;                           // the numbers of edges cut by the
     // resulting partition
 
     // We can not partition n items into more than n parts. METIS will

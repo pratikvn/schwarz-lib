@@ -53,6 +53,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <gather_scatter.hpp>
 
 
+#if SCHW_HAVE_METIS
+#include <metis.h>
+#define metis_indextype idx_t
+#else
+#define metis_indextype gko::int32
+#endif
+
+
 #define MINIMAL_OVERLAP 2
 
 
@@ -111,6 +119,11 @@ struct Settings {
      * Flag to enable printing of matrices.
      */
     bool print_matrices = false;
+
+    /**
+     * Flag to enable some debug printing.
+     */
+    bool debug_print = false;
 
     /**
      * The local solver algorithm for the local subdomain solves.
@@ -226,6 +239,10 @@ struct Settings {
     };
     convergence_settings convergence_settings;
 
+    /**
+     * The reordering for the local solve.
+     */
+    std::string reorder;
 
     Settings(std::string executor_string = "reference")
         : executor_string(executor_string)

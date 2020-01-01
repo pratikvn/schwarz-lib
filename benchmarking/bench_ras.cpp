@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <solve.hpp>
 
 
+DEFINE_bool(debug, false, "Enable some possibly expensive debug checks");
 DEFINE_uint32(num_iters, 100, "Number of Schwarz iterations");
 DEFINE_double(set_tol, 1e-6, "Tolerance for the Schwarz solver");
 DEFINE_double(local_tol, 1e-12, "Tolerance for the local solver");
@@ -102,6 +103,10 @@ DEFINE_string(
 DEFINE_string(local_solver, "iterative-ginkgo",
               "The local solver used in the local domains. The current choices "
               "include direct-cholmod , direct-ginkgo or iterative-ginkgo");
+DEFINE_string(local_reordering, "none",
+              "The reordering for the local direct solver. Choices"
+              "include none , rcm_reordering (symmetric matrices) or "
+              "metis_reordering (all)");
 DEFINE_uint32(num_threads, 1, "Number of threads to bind to a process");
 DEFINE_bool(factor_ordering_natural, false,
             "If true uses natural ordering instead of the default optimized "
@@ -341,6 +346,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     settings.enable_random_rhs = FLAGS_enable_random_rhs;
     settings.overlap = FLAGS_overlap;
     settings.naturally_ordered_factor = FLAGS_factor_ordering_natural;
+    settings.reorder = FLAGS_local_reordering;
     if (FLAGS_partition == "metis") {
         settings.partition =
             SchwarzWrappers::Settings::partition_settings::partition_metis;
@@ -362,6 +368,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
         settings.local_solver = SchwarzWrappers::Settings::
             local_solver_settings::direct_solver_ginkgo;
     }
+    settings.debug_print = FLAGS_debug;
 
     // The global solution vector to be passed in to the RAS solver.
     std::shared_ptr<gko::matrix::Dense<ValueType>> explicit_laplacian_solution =

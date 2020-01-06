@@ -84,11 +84,11 @@ void PartitionNaive2D(
         offset2 = j1 * sq_partn * std::pow(sq_n / sq_partn, 2);
         for (auto j2 = 0; j2 < sq_partn; ++j2) {
             auto my_id = sq_partn * j1 + j2;
+            offset1 = (j2)*sq_n / sq_partn;
             for (auto i1 = 0; i1 < sq_n / sq_partn; ++i1) {
-                offset1 = (j2)*sq_n / sq_partn;
                 for (auto i2 = 0; i2 < sq_n / sq_partn; ++i2) {
-                    partition_indices[offset2 + offset1 +
-                                      (2 * i1 * sq_n / sq_partn) + i2] = my_id;
+                    partition_indices[offset2 + offset1 + (i1 * sq_n) + i2] =
+                        my_id;
                 }
             }
         }

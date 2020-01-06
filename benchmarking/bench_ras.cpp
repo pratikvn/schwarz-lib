@@ -52,6 +52,7 @@ DEFINE_uint32(set_1d_laplacian_size, 16,
 DEFINE_uint32(
     num_refine_cycles, 1,
     "Number of refinement cycles for the adaptive refinement within deal.ii");
+DEFINE_bool(enable_debug_write, false, "Enable some debug writes.");
 DEFINE_bool(enable_onesided, false,
             "Use the onesided communication version for the solver");
 DEFINE_bool(enable_twosided, true,
@@ -228,6 +229,9 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     metadata.oned_laplacian_size = FLAGS_set_1d_laplacian_size;
     metadata.global_size =
         metadata.oned_laplacian_size * metadata.oned_laplacian_size;
+
+    // Generic settings
+    settings.write_debug_out = FLAGS_enable_debug_write;
 
     // Set solver settings from command line args.
     // Comm settings

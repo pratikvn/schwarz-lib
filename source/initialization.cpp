@@ -293,7 +293,8 @@ void Initialize<ValueType, IndexType>::partition(
                 std::cout << " Regular 2D partition" << std::endl;
             }
             PartitionTools::PartitionNaive2D(
-                global_matrix, metadata.num_subdomains, partition_indices);
+                global_matrix, settings.write_debug_out,
+                metadata.num_subdomains, partition_indices);
         } else if (partition_settings ==
                    Settings::partition_settings::partition_custom) {
             // User partitions mesh manually

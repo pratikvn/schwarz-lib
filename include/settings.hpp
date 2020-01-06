@@ -139,6 +139,11 @@ struct Settings {
     bool use_precond = false;
 
     /**
+     * Enable the writing of debug out to file.
+     */
+    bool write_debug_out = false;
+
+    /**
      * The settings for the various available communication paradigms.
      */
     struct comm_settings {

@@ -71,10 +71,39 @@ template <typename ValueType, typename IndexType>
 void PartitionNaive2D(
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &global_matrix,
-    const unsigned int &n_partitions,
+    bool write_debug_out, const unsigned int &n_partitions,
     std::vector<unsigned int> &partition_indices)
 {
-    // TODO: Move the naive partitioning here from initialization
+    auto n = global_matrix->get_size()[0];
+    int sq_n = static_cast<int>(std::sqrt(n));
+    int sq_partn = static_cast<int>(std::sqrt(n_partitions));
+    auto offset1 = 0;
+    auto offset2 = 0;
+    int subd = 0;
+    for (auto j1 = 0; j1 < sq_partn; ++j1) {
+        offset2 = j1 * sq_partn * std::pow(sq_n / sq_partn, 2);
+        for (auto j2 = 0; j2 < sq_partn; ++j2) {
+            auto my_id = sq_partn * j1 + j2;
+            for (auto i1 = 0; i1 < sq_n / sq_partn; ++i1) {
+                offset1 = (j2)*sq_n / sq_partn;
+                for (auto i2 = 0; i2 < sq_n / sq_partn; ++i2) {
+                    partition_indices[offset2 + offset1 +
+                                      (2 * i1 * sq_n / sq_partn) + i2] = my_id;
+                }
+            }
+        }
+    }
+
+    if (write_debug_out) {
+        std::ofstream file;
+        std::string filename = "part_indices.csv";
+        file.open(filename);
+        file << "idx,subd\n";
+        for (auto i = 0; i < partition_indices.size(); ++i) {
+            file << i << "," << partition_indices[i] << "\n";
+        }
+        file.close();
+    }
 }
 
 

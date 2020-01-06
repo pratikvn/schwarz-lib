@@ -241,6 +241,7 @@ void SolverBase<ValueType, IndexType>::initialize(
         Initialize<ValueType, IndexType>::setup_global_matrix(
             matrix, this->global_matrix);
     }
+
     // Partition the global matrix.
     Initialize<ValueType, IndexType>::partition(
         settings, metadata, this->global_matrix, this->partition_indices);
@@ -480,13 +481,19 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
                                Settings::partition_settings::partition_custom) &
                               settings.partition;
 
+    IndexType *gmat_row_ptrs = global_matrix->get_row_ptrs();
+    IndexType *gmat_col_idxs = global_matrix->get_col_idxs();
+    ValueType *gmat_values = global_matrix->get_values();
+
     // default local p size set for 1 subdomain.
     first_row[0] = 0;
     for (auto p = 0; p < num_subdomains; ++p) {
         local_p_size[p] = std::min(global_size - first_row[p], nb);
         first_row[p + 1] = first_row[p] + local_p_size[p];
     }
-    if (partition_settings == Settings::partition_settings::partition_metis) {
+
+    if (partition_settings == Settings::partition_settings::partition_metis ||
+        partition_settings == Settings::partition_settings::partition_naive2d) {
         if (num_subdomains > 1) {
             for (auto p = 0; p < num_subdomains; p++) {
                 local_p_size[p] = 0;
@@ -513,12 +520,7 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
                 i_permutation[permutation[i]] = i;
             }
         }
-    }
 
-    IndexType *gmat_row_ptrs = global_matrix->get_row_ptrs();
-    IndexType *gmat_col_idxs = global_matrix->get_col_idxs();
-    ValueType *gmat_values = global_matrix->get_values();
-    if (partition_settings == Settings::partition_settings::partition_metis) {
         auto gmat_temp = mtx::create(settings.executor->get_master(),
                                      global_matrix->get_size(),
                                      global_matrix->get_num_stored_elements());

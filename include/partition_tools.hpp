@@ -109,6 +109,7 @@ void PartitionNaive2D(
 
 template <typename ValueType, typename IndexType>
 void PartitionMetis(
+    const Settings &settings,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &global_matrix,
     const std::vector<unsigned int> &cell_weights,
@@ -141,6 +142,11 @@ void PartitionMetis(
     SCHWARZ_ASSERT_NO_METIS_ERRORS(METIS_SetDefaultOptions(options));
     // options[METIS_OPTION_SEED]      = 0;
     // options[METIS_OPTION_NUMBERING] = 0;
+    if (settings.metis_objtype == "edgecut") {
+        options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;
+    } else if (settings.metis_objtype == "totalvol") {
+        options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL;
+    }
 
     // // one more nuisance: we have to copy our own data to arrays that
     // store
@@ -197,6 +203,7 @@ void PartitionMetis(
 
 #define DECLARE_FUNCTION(ValueType, IndexType)                           \
     void PartitionMetis(                                                 \
+        const Settings &,                                                \
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &, \
         const std::vector<unsigned int> &, const unsigned int &,         \
         std::vector<unsigned int> &)

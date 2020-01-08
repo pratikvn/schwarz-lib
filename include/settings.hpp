@@ -134,6 +134,11 @@ struct Settings {
     bool naturally_ordered_factor = false;
 
     /**
+     * This setting defines the objective type for the metis partitioning.
+     */
+    std::string metis_objtype;
+
+    /**
      * Enable the block jacobi local preconditioner for the local solver.
      */
     bool use_precond = false;

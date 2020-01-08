@@ -95,6 +95,9 @@ DEFINE_bool(enable_local_precond, false,
             "iterative solver. ");
 DEFINE_uint32(precond_max_block_size, 16,
               "Maximum size of the blocks for the block jacobi preconditioner");
+DEFINE_string(metis_objtype, "null",
+              "Defines the objective type for the metis partitioning, options "
+              "are edgecut and totalvol ");
 
 
 void initialize_argument_parsing(int *argc, char **argv[])
@@ -264,6 +267,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     if (FLAGS_partition == "metis") {
         settings.partition =
             SchwarzWrappers::Settings::partition_settings::partition_metis;
+        settings.metis_objtype = FLAGS_metis_objtype;
     } else if (FLAGS_partition == "naive") {
         settings.partition =
             SchwarzWrappers::Settings::partition_settings::partition_naive;
@@ -299,15 +303,20 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     solver.initialize();
     solver.run(explicit_laplacian_solution);
     if (FLAGS_timings_file != "null") {
-        std::string filename = FLAGS_timings_file + "_" +
-                               std::to_string(metadata.my_rank) + ".csv";
+        std::string rank_string = std::to_string(metadata.my_rank);
+        if (metadata.my_rank < 10) {
+            rank_string = "0" + std::to_string(metadata.my_rank);
+        }
+        std::string filename = FLAGS_timings_file + "_" + rank_string + ".csv";
         write_timings(metadata.time_struct, filename);
     }
     if (FLAGS_write_comm_data) {
-        std::string filename_send =
-            "num_send_" + std::to_string(metadata.my_rank) + ".csv";
-        std::string filename_recv =
-            "num_recv_" + std::to_string(metadata.my_rank) + ".csv";
+        std::string rank_string = std::to_string(metadata.my_rank);
+        if (metadata.my_rank < 10) {
+            rank_string = "0" + std::to_string(metadata.my_rank);
+        }
+        std::string filename_send = "num_send_" + rank_string + ".csv";
+        std::string filename_recv = "num_recv_" + rank_string + ".csv";
         write_comm_data(metadata.num_subdomains, metadata.my_rank,
                         metadata.comm_data_struct, filename_send,
                         filename_recv);

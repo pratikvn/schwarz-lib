@@ -277,9 +277,9 @@ void Initialize<ValueType, IndexType>::partition(
             if (metadata.my_rank == 0) {
                 std::cout << " METIS partition" << std::endl;
             }
-            PartitionTools::PartitionMetis(global_matrix, this->cell_weights,
-                                           metadata.num_subdomains,
-                                           partition_indices);
+            PartitionTools::PartitionMetis(
+                settings, global_matrix, this->cell_weights,
+                metadata.num_subdomains, partition_indices);
         } else if (partition_settings ==
                    Settings::partition_settings::partition_naive) {
             if (metadata.my_rank == 0) {

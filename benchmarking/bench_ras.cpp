@@ -52,6 +52,7 @@ DEFINE_uint32(set_1d_laplacian_size, 16,
 DEFINE_uint32(
     num_refine_cycles, 1,
     "Number of refinement cycles for the adaptive refinement within deal.ii");
+DEFINE_bool(enable_debug_write, false, "Enable some debug writes.");
 DEFINE_bool(enable_onesided, false,
             "Use the onesided communication version for the solver");
 DEFINE_bool(enable_twosided, true,
@@ -77,8 +78,11 @@ DEFINE_string(
 DEFINE_string(enable_flush, "flush_all",
               "The window flush. The choices are flush_local and flush_all");
 DEFINE_string(timings_file, "null", "The filename for the timings");
+DEFINE_bool(write_comm_data, false,
+            "Write the number of elements sent and received by each subdomain "
+            "to a file.");
 DEFINE_string(partition, "naive",
-              "The partitioner used. The choices are metis or naive");
+              "The partitioner used. The choices are metis, naive, naive2d");
 DEFINE_string(local_solver, "direct_cholmod",
               "The local solver used in the local domains. The current choices "
               "include direct_cholmod , direct_ginkgo or iterative_ginkgo");
@@ -91,6 +95,9 @@ DEFINE_bool(enable_local_precond, false,
             "iterative solver. ");
 DEFINE_uint32(precond_max_block_size, 16,
               "Maximum size of the blocks for the block jacobi preconditioner");
+DEFINE_string(metis_objtype, "null",
+              "Defines the objective type for the metis partitioning, options "
+              "are edgecut and totalvol ");
 
 
 void initialize_argument_parsing(int *argc, char **argv[])
@@ -113,8 +120,55 @@ private:
         std::vector<std::tuple<int, int, int, std::string,
                                std::vector<ValueType>>> &time_struct,
         std::string filename);
+    void write_comm_data(
+        int num_subd, int my_rank,
+        std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
+                               std::vector<std::tuple<int, int>>, int, int>>
+            &comm_data_struct,
+        std::string filename_send, std::string filename_recv);
     int get_local_rank(MPI_Comm mpi_communicator);
 };
+
+
+template <typename ValueType, typename IndexType>
+void BenchRas<ValueType, IndexType>::write_comm_data(
+    int num_subd, int my_rank,
+    std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
+                           std::vector<std::tuple<int, int>>, int, int>>
+        &comm_data_struct,
+    std::string filename_send, std::string filename_recv)
+{
+    {
+        std::ofstream file;
+        file.open(filename_send);
+        file << "subdomain " << my_rank << " has "
+             << std::get<4>(comm_data_struct[my_rank]) << " neighbors\n";
+        file << "my_id,to_id,num_send\n";
+        for (auto i = 0; i < num_subd; ++i) {
+            file << my_rank << ","
+                 << std::get<0>(std::get<2>(comm_data_struct[my_rank])[i])
+                 << ","
+                 << std::get<1>(std::get<2>(comm_data_struct[my_rank])[i])
+                 << "\n";
+        }
+        file.close();
+    }
+    {
+        std::ofstream file;
+        file.open(filename_recv);
+        file << "subdomain " << my_rank << " has "
+             << std::get<3>(comm_data_struct[my_rank]) << " neighbors\n";
+        file << "my_id,from_id,num_recv\n";
+        for (auto i = 0; i < num_subd; ++i) {
+            file << my_rank << ","
+                 << std::get<0>(std::get<1>(comm_data_struct[my_rank])[i])
+                 << ","
+                 << std::get<1>(std::get<1>(comm_data_struct[my_rank])[i])
+                 << "\n";
+        }
+        file.close();
+    }
+}
 
 
 template <typename ValueType, typename IndexType>
@@ -179,6 +233,9 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     metadata.global_size =
         metadata.oned_laplacian_size * metadata.oned_laplacian_size;
 
+    // Generic settings
+    settings.write_debug_out = FLAGS_enable_debug_write;
+
     // Set solver settings from command line args.
     // Comm settings
     settings.comm_settings.enable_onesided = FLAGS_enable_onesided;
@@ -210,9 +267,13 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     if (FLAGS_partition == "metis") {
         settings.partition =
             SchwarzWrappers::Settings::partition_settings::partition_metis;
+        settings.metis_objtype = FLAGS_metis_objtype;
     } else if (FLAGS_partition == "naive") {
         settings.partition =
             SchwarzWrappers::Settings::partition_settings::partition_naive;
+    } else if (FLAGS_partition == "naive2d") {
+        settings.partition =
+            SchwarzWrappers::Settings::partition_settings::partition_naive2d;
     }
     if (FLAGS_local_solver == "iterative_ginkgo") {
         settings.local_solver = SchwarzWrappers::Settings::
@@ -242,9 +303,23 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     solver.initialize();
     solver.run(explicit_laplacian_solution);
     if (FLAGS_timings_file != "null") {
-        std::string filename = FLAGS_timings_file + "_" +
-                               std::to_string(metadata.my_rank) + ".csv";
+        std::string rank_string = std::to_string(metadata.my_rank);
+        if (metadata.my_rank < 10) {
+            rank_string = "0" + std::to_string(metadata.my_rank);
+        }
+        std::string filename = FLAGS_timings_file + "_" + rank_string + ".csv";
         write_timings(metadata.time_struct, filename);
+    }
+    if (FLAGS_write_comm_data) {
+        std::string rank_string = std::to_string(metadata.my_rank);
+        if (metadata.my_rank < 10) {
+            rank_string = "0" + std::to_string(metadata.my_rank);
+        }
+        std::string filename_send = "num_send_" + rank_string + ".csv";
+        std::string filename_recv = "num_recv_" + rank_string + ".csv";
+        write_comm_data(metadata.num_subdomains, metadata.my_rank,
+                        metadata.comm_data_struct, filename_send,
+                        filename_recv);
     }
 }
 

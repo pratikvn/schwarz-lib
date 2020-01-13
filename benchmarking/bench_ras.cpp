@@ -65,8 +65,15 @@ DEFINE_bool(enable_comm_overlap, false,
             "Enable overlap of communication and computation");
 DEFINE_bool(enable_global_check, false,
             "Use the global convergence check for twosided");
-DEFINE_bool(enable_global_tree_check, false,
-            "Use the global convergence tree check for onesided");
+DEFINE_string(global_convergence_type, "centralized_tree",
+              "The type of global convergence check strategy for onesided. "
+              "Choices are centralized_tree or decentralized");
+DEFINE_bool(
+    enable_decentralized_accumulate, false,
+    "Use accumulate strategy for decentralized global convergence check");
+DEFINE_bool(enable_global_check_iter_offset, false,
+            "Enable global convergence check only after a certain number of "
+            "iterations");
 DEFINE_bool(explicit_laplacian, false,
             "Use the explicit laplacian instead of deal.ii's matrix");
 DEFINE_bool(enable_random_rhs, false,
@@ -251,10 +258,18 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     // Convergence settings
     settings.convergence_settings.put_all_local_residual_norms =
         FLAGS_enable_put_all_local_residual_norms;
+    settings.convergence_settings.enable_global_check_iter_offset =
+        FLAGS_enable_global_check_iter_offset;
     settings.convergence_settings.enable_global_check =
         FLAGS_enable_global_check;
-    settings.convergence_settings.enable_global_simple_tree =
-        FLAGS_enable_global_tree_check;
+    if (FLAGS_global_convergence_type == "centralized_tree") {
+        settings.convergence_settings.enable_global_simple_tree = true;
+    } else if (FLAGS_global_convergence_type == "decentralized") {
+        settings.convergence_settings.enable_decentralized_leader_election =
+            true;
+        settings.convergence_settings.enable_accumulate =
+            FLAGS_enable_decentralized_accumulate;
+    }
 
     // General solver settings
     metadata.local_solver_tolerance = FLAGS_local_tol;

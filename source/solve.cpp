@@ -355,7 +355,10 @@ bool Solve<ValueType, IndexType>::check_local_convergence(
 
         if (local_resnorm0 < 0.0) local_resnorm0 = local_resnorm;
 
-        locally_converged = (local_resnorm) / (local_resnorm0) < tolerance;
+        // locally_converged = (local_resnorm) / (local_resnorm0) < tolerance;
+        locally_converged = (local_resnorm * local_resnorm) /
+                                (local_resnorm0 * local_resnorm0) <
+                            (tolerance * tolerance);
     }
     return locally_converged;
 }
@@ -431,11 +434,16 @@ void Solve<ValueType, IndexType>::check_global_convergence(
             ConvergenceTools::global_convergence_check_onesided_tree(
                 settings, metadata, convergence_vector, converged_all_local,
                 num_converged_procs, window_convergence);
-        } else {  // propagate to neighbors
-            ConvergenceTools::global_convergence_check_onesided_propagate(
+        } else if (settings.convergence_settings
+                       .enable_decentralized_leader_election) {
+            ConvergenceTools::global_convergence_decentralized(
                 settings, metadata, comm_struct, convergence_vector,
                 convergence_sent, convergence_local, converged_all_local,
                 num_converged_procs, window_convergence);
+        } else {
+            std::cout << "Global Convergence check type unspecified"
+                      << std::endl;
+            std::exit(-1);
         }
     } else {  // two-sided MPI
         if (settings.convergence_settings.enable_global_check) {
@@ -448,7 +456,7 @@ void Solve<ValueType, IndexType>::check_global_convergence(
                           MPI_SUM, MPI_COMM_WORLD);
         }
     }
-}
+}  // namespace SchwarzWrappers
 
 
 template <typename ValueType, typename IndexType>
@@ -479,14 +487,19 @@ void Solve<ValueType, IndexType>::check_convergence(
         (iter == 0 ? local_residual_norm
                    : std::min(local_residual_norm, metadata.min_residual_norm));
 
-    if (tolerance > 0.0) {
+    auto iter_cond =
+        settings.convergence_settings.enable_global_check_iter_offset
+            ? ((iter > (metadata.max_iters * 0.05)) ||
+               metadata.max_iters < 1000)
+            : true;
+    if (tolerance > 0.0 && iter_cond) {
         int converged_all_local = 0;
         check_global_convergence(
             settings, metadata, comm_struct, convergence_vector,
             local_residual_norm, local_residual_norm0, global_residual_norm,
             global_residual_norm0, converged_all_local, num_converged_p);
+        num_converged_procs = num_converged_p;
     }
-    num_converged_procs = num_converged_p;
 }
 
 

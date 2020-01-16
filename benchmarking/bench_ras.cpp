@@ -59,6 +59,7 @@ DEFINE_bool(enable_twosided, true,
             "Use the twosided communication version for the solver");
 DEFINE_bool(enable_push_one_by_one, false,
             "Enable push one element after another in onesided");
+DEFINE_bool(enable_get, false, "Enable MPI_Get instead of the MPI_Put");
 DEFINE_bool(enable_put_all_local_residual_norms, false,
             "Enable putting of all local residual norms");
 DEFINE_bool(enable_comm_overlap, false,
@@ -248,6 +249,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     settings.comm_settings.enable_onesided = FLAGS_enable_onesided;
     settings.comm_settings.enable_push_one_by_one =
         FLAGS_enable_push_one_by_one;
+    settings.comm_settings.enable_push = !(FLAGS_enable_get);
     settings.comm_settings.enable_overlap = FLAGS_enable_comm_overlap;
     if (FLAGS_enable_flush == "flush_all") {
         settings.comm_settings.enable_flush_all = true;

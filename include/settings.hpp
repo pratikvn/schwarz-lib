@@ -190,8 +190,11 @@ struct Settings {
     struct convergence_settings {
         bool put_all_local_residual_norms = true;
         bool enable_global_simple_tree = false;
+        bool enable_decentralized_leader_election = false;
         bool enable_global_check = true;
         bool enable_accumulate = false;
+
+        bool enable_global_check_iter_offset = false;
 
         enum local_convergence_crit {
             residual_based = 0x0,
@@ -202,6 +205,7 @@ struct Settings {
             local_convergence_crit::solution_based;
     };
     convergence_settings convergence_settings;
+
 
     Settings(std::string executor_string = "reference")
         : executor_string(executor_string)

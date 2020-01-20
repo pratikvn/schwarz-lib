@@ -59,14 +59,22 @@ DEFINE_bool(enable_twosided, true,
             "Use the twosided communication version for the solver");
 DEFINE_bool(enable_push_one_by_one, false,
             "Enable push one element after another in onesided");
+DEFINE_bool(enable_get, false, "Enable MPI_Get instead of the MPI_Put");
 DEFINE_bool(enable_put_all_local_residual_norms, false,
             "Enable putting of all local residual norms");
 DEFINE_bool(enable_comm_overlap, false,
             "Enable overlap of communication and computation");
 DEFINE_bool(enable_global_check, false,
             "Use the global convergence check for twosided");
-DEFINE_bool(enable_global_tree_check, false,
-            "Use the global convergence tree check for onesided");
+DEFINE_string(global_convergence_type, "centralized_tree",
+              "The type of global convergence check strategy for onesided. "
+              "Choices are centralized_tree or decentralized");
+DEFINE_bool(
+    enable_decentralized_accumulate, false,
+    "Use accumulate strategy for decentralized global convergence check");
+DEFINE_bool(enable_global_check_iter_offset, false,
+            "Enable global convergence check only after a certain number of "
+            "iterations");
 DEFINE_bool(explicit_laplacian, false,
             "Use the explicit laplacian instead of deal.ii's matrix");
 DEFINE_bool(enable_random_rhs, false,
@@ -241,6 +249,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     settings.comm_settings.enable_onesided = FLAGS_enable_onesided;
     settings.comm_settings.enable_push_one_by_one =
         FLAGS_enable_push_one_by_one;
+    settings.comm_settings.enable_push = !(FLAGS_enable_get);
     settings.comm_settings.enable_overlap = FLAGS_enable_comm_overlap;
     if (FLAGS_enable_flush == "flush_all") {
         settings.comm_settings.enable_flush_all = true;
@@ -251,10 +260,18 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     // Convergence settings
     settings.convergence_settings.put_all_local_residual_norms =
         FLAGS_enable_put_all_local_residual_norms;
+    settings.convergence_settings.enable_global_check_iter_offset =
+        FLAGS_enable_global_check_iter_offset;
     settings.convergence_settings.enable_global_check =
         FLAGS_enable_global_check;
-    settings.convergence_settings.enable_global_simple_tree =
-        FLAGS_enable_global_tree_check;
+    if (FLAGS_global_convergence_type == "centralized_tree") {
+        settings.convergence_settings.enable_global_simple_tree = true;
+    } else if (FLAGS_global_convergence_type == "decentralized") {
+        settings.convergence_settings.enable_decentralized_leader_election =
+            true;
+        settings.convergence_settings.enable_accumulate =
+            FLAGS_enable_decentralized_accumulate;
+    }
 
     // General solver settings
     metadata.local_solver_tolerance = FLAGS_local_tol;

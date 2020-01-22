@@ -57,18 +57,18 @@ namespace PartitionTools {
 
 
 template <typename ValueType, typename IndexType>
-void PartitionNaive(
+void PartitionRegular(
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &global_matrix,
     const unsigned int &n_partitions,
     std::vector<unsigned int> &partition_indices)
 {
-    // TODO: Move the naive partitioning here from initialization
+    // TODO: Move the regular partitioning here from initialization
 }
 
 
 template <typename ValueType, typename IndexType>
-void PartitionNaive2D(
+void PartitionRegular2D(
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &global_matrix,
     bool write_debug_out, const unsigned int &n_partitions,
@@ -211,7 +211,7 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
 #undef DECLARE_FUNCTION
 
 #define DECLARE_FUNCTION(ValueType, IndexType)                           \
-    void PartitionNaive(                                                 \
+    void PartitionRegular(                                               \
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &, \
         const unsigned int &, std::vector<unsigned int> &)
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);

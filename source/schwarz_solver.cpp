@@ -474,12 +474,13 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     auto i_permutation = metadata.i_permutation->get_data();
 
     auto nb = (global_size + num_subdomains - 1) / num_subdomains;
-    auto partition_settings = (Settings::partition_settings::partition_zoltan |
-                               Settings::partition_settings::partition_metis |
-                               Settings::partition_settings::partition_naive |
-                               Settings::partition_settings::partition_naive2d |
-                               Settings::partition_settings::partition_custom) &
-                              settings.partition;
+    auto partition_settings =
+        (Settings::partition_settings::partition_zoltan |
+         Settings::partition_settings::partition_metis |
+         Settings::partition_settings::partition_regular |
+         Settings::partition_settings::partition_regular2d |
+         Settings::partition_settings::partition_custom) &
+        settings.partition;
 
     IndexType *gmat_row_ptrs = global_matrix->get_row_ptrs();
     IndexType *gmat_col_idxs = global_matrix->get_col_idxs();
@@ -493,7 +494,8 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     }
 
     if (partition_settings == Settings::partition_settings::partition_metis ||
-        partition_settings == Settings::partition_settings::partition_naive2d) {
+        partition_settings ==
+            Settings::partition_settings::partition_regular2d) {
         if (num_subdomains > 1) {
             for (auto p = 0; p < num_subdomains; p++) {
                 local_p_size[p] = 0;

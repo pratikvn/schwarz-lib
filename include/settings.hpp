@@ -83,13 +83,13 @@ struct Settings {
      * The partition algorithm to be used for partitioning the matrix.
      */
     enum partition_settings {
-        partition_naive = 0x0,
-        partition_naive2d = 0x4,
+        partition_regular = 0x0,
+        partition_regular2d = 0x4,
         partition_metis = 0x1,
         partition_zoltan = 0x2,
         partition_custom = 0x3
     };
-    partition_settings partition = partition_settings::partition_naive;
+    partition_settings partition = partition_settings::partition_regular;
 
     /**
      * The overlap between the subdomains.

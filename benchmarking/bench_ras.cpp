@@ -128,7 +128,7 @@ private:
     void write_timings(
         std::vector<std::tuple<int, int, int, std::string,
                                std::vector<ValueType>>> &time_struct,
-        std::string filename);
+        std::string filename, bool enable_onesided);
     void write_comm_data(
         int num_subd, int my_rank,
         std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
@@ -184,7 +184,7 @@ template <typename ValueType, typename IndexType>
 void BenchRas<ValueType, IndexType>::write_timings(
     std::vector<std::tuple<int, int, int, std::string, std::vector<ValueType>>>
         &time_struct,
-    std::string filename)
+    std::string filename, bool enable_onesided)
 {
     std::ofstream file;
     file.open(filename);
@@ -192,20 +192,45 @@ void BenchRas<ValueType, IndexType>::write_timings(
         std::sort(std::get<4>(time_struct[id]).begin(),
                   std::get<4>(time_struct[id]).end());
     file << "func,total,avg,min,med,max\n";
+    auto vec_size = time_struct.size() + 1;
+    std::vector<std::string> func_name(vec_size);
+    std::vector<ValueType> avg_time(vec_size), med_time(vec_size),
+        min_time(vec_size), max_time(vec_size), total_time(vec_size);
     for (auto id = 0; id < time_struct.size(); id++) {
-        ValueType total_time =
+        func_name[id] = std::get<3>(time_struct[id]);
+        total_time[id] =
             std::accumulate(std::get<4>(time_struct[id]).begin(),
                             std::get<4>(time_struct[id]).end(), 0.0);
-        file << std::get<3>(time_struct[id]) << "," << total_time << ","
-             << total_time / (std::get<2>(time_struct[id])) << ","
-             << *std::min_element(std::get<4>(time_struct[id]).begin(),
-                                  std::get<4>(time_struct[id]).end())
-             << ","
-             << std::get<4>(
-                    time_struct[id])[std::get<4>(time_struct[id]).size() / 2]
-             << ","
-             << *std::max_element(std::get<4>(time_struct[id]).begin(),
-                                  std::get<4>(time_struct[id]).end())
+        avg_time[id] = total_time[id] / (std::get<2>(time_struct[id]));
+        min_time[id] = *std::min_element(std::get<4>(time_struct[id]).begin(),
+                                         std::get<4>(time_struct[id]).end());
+        med_time[id] = std::get<4>(
+            time_struct[id])[std::get<4>(time_struct[id]).size() / 2];
+        max_time[id] = *std::max_element(std::get<4>(time_struct[id]).begin(),
+                                         std::get<4>(time_struct[id]).end());
+    }
+    func_name[time_struct.size()] = "other";
+    if (enable_onesided) {
+        total_time[time_struct.size()] = total_time[0] + total_time[2];
+        total_time[0] = 0.0;
+        total_time[2] = 0.0;
+        avg_time[time_struct.size()] = avg_time[0] + avg_time[2];
+        avg_time[0] = 0.0;
+        avg_time[2] = 0.0;
+        min_time[time_struct.size()] = min_time[0] + min_time[2];
+        min_time[0] = 0.0;
+        min_time[2] = 0.0;
+        max_time[time_struct.size()] = max_time[0] + max_time[2];
+        max_time[0] = 0.0;
+        max_time[2] = 0.0;
+        med_time[time_struct.size()] = med_time[0] + med_time[2];
+        med_time[0] = 0.0;
+        med_time[2] = 0.0;
+    }
+
+    for (auto i = 0; i < func_name.size(); ++i) {
+        file << func_name[i] << "," << total_time[i] << "," << avg_time[i]
+             << "," << min_time[i] << "," << med_time[i] << "," << max_time[i]
              << "\n";
     }
     file.close();
@@ -326,7 +351,8 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
             rank_string = "0" + std::to_string(metadata.my_rank);
         }
         std::string filename = FLAGS_timings_file + "_" + rank_string + ".csv";
-        write_timings(metadata.time_struct, filename);
+        write_timings(metadata.time_struct, filename,
+                      settings.comm_settings.enable_onesided);
     }
     if (FLAGS_write_comm_data) {
         std::string rank_string = std::to_string(metadata.my_rank);

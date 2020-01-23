@@ -106,7 +106,7 @@ public:
 
     /**
      * The partitioning function. Allows the partition of the global matrix
-     * depending with METIS and a naive 1D decomposition.
+     * depending with METIS and a regular 1D decomposition.
      *
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.

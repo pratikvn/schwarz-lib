@@ -66,9 +66,9 @@ DEFINE_bool(enable_comm_overlap, false,
             "Enable overlap of communication and computation");
 DEFINE_bool(enable_global_check, false,
             "Use the global convergence check for twosided");
-DEFINE_string(global_convergence_type, "centralized_tree",
+DEFINE_string(global_convergence_type, "centralized-tree",
               "The type of global convergence check strategy for onesided. "
-              "Choices are centralized_tree or decentralized");
+              "Choices are centralized-tree or decentralized");
 DEFINE_bool(
     enable_decentralized_accumulate, false,
     "Use accumulate strategy for decentralized global convergence check");
@@ -83,17 +83,18 @@ DEFINE_uint32(overlap, 2, "Overlap between the domains");
 DEFINE_string(
     executor, "reference",
     "The executor used to run the solver, one of reference, cuda or omp");
-DEFINE_string(enable_flush, "flush_all",
-              "The window flush. The choices are flush_local and flush_all");
+DEFINE_string(enable_flush, "flush-all",
+              "The window flush. The choices are flush-local and flush-all");
 DEFINE_string(timings_file, "null", "The filename for the timings");
 DEFINE_bool(write_comm_data, false,
             "Write the number of elements sent and received by each subdomain "
             "to a file.");
-DEFINE_string(partition, "naive",
-              "The partitioner used. The choices are metis, naive, naive2d");
-DEFINE_string(local_solver, "direct_cholmod",
+DEFINE_string(
+    partition, "regular",
+    "The partitioner used. The choices are metis, regular, regular2d");
+DEFINE_string(local_solver, "direct-cholmod",
               "The local solver used in the local domains. The current choices "
-              "include direct_cholmod , direct_ginkgo or iterative_ginkgo");
+              "include direct-cholmod , direct-ginkgo or iterative-ginkgo");
 DEFINE_uint32(num_threads, 1, "Number of threads to bind to a process");
 DEFINE_bool(factor_ordering_natural, false,
             "If true uses natural ordering instead of the default optimized "
@@ -251,9 +252,9 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
         FLAGS_enable_push_one_by_one;
     settings.comm_settings.enable_push = !(FLAGS_enable_get);
     settings.comm_settings.enable_overlap = FLAGS_enable_comm_overlap;
-    if (FLAGS_enable_flush == "flush_all") {
+    if (FLAGS_enable_flush == "flush-all") {
         settings.comm_settings.enable_flush_all = true;
-    } else if (FLAGS_enable_flush == "flush_local") {
+    } else if (FLAGS_enable_flush == "flush-local") {
         settings.comm_settings.enable_flush_all = false;
         settings.comm_settings.enable_flush_local = true;
     }
@@ -264,7 +265,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
         FLAGS_enable_global_check_iter_offset;
     settings.convergence_settings.enable_global_check =
         FLAGS_enable_global_check;
-    if (FLAGS_global_convergence_type == "centralized_tree") {
+    if (FLAGS_global_convergence_type == "centralized-tree") {
         settings.convergence_settings.enable_global_simple_tree = true;
     } else if (FLAGS_global_convergence_type == "decentralized") {
         settings.convergence_settings.enable_decentralized_leader_election =
@@ -285,20 +286,20 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
         settings.partition =
             SchwarzWrappers::Settings::partition_settings::partition_metis;
         settings.metis_objtype = FLAGS_metis_objtype;
-    } else if (FLAGS_partition == "naive") {
+    } else if (FLAGS_partition == "regular") {
         settings.partition =
-            SchwarzWrappers::Settings::partition_settings::partition_naive;
-    } else if (FLAGS_partition == "naive2d") {
+            SchwarzWrappers::Settings::partition_settings::partition_regular;
+    } else if (FLAGS_partition == "regular2d") {
         settings.partition =
-            SchwarzWrappers::Settings::partition_settings::partition_naive2d;
+            SchwarzWrappers::Settings::partition_settings::partition_regular2d;
     }
-    if (FLAGS_local_solver == "iterative_ginkgo") {
+    if (FLAGS_local_solver == "iterative-ginkgo") {
         settings.local_solver = SchwarzWrappers::Settings::
             local_solver_settings::iterative_solver_ginkgo;
-    } else if (FLAGS_local_solver == "direct_cholmod") {
+    } else if (FLAGS_local_solver == "direct-cholmod") {
         settings.local_solver = SchwarzWrappers::Settings::
             local_solver_settings::direct_solver_cholmod;
-    } else if (FLAGS_local_solver == "direct_ginkgo") {
+    } else if (FLAGS_local_solver == "direct-ginkgo") {
         settings.local_solver = SchwarzWrappers::Settings::
             local_solver_settings::direct_solver_ginkgo;
     }

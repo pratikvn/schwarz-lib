@@ -52,6 +52,8 @@ DEFINE_uint32(set_1d_laplacian_size, 16,
 DEFINE_uint32(
     num_refine_cycles, 1,
     "Number of refinement cycles for the adaptive refinement within deal.ii");
+DEFINE_uint32(shifted_iter, 1,
+              "Use a shifter communication after every x iterations.");
 DEFINE_bool(enable_debug_write, false, "Enable some debug writes.");
 DEFINE_bool(enable_onesided, false,
             "Use the onesided communication version for the solver");
@@ -269,6 +271,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
 
     // Generic settings
     settings.write_debug_out = FLAGS_enable_debug_write;
+    settings.shifted_iter = FLAGS_shifted_iter;
 
     // Set solver settings from command line args.
     // Comm settings

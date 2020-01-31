@@ -53,17 +53,17 @@ SolverBase<ValueType, IndexType>::SolverBase(
 {
     using vec_itype = gko::Array<IndexType>;
     using vec_vecshared = gko::Array<IndexType *>;
-    auto local_rank =
+    metadata.my_local_rank =
         Utils<ValueType, IndexType>::get_local_rank(metadata.mpi_communicator);
-    auto local_num_procs = Utils<ValueType, IndexType>::get_local_num_procs(
+    metadata.local_num_procs = Utils<ValueType, IndexType>::get_local_num_procs(
         metadata.mpi_communicator);
-
+    auto my_local_rank = metadata.my_local_rank;
     if (settings.executor_string == "omp") {
         settings.executor = gko::OmpExecutor::create();
         auto exec_info =
             static_cast<gko::OmpExecutor *>(settings.executor.get())
                 ->get_exec_info();
-        exec_info->bind_to_core(local_rank);
+        exec_info->bind_to_core(metadata.my_local_rank);
 
     } else if (settings.executor_string == "cuda") {
         int num_devices = 0;
@@ -82,17 +82,17 @@ SolverBase<ValueType, IndexType>::SolverBase(
                       << metadata.my_rank << std::endl;
             std::exit(-1);
         }
-        settings.executor =
-            gko::CudaExecutor::create(local_rank, gko::OmpExecutor::create());
+        settings.executor = gko::CudaExecutor::create(
+            my_local_rank, gko::OmpExecutor::create());
         auto exec_info = static_cast<gko::OmpExecutor *>(
                              settings.executor->get_master().get())
                              ->get_exec_info();
-        exec_info->bind_to_core(local_rank);
+        exec_info->bind_to_core(my_local_rank);
         settings.cuda_device_guard =
-            std::make_shared<SchwarzWrappers::device_guard>(local_rank);
+            std::make_shared<SchwarzWrappers::device_guard>(my_local_rank);
 
         std::cout << " Rank " << metadata.my_rank << " with local rank "
-                  << local_rank << " has "
+                  << my_local_rank << " has "
                   << (static_cast<gko::CudaExecutor *>(settings.executor.get()))
                          ->get_device_id()
                   << " id of gpu" << std::endl;
@@ -102,7 +102,7 @@ SolverBase<ValueType, IndexType>::SolverBase(
         auto exec_info =
             static_cast<gko::ReferenceExecutor *>(settings.executor.get())
                 ->get_exec_info();
-        exec_info->bind_to_core(local_rank);
+        exec_info->bind_to_core(my_local_rank);
     }
 
     auto my_rank = this->metadata.my_rank;
@@ -128,6 +128,12 @@ SolverBase<ValueType, IndexType>::SolverBase(
         std::default_delete<vec_itype>());
 
     // Some arrays for communication.
+    comm_struct.local_neighbors_in = std::shared_ptr<vec_itype>(
+        new vec_itype(settings.executor->get_master(), num_subdomains),
+        std::default_delete<vec_itype>());
+    comm_struct.local_neighbors_out = std::shared_ptr<vec_itype>(
+        new vec_itype(settings.executor->get_master(), num_subdomains),
+        std::default_delete<vec_itype>());
     comm_struct.neighbors_in = std::shared_ptr<vec_itype>(
         new vec_itype(settings.executor->get_master(), num_subdomains),
         std::default_delete<vec_itype>());
@@ -707,6 +713,7 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     auto comm_size = metadata.comm_size;
 
     auto neighbors_in = this->comm_struct.neighbors_in->get_data();
+    auto local_neighbors_in = this->comm_struct.local_neighbors_in->get_data();
     auto global_get = this->comm_struct.global_get->get_data();
 
     this->comm_struct.num_neighbors_in = 0;
@@ -767,6 +774,8 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     }
     this->comm_struct.num_neighbors_out = 0;
     auto neighbors_out = this->comm_struct.neighbors_out->get_data();
+    auto local_neighbors_out =
+        this->comm_struct.local_neighbors_out->get_data();
     auto global_put = this->comm_struct.global_put->get_data();
     mpi_itype = boost::mpi::get_mpi_datatype((global_put[pp])[0]);
     int pflag = 0;
@@ -970,7 +979,9 @@ void exchange_boundary_onesided(
     // TODO: NOT SETUP FOR GPU, copies from local solution is needs to be
     // copied to gpu memory. (DONE)
     auto num_neighbors_out = comm_struct.num_neighbors_out;
+    auto local_num_neighbors_out = comm_struct.local_num_neighbors_out;
     auto neighbors_out = comm_struct.neighbors_out->get_data();
+    auto local_neighbors_out = comm_struct.local_neighbors_out->get_data();
     auto global_put = comm_struct.global_put->get_data();
     auto local_put = comm_struct.local_put->get_data();
     auto remote_put = comm_struct.remote_put->get_data();
@@ -978,7 +989,9 @@ void exchange_boundary_onesided(
     auto send_buffer = comm_struct.send_buffer->get_values();
 
     auto num_neighbors_in = comm_struct.num_neighbors_in;
+    auto local_num_neighbors_in = comm_struct.local_num_neighbors_in;
     auto neighbors_in = comm_struct.neighbors_in->get_data();
+    auto local_neighbors_in = comm_struct.local_neighbors_in->get_data();
     auto global_get = comm_struct.global_get->get_data();
     auto local_get = comm_struct.local_get->get_data();
     auto remote_get = comm_struct.remote_get->get_data();
@@ -1009,7 +1022,55 @@ void exchange_boundary_onesided(
             int num_put = 0;
             for (auto p = 0; p < num_neighbors_out; p++) {
                 // send
-                if ((global_put[p])[0] > 0) {
+                if ((global_put[p])[0] > 0 &&
+                    ((neighbors_out[p] % metadata.my_rank) == 1) &&
+                    (metadata.iter_count % settings.shifted_iter == 0)) {
+                    // Evil. Change this. TODO
+                    if (settings.executor_string == "cuda") {
+                        // TODO: Optimize this for GPU with GPU buffers.
+                        auto tmp_send_buf = vec_vtype::create(
+                            settings.executor,
+                            gko::dim<2>((global_put[p])[0], 1));
+                        auto tmp_idx_s =
+                            arr(settings.executor,
+                                arr::view(settings.executor->get_master(),
+                                          ((global_put)[p])[0],
+                                          &((local_put[p])[1])));
+                        settings.executor->run(
+                            GatherScatter<ValueType, IndexType>(
+                                true, (global_put[p])[0], tmp_idx_s.get_data(),
+                                local_solution->get_values(),
+                                tmp_send_buf->get_values()));
+                        auto cpu_send_buf =
+                            vec_vtype::create(settings.executor->get_master(),
+                                              gko::dim<2>((global_put[p])[0]));
+                        cpu_send_buf->copy_from(tmp_send_buf.get());
+                        for (auto i = 1; i <= (global_put[p])[0]; i++) {
+                            send_buffer[num_put + i - 1] =
+                                cpu_send_buf->get_values()[i - 1];
+                        }
+                    } else {
+                        for (auto i = 1; i <= (global_put[p])[0]; i++) {
+                            send_buffer[num_put + i - 1] =
+                                local_solution->get_values()[(local_put[p])[i]];
+                        }
+                    }
+                    // use same window for all neighbors
+                    MPI_Put(&send_buffer[num_put], (global_put[p])[0],
+                            mpi_vtype, neighbors_out[p],
+                            put_displacements[neighbors_out[p]],
+                            (global_put[p])[0], mpi_vtype,
+                            comm_struct.window_buffer);
+                    if (settings.comm_settings.enable_flush_all) {
+                        MPI_Win_flush(neighbors_out[p],
+                                      comm_struct.window_buffer);
+                    } else if (settings.comm_settings.enable_flush_local) {
+                        MPI_Win_flush_local(neighbors_out[p],
+                                            comm_struct.window_buffer);
+                    }
+                    num_put += (global_put[p])[0];
+                } else if ((global_put[p])[0] > 0 &&
+                           (neighbors_out[p] % metadata.my_rank) != 1) {
                     // Evil. Change this. TODO
                     if (settings.executor_string == "cuda") {
                         // TODO: Optimize this for GPU with GPU buffers.
@@ -1056,41 +1117,38 @@ void exchange_boundary_onesided(
                     num_put += (global_put[p])[0];
                 }
             }
-            // unpack receive buffer
-            int num_get = 0;
-            for (auto p = 0; p < num_neighbors_in; p++) {
-                if ((global_get[p])[0] > 0) {
-                    // Evil. Change this. TODO
-                    if (settings.executor_string == "cuda") {
-                        auto cpu_recv_buf =
-                            vec_vtype::create(settings.executor->get_master(),
-                                              gko::dim<2>((global_get[p])[0]));
-                        for (auto i = 1; i <= (global_get[p])[0]; i++) {
-                            cpu_recv_buf->get_values()[i - 1] =
-                                recv_buffer[num_get + i - 1];
-                        }
-                        auto tmp_recv_buf = vec_vtype::create(
-                            settings.executor,
-                            gko::dim<2>((global_get[p])[0], 1));
-                        tmp_recv_buf->copy_from(cpu_recv_buf.get());
-                        auto tmp_idx_r =
-                            arr(settings.executor,
-                                arr::view(settings.executor->get_master(),
-                                          ((global_get)[p])[0],
-                                          &((local_get[p])[1])));
-                        settings.executor->run(
-                            GatherScatter<ValueType, IndexType>(
-                                false, (global_get[p])[0], tmp_idx_r.get_data(),
-                                tmp_recv_buf->get_values(),
-                                local_solution->get_values()));
-                    } else {
-                        for (auto i = 1; i <= (global_get[p])[0]; i++) {
-                            local_solution->get_values()[(local_get[p])[i]] =
-                                recv_buffer[num_get + i - 1];
-                        }
+        }
+        // unpack receive buffer
+        int num_get = 0;
+        for (auto p = 0; p < num_neighbors_in; p++) {
+            if ((global_get[p])[0] > 0) {
+                // Evil. Change this. TODO
+                if (settings.executor_string == "cuda") {
+                    auto cpu_recv_buf =
+                        vec_vtype::create(settings.executor->get_master(),
+                                          gko::dim<2>((global_get[p])[0]));
+                    for (auto i = 1; i <= (global_get[p])[0]; i++) {
+                        cpu_recv_buf->get_values()[i - 1] =
+                            recv_buffer[num_get + i - 1];
                     }
-                    num_get += (global_get[p])[0];
+                    auto tmp_recv_buf = vec_vtype::create(
+                        settings.executor, gko::dim<2>((global_get[p])[0], 1));
+                    tmp_recv_buf->copy_from(cpu_recv_buf.get());
+                    auto tmp_idx_r = arr(
+                        settings.executor,
+                        arr::view(settings.executor->get_master(),
+                                  ((global_get)[p])[0], &((local_get[p])[1])));
+                    settings.executor->run(GatherScatter<ValueType, IndexType>(
+                        false, (global_get[p])[0], tmp_idx_r.get_data(),
+                        tmp_recv_buf->get_values(),
+                        local_solution->get_values()));
+                } else {
+                    for (auto i = 1; i <= (global_get[p])[0]; i++) {
+                        local_solution->get_values()[(local_get[p])[i]] =
+                            recv_buffer[num_get + i - 1];
+                    }
                 }
+                num_get += (global_get[p])[0];
             }
         }
     } else {

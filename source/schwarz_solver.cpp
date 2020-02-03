@@ -457,8 +457,8 @@ SolverRAS<ValueType, IndexType>::SolverRAS(
 
 
 template <typename IndexType>
-bool find_duplicates(IndexType val, std::size_t index, const IndexType *data,
-                     std::size_t length)
+int find_duplicates(IndexType val, std::size_t index, const IndexType *data,
+                    std::size_t length)
 {
     auto count = 0;
     for (auto i = 0; i < length; ++i) {
@@ -466,11 +466,7 @@ bool find_duplicates(IndexType val, std::size_t index, const IndexType *data,
             count++;
         }
     }
-    if (count == 0) {
-        return false;
-    } else {
-        return true;
-    }
+    return count;
 }
 
 
@@ -491,8 +487,10 @@ bool assert_correct_permutation(
             std::cout << "Here " << __LINE__ << std::endl;
             return false;
         }
-        if (!find_duplicates(perm_data[i], i, perm_data, perm_size)) {
-            std::cout << "Here " << __LINE__ << std::endl;
+        auto duplicates =
+            find_duplicates(perm_data[i], i, perm_data, perm_size);
+        if (duplicates > 0) {
+            std::cout << "Here " << __LINE__ << " " << duplicates << std::endl;
             return false;
         }
     }
@@ -513,7 +511,8 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     using rcm_reorder_type = gko::reorder::Rcm<ValueType, IndexType>;
     // Only instantiated for metis_indextype
     using metis_reorder_type =
-        gko::reorder::MetisFillReduce<ValueType, metis_indextype>;
+        // gko::reorder::MetisFillReduce<ValueType, metis_indextype>;
+        gko::reorder::MetisFillReduce<ValueType, gko::int32>;
     using perm_type = gko::matrix::Permutation<IndexType>;
     auto my_rank = metadata.my_rank;
     auto comm_size = metadata.comm_size;
@@ -754,15 +753,18 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
         local_perm =
             perm_type::create(settings.executor, local_matrix->get_size());
         local_perm->copy_from(gko::lend(lperm));
+        std::cout << " Local matrix reordering through METIS" << std::endl;
     } else if (settings.reorder == "rcm_reordering") {
         auto reorder = rcm_reorder_type::build()
                            .on(settings.executor)
                            ->generate(local_matrix);
         auto lperm = reorder->get_permutation();
         local_perm->copy_from(gko::lend(lperm));
+        std::cout << " Local matrix reordering through RCM " << std::endl;
     } else {
         local_perm =
             perm_type::create(settings.executor, local_matrix->get_size());
+        std::cout << "No local matrix reordering" << std::endl;
     }
 
     if (settings.debug_print) {

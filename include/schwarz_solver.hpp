@@ -250,6 +250,10 @@ public:
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &interface_matrix) override;
 
+    void get_threshold(
+         const Settings &settings,
+         const Metadata<ValueType, IndexType> &metadata); //metadata.iter_count is iter count
+
     /**
      * Store a copy of the flags for this particular solver.
      */

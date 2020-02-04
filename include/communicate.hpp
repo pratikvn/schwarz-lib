@@ -167,6 +167,11 @@ public:
          * Average of values in the last send buffer for each of the out neighbors
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> last_send_avg;
+
+        /**
+         * Number of messages sent
+         */
+        std::shared_ptr<gko::Array<IndexType>> msg_count;
         //END CHANGED
 
         /**

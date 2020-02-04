@@ -98,7 +98,7 @@ template <typename ValueType, typename IndexType>
 void Communicate<ValueType, IndexType>::clear(Settings &settings) {
   if (settings.comm_settings.enable_onesided) {
     MPI_Win_unlock_all(comm_struct.window_buffer);
-    MPI_Win_unlock_all(comm_struct.window_x);
+    //MPI_Win_unlock_all(comm_struct.window_x);
 
     MPI_Win_free(&comm_struct.window_x);
   }

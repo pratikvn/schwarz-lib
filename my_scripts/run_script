@@ -1,0 +1,17 @@
+#!/bin/bash -l
+
+
+for num_nodes in 1 2 3 4 
+do 
+  for comm in "twosided" "onesided"
+  do 
+    for size in 64 128 256 512
+    do
+      for part in "metis" "naive"
+      do 
+        ./gpu_batch $num_nodes 6 $comm cuda $size 20000 direct_ginkgo $part
+      done
+    done
+  done
+done
+

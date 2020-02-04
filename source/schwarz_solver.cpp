@@ -54,7 +54,6 @@ SolverBase<ValueType, IndexType>::SolverBase(
 {
     using vec_itype = gko::Array<IndexType>;
     using vec_vecshared = gko::Array<IndexType *>;
-
     auto local_rank =
         Utils<ValueType, IndexType>::get_local_rank(metadata.mpi_communicator);
     auto local_num_procs = Utils<ValueType, IndexType>::get_local_num_procs(
@@ -96,9 +95,9 @@ SolverBase<ValueType, IndexType>::SolverBase(
         }
         settings.executor =
             gko::CudaExecutor::create(local_rank, gko::OmpExecutor::create());
-        auto exec_info =
-          static_cast<gko::OmpExecutor *>(settings.executor->get_master().get())
-                ->get_exec_info();
+        auto exec_info = static_cast<gko::OmpExecutor *>(
+                             settings.executor->get_master().get())
+                             ->get_exec_info();
         exec_info->bind_to_core(local_rank);
         settings.cuda_device_guard =
             std::make_shared<SchwarzWrappers::device_guard>(local_rank);
@@ -170,17 +169,69 @@ SolverBase<ValueType, IndexType>::SolverBase(
 }
 
 
+template <typename ValueType, typename IndexType>
+void SolverBase<ValueType, IndexType>::initialize()
+{
+    using vec_vtype = gko::matrix::Dense<ValueType>;
+
+    // Setup the right hand side vector.
+    std::vector<ValueType> rhs(metadata.global_size, 1.0);
+    if (settings.enable_random_rhs && settings.explicit_laplacian) {
+        if (metadata.my_rank == 0) {
+            Initialize<ValueType, IndexType>::generate_rhs(rhs);
+        }
+        auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
+        MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
+                  MPI_COMM_WORLD);
+    }
+
+    // Setup the global matrix
+    if (settings.explicit_laplacian) {
+        Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
+            metadata.oned_laplacian_size, this->global_matrix);
+    } else {
+        std::cerr << " Explicit laplacian needs to be enabled with the "
+                     "--explicit_laplacian flag or deal.ii support needs to be "
+                     "enabled to generate the matrices"
+                  << std::endl;
+        std::exit(-1);
+    }
+    // Partition the global matrix.
+    Initialize<ValueType, IndexType>::partition(
+        settings, metadata, this->global_matrix, this->partition_indices);
+
+    // Setup the local matrices on each of the subddomains.
+    this->setup_local_matrices(this->settings, this->metadata,
+                               this->partition_indices, this->global_matrix,
+                               this->local_matrix, this->interface_matrix);
+    // Debug to print matrices.
+    if (settings.print_matrices && settings.executor_string != "cuda") {
+        Utils<ValueType, IndexType>::print_matrix(
+            this->local_matrix.get(), metadata.my_rank, "local_mat");
+        Utils<ValueType, IndexType>::print_matrix(this->interface_matrix.get(),
+                                                  metadata.my_rank, "int_mat");
+    }
+
+    // Setup the local vectors on each of the subddomains.
+    Initialize<ValueType, IndexType>::setup_vectors(
+        this->settings, this->metadata, rhs, this->local_rhs, this->global_rhs,
+        this->local_solution, this->global_solution);
+
+    // Setup the local solver on each of the subddomains.
+    Solve<ValueType, IndexType>::setup_local_solver(
+        this->settings, metadata, this->local_matrix, this->triangular_factor,
+        this->local_rhs);
+
+    // Setup the communication buffers on each of the subddomains.
+    this->setup_comm_buffers();
+}
+
 #if SCHW_HAVE_DEALII
 template <typename ValueType, typename IndexType>
 void SolverBase<ValueType, IndexType>::initialize(
     const dealii::SparseMatrix<ValueType> &matrix,
     const dealii::Vector<ValueType> &system_rhs)
 {
-#else
-template <typename ValueType, typename IndexType>
-void SolverBase<ValueType, IndexType>::initialize()
-{
-#endif
     using vec_vtype = gko::matrix::Dense<ValueType>;
 
     // Setup the right hand side vector.
@@ -195,26 +246,19 @@ void SolverBase<ValueType, IndexType>::initialize()
         MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
                   MPI_COMM_WORLD);
     }
-#if SCHW_HAVE_DEALII
-    if (metadata.my_rank == 0 && !settings.explicit_laplacian) 
-    {
+    if (metadata.my_rank == 0 && !settings.explicit_laplacian) {
         std::copy(system_rhs.begin(), system_rhs.begin() + metadata.global_size,
                   rhs.begin());
     }
-#endif
 
     // Setup the global matrix
     if (settings.explicit_laplacian) 
     {
         Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
             metadata.oned_laplacian_size, this->global_matrix);
-#if SCHW_HAVE_DEALII
-    }
-    else 
-    {
+    } else {
         Initialize<ValueType, IndexType>::setup_global_matrix(
             matrix, this->global_matrix);
-#endif
     }
     // Partition the global matrix.
     Initialize<ValueType, IndexType>::partition(
@@ -246,6 +290,7 @@ void SolverBase<ValueType, IndexType>::initialize()
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
+#endif
 
 
 template <typename ValueType, typename IndexType>
@@ -264,7 +309,7 @@ void SolverBase<ValueType, IndexType>::run(
     //END CHANGED
 
     // A temp local solution
-    std::shared_ptr<vec_vtype> temp_loc_solution =
+    std::shared_ptr<vec_vtype> init_guess =
         vec_vtype::create(settings.executor, this->local_solution->get_size());
     // A global gathered solution of the previous iteration.
     std::shared_ptr<vec_vtype> global_old_solution = vec_vtype::create(
@@ -311,6 +356,13 @@ void SolverBase<ValueType, IndexType>::run(
                 global_residual_norm0, num_converged_procs)),
             2, metadata.my_rank, convergence_check, metadata.iter_count);
 
+        // break if the solution diverges.
+        if (std::isnan(global_residual_norm) || global_residual_norm > 1e12) {
+            std::cout << " Rank " << metadata.my_rank << " diverged in "
+                      << metadata.iter_count << " iters " << std::endl;
+            std::exit(-1);
+        }
+
         // break if all processes detect that all other processes have converged
         // otherwise continue iterations.
         if (num_converged_procs == metadata.num_subdomains)
@@ -318,15 +370,13 @@ void SolverBase<ValueType, IndexType>::run(
             std::cout << " Rank " << metadata.my_rank << " converged in "
                       << metadata.iter_count << " iters " << std::endl;
             break;
-        }
-        else
-        {
-            temp_loc_solution->copy_from(this->local_solution.get());
+        } else {
             MEASURE_ELAPSED_FUNC_TIME(
                 (Solve<ValueType, IndexType>::local_solve(
-                    settings, metadata, this->triangular_factor,
-                    temp_loc_solution, this->local_solution)),
+                    settings, metadata, this->triangular_factor, init_guess,
+                    this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
+            // init_guess->copy_from(this->local_solution.get());
             // Gather the local vector into the locally global vector for
             // communication.
             MEASURE_ELAPSED_FUNC_TIME(
@@ -897,19 +947,16 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
 {
     using vec_itype = gko::Array<IndexType>;
     using vec_vtype = gko::matrix::Dense<ValueType>;
-    auto comm_struct = this->comm_struct;
     auto num_subdomains = metadata.num_subdomains;
     auto local_size_o = metadata.local_size_o;
-    auto neighbors_in = comm_struct.neighbors_in->get_data();
-    auto global_get = comm_struct.global_get->get_data();
+    auto neighbors_in = this->comm_struct.neighbors_in->get_data();
+    auto global_get = this->comm_struct.global_get->get_data();
 
     // set displacement for the MPI buffer
-    auto get_displacements = comm_struct.get_displacements->get_data();
+    auto get_displacements = this->comm_struct.get_displacements->get_data();
     get_displacements[0] = 0;
-    for (auto j = 0; j < comm_struct.num_neighbors_in; j++) 
-    {
-        if ((global_get[j])[0] > 0) 
-        {
+    for (auto j = 0; j < this->comm_struct.num_neighbors_in; j++) {
+        if ((global_get[j])[0] > 0) {
             int p = neighbors_in[j];
             get_displacements[p + 1] = (global_get[j])[0];
         }
@@ -919,7 +966,7 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
         get_displacements[j] += get_displacements[j - 1];
     }
 
-    auto put_displacements = comm_struct.put_displacements->get_data();
+    auto put_displacements = this->comm_struct.put_displacements->get_data();
     auto mpi_itype = boost::mpi::get_mpi_datatype(get_displacements[0]);
     MPI_Alltoall(get_displacements, 1, mpi_itype, put_displacements, 1,
                  mpi_itype, MPI_COMM_WORLD);
@@ -932,10 +979,8 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
         MPI_Win_create(main_buffer->get_values(),
                        main_buffer->get_size()[0] * sizeof(ValueType),
                        sizeof(ValueType), MPI_INFO_NULL, MPI_COMM_WORLD,
-                       &comm_struct.window_x);
-    }
-    else 
-    {
+                       &(this->comm_struct.window_x));
+    } else {
         // Twosided
     }
 
@@ -971,8 +1016,8 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
     if (settings.comm_settings.enable_onesided && num_subdomains > 1) 
     {
         // Lock all windows.
-        MPI_Win_lock_all(0, comm_struct.window_buffer);
-        MPI_Win_lock_all(0, comm_struct.window_x);
+        MPI_Win_lock_all(0, this->comm_struct.window_buffer);
+        MPI_Win_lock_all(0, this->comm_struct.window_x);
         MPI_Win_lock_all(0, this->window_residual_vector);
         MPI_Win_lock_all(0, this->window_convergence);
     }
@@ -1059,8 +1104,8 @@ void exchange_boundary_onesided(
                 if ((global_put[p])[0] > 0) 
                 {
                     // Evil. Change this. TODO
-                    if (settings.executor_string == "cuda") 
-                    {
+                    if (settings.executor_string == "cuda") {
+                        // TODO: Optimize this for GPU with GPU buffers.
                         auto tmp_send_buf = vec_vtype::create(
                             settings.executor,
                             gko::dim<2>((global_put[p])[0], 1));

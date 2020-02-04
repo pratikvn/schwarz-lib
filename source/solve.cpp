@@ -222,18 +222,40 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             std::cout << " Local iterative solve with Ginkgo CG " << std::endl;
         }
         using cg = gko::solver::Cg<ValueType>;
+        using bj = gko::preconditioner::Jacobi<ValueType, IndexType>;
         // Setup the Ginkgo iterative CG solver.
-        this->solver =
-            cg::build()
-                .with_criteria(
-                    gko::stop::Iteration::build()
-                        .with_max_iters(local_matrix->get_size()[0])
-                        .on(settings.executor),
-                    gko::stop::ResidualNormReduction<>::build()
-                        .with_reduction_factor(metadata.local_solver_tolerance)
-                        .on(settings.executor))
-                .on(settings.executor)
-                ->generate(local_matrix);
+        if (settings.use_precond) {
+            this->solver =
+                cg::build()
+                    .with_criteria(
+                        gko::stop::Iteration::build()
+                            .with_max_iters(local_matrix->get_size()[0])
+                            .on(settings.executor),
+                        gko::stop::ResidualNormReduction<ValueType>::build()
+                            .with_reduction_factor(
+                                metadata.local_solver_tolerance)
+                            .on(settings.executor))
+                    .with_preconditioner(
+                        bj::build()
+                            .with_max_block_size(
+                                metadata.precond_max_block_size)
+                            .on(settings.executor))
+                    .on(settings.executor)
+                    ->generate(local_matrix);
+        } else {
+            this->solver =
+                cg::build()
+                    .with_criteria(
+                        gko::stop::Iteration::build()
+                            .with_max_iters(local_matrix->get_size()[0])
+                            .on(settings.executor),
+                        gko::stop::ResidualNormReduction<ValueType>::build()
+                            .with_reduction_factor(
+                                metadata.local_solver_tolerance)
+                            .on(settings.executor))
+                    .on(settings.executor)
+                    ->generate(local_matrix);
+        }
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_dealii) {
         SCHWARZ_NOT_IMPLEMENTED
@@ -252,7 +274,7 @@ void Solve<ValueType, IndexType>::local_solve(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &triangular_factor,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &temp_loc_solution,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
     const auto solver_settings =
@@ -271,13 +293,12 @@ void Solve<ValueType, IndexType>::local_solve(
     } else if (solver_settings ==
                Settings::local_solver_settings::direct_solver_ginkgo) {
         SolverTools::solve_direct_ginkgo(settings, metadata, this->L_solver,
-                                         this->U_solver, temp_loc_solution,
-                                         local_solution);
+                                         this->U_solver, local_solution);
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
         SolverTools::solve_iterative_ginkgo(settings, metadata, this->solver,
-                                            temp_loc_solution, local_solution);
-        // local_solution->copy_from(temp_loc_solution.get());
+                                            local_solution, init_guess);
+        local_solution->copy_from(init_guess.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_dealii) {
         SCHWARZ_NOT_IMPLEMENTED
@@ -356,25 +377,22 @@ void Solve<ValueType, IndexType>::check_global_convergence(
     auto l_res_vec = this->local_residual_vector->get_values();
     auto mpi_vtype = boost::mpi::get_mpi_datatype(l_res_vec[0]);
 
-    if (settings.convergence_settings.enable_global_check) {
-        if (settings.comm_settings.enable_onesided) {
-            if (settings.convergence_settings.put_all_local_residual_norms) {
-                ConvergenceTools::put_all_local_residual_norms(
-                    settings, metadata, local_resnorm,
-                    this->local_residual_vector,
-                    this->global_residual_vector_out,
-                    this->window_residual_vector);
-            } else {
-                ConvergenceTools::propagate_all_local_residual_norms(
-                    settings, metadata, comm_struct, local_resnorm,
-                    this->local_residual_vector,
-                    this->global_residual_vector_out,
-                    this->window_residual_vector);
-            }
+    if (settings.comm_settings.enable_onesided) {
+        if (settings.convergence_settings.put_all_local_residual_norms) {
+            ConvergenceTools::put_all_local_residual_norms(
+                settings, metadata, local_resnorm, this->local_residual_vector,
+                this->global_residual_vector_out, this->window_residual_vector);
         } else {
-            MPI_Allgather(&local_resnorm, 1, mpi_vtype, l_res_vec, 1, mpi_vtype,
-                          MPI_COMM_WORLD);
+            ConvergenceTools::propagate_all_local_residual_norms(
+                settings, metadata, comm_struct, local_resnorm,
+                this->local_residual_vector, this->global_residual_vector_out,
+                this->window_residual_vector);
         }
+    }
+    if (settings.convergence_settings.enable_global_check &&
+        !settings.comm_settings.enable_onesided) {
+        MPI_Allgather(&local_resnorm, 1, mpi_vtype, l_res_vec, 1, mpi_vtype,
+                      MPI_COMM_WORLD);
 
         // compute the global residual norm by summing the local residual
         // norms
@@ -395,7 +413,7 @@ void Solve<ValueType, IndexType>::check_global_convergence(
             if ((global_resnorm) / (global_resnorm0) <= tolerance)
                 (converged_all_local)++;
         }
-    } else {
+    } else if (settings.comm_settings.enable_onesided) {
         if (local_resnorm / local_resnorm0 <= tolerance)
             (converged_all_local)++;
 

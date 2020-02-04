@@ -34,8 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //This is the branch event-based
 
 #include <schwarz/config.hpp>
-
-
 #include <exception_helpers.hpp>
 #include <process_topology.hpp>
 #include <schwarz_solver.hpp>
@@ -215,7 +213,7 @@ void SolverBase<ValueType, IndexType>::initialize()
     // Setup the local vectors on each of the subddomains.
     Initialize<ValueType, IndexType>::setup_vectors(
         this->settings, this->metadata, rhs, this->local_rhs, this->global_rhs,
-        this->local_solution, this->global_solution);
+        this->local_solution, this->local_last_solution, this->global_solution);
 
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
@@ -303,6 +301,12 @@ void SolverBase<ValueType, IndexType>::run(
         settings.executor, gko::dim<2>(metadata.global_size, 1));
 
     //CHANGED
+    
+    auto num_neighbors_out = this->comm_struct.num_neighbors_out;
+    auto neighbors_out = this->comm_struct.neighbors_out->get_data();
+    //auto msg_count = this->comm_struct.msg_count->get_data();
+          //msg_count changing over time
+
     //The last communicated solution vector
     std::shared_ptr<vec_vtype> last_solution_vector = vec_vtype::create(
         settings.executor, gko::dim<2>(metadata.global_size, 1));
@@ -369,8 +373,16 @@ void SolverBase<ValueType, IndexType>::run(
         {
             std::cout << " Rank " << metadata.my_rank << " converged in "
                       << metadata.iter_count << " iters " << std::endl;
+            for (int k = 0; k < num_neighbors_out; k++)
+            {
+                std::cout << " Rank: " << metadata.my_rank << " "
+                      << neighbors_out[k] << " : " << this->comm_struct.msg_count->get_data()[k];
+            }
+            std::cout << std::endl;
             break;
-        } else {
+        }
+        else
+        {
             MEASURE_ELAPSED_FUNC_TIME(
                 (Solve<ValueType, IndexType>::local_solve(
                     settings, metadata, this->triangular_factor, init_guess,
@@ -714,7 +726,7 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     interface_matrix->copy_from(gko::lend(interface_matrix_compute));
 }
 
-
+//allocate send avg bufferes here
 template <typename ValueType, typename IndexType>
 void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
 {
@@ -842,7 +854,7 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     }
     this->comm_struct.num_neighbors_out = pp;
 
-    // allocate MPI buffer
+    // Allocating for recv buffer
     // one-sided
     if (settings.comm_settings.enable_onesided) 
     {
@@ -895,6 +907,7 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
             std::default_delete<vec_request>());
     }
 
+    //Allocating the send buffer
     // one-sided
     if (settings.comm_settings.enable_onesided) 
     {
@@ -902,10 +915,29 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
         {
             this->comm_struct.send_buffer = vec_vtype::create(
                 settings.executor->get_master(), gko::dim<2>(num_send, 1));
+           
+            //CHANGED
+            this->comm_struct.curr_send_avg = vec_vtype::create(
+                settings.executor->get_master(), gko::dim<2>(this->comm_struct.num_neighbors_out, 1));
+            this->comm_struct.last_send_avg = vec_vtype::create(
+                settings.executor->get_master(), gko::dim<2>(this->comm_struct.num_neighbors_out, 1));
+            this->comm_struct.msg_count = std::shared_ptr<vec_itype>(
+                new vec_itype(settings.executor->get_master(),
+                              this->comm_struct.num_neighbors_out),
+                std::default_delete<vec_itype>());
+
+            //initializing the msg_count array to 0
+            for(int i = 0; i < this->comm_struct.num_neighbors_out; i++)
+            {
+                this->comm_struct.msg_count->get_data()[i] = 0;
+            }          
+            //END CHANGED
+
             this->comm_struct.windows_to = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
                               this->comm_struct.num_neighbors_out),
                 std::default_delete<vec_itype>());
+  
             for (auto j = 0; j < this->comm_struct.num_neighbors_out; j++) 
             {
                 this->comm_struct.windows_to->get_data()[j] =
@@ -1017,12 +1049,22 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
     {
         // Lock all windows.
         MPI_Win_lock_all(0, this->comm_struct.window_buffer);
-        MPI_Win_lock_all(0, this->comm_struct.window_x);
+        //MPI_Win_lock_all(0, this->comm_struct.window_x);
         MPI_Win_lock_all(0, this->window_residual_vector);
         MPI_Win_lock_all(0, this->window_convergence);
     }
 }
 
+//implement get threshold here
+template <typename ValueType, typename IndexType>
+ValueType get_threshold(
+          const Settings &settings, const Metadata<ValueType, IndexType> &metadata)
+{
+    auto alpha = 0; //1e-2;
+    auto beta = 1;
+    
+    return alpha * std::pow(beta, metadata.iter_count);
+}   
 
 template <typename ValueType, typename IndexType>
 void exchange_boundary_onesided(
@@ -1049,62 +1091,75 @@ void exchange_boundary_onesided(
     auto local_get = comm_struct.local_get->get_data();
     auto remote_get = comm_struct.remote_get->get_data();
     auto recv_buffer = comm_struct.recv_buffer->get_values();
+    
     ValueType dummy = 1.0;
     auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
     if (settings.comm_settings.enable_push) 
     {
         if (settings.comm_settings.enable_push_one_by_one) 
         {
-            for (auto p = 0; p < num_neighbors_out; p++) 
+            for (auto p = 0; p < num_neighbors_out; p++) //iterating over all neighbors 
             {
-                if ((global_put[p])[0] > 0) //no of elements
+                if ((global_put[p])[0] > 0) //no of elements in the boundary with p-th neighbor
                 {
                     //CHANGED
                     // push
-                    for (auto i = 1; i <= (global_put[p])[0]; i++) 
+                    for (auto i = 1; i <= (global_put[p])[0]; i++) //sending all elements in boundary
+                                                                   //one by one
                     {
                         auto curr_value = &local_solution->get_values()[(local_put[p])[i]];
                         auto last_value = &local_last_solution->get_values()[(local_put[p])[i]];
-
-                        if(std::fabs(curr_value - last_value) > 0)
+                        //event condition below
+                        if(std::fabs(curr_value - last_value) > get_threshold(settings, metadata))
                         {
                             MPI_Win_lock(MPI_LOCK_EXCLUSIVE, neighbors_out[p], 0, comm_struct.window_x);
                             MPI_Put(
                             &local_solution->get_values()[(local_put[p])[i]], 1,
                             mpi_vtype, neighbors_out[p], (remote_put[p])[i], 1,
                             mpi_vtype, comm_struct.window_x);
-                            MPI_Win_unlock(neighbors_out[p], comm_struct.window_x);
-    
-                            //how to copy current solution to current?                        
+   
+                            //copy current to last communicated 
                             local_last_solution->get_values()[(local_put[p])[i]] =
                                local_solution->get_values()[(local_put[p])[i]];
-                        }
-                    }
-                    //END CHANGED
-
-                    if (settings.comm_settings.enable_flush_all) 
-                    {
-                        MPI_Win_flush(neighbors_out[p], comm_struct.window_x);
-                    } 
-                    else if (settings.comm_settings.enable_flush_local) 
-                    {
-                        MPI_Win_flush_local(neighbors_out[p],
+                            
+                            //increment counter
+                            comm_struct.msg_count->get_data()[p]++;
+            
+                            if (settings.comm_settings.enable_flush_all) 
+                            {
+                                MPI_Win_flush(neighbors_out[p], comm_struct.window_x);
+                            } 
+                            else if (settings.comm_settings.enable_flush_local) 
+                            {
+                                MPI_Win_flush_local(neighbors_out[p],
                                             comm_struct.window_x);
-                    }
-                }
-            }
-        }
-        else 
+                            }
+                            
+                            MPI_Win_unlock(neighbors_out[p], comm_struct.window_x);
+                        } //end if (event condition)
+                    } //end for (sending elements of boundary)
+                } //end if( check for no of elements in boundary)
+            } //end for (iterating over all neighbors)
+        } //end if (push one by one)
+
+        else //not push one by one
         {
             // accumulate
             int num_put = 0;
+            auto curr_send_avg = comm_struct.curr_send_avg->get_values();
+            auto last_send_avg = comm_struct.last_send_avg->get_values(); 
+  
             for (auto p = 0; p < num_neighbors_out; p++) 
             {
                 // send
                 if ((global_put[p])[0] > 0) 
                 {
+                    double temp_sum = 0;
                     // Evil. Change this. TODO
-                    if (settings.executor_string == "cuda") {
+                    
+           
+                    if (settings.executor_string == "cuda")
+                    {
                         // TODO: Optimize this for GPU with GPU buffers.
                         auto tmp_send_buf = vec_vtype::create(
                             settings.executor,
@@ -1129,34 +1184,53 @@ void exchange_boundary_onesided(
                                 cpu_send_buf->get_values()[i - 1];
                         }
                     }
-                    else 
+                    
+                    else //not cuda
                     {
+                        //iterate over the boundary with p-th neighbor to create send buffer
                         for (auto i = 1; i <= (global_put[p])[0]; i++) 
                         {
                             send_buffer[num_put + i - 1] =
                                 local_solution->get_values()[(local_put[p])[i]];
+                            temp_sum += send_buffer[num_put + i - 1]; 
                         }
+                        curr_send_avg[p] = temp_sum/(global_put[p])[0];
                     }
                     // use same window for all neighbors
-                    MPI_Put(&send_buffer[num_put], (global_put[p])[0],
-                            mpi_vtype, neighbors_out[p],
-                            put_displacements[neighbors_out[p]],
-                            (global_put[p])[0], mpi_vtype,
-                            comm_struct.window_buffer);
-                    if (settings.comm_settings.enable_flush_all) 
+                    if(std::fabs(curr_send_avg[p] - last_send_avg[p]) >= get_threshold(settings, metadata))
                     {
-                        MPI_Win_flush(neighbors_out[p],
-                                      comm_struct.window_buffer);
-                    }
-                    else if (settings.comm_settings.enable_flush_local) 
-                    {
-                        MPI_Win_flush_local(neighbors_out[p],
+                         MPI_Win_lock(MPI_LOCK_EXCLUSIVE, neighbors_out[p], 0, comm_struct.window_x); 
+                         MPI_Put(&send_buffer[num_put], (global_put[p])[0],
+                                 mpi_vtype, neighbors_out[p],
+                                 put_displacements[neighbors_out[p]],
+                                 (global_put[p])[0], mpi_vtype,
+                                 comm_struct.window_buffer);
+
+                         //copy current to last communicated
+                         comm_struct.last_send_avg->get_values()[p] = 
+                                         comm_struct.curr_send_avg->get_values()[p];
+                         
+                         //increment counter
+                         comm_struct.msg_count->get_data()[p]++;
+
+			 if (settings.comm_settings.enable_flush_all) 
+			 {
+		              MPI_Win_flush(neighbors_out[p],
+					    comm_struct.window_buffer);
+			 }
+			 else if (settings.comm_settings.enable_flush_local) 
+                         {  
+                              MPI_Win_flush_local(neighbors_out[p],
                                             comm_struct.window_buffer);
-                    }
-                    num_put += (global_put[p])[0];
-                }
-            }
-            // unpack receive buffer
+                         }
+                         num_put += (global_put[p])[0]; //VERIFY WHAT THIS DOES!!
+
+                         MPI_Win_unlock(neighbors_out[p], comm_struct.window_x);
+                    }// end if (event condition)
+                } //end if (global_put[p] > 0) 
+            } // end for (iterating over neighbors)
+
+            // unpack receive buffer - WHAT IS THIS ?
             int num_get = 0;
             for (auto p = 0; p < num_neighbors_in; p++) 
             {
@@ -1198,11 +1272,13 @@ void exchange_boundary_onesided(
                     }
                     num_get += (global_get[p])[0];
                 }
-            }
-        }
-    }
+            } //end for (iterating over neighbors)
+        } //end else for push one by one
+    } // end if (enable push)
+
     //Get is not relevant for event-triggered
-    else {
+    else 
+    {
         // TODO: needs to be updated and create window on the sender
         for (auto p = 0; p < num_neighbors_in; p++) 
         {

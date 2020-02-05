@@ -241,6 +241,7 @@ void SolverBase<ValueType, IndexType>::initialize(
         Initialize<ValueType, IndexType>::setup_global_matrix(
             matrix, this->global_matrix);
     }
+
     // Partition the global matrix.
     Initialize<ValueType, IndexType>::partition(
         settings, metadata, this->global_matrix, this->partition_indices);
@@ -271,6 +272,53 @@ void SolverBase<ValueType, IndexType>::initialize(
     this->setup_comm_buffers();
 }
 #endif
+
+
+template <typename ValueType, typename IndexType>
+void gather_comm_data(
+    int num_subdomains,
+    struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+    std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
+                           std::vector<std::tuple<int, int>>, int, int>>
+        &comm_data_struct)
+{
+    for (auto i = 0; i < num_subdomains; ++i) {
+        auto owning_subd = i;
+        auto num_neighbors_out = comm_struct.num_neighbors_out;
+        auto num_neighbors_in = comm_struct.num_neighbors_in;
+        auto neighbors_in = comm_struct.neighbors_in->get_data();
+        auto neighbors_out = comm_struct.neighbors_out->get_data();
+        auto global_put = comm_struct.global_put->get_data();
+        auto global_get = comm_struct.global_get->get_data();
+
+        std::vector<int> count_out(num_subdomains, 0);
+        std::vector<int> count_in(num_subdomains, 0);
+        std::vector<std::tuple<int, int>> send_tuple;
+        std::vector<std::tuple<int, int>> recv_tuple;
+        for (auto j = 0; j < num_neighbors_out; ++j) {
+            send_tuple.push_back(
+                std::make_tuple(neighbors_out[j], (global_put[j])[0]));
+            count_out[neighbors_out[j]] = 1;
+        }
+
+        for (auto j = 0; j < num_neighbors_in; ++j) {
+            recv_tuple.push_back(
+                std::make_tuple(neighbors_in[j], (global_get[j])[0]));
+            count_in[neighbors_in[j]] = 1;
+        }
+        for (auto j = 0; j < num_subdomains; ++j) {
+            if (count_out[j] == 0) {
+                send_tuple.push_back(std::make_tuple(j, 0));
+            }
+            if (count_in[j] == 0) {
+                recv_tuple.push_back(std::make_tuple(j, 0));
+            }
+        }
+        comm_data_struct.push_back(std::make_tuple(owning_subd, recv_tuple,
+                                                   send_tuple, num_neighbors_in,
+                                                   num_neighbors_out));
+    }
+}
 
 
 template <typename ValueType, typename IndexType>
@@ -334,8 +382,8 @@ void SolverBase<ValueType, IndexType>::run(
             std::exit(-1);
         }
 
-        // break if all processes detect that all other processes have converged
-        // otherwise continue iterations.
+        // break if all processes detect that all other processes have
+        // converged otherwise continue iterations.
         if (num_converged_procs == metadata.num_subdomains) {
             std::cout << " Rank " << metadata.my_rank << " converged in "
                       << metadata.iter_count << " iters " << std::endl;
@@ -365,7 +413,8 @@ void SolverBase<ValueType, IndexType>::run(
     Solve<ValueType, IndexType>::compute_residual_norm(
         settings, metadata, global_matrix, global_rhs, solution_vector,
         mat_norm, rhs_norm, sol_norm, residual_norm);
-
+    gather_comm_data<ValueType, IndexType>(
+        metadata.num_subdomains, this->comm_struct, metadata.comm_data_struct);
     // clang-format off
     if (metadata.my_rank == 0)
       {
@@ -425,11 +474,17 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     auto i_permutation = metadata.i_permutation->get_data();
 
     auto nb = (global_size + num_subdomains - 1) / num_subdomains;
-    auto partition_settings = (Settings::partition_settings::partition_zoltan |
-                               Settings::partition_settings::partition_metis |
-                               Settings::partition_settings::partition_naive |
-                               Settings::partition_settings::partition_custom) &
-                              settings.partition;
+    auto partition_settings =
+        (Settings::partition_settings::partition_zoltan |
+         Settings::partition_settings::partition_metis |
+         Settings::partition_settings::partition_regular |
+         Settings::partition_settings::partition_regular2d |
+         Settings::partition_settings::partition_custom) &
+        settings.partition;
+
+    IndexType *gmat_row_ptrs = global_matrix->get_row_ptrs();
+    IndexType *gmat_col_idxs = global_matrix->get_col_idxs();
+    ValueType *gmat_values = global_matrix->get_values();
 
     // default local p size set for 1 subdomain.
     first_row[0] = 0;
@@ -437,7 +492,10 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
         local_p_size[p] = std::min(global_size - first_row[p], nb);
         first_row[p + 1] = first_row[p] + local_p_size[p];
     }
-    if (partition_settings == Settings::partition_settings::partition_metis) {
+
+    if (partition_settings == Settings::partition_settings::partition_metis ||
+        partition_settings ==
+            Settings::partition_settings::partition_regular2d) {
         if (num_subdomains > 1) {
             for (auto p = 0; p < num_subdomains; p++) {
                 local_p_size[p] = 0;
@@ -464,12 +522,7 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
                 i_permutation[permutation[i]] = i;
             }
         }
-    }
 
-    IndexType *gmat_row_ptrs = global_matrix->get_row_ptrs();
-    IndexType *gmat_col_idxs = global_matrix->get_col_idxs();
-    ValueType *gmat_values = global_matrix->get_values();
-    if (partition_settings == Settings::partition_settings::partition_metis) {
         auto gmat_temp = mtx::create(settings.executor->get_master(),
                                      global_matrix->get_size(),
                                      global_matrix->get_num_stored_elements());
@@ -727,7 +780,8 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
             if (send[p] > 0) {
                 neighbors_out[pp] = p;
 
-                // global_put[pp] = std::make_shared<IndexType>(1 + send[p]);
+                // global_put[pp] = std::make_shared<IndexType>(1 +
+                // send[p]);
                 global_put[pp] = new IndexType[1 + send[p]];
                 // global_get[pp] = new IndexType[1 + count];
                 (global_put[pp])[0] = send[p];
@@ -913,8 +967,8 @@ void exchange_boundary_onesided(
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using arr = gko::Array<IndexType>;
-    // TODO: NOT SETUP FOR GPU, copies from local solution is needs to be copied
-    // to gpu memory. (DONE)
+    // TODO: NOT SETUP FOR GPU, copies from local solution is needs to be
+    // copied to gpu memory. (DONE)
     auto num_neighbors_out = comm_struct.num_neighbors_out;
     auto neighbors_out = comm_struct.neighbors_out->get_data();
     auto global_put = comm_struct.global_put->get_data();

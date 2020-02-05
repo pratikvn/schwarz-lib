@@ -205,7 +205,7 @@ void global_convergence_check_onesided_tree(
 
 
 template <typename ValueType, typename IndexType>
-void global_convergence_check_onesided_propagate(
+void global_convergence_decentralized(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType>::comm_struct &comm_s,
     std::shared_ptr<gko::Array<IndexType>> &convergence_vector,
@@ -223,8 +223,8 @@ void global_convergence_check_onesided_propagate(
     auto neighbors_out = comm_s.neighbors_out->get_data();
     // count how many processes have locally detected the global convergence
     if (settings.convergence_settings.enable_accumulate) {
-        // > if this process has detected the global convergence
-        // > let everyone know (by incrementing the counter)
+        // if this process has detected the global convergence
+        // let everyone know (by incrementing the counter)
         if (converged_all_local == 1) {
             for (auto j = 0; j < num_subdomains; j++) {
                 if (j != my_rank) {
@@ -241,24 +241,24 @@ void global_convergence_check_onesided_propagate(
                 }
             }
         }
-        // > read (from the window) how many processed have locally detected
+        // read (from the window) how many processed have locally detected
         // the global convergence
         num_converged_procs = conv_vector[0];
     } else {
-        // > if this process has detected the global convergence
-        // > put a check at my slot in the window
+        // if this process has detected the global convergence
+        // put a check at my slot in the window
         if (converged_all_local == 1) {
             conv_vector[my_rank] = 1;
         }
-        // > go through all the slots in the window
-        // > and count how many processes have locally detected the global
+        // go through all the slots in the window
+        // and count how many processes have locally detected the global
         // convergence
         num_converged_procs = 0;
         for (auto j = 0; j < num_subdomains; j++) {
             conv_local[j] = conv_vector[j];
             num_converged_procs += conv_vector[j];
         }
-        // > let the neighbors know who have detected the global convergence
+        // let the neighbors know who have detected the global convergence
         for (auto i = 0; i < comm_s.num_neighbors_out; i++) {
             if ((global_put[i])[0] > 0) {
                 auto p = neighbors_out[i];
@@ -311,12 +311,12 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION2);
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION3);
 #undef DECLARE_FUNCTION3
 
-#define DECLARE_FUNCTION4(ValueType, IndexType)                         \
-    void ConvergenceTools::global_convergence_check_onesided_propagate( \
-        const Settings &, const Metadata<ValueType, IndexType> &,       \
-        struct Communicate<ValueType, IndexType>::comm_struct &,        \
-        std::shared_ptr<gko::Array<IndexType>> &,                       \
-        std::shared_ptr<gko::Array<IndexType>> &,                       \
+#define DECLARE_FUNCTION4(ValueType, IndexType)                   \
+    void ConvergenceTools::global_convergence_decentralized(      \
+        const Settings &, const Metadata<ValueType, IndexType> &, \
+        struct Communicate<ValueType, IndexType>::comm_struct &,  \
+        std::shared_ptr<gko::Array<IndexType>> &,                 \
+        std::shared_ptr<gko::Array<IndexType>> &,                 \
         std::shared_ptr<gko::Array<IndexType>> &, int &, int &, MPI_Win &);
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION4);
 #undef DECLARE_FUNCTION4

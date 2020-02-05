@@ -29,3 +29,13 @@ The library adds the following additional switches to control what is being buil
     Default is `OFF`
 *   `-DSCHWARZ_WITH_HWLOC={ON, OFF}` Builds with support for the hardware locality library used for binding hardware.
     `hwloc` is distributed as a part of the Open-MPI project. Default is `ON`
+*   `-DSCHWARZ_DEVEL_TOOLS={ON, OFF}` Builds with some developer tools support. Default is `ON`. In particular uses [`git-cmake-format`](https://github.com/ginkgo-project/git-cmake-format) to automatically format the source files with `clang-format`. 
+
+
+## Tips
+
+* If you are having CUDA problems and you are not using CUDA, then feel free to switch the CUDA module off with `-DSCHWARZ_BUILD_CUDA=off`. 
+
+* Installing CHOLMOD can be a bit annoying. TODO add some details on fixing Suitesparse compilation.
+
+* When doing merge commits it is possible that make format does not work. You can run `cmake -DSCHWARZ_DEVEL_TOOLS=OFF ..` to temporarily switch off the formatting. Please switch it on again when committing normally.

@@ -83,12 +83,13 @@ struct Settings {
      * The partition algorithm to be used for partitioning the matrix.
      */
     enum partition_settings {
-        partition_naive = 0x0,
+        partition_regular = 0x0,
+        partition_regular2d = 0x4,
         partition_metis = 0x1,
         partition_zoltan = 0x2,
         partition_custom = 0x3
     };
-    partition_settings partition = partition_settings::partition_naive;
+    partition_settings partition = partition_settings::partition_regular;
 
     /**
      * The overlap between the subdomains.
@@ -133,9 +134,19 @@ struct Settings {
     bool naturally_ordered_factor = false;
 
     /**
+     * This setting defines the objective type for the metis partitioning.
+     */
+    std::string metis_objtype;
+
+    /**
      * Enable the block jacobi local preconditioner for the local solver.
      */
     bool use_precond = false;
+
+    /**
+     * Enable the writing of debug out to file.
+     */
+    bool write_debug_out = false;
 
     /**
      * The settings for the various available communication paradigms.
@@ -179,8 +190,11 @@ struct Settings {
     struct convergence_settings {
         bool put_all_local_residual_norms = true;
         bool enable_global_simple_tree = false;
+        bool enable_decentralized_leader_election = false;
         bool enable_global_check = true;
         bool enable_accumulate = false;
+
+        bool enable_global_check_iter_offset = false;
 
         enum local_convergence_crit {
             residual_based = 0x0,
@@ -191,6 +205,7 @@ struct Settings {
             local_convergence_crit::solution_based;
     };
     convergence_settings convergence_settings;
+
 
     Settings(std::string executor_string = "reference")
         : executor_string(executor_string)
@@ -305,6 +320,14 @@ struct Metadata {
      */
     std::vector<std::tuple<int, int, int, std::string, std::vector<ValueType>>>
         time_struct;
+
+    /**
+     * The struct used to measure the timings of each function within the solver
+     * loop.
+     */
+    std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
+                           std::vector<std::tuple<int, int>>, int, int>>
+        comm_data_struct;
 
     /**
      * The mapping containing the global to local indices.

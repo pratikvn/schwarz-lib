@@ -575,17 +575,7 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
             }
         }
 
-/* DELETE THIS LATER AFTER CHECKING
-<<<<<<< HEAD
-    IndexType *gmat_row_ptrs = global_matrix->get_row_ptrs();
-    IndexType *gmat_col_idxs = global_matrix->get_col_idxs();
-    ValueType *gmat_values = global_matrix->get_values();
-    if (partition_settings == Settings::partition_settings::partition_metis) 
-    {
-=======
->>>>>>> develop
-*/
-        auto gmat_temp = mtx::create(settings.executor->get_master(),
+       auto gmat_temp = mtx::create(settings.executor->get_master(),
                                      global_matrix->get_size(),
                                      global_matrix->get_num_stored_elements());
         auto nnz = 0;

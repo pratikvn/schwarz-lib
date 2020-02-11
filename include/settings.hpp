@@ -168,14 +168,19 @@ struct Settings {
         bool enable_overlap = false;
 
         /**
-         * Push the data to the window to use MPI_Put rather than get.
+         * Put the data to the window using MPI_Put rather than get.
          */
-        bool enable_push = true;
+        bool enable_put = false;
 
         /**
-         * Push each element separately.
+         * Get the data to the window using MPI_Get rather than put.
          */
-        bool enable_push_one_by_one = false;
+        bool enable_get = true;
+
+        /**
+         * Push each element separately directly into the buffer.
+         */
+        bool enable_one_by_one = false;
 
         /**
          * Use local flush.

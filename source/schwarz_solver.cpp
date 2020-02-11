@@ -814,8 +814,8 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     // one-sided
     if (settings.comm_settings.enable_onesided) {
         if (num_recv > 0) {
-            this->comm_struct.recv_buffer = vec_vtype::create(
-                settings.executor->get_master(), gko::dim<2>(num_recv, 1));
+            this->comm_struct.recv_buffer =
+                vec_vtype::create(settings.executor, gko::dim<2>(num_recv, 1));
 
             MPI_Win_create(this->comm_struct.recv_buffer->get_values(),
                            num_recv * sizeof(ValueType), sizeof(ValueType),
@@ -830,8 +830,8 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
                 this->comm_struct.windows_from->get_data()[j] = j;
             }
         } else {
-            this->comm_struct.recv_buffer = vec_vtype::create(
-                settings.executor->get_master(), gko::dim<2>(1, 1));
+            this->comm_struct.recv_buffer =
+                vec_vtype::create(settings.executor, gko::dim<2>(1, 1));
         }
     }
     // two-sided
@@ -857,8 +857,8 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     // one-sided
     if (settings.comm_settings.enable_onesided) {
         if (num_send > 0) {
-            this->comm_struct.send_buffer = vec_vtype::create(
-                settings.executor->get_master(), gko::dim<2>(num_send, 1));
+            this->comm_struct.send_buffer =
+                vec_vtype::create(settings.executor, gko::dim<2>(num_send, 1));
             this->comm_struct.windows_to = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
                               this->comm_struct.num_neighbors_out),
@@ -868,8 +868,8 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
                     j;  // j-th neighbor maped to j-th window
             }
         } else {
-            this->comm_struct.send_buffer = vec_vtype::create(
-                settings.executor->get_master(), gko::dim<2>(1, 1));
+            this->comm_struct.send_buffer =
+                vec_vtype::create(settings.executor, gko::dim<2>(1, 1));
         }
     }
     // two-sided
@@ -976,6 +976,7 @@ void exchange_boundary_onesided(
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using arr = gko::Array<IndexType>;
+    using varr = gko::Array<ValueType>;
     // TODO: NOT SETUP FOR GPU, copies from local solution is needs to be
     // copied to gpu memory. (DONE)
     auto num_neighbors_out = comm_struct.num_neighbors_out;
@@ -995,11 +996,12 @@ void exchange_boundary_onesided(
     auto global_get = comm_struct.global_get->get_data();
     auto local_get = comm_struct.local_get->get_data();
     auto remote_get = comm_struct.remote_get->get_data();
+    auto get_displacements = comm_struct.get_displacements->get_data();
     auto recv_buffer = comm_struct.recv_buffer->get_values();
     ValueType dummy = 1.0;
     auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
-    if (settings.comm_settings.enable_push) {
-        if (settings.comm_settings.enable_push_one_by_one) {
+    if (settings.comm_settings.enable_put) {
+        if (settings.comm_settings.enable_one_by_one) {
             for (auto p = 0; p < num_neighbors_out; p++) {
                 if ((global_put[p])[0] > 0) {
                     // push
@@ -1041,14 +1043,9 @@ void exchange_boundary_onesided(
                                 true, (global_put[p])[0], tmp_idx_s.get_data(),
                                 local_solution->get_values(),
                                 tmp_send_buf->get_values()));
-                        auto cpu_send_buf =
-                            vec_vtype::create(settings.executor->get_master(),
-                                              gko::dim<2>((global_put[p])[0]));
-                        cpu_send_buf->copy_from(tmp_send_buf.get());
-                        for (auto i = 1; i <= (global_put[p])[0]; i++) {
-                            send_buffer[num_put + i - 1] =
-                                cpu_send_buf->get_values()[i - 1];
-                        }
+                        cudaMemcpy(
+                            &(send_buffer[num_put]), tmp_send_buf->get_values(),
+                            ((global_put)[p])[0], cudaMemcpyDeviceToDevice);
                     } else {
                         for (auto i = 1; i <= (global_put[p])[0]; i++) {
                             send_buffer[num_put + i - 1] =
@@ -1087,14 +1084,9 @@ void exchange_boundary_onesided(
                                 true, (global_put[p])[0], tmp_idx_s.get_data(),
                                 local_solution->get_values(),
                                 tmp_send_buf->get_values()));
-                        auto cpu_send_buf =
-                            vec_vtype::create(settings.executor->get_master(),
-                                              gko::dim<2>((global_put[p])[0]));
-                        cpu_send_buf->copy_from(tmp_send_buf.get());
-                        for (auto i = 1; i <= (global_put[p])[0]; i++) {
-                            send_buffer[num_put + i - 1] =
-                                cpu_send_buf->get_values()[i - 1];
-                        }
+                        cudaMemcpy(
+                            &(send_buffer[num_put]), tmp_send_buf->get_values(),
+                            ((global_put)[p])[0], cudaMemcpyDeviceToDevice);
                     } else {
                         for (auto i = 1; i <= (global_put[p])[0]; i++) {
                             send_buffer[num_put + i - 1] =
@@ -1124,16 +1116,25 @@ void exchange_boundary_onesided(
             if ((global_get[p])[0] > 0) {
                 // Evil. Change this. TODO
                 if (settings.executor_string == "cuda") {
-                    auto cpu_recv_buf =
-                        vec_vtype::create(settings.executor->get_master(),
-                                          gko::dim<2>((global_get[p])[0]));
-                    for (auto i = 1; i <= (global_get[p])[0]; i++) {
-                        cpu_recv_buf->get_values()[i - 1] =
-                            recv_buffer[num_get + i - 1];
-                    }
+                    // auto cpu_recv_buf =
+                    //     vec_vtype::create(settings.executor->get_master(),
+                    //                       gko::dim<2>((global_get[p])[0]));
+                    // for (auto i = 1; i <= (global_get[p])[0]; i++) {
+                    //     cpu_recv_buf->get_values()[i - 1] =
+                    //         recv_buffer[num_get + i - 1];
+                    // }
                     auto tmp_recv_buf = vec_vtype::create(
                         settings.executor, gko::dim<2>((global_get[p])[0], 1));
-                    tmp_recv_buf->copy_from(cpu_recv_buf.get());
+                    // auto tmp_r_buf = vec_vtype::create(
+                    //     settings.executor, gko::dim<2>((global_get[p])[0],
+                    //     1), varr::view(settings.executor,
+                    //     ((global_get)[p])[0],
+                    //                &(recv_buffer[num_get])));
+                    // tmp_recv_buf->copy_from(tmp_r_buf.get());
+                    cudaMemcpy(tmp_recv_buf->get_values(),
+                               &(recv_buffer[num_get]), ((global_get)[p])[0],
+                               cudaMemcpyDeviceToDevice);
+                    // tmp_recv_buf= tmp_r_buf;
                     auto tmp_idx_r = arr(
                         settings.executor,
                         arr::view(settings.executor->get_master(),
@@ -1151,20 +1152,160 @@ void exchange_boundary_onesided(
                 num_get += (global_get[p])[0];
             }
         }
-    } else {
+    } else if (settings.comm_settings.enable_get) {
         // TODO: needs to be updated and create window on the sender
-        for (auto p = 0; p < num_neighbors_in; p++) {
-            if ((global_put[p])[0] > 0) {
-                // pull
-                for (auto i = 1; i <= (global_get[p])[0]; i++) {
-                    MPI_Get(&local_solution->get_values()[(local_get[p])[i]], 1,
+        if (settings.comm_settings.enable_one_by_one) {
+            for (auto p = 0; p < num_neighbors_in; p++) {
+                if ((global_get[p])[0] > 0) {
+                    // pull
+                    for (auto i = 1; i <= (global_get[p])[0]; i++) {
+                        MPI_Get(
+                            &local_solution->get_values()[(local_get[p])[i]], 1,
                             mpi_vtype, neighbors_in[p], (remote_get[p])[i], 1,
                             mpi_vtype, comm_struct.window_x);
+                    }
+                    if (settings.comm_settings.enable_flush_all) {
+                        MPI_Win_flush(neighbors_in[p], comm_struct.window_x);
+                    } else if (settings.comm_settings.enable_flush_local) {
+                        MPI_Win_flush_local(neighbors_in[p],
+                                            comm_struct.window_x);
+                    }
                 }
-                if (settings.comm_settings.enable_flush_all) {
-                    MPI_Win_flush(neighbors_in[p], comm_struct.window_x);
-                } else if (settings.comm_settings.enable_flush_local) {
-                    MPI_Win_flush_local(neighbors_in[p], comm_struct.window_x);
+            }
+        } else {
+            // unpack receive buffer
+            int num_put = 0;
+            for (auto p = 0; p < num_neighbors_in; p++) {
+                if ((global_put[p])[0] > 0) {
+                    // Evil. Change this. TODO
+                    if (settings.executor_string == "cuda") {
+                        // auto cpu_recv_buf =
+                        //     vec_vtype::create(settings.executor->get_master(),
+                        //                       gko::dim<2>((global_get[p])[0]));
+                        // for (auto i = 1; i <= (global_put[p])[0]; i++) {
+                        //     cpu_recv_buf->get_values()[i - 1] =
+                        //         recv_buffer[num_put + i - 1];
+                        // }
+                        auto tmp_recv_buf = vec_vtype::create(
+                            settings.executor,
+                            gko::dim<2>((global_put[p])[0], 1));
+                        // auto tmp_r_buf = vec_vtype::create(
+                        //     settings.executor,
+                        //     gko::dim<2>((global_put[p])[0], 1),
+                        //     varr::view(settings.executor,
+                        //     ((global_put)[p])[0],
+                        //                &(recv_buffer[num_put])));
+                        // tmp_recv_buf->copy_from(tmp_r_buf.put());
+                        cudaMemcpy(
+                            tmp_recv_buf->get_values(), &(recv_buffer[num_put]),
+                            ((global_put)[p])[0], cudaMemcpyDeviceToDevice);
+                        // tmp_recv_buf= tmp_r_buf;
+                        auto tmp_idx_r =
+                            arr(settings.executor,
+                                arr::view(settings.executor->get_master(),
+                                          ((global_put)[p])[0],
+                                          &((local_put[p])[1])));
+                        settings.executor->run(
+                            GatherScatter<ValueType, IndexType>(
+                                false, (global_put[p])[0], tmp_idx_r.get_data(),
+                                tmp_recv_buf->get_values(),
+                                local_solution->get_values()));
+                    } else {
+                        for (auto i = 1; i <= (global_put[p])[0]; i++) {
+                            local_solution->get_values()[(local_put[p])[i]] =
+                                recv_buffer[num_put + i - 1];
+                        }
+                    }
+                    num_put += (global_put[p])[0];
+                }
+            }
+            // accumulate
+            int num_get = 0;
+            for (auto p = 0; p < num_neighbors_in; p++) {
+                // recv
+                if ((global_get[p])[0] > 0 &&
+                    ((neighbors_in[p] % metadata.my_rank) == 1) &&
+                    (metadata.iter_count % settings.shifted_iter == 0)) {
+                    // Evil. Change this. TODO
+                    if (settings.executor_string == "cuda") {
+                        // TODO: Optimize this for GPU with GPU buffers.
+                        auto tmp_recv_buf = vec_vtype::create(
+                            settings.executor,
+                            gko::dim<2>((global_get[p])[0], 1));
+                        auto tmp_idx_s =
+                            arr(settings.executor,
+                                arr::view(settings.executor->get_master(),
+                                          ((global_get)[p])[0],
+                                          &((local_get[p])[1])));
+                        settings.executor->run(
+                            GatherScatter<ValueType, IndexType>(
+                                true, (global_get[p])[0], tmp_idx_s.get_data(),
+                                local_solution->get_values(),
+                                tmp_recv_buf->get_values()));
+                        cudaMemcpy(
+                            &(recv_buffer[num_get]), tmp_recv_buf->get_values(),
+                            ((global_get)[p])[0], cudaMemcpyDeviceToDevice);
+                    } else {
+                        for (auto i = 1; i <= (global_get[p])[0]; i++) {
+                            recv_buffer[num_get + i - 1] =
+                                local_solution->get_values()[(local_get[p])[i]];
+                        }
+                    }
+                    // use same window for all neighbors
+                    MPI_Get(&recv_buffer[num_get], (global_get[p])[0],
+                            mpi_vtype, neighbors_in[p],
+                            get_displacements[neighbors_in[p]],
+                            (global_get[p])[0], mpi_vtype,
+                            comm_struct.window_buffer);
+                    if (settings.comm_settings.enable_flush_all) {
+                        MPI_Win_flush(neighbors_in[p],
+                                      comm_struct.window_buffer);
+                    } else if (settings.comm_settings.enable_flush_local) {
+                        MPI_Win_flush_local(neighbors_in[p],
+                                            comm_struct.window_buffer);
+                    }
+                    num_get += (global_get[p])[0];
+                } else if ((global_get[p])[0] > 0 &&
+                           (neighbors_in[p] % metadata.my_rank) != 1) {
+                    // Evil. Change this. TODO
+                    if (settings.executor_string == "cuda") {
+                        // TODO: Optimize this for GPU with GPU buffers.
+                        auto tmp_recv_buf = vec_vtype::create(
+                            settings.executor,
+                            gko::dim<2>((global_get[p])[0], 1));
+                        auto tmp_idx_s =
+                            arr(settings.executor,
+                                arr::view(settings.executor->get_master(),
+                                          ((global_get)[p])[0],
+                                          &((local_get[p])[1])));
+                        settings.executor->run(
+                            GatherScatter<ValueType, IndexType>(
+                                true, (global_get[p])[0], tmp_idx_s.get_data(),
+                                local_solution->get_values(),
+                                tmp_recv_buf->get_values()));
+                        cudaMemcpy(
+                            &(recv_buffer[num_get]), tmp_recv_buf->get_values(),
+                            ((global_get)[p])[0], cudaMemcpyDeviceToDevice);
+                    } else {
+                        for (auto i = 1; i <= (global_get[p])[0]; i++) {
+                            recv_buffer[num_get + i - 1] =
+                                local_solution->get_values()[(local_get[p])[i]];
+                        }
+                    }
+                    // use same window for all neighbors
+                    MPI_Get(&recv_buffer[num_get], (global_get[p])[0],
+                            mpi_vtype, neighbors_in[p],
+                            get_displacements[neighbors_in[p]],
+                            (global_get[p])[0], mpi_vtype,
+                            comm_struct.window_buffer);
+                    if (settings.comm_settings.enable_flush_all) {
+                        MPI_Win_flush(neighbors_in[p],
+                                      comm_struct.window_buffer);
+                    } else if (settings.comm_settings.enable_flush_local) {
+                        MPI_Win_flush_local(neighbors_in[p],
+                                            comm_struct.window_buffer);
+                    }
+                    num_get += (global_get[p])[0];
                 }
             }
         }

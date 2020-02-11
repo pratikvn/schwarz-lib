@@ -189,9 +189,14 @@ public:
         std::shared_ptr<gko::Array<IndexType>> put_displacements;
 
         /**
-         * The RDMA window for the buffer.
+         * The RDMA window for the recv buffer.
          */
-        MPI_Win window_buffer;
+        MPI_Win window_recv_buffer;
+
+        /**
+         * The RDMA window for the send buffer.
+         */
+        MPI_Win window_send_buffer;
 
         /**
          * The RDMA window for the solution vector.

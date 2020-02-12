@@ -93,6 +93,9 @@ DEFINE_string(timings_file, "null", "The filename for the timings");
 DEFINE_bool(write_comm_data, false,
             "Write the number of elements sent and received by each subdomain "
             "to a file.");
+DEFINE_bool(print_config, false,
+            "Write the number of elements sent and received by each subdomain "
+            "to a file.");
 DEFINE_string(
     partition, "regular",
     "The partitioner used. The choices are metis, regular, regular2d");
@@ -140,6 +143,7 @@ private:
             &comm_data_struct,
         std::string filename_send, std::string filename_recv);
     int get_local_rank(MPI_Comm mpi_communicator);
+    void print_config();
 };
 
 
@@ -254,6 +258,19 @@ int BenchRas<ValueType, IndexType>::get_local_rank(MPI_Comm mpi_communicator)
 
 
 template <typename ValueType, typename IndexType>
+void BenchRas<ValueType, IndexType>::print_config()
+{
+    std::cout << " Executor: " << FLAGS_executor << "\n"
+              << " Comm type: "
+              << (FLAGS_enable_onesided ? "onesided" : "twosided") << "\n"
+              << " Remote comm type: " << FLAGS_remote_comm_type << "\n"
+              << " Element sending strategy:  "
+              << (FLAGS_enable_one_by_one ? "one by one" : "gathered") << "\n"
+              << std::endl;
+}
+
+
+template <typename ValueType, typename IndexType>
 void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
 {
     SchwarzWrappers::Metadata<ValueType, IndexType> metadata;
@@ -351,8 +368,13 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
                   << FLAGS_num_threads << " threads" << std::endl;
         std::cout << " Problem Size: " << metadata.global_size << std::endl;
     }
-    SchwarzWrappers::SolverRAS<ValueType, IndexType> solver(settings, metadata);
+    if (FLAGS_print_config) {
+        if (metadata.my_rank == 0) {
+            print_config();
+        }
+    }
 
+    SchwarzWrappers::SolverRAS<ValueType, IndexType> solver(settings, metadata);
     solver.initialize();
     solver.run(explicit_laplacian_solution);
     if (FLAGS_timings_file != "null") {

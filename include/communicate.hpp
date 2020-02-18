@@ -1,6 +1,6 @@
-/*******************************<SCHWARZ LIB LICENSE>******************************
-Copyright (c) 2019, the SCHWARZ LIB authors
-All rights reserved.
+/*******************************<SCHWARZ LIB
+LICENSE>****************************** Copyright (c) 2019, the SCHWARZ LIB
+authors All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -28,7 +28,8 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-******************************<SCHWARZ LIB LICENSE>*******************************/
+******************************<SCHWARZ LIB
+LICENSE>*******************************/
 
 #ifndef communicate_hpp
 #define communicate_hpp
@@ -82,6 +83,26 @@ public:
          * The neighbors this subdomain has to send data to.
          */
         std::shared_ptr<gko::Array<IndexType>> neighbors_out;
+
+        /**
+         * The number of neighbors this subdomain has to receive data from.
+         */
+        int local_num_neighbors_in;
+
+        /**
+         * The number of neighbors this subdomain has to send data to.
+         */
+        int local_num_neighbors_out;
+
+        /**
+         * The neighbors this subdomain has to receive data from.
+         */
+        std::shared_ptr<gko::Array<IndexType>> local_neighbors_in;
+
+        /**
+         * The neighbors this subdomain has to send data to.
+         */
+        std::shared_ptr<gko::Array<IndexType>> local_neighbors_out;
 
         /**
          * The array containing the number of elements that each subdomain sends
@@ -168,9 +189,14 @@ public:
         std::shared_ptr<gko::Array<IndexType>> put_displacements;
 
         /**
-         * The RDMA window for the buffer.
+         * The RDMA window for the recv buffer.
          */
-        MPI_Win window_buffer;
+        MPI_Win window_recv_buffer;
+
+        /**
+         * The RDMA window for the send buffer.
+         */
+        MPI_Win window_send_buffer;
 
         /**
          * The RDMA window for the solution vector.

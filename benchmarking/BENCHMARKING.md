@@ -24,7 +24,7 @@ Where `[FLAGS]` are the options below with the template [`flag_name [type][defau
 * `num_refine_cycles` [uint32][1][disabled] : The number of refinement cycles when used with `deal.ii`.
 * `enable_onesided` [bool][false] : Enable the onesided asynchronous communication.
 * `enable_twosided` [bool][true] : Enable the twosided asynchronous communication. A dummy flag.
-* `enable_push_one_by_one` [bool][false] : Enable pushing of each element in onesided communication.
+* `enable_one_by_one` [bool][false] : Enable putting/getting of each element in onesided communication.
 * `enable_put_all_local_residual_norms`  [bool][false] : Enable putting of all local residual norms"
 * `enable_comm_overlap` [bool][false] : Enable overlap of communication and computation.
 * `enable_global_check` [bool][false] : Use the global convergence check for twosided.
@@ -33,11 +33,18 @@ Where `[FLAGS]` are the options below with the template [`flag_name [type][defau
 * `enable_random_rhs` [bool][false] : Use a random rhs instead of the default 1.0's .
 * `overlap` [uint32][2] : Overlap between the domains.
 * `executor` [std::string][reference] : The executor used to run the solver, one of `reference`, `cuda` or `omp`.
-* `enable_flush` [std::string][flush-all] : The window flush. The choices are `flush-local` and `flush-all`.
+* `flush-type` [std::string][flush-all] : The window flush strategy. The choices are `flush-local` and `flush-all`.
+* `lock-type` [std::string][lock-all] : The window lock strategy. The choices are `lock-local` and `lock-all`.
 * `timings_file` [std::string][null] : The filename for the timings.
-* `partition` [std::string][regular] : The partitioner used. The choices are `metis` or `regular`.
-* `local_solver` [std::string][direct-cholmod] : The local solver used in the local domains. The current choices are `direct-cholmod` , `direct-ginkgo` or `iterative-ginkgo`.
-* `num_threads` [uint32][1], "Number of threads to bind to a process.
-* `factor_ordering_natural` [bool][false]: If true uses natural ordering instead of the default optimized ordering. This is needed for CUDA runs as the factorization ordering needs to be given to the solver.
-* `enable_local_precond` [bool][false], "If true uses the Block jacobi preconditioning for the local iterative solver. "
-* `precond_max_block_size` [uint32][16], "Maximum size of the blocks for the block jacobi preconditioner"
+* `partition` [std::string][regular] : The partitioner used. The choices are `metis`, `regular` or `regular2d`.
+* `metis_objtype` [std::string][null] : The objective type to minimize for the metis partitioner. The choices are `edgecut` and `totalvol`.
+* `local_solver` [std::string][iterative-ginkgo] : The local solver used in the local domains. The current choices are `direct-cholmod` , `direct-ginkgo` or `iterative-ginkgo`.
+* `num_threads` [uint32][1] : Number of threads to bind to a process.
+* `factor_ordering_natural` [bool][false] : If true uses natural ordering instead of the default optimized ordering. This is needed for CUDA runs as the factorization ordering needs to be given to the solver.
+* `enable_local_precond` [bool][false] : If true uses the Block jacobi preconditioning for the local iterative solver. 
+* `precond_max_block_size` [uint32][16]:  Maximum size of the blocks for the block jacobi preconditioner
+* `enable_debug_writes` [bool][false] : Enable some debugging outputs to stdout.
+* `write_comm_data` [bool][false] : Write the number of sends and recvs of each subdomain to files.
+* `print_config` [bool][true] : Print the configuration of the run.
+* `remote_comm_type` [std::string][get] : The type of the remote communication. `get` uses `MPI_Get` and `put` uses `MPI_Put`.
+* `shifted_iter` [uint32][1] : The number of iterations to communicate for the local subdomains.

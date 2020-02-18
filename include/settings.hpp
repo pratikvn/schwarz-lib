@@ -149,6 +149,11 @@ struct Settings {
     bool write_debug_out = false;
 
     /**
+     * Iteration shift for node local communication.
+     */
+    int shifted_iter = 1;
+
+    /**
      * The settings for the various available communication paradigms.
      */
     struct comm_settings {
@@ -163,14 +168,19 @@ struct Settings {
         bool enable_overlap = false;
 
         /**
-         * Push the data to the window to use MPI_Put rather than get.
+         * Put the data to the window using MPI_Put rather than get.
          */
-        bool enable_push = true;
+        bool enable_put = false;
 
         /**
-         * Push each element separately.
+         * Get the data to the window using MPI_Get rather than put.
          */
-        bool enable_push_one_by_one = false;
+        bool enable_get = true;
+
+        /**
+         * Push each element separately directly into the buffer.
+         */
+        bool enable_one_by_one = false;
 
         /**
          * Use local flush.
@@ -181,6 +191,16 @@ struct Settings {
          * Use flush all.
          */
         bool enable_flush_all = true;
+
+        /**
+         * Use local locks.
+         */
+        bool enable_lock_local = false;
+
+        /**
+         * Use lock all.
+         */
+        bool enable_lock_all = true;
     };
     comm_settings comm_settings;
 
@@ -262,9 +282,19 @@ struct Metadata {
     gko::size_type num_subdomains = 1;
 
     /**
-     * The local rank of the subdomain.
+     * The rank of the subdomain.
      */
     int my_rank;
+
+    /**
+     * The local rank of the subdomain.
+     */
+    int my_local_rank;
+
+    /**
+     * The local number of procs in the subdomain.
+     */
+    int local_num_procs;
 
     /**
      * The number of subdomains used within the solver, size of the

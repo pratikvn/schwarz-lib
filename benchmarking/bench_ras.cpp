@@ -52,14 +52,18 @@ DEFINE_uint32(set_1d_laplacian_size, 16,
 DEFINE_uint32(
     num_refine_cycles, 1,
     "Number of refinement cycles for the adaptive refinement within deal.ii");
+DEFINE_uint32(shifted_iter, 1,
+              "Use a shifted communication after every x iterations.");
 DEFINE_bool(enable_debug_write, false, "Enable some debug writes.");
 DEFINE_bool(enable_onesided, false,
             "Use the onesided communication version for the solver");
 DEFINE_bool(enable_twosided, true,
             "Use the twosided communication version for the solver");
-DEFINE_bool(enable_push_one_by_one, false,
-            "Enable push one element after another in onesided");
-DEFINE_bool(enable_get, false, "Enable MPI_Get instead of the MPI_Put");
+DEFINE_bool(enable_one_by_one, false,
+            "Enable one element after another in onesided");
+DEFINE_string(remote_comm_type, "get",
+              " The remote memory function to use, MPI_Put / MPI_Get, options "
+              "are put or get");
 DEFINE_bool(enable_put_all_local_residual_norms, false,
             "Enable putting of all local residual norms");
 DEFINE_bool(enable_comm_overlap, false,
@@ -83,16 +87,19 @@ DEFINE_uint32(overlap, 2, "Overlap between the domains");
 DEFINE_string(
     executor, "reference",
     "The executor used to run the solver, one of reference, cuda or omp");
-DEFINE_string(enable_flush, "flush-all",
+DEFINE_string(flush_type, "flush-all",
               "The window flush. The choices are flush-local and flush-all");
+DEFINE_string(lock_type, "lock-all",
+              "The window locking. The choices are lock-local and lock-all");
 DEFINE_string(timings_file, "null", "The filename for the timings");
 DEFINE_bool(write_comm_data, false,
             "Write the number of elements sent and received by each subdomain "
             "to a file.");
+DEFINE_bool(print_config, true, "Print the configuration of the run ");
 DEFINE_string(
     partition, "regular",
     "The partitioner used. The choices are metis, regular, regular2d");
-DEFINE_string(local_solver, "direct-cholmod",
+DEFINE_string(local_solver, "iterative-ginkgo",
               "The local solver used in the local domains. The current choices "
               "include direct-cholmod , direct-ginkgo or iterative-ginkgo");
 DEFINE_uint32(num_threads, 1, "Number of threads to bind to a process");
@@ -136,6 +143,7 @@ private:
             &comm_data_struct,
         std::string filename_send, std::string filename_recv);
     int get_local_rank(MPI_Comm mpi_communicator);
+    void print_config();
 };
 
 
@@ -250,6 +258,19 @@ int BenchRas<ValueType, IndexType>::get_local_rank(MPI_Comm mpi_communicator)
 
 
 template <typename ValueType, typename IndexType>
+void BenchRas<ValueType, IndexType>::print_config()
+{
+    std::cout << " Executor: " << FLAGS_executor << "\n"
+              << " Comm type: "
+              << (FLAGS_enable_onesided ? "onesided" : "twosided") << "\n"
+              << " Remote comm type: " << FLAGS_remote_comm_type << "\n"
+              << " Element sending strategy:  "
+              << (FLAGS_enable_one_by_one ? "one by one" : "gathered") << "\n"
+              << std::endl;
+}
+
+
+template <typename ValueType, typename IndexType>
 void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
 {
     SchwarzWrappers::Metadata<ValueType, IndexType> metadata;
@@ -269,20 +290,33 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
 
     // Generic settings
     settings.write_debug_out = FLAGS_enable_debug_write;
+    settings.shifted_iter = FLAGS_shifted_iter;
 
     // Set solver settings from command line args.
     // Comm settings
     settings.comm_settings.enable_onesided = FLAGS_enable_onesided;
-    settings.comm_settings.enable_push_one_by_one =
-        FLAGS_enable_push_one_by_one;
-    settings.comm_settings.enable_push = !(FLAGS_enable_get);
+    if (FLAGS_remote_comm_type == "put") {
+        settings.comm_settings.enable_put = true;
+        settings.comm_settings.enable_get = false;
+    } else if (FLAGS_remote_comm_type == "get") {
+        settings.comm_settings.enable_put = false;
+        settings.comm_settings.enable_get = true;
+    }
+    settings.comm_settings.enable_one_by_one = FLAGS_enable_one_by_one;
     settings.comm_settings.enable_overlap = FLAGS_enable_comm_overlap;
-    if (FLAGS_enable_flush == "flush-all") {
+    if (FLAGS_flush_type == "flush-all") {
         settings.comm_settings.enable_flush_all = true;
-    } else if (FLAGS_enable_flush == "flush-local") {
+    } else if (FLAGS_flush_type == "flush-local") {
         settings.comm_settings.enable_flush_all = false;
         settings.comm_settings.enable_flush_local = true;
     }
+    if (FLAGS_lock_type == "lock-all") {
+        settings.comm_settings.enable_lock_all = true;
+    } else if (FLAGS_lock_type == "lock-local") {
+        settings.comm_settings.enable_lock_all = false;
+        settings.comm_settings.enable_lock_local = true;
+    }
+
     // Convergence settings
     settings.convergence_settings.put_all_local_residual_norms =
         FLAGS_enable_put_all_local_residual_norms;
@@ -341,8 +375,13 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
                   << FLAGS_num_threads << " threads" << std::endl;
         std::cout << " Problem Size: " << metadata.global_size << std::endl;
     }
-    SchwarzWrappers::SolverRAS<ValueType, IndexType> solver(settings, metadata);
+    if (FLAGS_print_config) {
+        if (metadata.my_rank == 0) {
+            print_config();
+        }
+    }
 
+    SchwarzWrappers::SolverRAS<ValueType, IndexType> solver(settings, metadata);
     solver.initialize();
     solver.run(explicit_laplacian_solution);
     if (FLAGS_timings_file != "null") {
@@ -397,6 +436,7 @@ int main(int argc, char *argv[])
                       << " but provided thread support is only "
                       << prov_thread_support << std::endl;
         }
+        // MPI_Init(&argc, &argv);
         laplace_problem_2d.run();
         MPI_Finalize();
     } catch (std::exception &exc) {

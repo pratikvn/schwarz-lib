@@ -53,7 +53,7 @@ DEFINE_uint32(
     num_refine_cycles, 1,
     "Number of refinement cycles for the adaptive refinement within deal.ii");
 DEFINE_uint32(shifted_iter, 1,
-              "Use a shifter communication after every x iterations.");
+              "Use a shifted communication after every x iterations.");
 DEFINE_bool(enable_debug_write, false, "Enable some debug writes.");
 DEFINE_bool(enable_onesided, false,
             "Use the onesided communication version for the solver");
@@ -61,8 +61,8 @@ DEFINE_bool(enable_twosided, true,
             "Use the twosided communication version for the solver");
 DEFINE_bool(enable_one_by_one, false,
             "Enable one element after another in onesided");
-DEFINE_string(remote_comm_type, "put",
-              " The remove memory function to use, MPI_Put / MPI_Get, options "
+DEFINE_string(remote_comm_type, "get",
+              " The remote memory function to use, MPI_Put / MPI_Get, options "
               "are put or get");
 DEFINE_bool(enable_put_all_local_residual_norms, false,
             "Enable putting of all local residual norms");
@@ -87,19 +87,19 @@ DEFINE_uint32(overlap, 2, "Overlap between the domains");
 DEFINE_string(
     executor, "reference",
     "The executor used to run the solver, one of reference, cuda or omp");
-DEFINE_string(enable_flush, "flush-all",
+DEFINE_string(flush_type, "flush-all",
               "The window flush. The choices are flush-local and flush-all");
+DEFINE_string(lock_type, "lock-all",
+              "The window locking. The choices are lock-local and lock-all");
 DEFINE_string(timings_file, "null", "The filename for the timings");
 DEFINE_bool(write_comm_data, false,
             "Write the number of elements sent and received by each subdomain "
             "to a file.");
-DEFINE_bool(print_config, false,
-            "Write the number of elements sent and received by each subdomain "
-            "to a file.");
+DEFINE_bool(print_config, true, "Print the configuration of the run ");
 DEFINE_string(
     partition, "regular",
     "The partitioner used. The choices are metis, regular, regular2d");
-DEFINE_string(local_solver, "direct-cholmod",
+DEFINE_string(local_solver, "iterative-ginkgo",
               "The local solver used in the local domains. The current choices "
               "include direct-cholmod , direct-ginkgo or iterative-ginkgo");
 DEFINE_uint32(num_threads, 1, "Number of threads to bind to a process");
@@ -304,12 +304,19 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     }
     settings.comm_settings.enable_one_by_one = FLAGS_enable_one_by_one;
     settings.comm_settings.enable_overlap = FLAGS_enable_comm_overlap;
-    if (FLAGS_enable_flush == "flush-all") {
+    if (FLAGS_flush_type == "flush-all") {
         settings.comm_settings.enable_flush_all = true;
-    } else if (FLAGS_enable_flush == "flush-local") {
+    } else if (FLAGS_flush_type == "flush-local") {
         settings.comm_settings.enable_flush_all = false;
         settings.comm_settings.enable_flush_local = true;
     }
+    if (FLAGS_lock_type == "lock-all") {
+        settings.comm_settings.enable_lock_all = true;
+    } else if (FLAGS_lock_type == "lock-local") {
+        settings.comm_settings.enable_lock_all = false;
+        settings.comm_settings.enable_lock_local = true;
+    }
+
     // Convergence settings
     settings.convergence_settings.put_all_local_residual_norms =
         FLAGS_enable_put_all_local_residual_norms;
@@ -429,6 +436,7 @@ int main(int argc, char *argv[])
                       << " but provided thread support is only "
                       << prov_thread_support << std::endl;
         }
+        // MPI_Init(&argc, &argv);
         laplace_problem_2d.run();
         MPI_Finalize();
     } catch (std::exception &exc) {

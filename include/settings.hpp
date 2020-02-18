@@ -191,6 +191,16 @@ struct Settings {
          * Use flush all.
          */
         bool enable_flush_all = true;
+
+        /**
+         * Use local locks.
+         */
+        bool enable_lock_local = false;
+
+        /**
+         * Use lock all.
+         */
+        bool enable_lock_all = true;
     };
     comm_settings comm_settings;
 

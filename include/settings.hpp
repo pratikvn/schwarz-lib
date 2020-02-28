@@ -162,6 +162,11 @@ struct Settings {
     bool write_debug_out = false;
 
     /**
+     * Enable the local permutations from CHOLMOD to a file.
+     */
+    bool write_perm_data = false;
+
+    /**
      * Iteration shift for node local communication.
      */
     int shifted_iter = 1;

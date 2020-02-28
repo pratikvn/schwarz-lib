@@ -96,6 +96,8 @@ DEFINE_string(timings_file, "null", "The filename for the timings");
 DEFINE_bool(write_comm_data, false,
             "Write the number of elements sent and received by each subdomain "
             "to a file.");
+DEFINE_bool(write_perm_data, false,
+            "Write the permutation from CHOLMOD to a file");
 DEFINE_bool(print_config, true, "Print the configuration of the run ");
 DEFINE_string(
     partition, "regular",
@@ -295,6 +297,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
 
     // Generic settings
     settings.write_debug_out = FLAGS_enable_debug_write;
+    settings.write_perm_data = FLAGS_write_perm_data;
     settings.shifted_iter = FLAGS_shifted_iter;
 
     // Set solver settings from command line args.

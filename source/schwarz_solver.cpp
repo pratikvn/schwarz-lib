@@ -194,7 +194,7 @@ void SolverBase<ValueType, IndexType>::initialize()
     this->setup_local_matrices(this->settings, this->metadata,
                                this->partition_indices, this->global_matrix,
                                this->local_matrix, this->interface_matrix,
-                               this->local_perm);
+                               this->local_perm, this->local_inv_perm);
     // Debug to print matrices.
     if (settings.print_matrices && settings.executor_string != "cuda") {
         Utils<ValueType, IndexType>::print_matrix(
@@ -211,7 +211,7 @@ void SolverBase<ValueType, IndexType>::initialize()
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
         this->settings, metadata, this->local_matrix, this->triangular_factor,
-        this->local_rhs);
+        this->local_perm, this->local_inv_perm, this->local_rhs);
 
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
@@ -257,7 +257,7 @@ void SolverBase<ValueType, IndexType>::initialize(
     this->setup_local_matrices(this->settings, this->metadata,
                                this->partition_indices, this->global_matrix,
                                this->local_matrix, this->interface_matrix,
-                               this->local_perm);
+                               this->local_perm, this->local_inv_perm);
     // Debug to print matrices.
     if (settings.print_matrices && settings.executor_string != "cuda") {
         Utils<ValueType, IndexType>::print_matrix(
@@ -274,7 +274,7 @@ void SolverBase<ValueType, IndexType>::initialize(
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
         this->settings, metadata, this->local_matrix, this->triangular_factor,
-        this->local_rhs);
+        this->local_perm, this->local_inv_perm, this->local_rhs);
 
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
@@ -399,7 +399,8 @@ void SolverBase<ValueType, IndexType>::run(
         } else {
             MEASURE_ELAPSED_FUNC_TIME(
                 (Solve<ValueType, IndexType>::local_solve(
-                    settings, metadata, this->triangular_factor, init_guess,
+                    settings, metadata, this->triangular_factor,
+                    this->local_perm, this->local_inv_perm, init_guess,
                     this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
             // init_guess->copy_from(this->local_solution.get());
@@ -456,47 +457,6 @@ SolverRAS<ValueType, IndexType>::SolverRAS(
 {}
 
 
-template <typename IndexType>
-int find_duplicates(IndexType val, std::size_t index, const IndexType *data,
-                    std::size_t length)
-{
-    auto count = 0;
-    for (auto i = 0; i < length; ++i) {
-        if (i != index && val == data[i]) {
-            count++;
-        }
-    }
-    return count;
-}
-
-
-template <typename IndexType>
-bool assert_correct_permutation(
-    const gko::matrix::Permutation<IndexType> *input_perm)
-{
-    auto perm_data = input_perm->get_const_permutation();
-    auto perm_size = input_perm->get_permutation_size();
-
-    for (auto i = 0; i < perm_size; ++i) {
-        if (perm_data[i] >= perm_size) {
-            std::cout << "Here " << __LINE__ << ", perm[i] " << perm_data[i]
-                      << " at " << i << std::endl;
-            return false;
-        }
-        if (perm_data[i] < 0) {
-            std::cout << "Here " << __LINE__ << std::endl;
-            return false;
-        }
-        auto duplicates =
-            find_duplicates(perm_data[i], i, perm_data, perm_size);
-        if (duplicates > 0) {
-            std::cout << "Here " << __LINE__ << " " << duplicates << std::endl;
-            return false;
-        }
-    }
-}
-
-
 template <typename ValueType, typename IndexType>
 void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     Settings &settings, Metadata<ValueType, IndexType> &metadata,
@@ -504,7 +464,8 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &interface_matrix,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm)
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm)
 {
     using mtx = gko::matrix::Csr<ValueType, IndexType>;
     using vec_itype = gko::Array<IndexType>;
@@ -512,8 +473,9 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     // Only instantiated for metis_indextype
     using metis_reorder_type =
         // gko::reorder::MetisFillReduce<ValueType, metis_indextype>;
-        gko::reorder::MetisFillReduce<ValueType, gko::int32>;
+        gko::reorder::MetisFillReduce<ValueType, metis_indextype>;
     using perm_type = gko::matrix::Permutation<IndexType>;
+    using arr = gko::Array<IndexType>;
     auto my_rank = metadata.my_rank;
     auto comm_size = metadata.comm_size;
     auto num_subdomains = metadata.num_subdomains;
@@ -744,38 +706,6 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     local_matrix->copy_from(gko::lend(local_matrix_compute));
     interface_matrix = mtx::create(settings.executor);
     interface_matrix->copy_from(gko::lend(interface_matrix_compute));
-
-    if (settings.reorder == "metis_reordering") {
-        auto reorder = metis_reorder_type::build()
-                           .on(settings.executor)
-                           ->generate(local_matrix);
-        auto lperm = reorder->get_permutation();
-        local_perm =
-            perm_type::create(settings.executor, local_matrix->get_size());
-        local_perm->copy_from(gko::lend(lperm));
-        std::cout << " Local matrix reordering through METIS" << std::endl;
-    } else if (settings.reorder == "rcm_reordering") {
-        auto reorder = rcm_reorder_type::build()
-                           .on(settings.executor)
-                           ->generate(local_matrix);
-        auto lperm = reorder->get_permutation();
-        local_perm->copy_from(gko::lend(lperm));
-        std::cout << " Local matrix reordering through RCM " << std::endl;
-    } else {
-        local_perm =
-            perm_type::create(settings.executor, local_matrix->get_size());
-        std::cout << "No local matrix reordering" << std::endl;
-    }
-
-    if (settings.debug_print) {
-        if (assert_correct_permutation(local_perm.get())) {
-            std::cout << " Rank " << metadata.my_rank
-                      << " Permutation is correct" << std::endl;
-        } else {
-            std::cout << " Rank " << metadata.my_rank
-                      << " Permutation is incorrect" << std::endl;
-        }
-    }
 }
 
 
@@ -1032,8 +962,6 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
                        main_buffer->get_size()[0] * sizeof(ValueType),
                        sizeof(ValueType), MPI_INFO_NULL, MPI_COMM_WORLD,
                        &(this->comm_struct.window_x));
-    } else {
-        // Twosided
     }
 
 
@@ -1059,8 +987,6 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
                        (num_subdomains) * sizeof(IndexType), sizeof(IndexType),
                        MPI_INFO_NULL, MPI_COMM_WORLD,
                        &(this->window_convergence));
-    } else {
-        // Twosided
     }
 
     if (settings.comm_settings.enable_onesided && num_subdomains > 1) {

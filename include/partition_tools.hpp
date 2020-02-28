@@ -183,15 +183,17 @@ void PartitionMetis(
     if (nparts <= 8) {
         SCHWARZ_ASSERT_NO_METIS_ERRORS(METIS_PartGraphRecursive(
             &n, &ncon, int_rowstart.data(), int_colnums.data(),
-            p_int_cell_weights, nullptr, nullptr, &nparts, nullptr, nullptr,
-            options, &dummy, int_partition_indices.data()));
+            // p_int_cell_weights, nullptr, nullptr, &nparts, nullptr, nullptr,
+            nullptr, nullptr, nullptr, &nparts, nullptr, nullptr, options,
+            &dummy, int_partition_indices.data()));
     }
     // Otherwise use kway
     else {
         SCHWARZ_ASSERT_NO_METIS_ERRORS(METIS_PartGraphKway(
             &n, &ncon, int_rowstart.data(), int_colnums.data(),
-            p_int_cell_weights, nullptr, nullptr, &nparts, nullptr, nullptr,
-            options, &dummy, int_partition_indices.data()));
+            // p_int_cell_weights, nullptr, nullptr, &nparts, nullptr, nullptr,
+            nullptr, nullptr, nullptr, &nparts, nullptr, nullptr, options,
+            &dummy, int_partition_indices.data()));
     }
 
     // now copy back generated indices into the output array

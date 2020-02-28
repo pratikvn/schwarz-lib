@@ -67,6 +67,12 @@ struct Utils {
 
     static void print_vector(const gko::matrix::Dense<ValueType> *vector,
                              int rank, std::string name);
+
+    static int find_duplicates(IndexType val, std::size_t index,
+                               const IndexType *data, std::size_t length);
+
+    static bool assert_correct_permutation(
+        const gko::matrix::Permutation<IndexType> *input_perm);
 };
 
 

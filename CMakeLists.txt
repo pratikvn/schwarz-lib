@@ -36,6 +36,7 @@ if(SCHWARZ_BUILD_METIS)
   if(NOT DEFINED ENV{METIS_DIR})
     message(FATAL_ERROR "Please specify where METIS has been installed.")
   endif()
+  find_package(METIS REQUIRED)
   set(METIS_INCLUDE_DIR $ENV{METIS_DIR}/include)
   set(METIS_LIBRARY_DIR $ENV{METIS_DIR}/lib)
   find_package(METIS REQUIRED)
@@ -101,6 +102,7 @@ TARGET_SOURCES(${TARGET} PRIVATE
   source/exception.cpp
   )
 
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.hpp.in
     ${CMAKE_CURRENT_BINARY_DIR}/include/schwarz/config.hpp @ONLY)
 
@@ -165,7 +167,7 @@ endif()
 
 if(SCHWARZ_BUILD_CUDA)
   TARGET_INCLUDE_DIRECTORIES(${TARGET}
-    SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
+    SYSTEM PUBLIC ${CUDA_INCLUDE_DIRS})
   TARGET_LINK_LIBRARIES(${TARGET} ${CUDA_RUNTIME_LIBS} ${CUBLAS} ${CUSPARSE})
 endif()
 

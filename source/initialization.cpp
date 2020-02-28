@@ -69,7 +69,8 @@ void Initialize<ValueType, IndexType>::setup_local_matrices(
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &interface_matrix,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm)
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm)
     SCHWARZ_NOT_IMPLEMENTED;
 
 

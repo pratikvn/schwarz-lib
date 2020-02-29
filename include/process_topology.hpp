@@ -58,8 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace ProcessTopology {
 
 
-
-void bind_gpus_to_process(
+static void bind_gpus_to_process(
     std::shared_ptr<SchwarzWrappers::device_guard> &dev_guard, int &local_rank,
     int &local_num_procs, int &num_threads)
 {

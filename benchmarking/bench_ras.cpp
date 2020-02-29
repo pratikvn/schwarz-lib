@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <communicate.hpp>
 #include <initialization.hpp>
-#include <schwarz_solver.hpp>
+#include <restricted_schwarz.hpp>
 #include <solve.hpp>
 
 

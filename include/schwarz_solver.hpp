@@ -133,6 +133,16 @@ public:
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> local_matrix;
 
     /**
+     * The local subdomain permutation matrix/array.
+     */
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> local_perm;
+
+    /**
+     * The local subdomain inverse permutation matrix/array.
+     */
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> local_inv_perm;
+
+    /**
      * The local triangular factor used for the triangular solves.
      */
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> triangular_factor;
@@ -220,7 +230,10 @@ public:
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
-            &interface_matrix) override;
+            &interface_matrix,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm)
+        override;
 
     void setup_comm_buffers() override;
 

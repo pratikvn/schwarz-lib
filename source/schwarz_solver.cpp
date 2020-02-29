@@ -193,7 +193,8 @@ void SolverBase<ValueType, IndexType>::initialize()
     // Setup the local matrices on each of the subddomains.
     this->setup_local_matrices(this->settings, this->metadata,
                                this->partition_indices, this->global_matrix,
-                               this->local_matrix, this->interface_matrix);
+                               this->local_matrix, this->interface_matrix,
+                               this->local_perm, this->local_inv_perm);
     // Debug to print matrices.
     if (settings.print_matrices && settings.executor_string != "cuda") {
         Utils<ValueType, IndexType>::print_matrix(
@@ -210,7 +211,7 @@ void SolverBase<ValueType, IndexType>::initialize()
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
         this->settings, metadata, this->local_matrix, this->triangular_factor,
-        this->local_rhs);
+        this->local_perm, this->local_inv_perm, this->local_rhs);
 
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
@@ -255,7 +256,8 @@ void SolverBase<ValueType, IndexType>::initialize(
     // Setup the local matrices on each of the subddomains.
     this->setup_local_matrices(this->settings, this->metadata,
                                this->partition_indices, this->global_matrix,
-                               this->local_matrix, this->interface_matrix);
+                               this->local_matrix, this->interface_matrix,
+                               this->local_perm, this->local_inv_perm);
     // Debug to print matrices.
     if (settings.print_matrices && settings.executor_string != "cuda") {
         Utils<ValueType, IndexType>::print_matrix(
@@ -272,7 +274,7 @@ void SolverBase<ValueType, IndexType>::initialize(
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
         this->settings, metadata, this->local_matrix, this->triangular_factor,
-        this->local_rhs);
+        this->local_perm, this->local_inv_perm, this->local_rhs);
 
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
@@ -397,7 +399,8 @@ void SolverBase<ValueType, IndexType>::run(
         } else {
             MEASURE_ELAPSED_FUNC_TIME(
                 (Solve<ValueType, IndexType>::local_solve(
-                    settings, metadata, this->triangular_factor, init_guess,
+                    settings, metadata, this->triangular_factor,
+                    this->local_perm, this->local_inv_perm, init_guess,
                     this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
             // init_guess->copy_from(this->local_solution.get());
@@ -460,10 +463,19 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     std::vector<unsigned int> &partition_indices,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
-    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &interface_matrix)
+    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &interface_matrix,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm)
 {
     using mtx = gko::matrix::Csr<ValueType, IndexType>;
     using vec_itype = gko::Array<IndexType>;
+    using rcm_reorder_type = gko::reorder::Rcm<ValueType, IndexType>;
+    // Only instantiated for metis_indextype
+    using metis_reorder_type =
+        // gko::reorder::MetisFillReduce<ValueType, metis_indextype>;
+        gko::reorder::MetisFillReduce<ValueType, metis_indextype>;
+    using perm_type = gko::matrix::Permutation<IndexType>;
+    using arr = gko::Array<IndexType>;
     auto my_rank = metadata.my_rank;
     auto comm_size = metadata.comm_size;
     auto num_subdomains = metadata.num_subdomains;
@@ -950,8 +962,6 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
                        main_buffer->get_size()[0] * sizeof(ValueType),
                        sizeof(ValueType), MPI_INFO_NULL, MPI_COMM_WORLD,
                        &(this->comm_struct.window_x));
-    } else {
-        // Twosided
     }
 
 
@@ -977,8 +987,6 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
                        (num_subdomains) * sizeof(IndexType), sizeof(IndexType),
                        MPI_INFO_NULL, MPI_COMM_WORLD,
                        &(this->window_convergence));
-    } else {
-        // Twosided
     }
 
     if (settings.comm_settings.enable_onesided && num_subdomains > 1) {

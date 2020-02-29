@@ -91,6 +91,49 @@ void Utils<ValueType, IndexType>::print_matrix(
 }
 
 
+template <typename ValueType, typename IndexType>
+int Utils<ValueType, IndexType>::find_duplicates(IndexType val,
+                                                 std::size_t index,
+                                                 const IndexType *data,
+                                                 std::size_t length)
+{
+    auto count = 0;
+    for (auto i = 0; i < length; ++i) {
+        if (i != index && val == data[i]) {
+            count++;
+        }
+    }
+    return count;
+}
+
+
+template <typename ValueType, typename IndexType>
+bool Utils<ValueType, IndexType>::assert_correct_permutation(
+    const gko::matrix::Permutation<IndexType> *input_perm)
+{
+    auto perm_data = input_perm->get_const_permutation();
+    auto perm_size = input_perm->get_permutation_size();
+
+    for (auto i = 0; i < perm_size; ++i) {
+        if (perm_data[i] >= perm_size) {
+            std::cout << "Here " << __LINE__ << ", perm[i] " << perm_data[i]
+                      << " at " << i << std::endl;
+            return false;
+        }
+        if (perm_data[i] < 0) {
+            std::cout << "Here " << __LINE__ << std::endl;
+            return false;
+        }
+        auto duplicates = Utils<ValueType, IndexType>::find_duplicates(
+            perm_data[i], i, perm_data, perm_size);
+        if (duplicates > 0) {
+            std::cout << "Here " << __LINE__ << " " << duplicates << std::endl;
+            return false;
+        }
+    }
+}
+
+
 #define DECLARE_UTILS(ValueType, IndexType) struct Utils<ValueType, IndexType>
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_UTILS);
 #undef DECLARE_UTILS

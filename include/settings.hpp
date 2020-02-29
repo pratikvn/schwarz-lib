@@ -53,6 +53,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <gather_scatter.hpp>
 
 
+#if SCHW_HAVE_METIS
+#include <metis.h>
+#define metis_indextype idx_t
+#else
+#define metis_indextype gko::int32
+#endif
+
+
 #define MINIMAL_OVERLAP 2
 
 
@@ -113,6 +121,11 @@ struct Settings {
     bool print_matrices = false;
 
     /**
+     * Flag to enable some debug printing.
+     */
+    bool debug_print = false;
+
+    /**
      * The local solver algorithm for the local subdomain solves.
      */
     enum local_solver_settings {
@@ -147,6 +160,11 @@ struct Settings {
      * Enable the writing of debug out to file.
      */
     bool write_debug_out = false;
+
+    /**
+     * Enable the local permutations from CHOLMOD to a file.
+     */
+    bool write_perm_data = false;
 
     /**
      * Iteration shift for node local communication.
@@ -226,6 +244,10 @@ struct Settings {
     };
     convergence_settings convergence_settings;
 
+    /**
+     * The reordering for the local solve.
+     */
+    std::string reorder;
 
     Settings(std::string executor_string = "reference")
         : executor_string(executor_string)

@@ -98,7 +98,8 @@ TARGET_SOURCES(${TARGET} PRIVATE
   source/communicate.cpp
   source/utils.cpp
   source/solve.cpp
-  source/schwarz_solver.cpp
+  source/schwarz_base.cpp
+  source/restricted_schwarz.cpp
   source/exception.cpp
   )
 

@@ -84,6 +84,11 @@ public:
         std::shared_ptr<gko::Array<IndexType>> neighbors_out;
 
         /**
+         * The bool vector which is true if the neighbors of a subdomain are in
+         * one node..
+         */
+        std::vector<bool> is_local_neighbor;
+        /**
          * The number of neighbors this subdomain has to receive data from.
          */
         int local_num_neighbors_in;

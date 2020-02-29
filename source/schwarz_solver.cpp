@@ -135,6 +135,7 @@ SolverBase<ValueType, IndexType>::SolverBase(
     comm_struct.local_neighbors_out = std::shared_ptr<vec_itype>(
         new vec_itype(settings.executor->get_master(), num_subdomains),
         std::default_delete<vec_itype>());
+    comm_struct.is_local_neighbor = std::vector<bool>(num_subdomains, true);
     comm_struct.neighbors_in = std::shared_ptr<vec_itype>(
         new vec_itype(settings.executor->get_master(), num_subdomains),
         std::default_delete<vec_itype>());
@@ -730,6 +731,7 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     auto neighbors_in = this->comm_struct.neighbors_in->get_data();
     auto local_neighbors_in = this->comm_struct.local_neighbors_in->get_data();
     auto global_get = this->comm_struct.global_get->get_data();
+    auto is_local_neighbor = this->comm_struct.is_local_neighbor;
 
     this->comm_struct.num_neighbors_in = 0;
     int num_recv = 0;
@@ -759,6 +761,9 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
                 num_recv += (global_get[pp])[0];
                 recv[p] = 1;
             }
+            is_local_neighbor[p] =
+                Utils<ValueType, IndexType>::check_subd_locality(MPI_COMM_WORLD,
+                                                                 p, my_rank);
         }
     }
 
@@ -1039,6 +1044,8 @@ void exchange_boundary_onesided(
     auto remote_get = comm_struct.remote_get->get_data();
     auto get_displacements = comm_struct.get_displacements->get_data();
     auto recv_buffer = comm_struct.recv_buffer->get_values();
+    auto is_local_neighbor = comm_struct.is_local_neighbor;
+
     ValueType dummy = 1.0;
     auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
     if (settings.comm_settings.enable_put) {
@@ -1081,16 +1088,32 @@ void exchange_boundary_onesided(
             // Gather into send buffer so that the procs can Get from it
             int num_put = 0;
             for (auto p = 0; p < num_neighbors_out; p++) {
-                if ((global_put[p])[0] > 0) {
+                if ((global_put[p])[0] > 0 && !(is_local_neighbor[p])) {
+                    if ((metadata.iter_count % settings.shifted_iter == 0)) {
+                        CommHelpers::pack_buffer(
+                            settings, local_solution->get_values(), send_buffer,
+                            global_put, num_put, p);
+                    }
+                } else if ((global_put[p])[0] > 0 && (is_local_neighbor[p])) {
                     CommHelpers::pack_buffer(
                         settings, local_solution->get_values(), send_buffer,
                         global_put, num_put, p);
-                    num_put += (global_put[p])[0];
                 }
+                num_put += (global_put[p])[0];
             }
             int num_get = 0;
             for (auto p = 0; p < num_neighbors_in; p++) {
-                if ((global_get[p])[0] > 0) {
+                if ((global_put[p])[0] > 0 && !(is_local_neighbor[p])) {
+                    if ((metadata.iter_count % settings.shifted_iter == 0)) {
+                        CommHelpers::transfer_buffer(
+                            settings, comm_struct.window_send_buffer,
+                            recv_buffer, global_get, num_get, p, neighbors_in,
+                            get_displacements);
+                        CommHelpers::unpack_buffer(
+                            settings, local_solution->get_values(), recv_buffer,
+                            global_get, num_get, p);
+                    }
+                } else if ((global_put[p])[0] > 0 && (is_local_neighbor[p])) {
                     CommHelpers::transfer_buffer(
                         settings, comm_struct.window_send_buffer, recv_buffer,
                         global_get, num_get, p, neighbors_in,
@@ -1098,8 +1121,8 @@ void exchange_boundary_onesided(
                     CommHelpers::unpack_buffer(
                         settings, local_solution->get_values(), recv_buffer,
                         global_get, num_get, p);
-                    num_get += (global_get[p])[0];
                 }
+                num_get += (global_get[p])[0];
             }
         }
     }

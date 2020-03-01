@@ -1,6 +1,6 @@
-/*******************************<SCHWARZ LIB
-LICENSE>****************************** Copyright (c) 2019, the SCHWARZ LIB
-authors All rights reserved.
+/*******************************<SCHWARZ LIB LICENSE>***********************
+Copyright (c) 2019, the SCHWARZ LIB authors
+All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -28,8 +28,7 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-******************************<SCHWARZ LIB
-LICENSE>*******************************/
+******************************<SCHWARZ LIB LICENSE>*************************/
 
 #ifndef communicate_hpp
 #define communicate_hpp
@@ -84,6 +83,11 @@ public:
          */
         std::shared_ptr<gko::Array<IndexType>> neighbors_out;
 
+        /**
+         * The bool vector which is true if the neighbors of a subdomain are in
+         * one node..
+         */
+        std::vector<bool> is_local_neighbor;
         /**
          * The number of neighbors this subdomain has to receive data from.
          */

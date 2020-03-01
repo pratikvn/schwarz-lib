@@ -38,9 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 
-
 #include <comm_tools.hpp>
-
 
 #include <communicate.hpp>
 #include <settings.hpp>

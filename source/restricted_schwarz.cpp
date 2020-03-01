@@ -35,425 +35,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <schwarz/config.hpp>
 
 
+#include <comm_helpers.hpp>
 #include <exception_helpers.hpp>
 #include <process_topology.hpp>
-#include <schwarz_solver.hpp>
+#include <restricted_schwarz.hpp>
 #include <utils.hpp>
 
 
 namespace SchwarzWrappers {
 
-
-template <typename ValueType, typename IndexType>
-SolverBase<ValueType, IndexType>::SolverBase(
-    Settings &settings, Metadata<ValueType, IndexType> &metadata)
-    : Initialize<ValueType, IndexType>(settings, metadata),
-      settings(settings),
-      metadata(metadata)
-{
-    using vec_itype = gko::Array<IndexType>;
-    using vec_vecshared = gko::Array<IndexType *>;
-    metadata.my_local_rank =
-        Utils<ValueType, IndexType>::get_local_rank(metadata.mpi_communicator);
-    metadata.local_num_procs = Utils<ValueType, IndexType>::get_local_num_procs(
-        metadata.mpi_communicator);
-    auto my_local_rank = metadata.my_local_rank;
-    if (settings.executor_string == "omp") {
-        settings.executor = gko::OmpExecutor::create();
-        auto exec_info =
-            static_cast<gko::OmpExecutor *>(settings.executor.get())
-                ->get_exec_info();
-        exec_info->bind_to_core(metadata.my_local_rank);
-
-    } else if (settings.executor_string == "cuda") {
-        int num_devices = 0;
-#if SCHW_HAVE_CUDA
-        SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaGetDeviceCount(&num_devices));
-#else
-        SCHWARZ_NOT_IMPLEMENTED;
-#endif
-        if (num_devices > 0) {
-            if (metadata.my_rank == 0) {
-                std::cout << " Number of available devices: " << num_devices
-                          << std::endl;
-            }
-        } else {
-            std::cout << " No CUDA devices available for rank "
-                      << metadata.my_rank << std::endl;
-            std::exit(-1);
-        }
-        settings.executor = gko::CudaExecutor::create(
-            my_local_rank, gko::OmpExecutor::create());
-        auto exec_info = static_cast<gko::OmpExecutor *>(
-                             settings.executor->get_master().get())
-                             ->get_exec_info();
-        exec_info->bind_to_core(my_local_rank);
-        settings.cuda_device_guard =
-            std::make_shared<SchwarzWrappers::device_guard>(my_local_rank);
-
-        std::cout << " Rank " << metadata.my_rank << " with local rank "
-                  << my_local_rank << " has "
-                  << (static_cast<gko::CudaExecutor *>(settings.executor.get()))
-                         ->get_device_id()
-                  << " id of gpu" << std::endl;
-        MPI_Barrier(metadata.mpi_communicator);
-    } else if (settings.executor_string == "reference") {
-        settings.executor = gko::ReferenceExecutor::create();
-        auto exec_info =
-            static_cast<gko::ReferenceExecutor *>(settings.executor.get())
-                ->get_exec_info();
-        exec_info->bind_to_core(my_local_rank);
-    }
-
-    auto my_rank = this->metadata.my_rank;
-    auto comm_size = this->metadata.comm_size;
-    auto num_subdomains = this->metadata.num_subdomains;
-    auto global_size = this->metadata.global_size;
-
-    // Some arrays for partitioning and local matrix creation.
-    metadata.first_row = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), num_subdomains + 1),
-        std::default_delete<vec_itype>());
-    metadata.permutation = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), global_size),
-        std::default_delete<vec_itype>());
-    metadata.i_permutation = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), global_size),
-        std::default_delete<vec_itype>());
-    metadata.global_to_local = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), global_size),
-        std::default_delete<vec_itype>());
-    metadata.local_to_global = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), global_size),
-        std::default_delete<vec_itype>());
-
-    // Some arrays for communication.
-    comm_struct.local_neighbors_in = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), num_subdomains),
-        std::default_delete<vec_itype>());
-    comm_struct.local_neighbors_out = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), num_subdomains),
-        std::default_delete<vec_itype>());
-    comm_struct.neighbors_in = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), num_subdomains),
-        std::default_delete<vec_itype>());
-    comm_struct.neighbors_out = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), num_subdomains),
-        std::default_delete<vec_itype>());
-    comm_struct.global_get = std::shared_ptr<vec_vecshared>(
-        new vec_vecshared(settings.executor->get_master(), num_subdomains),
-        std::default_delete<vec_vecshared>());
-    comm_struct.global_put = std::shared_ptr<vec_vecshared>(
-        new vec_vecshared(settings.executor->get_master(), num_subdomains),
-        std::default_delete<vec_vecshared>());
-    // Need this to initialize the arrays with zeros.
-    std::vector<IndexType> temp(num_subdomains, 0);
-    comm_struct.get_displacements = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), temp.begin(),
-                      temp.end()),
-        std::default_delete<vec_itype>());
-    comm_struct.put_displacements = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), temp.begin(),
-                      temp.end()),
-        std::default_delete<vec_itype>());
-}
-
-
-template <typename ValueType, typename IndexType>
-void SolverBase<ValueType, IndexType>::initialize()
-{
-    using vec_vtype = gko::matrix::Dense<ValueType>;
-
-    // Setup the right hand side vector.
-    std::vector<ValueType> rhs(metadata.global_size, 1.0);
-    if (settings.enable_random_rhs && settings.explicit_laplacian) {
-        if (metadata.my_rank == 0) {
-            Initialize<ValueType, IndexType>::generate_rhs(rhs);
-        }
-        auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
-        MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
-                  MPI_COMM_WORLD);
-    }
-
-    // Setup the global matrix
-    if (settings.explicit_laplacian) {
-        Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
-            metadata.oned_laplacian_size, this->global_matrix);
-    } else {
-        std::cerr << " Explicit laplacian needs to be enabled with the "
-                     "--explicit_laplacian flag or deal.ii support needs to be "
-                     "enabled to generate the matrices"
-                  << std::endl;
-        std::exit(-1);
-    }
-    // Partition the global matrix.
-    Initialize<ValueType, IndexType>::partition(
-        settings, metadata, this->global_matrix, this->partition_indices);
-
-    // Setup the local matrices on each of the subddomains.
-    this->setup_local_matrices(this->settings, this->metadata,
-                               this->partition_indices, this->global_matrix,
-                               this->local_matrix, this->interface_matrix,
-                               this->local_perm, this->local_inv_perm);
-    // Debug to print matrices.
-    if (settings.print_matrices && settings.executor_string != "cuda") {
-        Utils<ValueType, IndexType>::print_matrix(
-            this->local_matrix.get(), metadata.my_rank, "local_mat");
-        Utils<ValueType, IndexType>::print_matrix(this->interface_matrix.get(),
-                                                  metadata.my_rank, "int_mat");
-    }
-
-    // Setup the local vectors on each of the subddomains.
-    Initialize<ValueType, IndexType>::setup_vectors(
-        this->settings, this->metadata, rhs, this->local_rhs, this->global_rhs,
-        this->local_solution, this->global_solution);
-
-    // Setup the local solver on each of the subddomains.
-    Solve<ValueType, IndexType>::setup_local_solver(
-        this->settings, metadata, this->local_matrix, this->triangular_factor,
-        this->local_perm, this->local_inv_perm, this->local_rhs);
-
-    // Setup the communication buffers on each of the subddomains.
-    this->setup_comm_buffers();
-}
-
-#if SCHW_HAVE_DEALII
-template <typename ValueType, typename IndexType>
-void SolverBase<ValueType, IndexType>::initialize(
-    const dealii::SparseMatrix<ValueType> &matrix,
-    const dealii::Vector<ValueType> &system_rhs)
-{
-    using vec_vtype = gko::matrix::Dense<ValueType>;
-
-    // Setup the right hand side vector.
-    std::vector<ValueType> rhs(metadata.global_size, 1.0);
-    if (settings.enable_random_rhs && settings.explicit_laplacian) {
-        if (metadata.my_rank == 0) {
-            Initialize<ValueType, IndexType>::generate_rhs(rhs);
-        }
-        auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
-        MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
-                  MPI_COMM_WORLD);
-    }
-    if (metadata.my_rank == 0 && !settings.explicit_laplacian) {
-        std::copy(system_rhs.begin(), system_rhs.begin() + metadata.global_size,
-                  rhs.begin());
-    }
-
-    // Setup the global matrix
-    if (settings.explicit_laplacian) {
-        Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
-            metadata.oned_laplacian_size, this->global_matrix);
-    } else {
-        Initialize<ValueType, IndexType>::setup_global_matrix(
-            matrix, this->global_matrix);
-    }
-
-    // Partition the global matrix.
-    Initialize<ValueType, IndexType>::partition(
-        settings, metadata, this->global_matrix, this->partition_indices);
-
-    // Setup the local matrices on each of the subddomains.
-    this->setup_local_matrices(this->settings, this->metadata,
-                               this->partition_indices, this->global_matrix,
-                               this->local_matrix, this->interface_matrix,
-                               this->local_perm, this->local_inv_perm);
-    // Debug to print matrices.
-    if (settings.print_matrices && settings.executor_string != "cuda") {
-        Utils<ValueType, IndexType>::print_matrix(
-            this->local_matrix.get(), metadata.my_rank, "local_mat");
-        Utils<ValueType, IndexType>::print_matrix(this->interface_matrix.get(),
-                                                  metadata.my_rank, "int_mat");
-    }
-
-    // Setup the local vectors on each of the subddomains.
-    Initialize<ValueType, IndexType>::setup_vectors(
-        this->settings, this->metadata, rhs, this->local_rhs, this->global_rhs,
-        this->local_solution, this->global_solution);
-
-    // Setup the local solver on each of the subddomains.
-    Solve<ValueType, IndexType>::setup_local_solver(
-        this->settings, metadata, this->local_matrix, this->triangular_factor,
-        this->local_perm, this->local_inv_perm, this->local_rhs);
-
-    // Setup the communication buffers on each of the subddomains.
-    this->setup_comm_buffers();
-}
-#endif
-
-
-template <typename ValueType, typename IndexType>
-void gather_comm_data(
-    int num_subdomains,
-    struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
-    std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
-                           std::vector<std::tuple<int, int>>, int, int>>
-        &comm_data_struct)
-{
-    for (auto i = 0; i < num_subdomains; ++i) {
-        auto owning_subd = i;
-        auto num_neighbors_out = comm_struct.num_neighbors_out;
-        auto num_neighbors_in = comm_struct.num_neighbors_in;
-        auto neighbors_in = comm_struct.neighbors_in->get_data();
-        auto neighbors_out = comm_struct.neighbors_out->get_data();
-        auto global_put = comm_struct.global_put->get_data();
-        auto global_get = comm_struct.global_get->get_data();
-
-        std::vector<int> count_out(num_subdomains, 0);
-        std::vector<int> count_in(num_subdomains, 0);
-        std::vector<std::tuple<int, int>> send_tuple;
-        std::vector<std::tuple<int, int>> recv_tuple;
-        for (auto j = 0; j < num_neighbors_out; ++j) {
-            send_tuple.push_back(
-                std::make_tuple(neighbors_out[j], (global_put[j])[0]));
-            count_out[neighbors_out[j]] = 1;
-        }
-
-        for (auto j = 0; j < num_neighbors_in; ++j) {
-            recv_tuple.push_back(
-                std::make_tuple(neighbors_in[j], (global_get[j])[0]));
-            count_in[neighbors_in[j]] = 1;
-        }
-        for (auto j = 0; j < num_subdomains; ++j) {
-            if (count_out[j] == 0) {
-                send_tuple.push_back(std::make_tuple(j, 0));
-            }
-            if (count_in[j] == 0) {
-                recv_tuple.push_back(std::make_tuple(j, 0));
-            }
-        }
-        comm_data_struct.push_back(std::make_tuple(owning_subd, recv_tuple,
-                                                   send_tuple, num_neighbors_in,
-                                                   num_neighbors_out));
-    }
-}
-
-
-template <typename ValueType, typename IndexType>
-void SolverBase<ValueType, IndexType>::run(
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &solution)
-{
-    using vec_vtype = gko::matrix::Dense<ValueType>;
-    // The main solution vector
-    std::shared_ptr<vec_vtype> solution_vector = vec_vtype::create(
-        settings.executor, gko::dim<2>(metadata.global_size, 1));
-    // A temp local solution
-    std::shared_ptr<vec_vtype> init_guess =
-        vec_vtype::create(settings.executor, this->local_solution->get_size());
-    // A global gathered solution of the previous iteration.
-    std::shared_ptr<vec_vtype> global_old_solution = vec_vtype::create(
-        settings.executor, gko::dim<2>(metadata.global_size, 1));
-    // Setup the windows for the onesided communication.
-    this->setup_windows(settings, metadata, solution_vector);
-
-    const auto solver_settings =
-        (Settings::local_solver_settings::direct_solver_cholmod |
-         Settings::local_solver_settings::direct_solver_ginkgo |
-         Settings::local_solver_settings::iterative_solver_dealii |
-         Settings::local_solver_settings::iterative_solver_ginkgo) &
-        settings.local_solver;
-
-    ValueType local_residual_norm = -1.0, local_residual_norm0 = -1.0,
-              global_residual_norm = 0.0, global_residual_norm0 = -1.0;
-    metadata.iter_count = 0;
-    auto start_time = std::chrono::steady_clock::now();
-    int num_converged_procs = 0;
-
-    for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
-        // Exchange the boundary values. The communication part.
-        MEASURE_ELAPSED_FUNC_TIME(
-            this->exchange_boundary(settings, metadata, solution_vector), 0,
-            metadata.my_rank, boundary_exchange, metadata.iter_count);
-
-        // Update the boundary and interior values after the exchanging from
-        // other processes.
-        MEASURE_ELAPSED_FUNC_TIME(
-            this->update_boundary(settings, metadata, this->local_solution,
-                                  this->local_rhs, solution_vector,
-                                  global_old_solution, this->interface_matrix),
-            1, metadata.my_rank, boundary_update, metadata.iter_count);
-
-        // Check for the convergence of the solver.
-        num_converged_procs = 0;
-        MEASURE_ELAPSED_FUNC_TIME(
-            (Solve<ValueType, IndexType>::check_convergence(
-                settings, metadata, this->comm_struct, this->convergence_vector,
-                global_old_solution, this->local_solution, this->local_matrix,
-                local_residual_norm, local_residual_norm0, global_residual_norm,
-                global_residual_norm0, num_converged_procs)),
-            2, metadata.my_rank, convergence_check, metadata.iter_count);
-
-        // break if the solution diverges.
-        if (std::isnan(global_residual_norm) || global_residual_norm > 1e12) {
-            std::cout << " Rank " << metadata.my_rank << " diverged in "
-                      << metadata.iter_count << " iters " << std::endl;
-            std::exit(-1);
-        }
-
-        // break if all processes detect that all other processes have
-        // converged otherwise continue iterations.
-        if (num_converged_procs == metadata.num_subdomains) {
-            std::cout << " Rank " << metadata.my_rank << " converged in "
-                      << metadata.iter_count << " iters " << std::endl;
-            break;
-        } else {
-            MEASURE_ELAPSED_FUNC_TIME(
-                (Solve<ValueType, IndexType>::local_solve(
-                    settings, metadata, this->triangular_factor,
-                    this->local_perm, this->local_inv_perm, init_guess,
-                    this->local_solution)),
-                3, metadata.my_rank, local_solve, metadata.iter_count);
-            // init_guess->copy_from(this->local_solution.get());
-            // Gather the local vector into the locally global vector for
-            // communication.
-            MEASURE_ELAPSED_FUNC_TIME(
-                (Communicate<ValueType, IndexType>::local_to_global_vector(
-                    settings, metadata, this->local_solution, solution_vector)),
-                4, metadata.my_rank, expand_local_vec, metadata.iter_count);
-        }
-    }
-    MPI_Barrier(MPI_COMM_WORLD);
-    auto elapsed_time = std::chrono::duration<ValueType>(
-        std::chrono::steady_clock::now() - start_time);
-    ValueType mat_norm = -1.0, rhs_norm = -1.0, sol_norm = -1.0,
-              residual_norm = -1.0;
-    // Compute the final residual norm. Also gathers the solution from all
-    // subdomains.
-    Solve<ValueType, IndexType>::compute_residual_norm(
-        settings, metadata, global_matrix, global_rhs, solution_vector,
-        mat_norm, rhs_norm, sol_norm, residual_norm);
-    gather_comm_data<ValueType, IndexType>(
-        metadata.num_subdomains, this->comm_struct, metadata.comm_data_struct);
-    // clang-format off
-    if (metadata.my_rank == 0)
-      {
-        std::cout
-              << " residual norm " << residual_norm << "\n"
-              << " relative residual norm of solution " << residual_norm/rhs_norm << "\n"
-              << " Time taken for solve " << elapsed_time.count()
-              << std::endl;
-        if (num_converged_procs < metadata.num_subdomains)
-          {
-            std::cout << " Did not converge in " << metadata.iter_count
-                      << " iterations."
-                      << std::endl;
-          }
-      }
-    // clang-format on
-    if (metadata.my_rank == 0) {
-        solution->copy_from(solution_vector.get());
-    }
-
-    // Communicate<ValueType, IndexType>::clear(settings);
-}
-
-
 template <typename ValueType, typename IndexType>
 SolverRAS<ValueType, IndexType>::SolverRAS(
-    Settings &settings, Metadata<ValueType, IndexType> &metadata,
-    const AdditionalData &data)
-    : SolverBase<ValueType, IndexType>(settings, metadata),
-      additional_data(data)
+    Settings &settings, Metadata<ValueType, IndexType> &metadata)
+    : SchwarzBase<ValueType, IndexType>(settings, metadata)
 {}
 
 
@@ -469,11 +63,6 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
 {
     using mtx = gko::matrix::Csr<ValueType, IndexType>;
     using vec_itype = gko::Array<IndexType>;
-    using rcm_reorder_type = gko::reorder::Rcm<ValueType, IndexType>;
-    // Only instantiated for metis_indextype
-    using metis_reorder_type =
-        // gko::reorder::MetisFillReduce<ValueType, metis_indextype>;
-        gko::reorder::MetisFillReduce<ValueType, metis_indextype>;
     using perm_type = gko::matrix::Permutation<IndexType>;
     using arr = gko::Array<IndexType>;
     auto my_rank = metadata.my_rank;
@@ -729,6 +318,7 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     auto neighbors_in = this->comm_struct.neighbors_in->get_data();
     auto local_neighbors_in = this->comm_struct.local_neighbors_in->get_data();
     auto global_get = this->comm_struct.global_get->get_data();
+    auto is_local_neighbor = this->comm_struct.is_local_neighbor;
 
     this->comm_struct.num_neighbors_in = 0;
     int num_recv = 0;
@@ -758,6 +348,9 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
                 num_recv += (global_get[pp])[0];
                 recv[p] = 1;
             }
+            is_local_neighbor[p] =
+                Utils<ValueType, IndexType>::check_subd_locality(MPI_COMM_WORLD,
+                                                                 p, my_rank);
         }
     }
 
@@ -1038,78 +631,27 @@ void exchange_boundary_onesided(
     auto remote_get = comm_struct.remote_get->get_data();
     auto get_displacements = comm_struct.get_displacements->get_data();
     auto recv_buffer = comm_struct.recv_buffer->get_values();
+    auto is_local_neighbor = comm_struct.is_local_neighbor;
+
     ValueType dummy = 1.0;
     auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
     if (settings.comm_settings.enable_put) {
         if (settings.comm_settings.enable_one_by_one) {
-            for (auto p = 0; p < num_neighbors_out; p++) {
-                if ((global_put[p])[0] > 0) {
-                    // push
-                    for (auto i = 1; i <= (global_put[p])[0]; i++) {
-                        MPI_Put(
-                            &local_solution->get_values()[(local_put[p])[i]], 1,
-                            mpi_vtype, neighbors_out[p], (remote_put[p])[i], 1,
-                            mpi_vtype, comm_struct.window_x);
-                    }
-                    if (settings.comm_settings.enable_flush_all) {
-                        MPI_Win_flush(neighbors_out[p], comm_struct.window_x);
-                    } else if (settings.comm_settings.enable_flush_local) {
-                        MPI_Win_flush_local(neighbors_out[p],
-                                            comm_struct.window_x);
-                    }
-                }
-            }
+            CommHelpers::transfer_one_by_one(
+                settings, comm_struct, local_solution->get_values(), global_put,
+                num_neighbors_out, neighbors_out);
         } else {
-            // accumulate
             int num_put = 0;
             for (auto p = 0; p < num_neighbors_out; p++) {
                 // send
                 if ((global_put[p])[0] > 0) {
-                    if (settings.executor_string == "cuda") {
-                        auto tmp_send_buf = vec_vtype::create(
-                            settings.executor,
-                            gko::dim<2>((global_put[p])[0], 1));
-                        auto tmp_idx_s =
-                            arr(settings.executor,
-                                arr::view(settings.executor->get_master(),
-                                          ((global_put)[p])[0],
-                                          &((local_put[p])[1])));
-                        settings.executor->run(
-                            GatherScatter<ValueType, IndexType>(
-                                true, (global_put[p])[0], tmp_idx_s.get_data(),
-                                local_solution->get_values(),
-                                tmp_send_buf->get_values()));
-                        cudaMemcpy(&(send_buffer[num_put]),
-                                   tmp_send_buf->get_values(),
-                                   ((global_put)[p])[0] * sizeof(ValueType),
-                                   cudaMemcpyDeviceToDevice);
-                    } else {
-                        for (auto i = 1; i <= (global_put[p])[0]; i++) {
-                            send_buffer[num_put + i - 1] =
-                                local_solution->get_values()[(local_put[p])[i]];
-                        }
-                    }
-                    if (settings.comm_settings.enable_lock_local) {
-                        MPI_Win_lock(MPI_LOCK_SHARED, neighbors_out[p], 0,
-                                     comm_struct.window_recv_buffer);
-                    }
-                    // use same window for all neighbors
-                    MPI_Put(&send_buffer[num_put], (global_put[p])[0],
-                            mpi_vtype, neighbors_out[p],
-                            put_displacements[neighbors_out[p]],
-                            (global_put[p])[0], mpi_vtype,
-                            comm_struct.window_recv_buffer);
-                    if (settings.comm_settings.enable_flush_all) {
-                        MPI_Win_flush(neighbors_out[p],
-                                      comm_struct.window_recv_buffer);
-                    } else if (settings.comm_settings.enable_flush_local) {
-                        MPI_Win_flush_local(neighbors_out[p],
-                                            comm_struct.window_recv_buffer);
-                    }
-                    if (settings.comm_settings.enable_lock_local) {
-                        MPI_Win_unlock(neighbors_out[p],
-                                       comm_struct.window_recv_buffer);
-                    }
+                    CommHelpers::pack_buffer(
+                        settings, local_solution->get_values(), send_buffer,
+                        global_put, num_put, p);
+                    CommHelpers::transfer_buffer(
+                        settings, comm_struct.window_recv_buffer, send_buffer,
+                        global_put, num_put, p, neighbors_out,
+                        put_displacements);
                     num_put += (global_put[p])[0];
                 }
             }
@@ -1118,131 +660,40 @@ void exchange_boundary_onesided(
         int num_get = 0;
         for (auto p = 0; p < num_neighbors_in; p++) {
             if ((global_get[p])[0] > 0) {
-                if (settings.executor_string == "cuda") {
-                    auto tmp_recv_buf = vec_vtype::create(
-                        settings.executor, gko::dim<2>((global_get[p])[0], 1));
-                    cudaMemcpy(tmp_recv_buf->get_values(),
-                               &(recv_buffer[num_get]),
-                               ((global_get)[p])[0] * sizeof(ValueType),
-                               cudaMemcpyDeviceToDevice);
-                    auto tmp_idx_r = arr(
-                        settings.executor,
-                        arr::view(settings.executor->get_master(),
-                                  ((global_get)[p])[0], &((local_get[p])[1])));
-                    settings.executor->run(GatherScatter<ValueType, IndexType>(
-                        false, (global_get[p])[0], tmp_idx_r.get_data(),
-                        tmp_recv_buf->get_values(),
-                        local_solution->get_values()));
-                } else {
-                    for (auto i = 1; i <= (global_get[p])[0]; i++) {
-                        local_solution->get_values()[(local_get[p])[i]] =
-                            recv_buffer[num_get + i - 1];
-                    }
-                }
+                CommHelpers::unpack_buffer(settings,
+                                           local_solution->get_values(),
+                                           recv_buffer, global_get, num_get, p);
                 num_get += (global_get[p])[0];
             }
         }
     } else if (settings.comm_settings.enable_get) {
         if (settings.comm_settings.enable_one_by_one) {
-            for (auto p = 0; p < num_neighbors_in; p++) {
-                if ((global_get[p])[0] > 0) {
-                    // pull
-                    for (auto i = 1; i <= (global_get[p])[0]; i++) {
-                        MPI_Get(
-                            &local_solution->get_values()[(local_get[p])[i]], 1,
-                            mpi_vtype, neighbors_in[p], (remote_get[p])[i], 1,
-                            mpi_vtype, comm_struct.window_x);
-                    }
-                    if (settings.comm_settings.enable_flush_all) {
-                        MPI_Win_flush(neighbors_in[p], comm_struct.window_x);
-                    } else if (settings.comm_settings.enable_flush_local) {
-                        MPI_Win_flush_local(neighbors_in[p],
-                                            comm_struct.window_x);
-                    }
-                }
-            }
+            CommHelpers::transfer_one_by_one(
+                settings, comm_struct, local_solution->get_values(), global_get,
+                num_neighbors_in, neighbors_in);
         } else {
             // Gather into send buffer so that the procs can Get from it
             int num_put = 0;
             for (auto p = 0; p < num_neighbors_out; p++) {
                 if ((global_put[p])[0] > 0) {
-                    if (settings.executor_string == "cuda") {
-                        auto tmp_send_buf = vec_vtype::create(
-                            settings.executor,
-                            gko::dim<2>((global_put[p])[0], 1));
-                        auto tmp_idx_s =
-                            arr(settings.executor,
-                                arr::view(settings.executor->get_master(),
-                                          ((global_put)[p])[0],
-                                          &((local_put[p])[1])));
-                        settings.executor->run(
-                            GatherScatter<ValueType, IndexType>(
-                                true, (global_put[p])[0], tmp_idx_s.get_data(),
-                                local_solution->get_values(),
-                                tmp_send_buf->get_values()));
-                        cudaMemcpy(&(send_buffer[num_put]),
-                                   tmp_send_buf->get_values(),
-                                   ((global_put)[p])[0] * sizeof(ValueType),
-                                   cudaMemcpyDeviceToDevice);
-                    } else {
-                        for (auto i = 1; i <= (global_put[p])[0]; i++) {
-                            send_buffer[num_put + i - 1] =
-                                local_solution->get_values()[(local_put[p])[i]];
-                        }
-                    }
-                    num_put += (global_put[p])[0];
+                    CommHelpers::pack_buffer(
+                        settings, local_solution->get_values(), send_buffer,
+                        global_put, num_put, p);
                 }
+                num_put += (global_put[p])[0];
             }
-            // accumulate
             int num_get = 0;
             for (auto p = 0; p < num_neighbors_in; p++) {
-                if ((global_get[p])[0] > 0) {
-                    if (settings.comm_settings.enable_lock_local) {
-                        MPI_Win_lock(MPI_LOCK_SHARED, neighbors_in[p], 0,
-                                     comm_struct.window_send_buffer);
-                    }
-                    MPI_Get(&recv_buffer[num_get], (global_get[p])[0],
-                            mpi_vtype, neighbors_in[p],
-                            get_displacements[neighbors_in[p]],
-                            (global_get[p])[0], mpi_vtype,
-                            comm_struct.window_send_buffer);
-                    if (settings.comm_settings.enable_flush_all) {
-                        MPI_Win_flush(neighbors_in[p],
-                                      comm_struct.window_send_buffer);
-                    } else if (settings.comm_settings.enable_flush_local) {
-                        MPI_Win_flush_local(neighbors_in[p],
-                                            comm_struct.window_send_buffer);
-                    }
-                    if (settings.comm_settings.enable_lock_local) {
-                        MPI_Win_unlock(neighbors_in[p],
-                                       comm_struct.window_send_buffer);
-                    }
-                    if (settings.executor_string == "cuda") {
-                        auto tmp_recv_buf = vec_vtype::create(
-                            settings.executor,
-                            gko::dim<2>((global_get[p])[0], 1));
-                        cudaMemcpy(tmp_recv_buf->get_values(),
-                                   &(recv_buffer[num_get]),
-                                   ((global_get)[p])[0] * sizeof(ValueType),
-                                   cudaMemcpyDeviceToDevice);
-                        auto tmp_idx_r =
-                            arr(settings.executor,
-                                arr::view(settings.executor->get_master(),
-                                          ((global_get)[p])[0],
-                                          &((local_get[p])[1])));
-                        settings.executor->run(
-                            GatherScatter<ValueType, IndexType>(
-                                false, (global_get[p])[0], tmp_idx_r.get_data(),
-                                tmp_recv_buf->get_values(),
-                                local_solution->get_values()));
-                    } else {
-                        for (auto i = 1; i <= (global_get[p])[0]; i++) {
-                            local_solution->get_values()[(local_get[p])[i]] =
-                                recv_buffer[num_get + i - 1];
-                        }
-                    }
-                    num_get += (global_get[p])[0];
+                if ((global_put[p])[0] > 0) {
+                    CommHelpers::transfer_buffer(
+                        settings, comm_struct.window_send_buffer, recv_buffer,
+                        global_get, num_get, p, neighbors_in,
+                        get_displacements);
+                    CommHelpers::unpack_buffer(
+                        settings, local_solution->get_values(), recv_buffer,
+                        global_get, num_get, p);
                 }
+                num_get += (global_get[p])[0];
             }
         }
     }
@@ -1382,11 +833,6 @@ void SolverRAS<ValueType, IndexType>::update_boundary(
     }
 }
 
-
-#define DECLARE_SOLVER_BASE(ValueType, IndexType) \
-    class SolverBase<ValueType, IndexType>
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_BASE);
-#undef DECLARE_SOLVER_BASE
 
 #define DECLARE_SOLVER_RAS(ValueType, IndexType) \
     class SolverRAS<ValueType, IndexType>

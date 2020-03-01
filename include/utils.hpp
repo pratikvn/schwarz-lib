@@ -61,6 +61,9 @@ struct Utils {
 
     static int get_local_num_procs(MPI_Comm mpi_communicator);
 
+    static bool check_subd_locality(MPI_Comm mpi_communicator,
+                                    int neighbor_rank, int my_rank);
+
     static void print_matrix(
         const gko::matrix::Csr<ValueType, IndexType> *matrix, int rank,
         std::string name);

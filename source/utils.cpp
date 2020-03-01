@@ -50,6 +50,23 @@ int Utils<ValueType, IndexType>::get_local_rank(MPI_Comm mpi_communicator)
 
 
 template <typename ValueType, typename IndexType>
+bool Utils<ValueType, IndexType>::check_subd_locality(MPI_Comm mpi_communicator,
+                                                      int neighbor_rank,
+                                                      int my_rank)
+{
+    MPI_Comm local_comm;
+    int local_nprocs = 0;
+    MPI_Comm_split_type(mpi_communicator, MPI_COMM_TYPE_SHARED, 0,
+                        MPI_INFO_NULL, &local_comm);
+    MPI_Comm_size(local_comm, &local_nprocs);
+    if (std::abs((neighbor_rank - my_rank)) < local_nprocs)
+        return true;
+    else
+        return false;
+}
+
+
+template <typename ValueType, typename IndexType>
 int Utils<ValueType, IndexType>::get_local_num_procs(MPI_Comm mpi_communicator)
 {
     MPI_Comm local_comm;

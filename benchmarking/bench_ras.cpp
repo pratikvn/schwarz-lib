@@ -107,7 +107,10 @@ DEFINE_uint32(precond_max_block_size, 16,
 DEFINE_string(metis_objtype, "null",
               "Defines the objective type for the metis partitioning, options "
               "are edgecut and totalvol ");
-
+//CHANGED
+DEFINE_double(constant, 0.0, "constant for the event threshold");
+DEFINE_double(gamma, 0.0, "gamma for the event threshold");
+//END CHANGED
 
 void initialize_argument_parsing(int *argc, char **argv[])
 {
@@ -135,6 +138,7 @@ private:
                                std::vector<std::tuple<int, int>>, int, int>>
             &comm_data_struct,
         std::string filename_send, std::string filename_recv);
+
     int get_local_rank(MPI_Comm mpi_communicator);
 };
 
@@ -236,7 +240,6 @@ void BenchRas<ValueType, IndexType>::write_timings(
     file.close();
 }
 
-
 template <typename ValueType, typename IndexType>
 int BenchRas<ValueType, IndexType>::get_local_rank(MPI_Comm mpi_communicator)
 {
@@ -329,6 +332,12 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
             local_solver_settings::direct_solver_ginkgo;
     }
 
+    //CHANGED 
+    //Event settings
+    metadata.constant = FLAGS_constant;
+    metadata.gamma = FLAGS_gamma;
+    //END CHANGED
+
     // The global solution vector to be passed in to the RAS solver.
     std::shared_ptr<gko::matrix::Dense<ValueType>> explicit_laplacian_solution =
         gko::matrix::Dense<ValueType>::create(
@@ -365,6 +374,22 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
                         metadata.comm_data_struct, filename_send,
                         filename_recv);
     }
+
+    //CHANGED	
+    //Print final solution to file
+    /*
+    char name[30];;
+    strcpy(name, "final.txt");
+ 
+    std::ofstream fp;
+    if(metadata.my_rank == 0)
+    {
+       fp.open(name);
+       fp << explicit_laplacian_solution->get_values();
+       fp.close();
+    }
+    */
+    //END CHANGED   
 }
 
 

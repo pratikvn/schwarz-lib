@@ -181,6 +181,7 @@ struct Settings {
          * Use flush all.
          */
         bool enable_flush_all = true;
+
     };
     comm_settings comm_settings;
 
@@ -313,6 +314,18 @@ struct Metadata {
      * The minimum residual norm of the subdomain.
      */
     ValueType min_residual_norm = -1.0;
+
+    //CHANGED
+    /**
+     * Value of constant for event threshold
+     */
+    ValueType constant = 0.0;
+
+    /**
+     * Value of gamma for event threshold
+     */
+    ValueType gamma = 0.0;
+    //END CHANGED
 
     /**
      * The struct used to measure the timings of each function within the solver

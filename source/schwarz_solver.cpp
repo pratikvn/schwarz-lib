@@ -174,6 +174,19 @@ void SolverBase<ValueType, IndexType>::initialize()
 
     // Setup the right hand side vector.
     std::vector<ValueType> rhs(metadata.global_size, 1.0);
+
+    //CHANGED
+    //create dipole source - probably a diagonally oriented dipole because of flattening of 2-D matrix
+    for (int i = 0; i < metadata.global_size; i++)
+    {
+        if (i == metadata.global_size / 4)
+           rhs[i] = 100.0;
+        else if (i == 3 * metadata.global_size / 4)
+           rhs[i] = -100.0;
+        else
+           rhs[i] = 0.0;
+    }
+         
     if (settings.enable_random_rhs && settings.explicit_laplacian) {
         if (metadata.my_rank == 0) {
             Initialize<ValueType, IndexType>::generate_rhs(rhs);
@@ -315,13 +328,13 @@ void gather_comm_data(
         std::vector<std::tuple<int, int>> recv_tuple;
         for (auto j = 0; j < num_neighbors_out; ++j) {
             send_tuple.push_back(
-                std::make_tuple(neighbors_out[j], (global_put[j])[0]));
+                std::make_tuple(neighbors_out[j], comm_struct.msg_count->get_data()[j])); //(global_put[j])[0]));
             count_out[neighbors_out[j]] = 1;
         }
 
         for (auto j = 0; j < num_neighbors_in; ++j) {
             recv_tuple.push_back(
-                std::make_tuple(neighbors_in[j], (global_get[j])[0]));
+                std::make_tuple(neighbors_in[j], comm_struct.msg_count->get_data()[j])); //(global_get[j])[0]));
             count_in[neighbors_in[j]] = 1;
         }
         for (auto j = 0; j < num_subdomains; ++j) {
@@ -382,6 +395,22 @@ void SolverBase<ValueType, IndexType>::run(
     auto start_time = std::chrono::steady_clock::now();
     int num_converged_procs = 0;
 
+    //CHANGED
+    
+    //creating a file to write curr avg values
+    char name[30], pe_str[3];
+    sprintf(pe_str, "%d", metadata.my_rank);
+    strcpy(name, "values");
+    strcat(name, pe_str);
+    strcat(name, ".txt");
+
+    std::ofstream fp;
+    fp.open(name);
+    
+    //END CHANGED
+
+    if(metadata.my_rank == 0) std::cout << "Constant - " << metadata.constant << ", Gamma - " << metadata.gamma <<std::endl;
+ 
     //iteration loop
     for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count))
     {
@@ -421,12 +450,14 @@ void SolverBase<ValueType, IndexType>::run(
         {
             std::cout << " Rank " << metadata.my_rank << " converged in "
                       << metadata.iter_count << " iters " << std::endl;
+            /* printing no of msgs to terminal
             for (int k = 0; k < num_neighbors_out; k++)
             {
                 std::cout << " Rank: " << metadata.my_rank << " "
                       << neighbors_out[k] << " : " << this->comm_struct.msg_count->get_data()[k];
             }
             std::cout << std::endl;
+            */
             break;
         }
         else
@@ -444,7 +475,26 @@ void SolverBase<ValueType, IndexType>::run(
                     settings, metadata, this->local_solution, solution_vector)),
                 4, metadata.my_rank, expand_local_vec, metadata.iter_count);
         }
+
+        //CHANGED
+        //Printing to file
+        
+        fp << metadata.iter_count << ", " << local_residual_norm << std::endl;
+        /*
+        for (auto i = 0; i < num_neighbors_out; i++)
+        {
+            fp << ", " << comm_struct.curr_send_avg->get_values()[i];
+        }
+        fp << std::endl;
+        */
+        
+        //END CHANGED
     }
+
+    //CHANGED
+    //Closing file
+    fp.close();
+    //END CHANGED
 
     MPI_Barrier(MPI_COMM_WORLD);
     auto elapsed_time = std::chrono::duration<ValueType>(
@@ -454,9 +504,11 @@ void SolverBase<ValueType, IndexType>::run(
 
     // Compute the final residual norm. Also gathers the solution from all
     // subdomains.
+    if(metadata.my_rank == 0) std::cout << "Before residual norm" << std::endl;
     Solve<ValueType, IndexType>::compute_residual_norm(
         settings, metadata, global_matrix, global_rhs, solution_vector,
         mat_norm, rhs_norm, sol_norm, residual_norm);
+    if(metadata.my_rank == 0) std::cout << "Before gather comm data" << std::endl;
     gather_comm_data<ValueType, IndexType>(
         metadata.num_subdomains, this->comm_struct, metadata.comm_data_struct);
     // clang-format off
@@ -1111,10 +1163,10 @@ template <typename ValueType, typename IndexType>
 ValueType get_threshold(
           const Settings &settings, const Metadata<ValueType, IndexType> &metadata)
 {
-    auto alpha = 0; //1e-2;
-    auto beta = 1;
+    auto constant = metadata.constant;
+    auto gamma = metadata.gamma;
     
-    return alpha * std::pow(beta, metadata.iter_count);
+    return constant * std::pow(gamma, metadata.iter_count);
 }   
 
 template <typename ValueType, typename IndexType>

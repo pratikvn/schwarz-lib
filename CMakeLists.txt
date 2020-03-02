@@ -100,6 +100,7 @@ TARGET_SOURCES(${TARGET} PRIVATE
   source/solve.cpp
   source/schwarz_base.cpp
   source/restricted_schwarz.cpp
+  source/optimized_schwarz.cpp
   source/exception.cpp
   )
 

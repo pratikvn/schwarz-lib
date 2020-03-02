@@ -1,13 +1,18 @@
-set(BENCH_TARGET "bench_ras")
+set(BENCH_TARGET
+  bench_ras
+  bench_oras
+  )
 
 include_directories(
   include
-  ${CMAKE_BINARY_DIR}/schwarz-lib/include
-  ${CMAKE_SOURCE_DIR}/schwarz-lib/include)
+  ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(${BENCH_TARGET} bench_ras.cpp)
+foreach( name ${BENCH_TARGET} )
+  add_executable( ${name} ${name}.cpp)
+  target_link_libraries(${name} PUBLIC schwarz)
+  if(SCHWARZ_BUILD_DEALII)
+    DEAL_II_SETUP_TARGET(${name})
+  endif()
+endforeach()
 
-target_link_libraries(${BENCH_TARGET} PUBLIC schwarz)
-if(SCHWARZ_BUILD_DEALII)
-  DEAL_II_SETUP_TARGET(${BENCH_TARGET})
-endif()
+

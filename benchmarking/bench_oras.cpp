@@ -50,14 +50,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 template <typename ValueType, typename IndexType>
-class BenchRas : public BenchBase<ValueType, IndexType> {
+class BenchOras : public BenchBase<ValueType, IndexType> {
 public:
     void solve(MPI_Comm mpi_communicator) override;
 };
 
 
 template <typename ValueType, typename IndexType>
-void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
+void BenchOras<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
 {
     SchwarzWrappers::Metadata<ValueType, IndexType> metadata;
     SchwarzWrappers::Settings settings(FLAGS_executor);
@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
 {
     try {
         initialize_argument_parsing(&argc, &argv);
-        BenchRas<double, int> laplace_problem_2d;
+        BenchOras<double, int> laplace_problem_2d;
 
         if (FLAGS_num_threads > 1) {
             int req_thread_support = MPI_THREAD_MULTIPLE;

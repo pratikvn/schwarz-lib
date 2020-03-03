@@ -78,7 +78,8 @@ endif()
 
 # Required packages
 
-find_package(Ginkgo REQUIRED)
+find_package(Ginkgo REQUIRED
+  HINTS ${Ginkgo_DIR} $ENV{Ginkgo_DIR})
 
 find_package(MPI REQUIRED)
 include_directories(SYSTEM ${MPI_C_INCLUDE_PATH} ${MPI_CXX_INCLUDE_PATH})

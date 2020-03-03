@@ -100,10 +100,12 @@ void pack_buffer(const Settings &settings, ValueType *buffer,
         settings.executor->run(GatherScatter<ValueType, IndexType>(
             true, (num_send_elems[send_subd])[0], tmp_idx_s.get_data(), buffer,
             tmp_send_buf->get_values()));
+#if SCHW_HAVE_CUDA
         SCHWARZ_ASSERT_NO_CUDA_ERRORS(
             cudaMemcpy(&(send_buffer[offset]), tmp_send_buf->get_values(),
                        ((num_send_elems)[send_subd])[0] * sizeof(ValueType),
                        cudaMemcpyDeviceToDevice));
+#endif
     } else {
         for (auto i = 0; i < (num_send_elems[send_subd])[0]; i++) {
             send_buffer[offset + i] =
@@ -155,10 +157,12 @@ void unpack_buffer(const Settings &settings, ValueType *buffer,
     if (settings.executor_string == "cuda") {
         auto tmp_recv_buf = vec_vtype::create(
             settings.executor, gko::dim<2>((num_recv_elems[recv_subd])[0], 1));
+#if SCHW_HAVE_CUDA
         SCHWARZ_ASSERT_NO_CUDA_ERRORS(
             cudaMemcpy(tmp_recv_buf->get_values(), &(recv_buffer[offset]),
                        ((num_recv_elems)[recv_subd])[0] * sizeof(ValueType),
                        cudaMemcpyDeviceToDevice));
+#endif
         auto tmp_idx_r = arr(settings.executor,
                              arr::view(settings.executor->get_master(),
                                        ((num_recv_elems)[recv_subd])[0],

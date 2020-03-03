@@ -1,7 +1,6 @@
 ### Schwarz testbed
 
-## Repository for testing schwarz methods.
---------------------------------------
+![Build status](https://github.com/pratikvn/schwarz-lib/workflows/Build/badge.svg)
 
 Required components
 -------------------

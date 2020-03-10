@@ -1,17 +1,21 @@
 #!/bin/bash -l
 
-
-for num_nodes in 1 2 3 4 
+for num_pe in 8
 do 
-  for comm in "twosided" "onesided"
+  for comm in "onesided"
   do 
-    for size in 64 128 256 512
+    for size in 144
     do
-      for part in "metis" "regular"
+      for part in "regular"
       do 
-        ./gpu_batch $num_nodes 6 $comm cuda $size 20000 direct-ginkgo $part
-      done
+        for constant in 1E-10
+        do
+          for gamma in 0.95
+          do
+            ./cpu_batch $num_pe $num_pe $comm reference $size 1000 iterative-ginkgo $part $constant $gamma
+          done   
+        done
+      done 
     done
   done
 done
-

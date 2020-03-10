@@ -176,20 +176,24 @@ void SolverBase<ValueType, IndexType>::initialize()
     std::vector<ValueType> rhs(metadata.global_size, 1.0);
 
     //CHANGED
-    //create dipole source - probably a diagonally oriented dipole because of flattening of 2-D matrix
-    for (int i = 0; i < metadata.global_size; i++)
+     
+    if (settings.explicit_laplacian)
     {
-        if (i == metadata.global_size / 4)
-           rhs[i] = 100.0;
-        else if (i == 3 * metadata.global_size / 4)
-           rhs[i] = -100.0;
-        else
-           rhs[i] = 0.0;
+        if(metadata.my_rank == 0)
+        {
+           Initialize<ValueType, IndexType>::generate_sin_rhs(rhs);
+           //Initialize<ValueType, IndexType>::generate_dipole_rhs(rhs);
+        }
+        auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
+        MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
+                  MPI_COMM_WORLD);
     }
-         
+    
+    //END CHANGED
+    
     if (settings.enable_random_rhs && settings.explicit_laplacian) {
         if (metadata.my_rank == 0) {
-            Initialize<ValueType, IndexType>::generate_rhs(rhs);
+            Initialize<ValueType, IndexType>::generate_random_rhs(rhs);
         }
         auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
         MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
@@ -396,7 +400,7 @@ void SolverBase<ValueType, IndexType>::run(
     int num_converged_procs = 0;
 
     //CHANGED
-    
+     
     //creating a file to write curr avg values
     char name[30], pe_str[3];
     sprintf(pe_str, "%d", metadata.my_rank);
@@ -478,16 +482,17 @@ void SolverBase<ValueType, IndexType>::run(
 
         //CHANGED
         //Printing to file
+             
+        fp << metadata.iter_count << ", " << local_residual_norm;
         
-        fp << metadata.iter_count << ", " << local_residual_norm << std::endl;
-        /*
         for (auto i = 0; i < num_neighbors_out; i++)
         {
             fp << ", " << comm_struct.curr_send_avg->get_values()[i];
         }
         fp << std::endl;
-        */
         
+       
+        //MPI_Barrier(MPI_COMM_WORLD); 
         //END CHANGED
     }
 
@@ -519,6 +524,7 @@ void SolverBase<ValueType, IndexType>::run(
               << " relative residual norm of solution " << residual_norm/rhs_norm << "\n"
               << " Time taken for solve " << elapsed_time.count()
               << std::endl;
+        std::cout << "No of PEs converged - " << num_converged_procs << std::endl;
         if (num_converged_procs < metadata.num_subdomains)
         {
             std::cout << " Did not converge in " << metadata.iter_count
@@ -1315,6 +1321,9 @@ void exchange_boundary_onesided(
                          
                          //increment counter
                          comm_struct.msg_count->get_data()[p]++;
+             
+                         std::cout << "Msg sent from PE " << metadata.my_rank << " to " << neighbors_out[p] 
+                                                          << " in iter " << metadata.iter_count << std::endl;
 
 			 if (settings.comm_settings.enable_flush_all) 
 			 {

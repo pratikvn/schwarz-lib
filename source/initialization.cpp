@@ -72,8 +72,9 @@ void Initialize<ValueType, IndexType>::setup_local_matrices(
     SCHWARZ_NOT_IMPLEMENTED;
 
 
+//CHANGED NAMING HERE
 template <typename ValueType, typename IndexType>
-void Initialize<ValueType, IndexType>::generate_rhs(std::vector<ValueType> &rhs)
+void Initialize<ValueType, IndexType>::generate_random_rhs(std::vector<ValueType> &rhs)
 {
     std::uniform_real_distribution<double> unif(0.0, 1.0);
     std::default_random_engine engine;
@@ -82,6 +83,44 @@ void Initialize<ValueType, IndexType>::generate_rhs(std::vector<ValueType> &rhs)
     }
 }
 
+//CHANGED	
+template <typename ValueType, typename IndexType>
+void Initialize<ValueType, IndexType>::generate_dipole_rhs(std::vector<ValueType> &rhs)
+{
+    auto oned_laplacian_size = metadata.oned_laplacian_size;
+
+    //Placing dipole at 1/4 and 3/4 of Y-dim at the middle of X-dim
+    for (int i = 0; i < oned_laplacian_size; i++)
+    {
+        for (int j = 0; j < oned_laplacian_size; j++)
+        {
+            if (i == oned_laplacian_size / 4 && j == oned_laplacian_size / 2)
+               rhs[i * oned_laplacian_size + j] = 100.0;
+            else if (i == 3 * oned_laplacian_size / 4 && j == oned_laplacian_size / 2)
+               rhs[i * oned_laplacian_size + j] = -100.0;
+            else
+               rhs[i * oned_laplacian_size + j] = 0.0;
+        }
+    }
+}
+
+template <typename ValueType, typename IndexType>
+void Initialize<ValueType, IndexType>::generate_sin_rhs(std::vector<ValueType> &rhs)
+{
+    auto PI = (ValueType) (atan(1.0) * 4);
+    auto oned_laplacian_size = metadata.oned_laplacian_size;
+
+    //Source = sin(x)sin(y)
+    for (int i = 0; i < oned_laplacian_size; i++)
+    {
+        for (int j = 0; j < oned_laplacian_size; j++)
+        {
+            rhs[i * oned_laplacian_size + j] = sin(2 * PI * i / oned_laplacian_size) *
+                                               sin(2 * PI * j / oned_laplacian_size);
+        }
+    }
+}
+//END CHANGED 
 
 #if SCHW_HAVE_DEALII
 

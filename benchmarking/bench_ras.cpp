@@ -377,7 +377,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
 
     //CHANGED	
     //Print final solution to file
-    /*
+    
     char name[30];;
     strcpy(name, "final.txt");
  
@@ -385,10 +385,19 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     if(metadata.my_rank == 0)
     {
        fp.open(name);
-       fp << explicit_laplacian_solution->get_values();
+       auto num_elem = explicit_laplacian_solution->get_size()[0];
+       auto dim = (int) sqrt(num_elem);
+       
+       //iterating over
+       for (auto i = 0; i < num_elem; i++)
+       {
+           if (i % dim == 0 && i != 0) fp << std::endl;
+           fp << explicit_laplacian_solution->get_values()[i] << "  ";
+       }
+
        fp.close();
     }
-    */
+    
     //END CHANGED   
 }
 

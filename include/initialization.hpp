@@ -81,12 +81,28 @@ public:
      */
     std::vector<unsigned int> cell_weights;
 
+//CHANGED
     /**
-     * Generates the right hand side vector
+     * Generates a random right hand side vector
      *
-     * @param rhs  The rhs vector.
+     * @param rhs The rhs vector.
      */
-    void generate_rhs(std::vector<ValueType> &rhs);
+    void generate_random_rhs(std::vector<ValueType> &rhs);
+
+    /**
+     * Generates a dipole right hand side vector
+     *
+     * @param rhs The rhs vector.
+     */
+    void generate_dipole_rhs(std::vector<ValueType> &rhs);
+
+    /**
+     * Generates a sinusoidal right hand side vector
+     *
+     * @param rhs The rhs vector.
+     */
+    void generate_sin_rhs(std::vector<ValueType> &rhs); 
+//END CHANGED
 
 #if SCHW_HAVE_DEALII
     void setup_global_matrix(

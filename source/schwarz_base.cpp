@@ -129,26 +129,26 @@ SchwarzBase<ValueType, IndexType>::SchwarzBase(
 
     // Some arrays for communication.
     comm_struct.local_neighbors_in = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), num_subdomains),
+        new vec_itype(settings.executor->get_master(), num_subdomains + 1),
         std::default_delete<vec_itype>());
     comm_struct.local_neighbors_out = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), num_subdomains),
+        new vec_itype(settings.executor->get_master(), num_subdomains + 1),
         std::default_delete<vec_itype>());
     comm_struct.neighbors_in = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), num_subdomains),
+        new vec_itype(settings.executor->get_master(), num_subdomains + 1),
         std::default_delete<vec_itype>());
     comm_struct.neighbors_out = std::shared_ptr<vec_itype>(
-        new vec_itype(settings.executor->get_master(), num_subdomains),
+        new vec_itype(settings.executor->get_master(), num_subdomains + 1),
         std::default_delete<vec_itype>());
-    comm_struct.is_local_neighbor = std::vector<bool>(num_subdomains, 0);
+    comm_struct.is_local_neighbor = std::vector<bool>(num_subdomains + 1, 0);
     comm_struct.global_get = std::shared_ptr<vec_vecshared>(
-        new vec_vecshared(settings.executor->get_master(), num_subdomains),
+        new vec_vecshared(settings.executor->get_master(), num_subdomains + 1),
         std::default_delete<vec_vecshared>());
     comm_struct.global_put = std::shared_ptr<vec_vecshared>(
-        new vec_vecshared(settings.executor->get_master(), num_subdomains),
+        new vec_vecshared(settings.executor->get_master(), num_subdomains + 1),
         std::default_delete<vec_vecshared>());
     // Need this to initialize the arrays with zeros.
-    std::vector<IndexType> temp(num_subdomains, 0);
+    std::vector<IndexType> temp(num_subdomains + 1, 0);
     comm_struct.get_displacements = std::shared_ptr<vec_itype>(
         new vec_itype(settings.executor->get_master(), temp.begin(),
                       temp.end()),
@@ -276,7 +276,6 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     Solve<ValueType, IndexType>::setup_local_solver(
         this->settings, metadata, this->local_matrix, this->triangular_factor,
         this->local_perm, this->local_inv_perm, this->local_rhs);
-
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
@@ -394,8 +393,6 @@ void SchwarzBase<ValueType, IndexType>::run(
         // break if all processes detect that all other processes have
         // converged otherwise continue iterations.
         if (num_converged_procs == metadata.num_subdomains) {
-            std::cout << " Rank " << metadata.my_rank << " converged in "
-                      << metadata.iter_count << " iters " << std::endl;
             break;
         } else {
             MEASURE_ELAPSED_FUNC_TIME(
@@ -416,6 +413,8 @@ void SchwarzBase<ValueType, IndexType>::run(
     MPI_Barrier(MPI_COMM_WORLD);
     auto elapsed_time = std::chrono::duration<ValueType>(
         std::chrono::steady_clock::now() - start_time);
+    std::cout << " Rank " << metadata.my_rank << " converged in "
+              << metadata.iter_count << " iters " << std::endl;
     ValueType mat_norm = -1.0, rhs_norm = -1.0, sol_norm = -1.0,
               residual_norm = -1.0;
     // Compute the final residual norm. Also gathers the solution from all

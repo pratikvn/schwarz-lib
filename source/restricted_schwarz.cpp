@@ -513,7 +513,7 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
     auto get_displacements = this->comm_struct.get_displacements->get_data();
     auto put_displacements = this->comm_struct.put_displacements->get_data();
     {
-        std::vector<IndexType> tmp_num_comm_elems(num_subdomains, 0);
+        std::vector<IndexType> tmp_num_comm_elems(num_subdomains + 1, 0);
         tmp_num_comm_elems[0] = 0;
         for (auto j = 0; j < this->comm_struct.num_neighbors_in; j++) {
             if ((global_get[j])[0] > 0) {
@@ -531,7 +531,7 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
     }
 
     {
-        std::vector<IndexType> tmp_num_comm_elems(num_subdomains, 0);
+        std::vector<IndexType> tmp_num_comm_elems(num_subdomains + 1, 0);
         tmp_num_comm_elems[0] = 0;
         for (auto j = 0; j < this->comm_struct.num_neighbors_out; j++) {
             if ((global_put[j])[0] > 0) {

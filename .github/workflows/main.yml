@@ -12,7 +12,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: install-mpi
       run: |
-        sudo apt-get install mpich
+        sudo apt-get update
+        sudo apt-get -y install mpich
     - name: info
       run: |
         g++ -v
@@ -52,7 +53,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: install-mpi
       run: |
-        sudo apt-get install mpich
+        sudo apt-get update
+        sudo apt-get -y install mpich
     - name: install-cuda
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
@@ -71,7 +73,7 @@ jobs:
         echo $MPI_DIR
     - name: install-metis
       run: |
-        sudo apt-get install metis
+        sudo apt-get -y install metis
     - name: install-ginkgo
       run: |
         export PATH=/usr/local/cuda-10.2/bin:/usr/local/cuda-10.2/NsightCompute-2019.1${PATH:+:${PATH}}

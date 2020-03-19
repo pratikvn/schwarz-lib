@@ -1,4 +1,4 @@
-SET(TARGET "schwarz")
+SET(TARGET "schwarz-lib")
 CMAKE_MINIMUM_REQUIRED(VERSION 3.8)
 
 PROJECT(${TARGET} LANGUAGES C CXX)
@@ -13,11 +13,14 @@ option(SCHWARZ_WITH_HWLOC "Build with hwloc support" ON)
 option(SCHWARZ_BUILD_DEALII "Build with deal.ii support" OFF)
 option(SCHWARZ_BUILD_CLANG_TIDY "Use clang-tidy for static checks of code." OFF)
 option(SCHWARZ_DEVEL_TOOLS "Switch on some developer tools" ON)
+option(SCHWARZ_BUILD_DOC "Build the doxygen documentation" OFF)
 
 # Optional packages
 include(cmake/package_helpers.cmake)
 ginkgo_find_package(gflags gflags FALSE 2.2.2)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
+
+set(Schwarz_SOURCE_DIR "${CMAKE_SOURCE_DIR}")
 
 set(SCHWARZ_HAVE_CHOLMOD 0)
 if(SCHWARZ_BUILD_CHOLMOD)
@@ -117,6 +120,14 @@ else()
     source/cuda_dummy_gather.cpp)
 endif()
 
+include(cmake/information_helpers.cmake)
+schwarz_git_information()
+
+if(SCHWARZ_BUILD_DOC)
+  add_subdirectory(doc)
+endif()
+
+
 if(SCHWARZ_BUILD_CLANG_TIDY)
   find_program(
     CLANG_TIDY_EXE
@@ -173,6 +184,7 @@ if(SCHWARZ_BUILD_CUDA)
     SYSTEM PUBLIC ${CUDA_INCLUDE_DIRS})
   TARGET_LINK_LIBRARIES(${TARGET} ${CUDA_RUNTIME_LIBS} ${CUBLAS} ${CUSPARSE})
 endif()
+
 
 # Link the required packages
 TARGET_LINK_LIBRARIES(${TARGET} Ginkgo::ginkgo)

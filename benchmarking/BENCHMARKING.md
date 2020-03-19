@@ -1,7 +1,8 @@
-### Benchmarking.
+Benchmarking.                            {#benchmarking_schwarz}
+----------------
 
-Example 1.
-==========
+Benchmark example 1.
+===================
 
 Poisson solver using Restricted Additive Schwarz with overlap.
 -------------------------------------------------------------

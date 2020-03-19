@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 
-#include <comm_tools.hpp>
+#include <conv_tools.hpp>
 
 #include <communicate.hpp>
 #include <settings.hpp>
@@ -54,6 +54,9 @@ namespace SchwarzWrappers {
  *
  * @tparam ValueType  The type of the floating point values.
  * @tparam IndexType  The type of the index type values.
+ *
+ * @ref solve
+ * @ingroup solve
  */
 template <typename ValueType = gko::default_precision,
           typename IndexType = gko::int32>

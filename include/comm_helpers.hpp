@@ -45,6 +45,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 namespace SchwarzWrappers {
+/**
+ * @brief The CommHelper namespace .
+ * @ref comm_helpers
+ * @ingroup comm
+ */
 namespace CommHelpers {
 
 

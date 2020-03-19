@@ -68,8 +68,11 @@ namespace SchwarzWrappers {
 
 
 /**
- * The struct that contains the solver settings and the parameters to be set by
- * the user.
+ * @brief The struct that contains the solver settings and the parameters to be
+ * set by the user.
+ *
+ * @ref settings
+ * @ingroup init
  */
 struct Settings {
     /**
@@ -260,6 +263,10 @@ struct Settings {
  *
  * @tparam ValueType  The type of the floating point values.
  * @tparam IndexType  The type of the index type values.
+ *
+ * @ingroup init
+ * @ingroup comm
+ * @ingroup solve
  */
 template <typename ValueType, typename IndexType>
 struct Metadata {

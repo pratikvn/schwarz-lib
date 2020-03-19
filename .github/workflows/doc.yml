@@ -1,0 +1,101 @@
+name: Build-doc
+
+on: [push]
+
+jobs:
+  build:
+
+    name: Doxygen build
+    runs-on: [ubuntu-latest]
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: install-doxygen
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install texlive doxygen graphviz ghostscript
+    - name: info
+      run: |
+        doxygen -v
+        cmake --version
+    - name: install-ginkgo
+      run: |
+        pushd .
+        cd ${HOME}
+        mkdir install
+        git clone https://github.com/ginkgo-project/ginkgo.git
+        cd ginkgo
+        git checkout expt-develop
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=${HOME}/install -DGINKGO_BUILD_BENCHMARKS=off -DGINKGO_BUILD_EXAMPLES=off -DGINKGO_BUILD_TESTS=off ..
+        make -j10
+        make install
+        export Ginkgo_DIR=${HOME}/install
+        echo $Ginkgo_DIR
+        popd
+    - name: build-doc 
+      run: |
+        mkdir build
+        cd build/
+        cmake -DCMAKE_PREFIX_PATH=${HOME}/install -DSCHWARZ_BUILD_CHOLMOD=off -DSCHWARZ_BUILD_METIS=off -DSCHWARZ_WITH_HWLOC=off -DSCHWARZ_BUILD_CUDA=off ..
+        make -j10
+
+  cuda-build:
+
+    name: Build with CUDA
+    runs-on: [ubuntu-latest]
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: install-mpi
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install mpich
+    - name: install-cuda
+      run: |
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
+        sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
+        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
+        sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/ /"
+        sudo apt-get update
+        sudo apt-get -y install cuda
+    - name: info
+      run: |
+        g++ -v
+        /usr/local/cuda-10.2/bin/nvcc --version
+        mpiexec --version
+        cmake --version
+        MPI_DIR=$(which mpicxx)
+        echo $MPI_DIR
+    - name: install-metis
+      run: |
+        sudo apt-get -y install metis
+    - name: install-ginkgo
+      run: |
+        export PATH=/usr/local/cuda-10.2/bin:/usr/local/cuda-10.2/NsightCompute-2019.1${PATH:+:${PATH}}
+        export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64\
+                         ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+        pushd .
+        cd ${HOME}
+        mkdir install
+        git clone https://github.com/ginkgo-project/ginkgo.git
+        cd ginkgo
+        git checkout expt-develop
+        mkdir build
+        cd build
+        cmake -DCMAKE_PREFIX_PATH=/usr/local/cuda-10.2 -DCMAKE_INSTALL_PREFIX=${HOME}/install -DGINKGO_BUILD_BENCHMARKS=off -DGINKGO_BUILD_EXAMPLES=off -DGINKGO_BUILD_TESTS=off -DGINKGO_BUILD_CUDA=on ..
+        make -j10
+        make install
+        popd
+    - name: configure-run-schwarz-lib
+      run: |
+        export Ginkgo_DIR=${HOME}/install
+        echo $Ginkgo_DIR
+        export PATH=/usr/local/cuda-10.2/bin:/usr/local/cuda-10.2/NsightCompute-2019.1${PATH:+:${PATH}}
+        export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64\
+                         ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+        mkdir build
+        cd build/
+        cmake -DCMAKE_PREFIX_PATH="${HOME}/install;/usr/local/cuda-10.2" -DSCHWARZ_BUILD_CHOLMOD=off -DSCHWARZ_BUILD_METIS=off -DSCHWARZ_WITH_HWLOC=off -DSCHWARZ_BUILD_CUDA=on ..
+        make -j10

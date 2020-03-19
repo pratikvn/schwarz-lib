@@ -52,6 +52,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace SchwarzWrappers {
 
 
+/**
+ * The utilities class which provides some checks and basic utilities.
+ *
+ * @tparam ValueType  The type of the floating point values.
+ * @tparam IndexType  The type of the index type values.
+ *
+ * @ref utils
+ * @ingroup utils
+ */
 template <typename ValueType = gko::default_precision,
           typename IndexType = gko::int32>
 struct Utils {

@@ -67,6 +67,8 @@ namespace SchwarzWrappers {
  *
  * @tparam ValueType  The type of the floating point values.
  * @tparam IndexType  The type of the index type values.
+ *
+ * @ingroup schwarz_class
  */
 template <typename ValueType = gko::default_precision,
           typename IndexType = gko::int32>

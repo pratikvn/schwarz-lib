@@ -16,6 +16,11 @@
 
 
 namespace SchwarzWrappers {
+/**
+ * @brief The SolverTools namespace .
+ * @ref solver_tools
+ * @ingroup solve
+ */
 namespace SolverTools {
 
 

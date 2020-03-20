@@ -1,21 +1,19 @@
-### Schwarz testbed
-
-![Build status](https://github.com/pratikvn/schwarz-lib/workflows/Build/badge.svg)
-
-Required components
+Schwarz Library
 -------------------
+
+[![Build status](https://github.com/pratikvn/schwarz-lib/workflows/Build/badge.svg)](https://github.com/pratikvn/schwarz-lib/actions?query=workflow%3ABuild-status)
+[![Documentation](https://github.com/pratikvn/schwarz-lib/workflows/Build-doc/badge.svg?branch=develop)](https://pratikvn.github.io/schwarz-lib/doc/doc-setup/index.html)
+
+## Required components
 
 The required components include:
 1. Ginkgo: The Ginkgo library is needed. It needs to be installed and preferably the installation path
    provided as an environment variable in `Ginkgo_DIR` variable.
 2. MPI: As multiple nodes and a domain decomposition is used, an MPI implementation is necessary.
 3. Boost: A Boost library is also required as one of its header files `mpi_datatype.hpp` is used to 
-   detect the `MPI_type` needed at run-time. It may also be possible to get this specific file provide 
-   its include path (NOT TESTED) if the complete Boost library is not easily available.
+   detect the `MPI_type` needed at run-time.
 
-
-Quick Install
-------------
+## Quick Install
 
 ### Building Schwarz-Lib 
 
@@ -32,8 +30,7 @@ For more CMake options please refer to the [Installation page](./INSTALL.md)
 
 
 
-Currently implemented features
--------------------------------
+## Currently implemented features
 
 1. Executor paradigm:
 + [x] GPU.
@@ -84,8 +81,7 @@ Currently implemented features
 
 Any of the implemented features can be permuted and tested.
 
-Known Issues
-------------
+## Known Issues
 
 1. On Summit, the Spectrum MPI seems to have a bug with using `MPI_Put` with GPU buffers. `MPI_Get` works as expected. This bug has also been confirmed with an external micro-benchmarking library, [OSU Micro-Benchmarks](https://github.com/pratikvn/osu-bench-personal-fork).
 

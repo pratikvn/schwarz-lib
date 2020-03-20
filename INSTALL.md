@@ -1,4 +1,4 @@
-Installation Instructions                      {#install_schwarz}
+# Installation Instructions                      {#install_schwarz}
 -------------------------------------
 
 ## Building 

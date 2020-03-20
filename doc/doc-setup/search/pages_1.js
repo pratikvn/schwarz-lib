@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['installation_20instructions',['Installation Instructions',['../install_schwarz.html',1,'']]]
+  ['testing_20instructions',['Testing Instructions',['../testing_schwarz.html',1,'']]]
 ];

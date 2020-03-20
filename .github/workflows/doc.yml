@@ -13,7 +13,7 @@ jobs:
     - name: install-doxygen
       run: |
         sudo apt-get update
-        sudo apt-get -y install mpich texlive-full texlive-generic-recommended texlive-latex-extra doxygen graphviz ghostscript
+        sudo apt-get -y install mpich texlive texlive-generic-recommended texlive-latex-extra doxygen graphviz ghostscript
     - name: info
       run: |
         doxygen -v
@@ -37,27 +37,34 @@ jobs:
     - name: build-doc 
       run: |
         mkdir -p build-doc && pushd build-doc
-        cmake -DCMAKE_PREFIX_PATH=${HOME}/install -DSCHWARZ_BUILD_CHOLMOD=off -DSCHWARZ_BUILD_METIS=off -DSCHWARZ_WITH_HWLOC=off -DSCHWARZ_BUILD_CUDA=off -DSCHWARZ_BUILD_DOC=on -DSCHWARZ_DOC_GENERATE_PDF=on ..
+        export CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+        cmake -DCMAKE_PREFIX_PATH=${HOME}/install -DSCHWARZ_BUILD_CHOLMOD=off -DSCHWARZ_BUILD_METIS=off -DSCHWARZ_WITH_HWLOC=off -DSCHWARZ_BUILD_CUDA=off -DSCHWARZ_BUILD_BENCHMARKING=off -DSCHWARZ_DEVEL_TOOLS=off -DSCHWARZ_BUILD_DOC=on -DSCHWARZ_DOC_GENERATE_PDF=on ..
         make usr
         make pdf
         popd
         # publish it
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        git clone git@github.com:pratikvn/schwarz-lib.git -b gh-pages gh-pages-repo
-        rm -rf gh-pages-repo/doc/build-doc-ref
-        mkdir -p gh-pages-repo/doc
-        mkdir -p gh-pages-repo/doc/pdf
-        cp -r build-doc/doc/usr gh-pages-repo/doc/build-doc-ref
-        cp build-doc/doc/pdf.pdf gh-pages-repo/doc/pdf/build-doc-ref.pdf
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        mkdir action-docs && cd action-docs
+        git init
+        git remote add github "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+        git pull github gh-pages --ff-only 
+        git checkout gh-pages
+        rm -rf doc/${CURRENT_BRANCH}
+        mkdir -p doc
+        mkdir -p doc/pdf
+        cp -r ../build-doc/doc/usr doc/${CURRENT_BRANCH}
+        cp ../build-doc/doc/pdf.pdf doc/pdf/${CURRENT_BRANCH}.pdf
         export CURRENT_SHA="$(git rev-parse --short HEAD)"
-        cd gh-pages-repo
+        echo $CURRENT_SHA
         git add -A
-        git diff --quiet HEAD ||
-            (git commit -m "Update documentation from ${CURRENT_SHA}")
-    - uses: ad-m/github-push-action@master
+        git commit -m "Update documentation from ${CURRENT_SHA}"
+        git status
+        git branch --set-upstream-to=github/gh-pages gh-pages
+    - uses: pratikvn/github-push-action@master
       with:
+        directory: action-docs
+        branch: gh-pages
         github_token: ${{ secrets.GITHUB_TOKEN }}
     - uses: actions/upload-artifact@v1.0.0
       with:

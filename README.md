@@ -2,7 +2,7 @@
 -------------------
 
 [![Build status](https://github.com/pratikvn/schwarz-lib/workflows/Build/badge.svg)](https://github.com/pratikvn/schwarz-lib/actions?query=workflow%3ABuild-status)
-[![Documentation](https://github.com/pratikvn/schwarz-lib/workflows/Build-doc/badge.svg?branch=develop)](https://github.com/pratikvn/schwarz-lib/actions?query=workflow%3ABuild-doc)
+[![Documentation](https://github.com/pratikvn/schwarz-lib/workflows/Build-doc/badge.svg?branch=develop)](https://pratikvn.github.io/schwarz-lib/doc/develop/index.html)
 
 
 ## Required components

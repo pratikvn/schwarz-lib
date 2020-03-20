@@ -1,0 +1,49 @@
+\hypertarget{structSchwarzWrappers_1_1Settings_1_1comm__settings}{}\section{Schwarz\+Wrappers\+:\+:Settings\+:\+:comm\+\_\+settings Struct Reference}
+\label{structSchwarzWrappers_1_1Settings_1_1comm__settings}\index{Schwarz\+Wrappers\+::\+Settings\+::comm\+\_\+settings@{Schwarz\+Wrappers\+::\+Settings\+::comm\+\_\+settings}}
+
+
+The settings for the various available communication paradigms.  
+
+
+
+
+{\ttfamily \#include $<$settings.\+hpp$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_1_1comm__settings_a01cc319c9a15cdd2846108059fa1b729}\label{structSchwarzWrappers_1_1Settings_1_1comm__settings_a01cc319c9a15cdd2846108059fa1b729}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_1_1comm__settings_a01cc319c9a15cdd2846108059fa1b729}{enable\+\_\+onesided} = false
+\begin{DoxyCompactList}\small\item\em Enable one-\/sided communication. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_1_1comm__settings_ab98451af29e631be677153b4882f2c69}\label{structSchwarzWrappers_1_1Settings_1_1comm__settings_ab98451af29e631be677153b4882f2c69}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_1_1comm__settings_ab98451af29e631be677153b4882f2c69}{enable\+\_\+overlap} = false
+\begin{DoxyCompactList}\small\item\em Enable explicit overlap between communication and computation. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_1_1comm__settings_aece8bd0a5ef5f5e24578658c36e0240b}\label{structSchwarzWrappers_1_1Settings_1_1comm__settings_aece8bd0a5ef5f5e24578658c36e0240b}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_1_1comm__settings_aece8bd0a5ef5f5e24578658c36e0240b}{enable\+\_\+put} = false
+\begin{DoxyCompactList}\small\item\em Put the data to the window using M\+P\+I\+\_\+\+Put rather than get. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_1_1comm__settings_a816e46a87611639bf208b565363e4998}\label{structSchwarzWrappers_1_1Settings_1_1comm__settings_a816e46a87611639bf208b565363e4998}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_1_1comm__settings_a816e46a87611639bf208b565363e4998}{enable\+\_\+get} = true
+\begin{DoxyCompactList}\small\item\em Get the data to the window using M\+P\+I\+\_\+\+Get rather than put. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_1_1comm__settings_a94a65410d1c436a47dbb116b5d3d5af1}\label{structSchwarzWrappers_1_1Settings_1_1comm__settings_a94a65410d1c436a47dbb116b5d3d5af1}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_1_1comm__settings_a94a65410d1c436a47dbb116b5d3d5af1}{enable\+\_\+one\+\_\+by\+\_\+one} = false
+\begin{DoxyCompactList}\small\item\em Push each element separately directly into the buffer. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_1_1comm__settings_a70c60458477096cecd87a53139ee61e8}\label{structSchwarzWrappers_1_1Settings_1_1comm__settings_a70c60458477096cecd87a53139ee61e8}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_1_1comm__settings_a70c60458477096cecd87a53139ee61e8}{enable\+\_\+flush\+\_\+local} = false
+\begin{DoxyCompactList}\small\item\em Use local flush. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_1_1comm__settings_a147d1ec7e1eaa5bea9e640d0bb6a7636}\label{structSchwarzWrappers_1_1Settings_1_1comm__settings_a147d1ec7e1eaa5bea9e640d0bb6a7636}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_1_1comm__settings_a147d1ec7e1eaa5bea9e640d0bb6a7636}{enable\+\_\+flush\+\_\+all} = true
+\begin{DoxyCompactList}\small\item\em Use flush all. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_1_1comm__settings_aef1f78be36243e63b9ef7c04dee35f1b}\label{structSchwarzWrappers_1_1Settings_1_1comm__settings_aef1f78be36243e63b9ef7c04dee35f1b}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_1_1comm__settings_aef1f78be36243e63b9ef7c04dee35f1b}{enable\+\_\+lock\+\_\+local} = false
+\begin{DoxyCompactList}\small\item\em Use local locks. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_1_1comm__settings_a9158358e7f737ae5769c5c51730dee7b}\label{structSchwarzWrappers_1_1Settings_1_1comm__settings_a9158358e7f737ae5769c5c51730dee7b}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_1_1comm__settings_a9158358e7f737ae5769c5c51730dee7b}{enable\+\_\+lock\+\_\+all} = true
+\begin{DoxyCompactList}\small\item\em Use lock all. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The settings for the various available communication paradigms. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+settings.\+hpp (2ff7891)\end{DoxyCompactItemize}

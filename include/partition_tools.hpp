@@ -53,6 +53,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 namespace SchwarzWrappers {
+/**
+ * @brief The PartitionTools namespace .
+ * @ref part_tools
+ * @ingroup init
+ */
 namespace PartitionTools {
 
 
@@ -220,7 +225,6 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
 #undef DECLARE_FUNCTION
 
 }  // namespace PartitionTools
-
 }  // namespace SchwarzWrappers
 
-#endif
+#endif  // partition_tool_hpp

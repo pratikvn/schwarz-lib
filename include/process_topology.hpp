@@ -55,6 +55,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "device_guard.hpp"
 
 
+/**
+ * @brief The ProcessTopology namespace .
+ * @ref proc_topo
+ * @ingroup init
+ * @ingroup comm
+ */
 namespace ProcessTopology {
 
 

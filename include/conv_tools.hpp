@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************<SCHWARZ LIB LICENSE>*************************/
 
 
-#ifndef comm_tools_hpp
-#define comm_tools_hpp
+#ifndef conv_tools_hpp
+#define conv_tools_hpp
 
 #include <memory>
 
@@ -42,6 +42,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 namespace SchwarzWrappers {
+/**
+ * @brief The ConvergenceTools namespace .
+ * @ref conv_tools
+ * @ingroup solve
+ */
 namespace ConvergenceTools {
 
 
@@ -325,4 +330,4 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION4);
 }  // namespace SchwarzWrappers
 
 
-#endif  // comm_tools.hpp
+#endif  // conv_tools.hpp

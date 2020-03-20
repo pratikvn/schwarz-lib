@@ -1,0 +1,13 @@
+<map id="SchwarzWrappers::SchwarzBase&lt; ValueType, IndexType &gt;" name="SchwarzWrappers::SchwarzBase&lt; ValueType, IndexType &gt;">
+<area shape="rect" id="node2" href="$classSchwarzWrappers_1_1Initialize.html" title="The initialization class that provides methods for initialization of the solver. " alt="" coords="1381,254,1566,295"/>
+<area shape="rect" id="node3" href="$structSchwarzWrappers_1_1Settings.html" title="The struct that contains the solver settings and the parameters to be set by the user. " alt="" coords="1033,185,1218,212"/>
+<area shape="rect" id="node17" href="$classSchwarzWrappers_1_1Solve.html" title="The Solver class the provides the solver and the convergence checking methods. " alt="" coords="1385,178,1562,219"/>
+<area shape="rect" id="node4" href="$structSchwarzWrappers_1_1Settings_1_1convergence__settings.html" title="The various convergence settings available. " alt="" coords="610,214,795,255"/>
+<area shape="rect" id="node5" title="STL class. " alt="" coords="663,47,743,73"/>
+<area shape="rect" id="node7" title="STL class. " alt="" coords="5,39,132,81"/>
+<area shape="rect" id="node8" href="$structSchwarzWrappers_1_1Settings_1_1comm__settings.html" title="The settings for the various available communication paradigms. " alt="" coords="610,149,795,190"/>
+<area shape="rect" id="node9" href="$structSchwarzWrappers_1_1Metadata.html" title="The solver metadata struct. " alt="" coords="1030,357,1221,398"/>
+<area shape="rect" id="node11" title="STL class. " alt="" coords="239,332,355,359"/>
+<area shape="rect" id="node14" href="$classSchwarzWrappers_1_1Communicate.html" title="The communication class that provides the methods for the communication between the subdomains..." alt="" coords="1364,107,1583,149"/>
+<area shape="rect" id="node15" href="$structSchwarzWrappers_1_1Communicate_1_1comm__struct.html" title="The communication struct used to store the communication data. " alt="" coords="1016,95,1235,151"/>
+</map>

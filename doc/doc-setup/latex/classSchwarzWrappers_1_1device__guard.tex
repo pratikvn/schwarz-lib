@@ -1,0 +1,39 @@
+\hypertarget{classSchwarzWrappers_1_1device__guard}{}\section{Schwarz\+Wrappers\+:\+:device\+\_\+guard Class Reference}
+\label{classSchwarzWrappers_1_1device__guard}\index{Schwarz\+Wrappers\+::device\+\_\+guard@{Schwarz\+Wrappers\+::device\+\_\+guard}}
+
+
+This class defines a device guard for the cuda functions and the cuda module.  
+
+
+
+
+{\ttfamily \#include $<$device\+\_\+guard.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1device__guard_a60864036f9a87a6bc589a216a6ac5393}\label{classSchwarzWrappers_1_1device__guard_a60864036f9a87a6bc589a216a6ac5393}} 
+{\bfseries device\+\_\+guard} (int device\+\_\+id)
+\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1device__guard_abd8b3984d04ba1185ca2ed84056b0de6}\label{classSchwarzWrappers_1_1device__guard_abd8b3984d04ba1185ca2ed84056b0de6}} 
+{\bfseries device\+\_\+guard} (\hyperlink{classSchwarzWrappers_1_1device__guard}{device\+\_\+guard} \&other)=delete
+\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1device__guard_a53abfe6522fc0df4c486c1b8828a5473}\label{classSchwarzWrappers_1_1device__guard_a53abfe6522fc0df4c486c1b8828a5473}} 
+\hyperlink{classSchwarzWrappers_1_1device__guard}{device\+\_\+guard} \& {\bfseries operator=} (const \hyperlink{classSchwarzWrappers_1_1device__guard}{device\+\_\+guard} \&other)=delete
+\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1device__guard_a087728bfdf633becaced536080d5f668}\label{classSchwarzWrappers_1_1device__guard_a087728bfdf633becaced536080d5f668}} 
+{\bfseries device\+\_\+guard} (\hyperlink{classSchwarzWrappers_1_1device__guard}{device\+\_\+guard} \&\&other)=delete
+\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1device__guard_a38c35992c7cbf3e67033cf26daf24c10}\label{classSchwarzWrappers_1_1device__guard_a38c35992c7cbf3e67033cf26daf24c10}} 
+\hyperlink{classSchwarzWrappers_1_1device__guard}{device\+\_\+guard} const  \& {\bfseries operator=} (\hyperlink{classSchwarzWrappers_1_1device__guard}{device\+\_\+guard} \&\&other)=delete
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class defines a device guard for the cuda functions and the cuda module. 
+
+The guard is used to make sure that the device code is run on the correct cuda device, when run with multiple devices. The class records the current device id and uses {\ttfamily cuda\+Set\+Device} to set the device id to the one being passed in. After the scope has been exited, the destructor sets the device\+\_\+id back to the one before entering the scope. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+device\+\_\+guard.\+hpp (d6ef4fd)\end{DoxyCompactItemize}

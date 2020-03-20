@@ -1,0 +1,165 @@
+\hypertarget{structSchwarzWrappers_1_1Settings}{}\section{Schwarz\+Wrappers\+:\+:Settings Struct Reference}
+\label{structSchwarzWrappers_1_1Settings}\index{Schwarz\+Wrappers\+::\+Settings@{Schwarz\+Wrappers\+::\+Settings}}
+
+
+The struct that contains the solver settings and the parameters to be set by the user.  
+
+
+
+
+{\ttfamily \#include $<$settings.\+hpp$>$}
+
+
+
+Collaboration diagram for Schwarz\+Wrappers\+:\+:Settings\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structSchwarzWrappers_1_1Settings__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structSchwarzWrappers_1_1Settings_1_1comm__settings}{comm\+\_\+settings}
+\begin{DoxyCompactList}\small\item\em The settings for the various available communication paradigms. \end{DoxyCompactList}\item 
+struct \hyperlink{structSchwarzWrappers_1_1Settings_1_1convergence__settings}{convergence\+\_\+settings}
+\begin{DoxyCompactList}\small\item\em The various convergence settings available. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_a5b3a60043fc866039d760e5357c17f6d}\label{structSchwarzWrappers_1_1Settings_a5b3a60043fc866039d760e5357c17f6d}} 
+enum \hyperlink{structSchwarzWrappers_1_1Settings_a5b3a60043fc866039d760e5357c17f6d}{partition\+\_\+settings} \{ \newline
+{\bfseries partition\+\_\+regular} = 0x0, 
+{\bfseries partition\+\_\+regular2d} = 0x4, 
+{\bfseries partition\+\_\+metis} = 0x1, 
+{\bfseries partition\+\_\+zoltan} = 0x2, 
+\newline
+{\bfseries partition\+\_\+custom} = 0x3
+ \}\begin{DoxyCompactList}\small\item\em The partition algorithm to be used for partitioning the matrix. \end{DoxyCompactList}
+\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_abb00a70a7c715c93a2e7570ad6dc1bbe}\label{structSchwarzWrappers_1_1Settings_abb00a70a7c715c93a2e7570ad6dc1bbe}} 
+enum \hyperlink{structSchwarzWrappers_1_1Settings_abb00a70a7c715c93a2e7570ad6dc1bbe}{local\+\_\+solver\+\_\+settings} \{ \newline
+{\bfseries direct\+\_\+solver\+\_\+cholmod} = 0x0, 
+{\bfseries direct\+\_\+solver\+\_\+ginkgo} = 0x1, 
+{\bfseries iterative\+\_\+solver\+\_\+ginkgo} = 0x2, 
+{\bfseries iterative\+\_\+solver\+\_\+dealii} = 0x3, 
+\newline
+{\bfseries solver\+\_\+custom} = 0x4
+ \}\begin{DoxyCompactList}\small\item\em The local solver algorithm for the local subdomain solves. \end{DoxyCompactList}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_a72edc489ebfe5ad7e8c2bb8424860f2a}\label{structSchwarzWrappers_1_1Settings_a72edc489ebfe5ad7e8c2bb8424860f2a}} 
+{\bfseries Settings} (std\+::string \hyperlink{structSchwarzWrappers_1_1Settings_a737e5de9833ab6f27606103b907ec06e}{executor\+\_\+string}=\char`\"{}reference\char`\"{})
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_a737e5de9833ab6f27606103b907ec06e}\label{structSchwarzWrappers_1_1Settings_a737e5de9833ab6f27606103b907ec06e}} 
+std\+::string \hyperlink{structSchwarzWrappers_1_1Settings_a737e5de9833ab6f27606103b907ec06e}{executor\+\_\+string}
+\begin{DoxyCompactList}\small\item\em The string that contains the ginkgo executor paradigm. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_a5fef952364864a479eaab9e44d99b525}\label{structSchwarzWrappers_1_1Settings_a5fef952364864a479eaab9e44d99b525}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Executor $>$ \hyperlink{structSchwarzWrappers_1_1Settings_a5fef952364864a479eaab9e44d99b525}{executor} = gko\+::\+Reference\+Executor\+::create()
+\begin{DoxyCompactList}\small\item\em The ginkgo executor the code is to be executed on. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_aab3c76df1bcfbc997eb3f2c1a3e1d96e}\label{structSchwarzWrappers_1_1Settings_aab3c76df1bcfbc997eb3f2c1a3e1d96e}} 
+std\+::shared\+\_\+ptr$<$ \hyperlink{classSchwarzWrappers_1_1device__guard}{device\+\_\+guard} $>$ \hyperlink{structSchwarzWrappers_1_1Settings_aab3c76df1bcfbc997eb3f2c1a3e1d96e}{cuda\+\_\+device\+\_\+guard}
+\begin{DoxyCompactList}\small\item\em The ginkgo executor the code is to be executed on. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_ade1f66243d1d3d8087b453f483af9d98}\label{structSchwarzWrappers_1_1Settings_ade1f66243d1d3d8087b453f483af9d98}} 
+\hyperlink{structSchwarzWrappers_1_1Settings_a5b3a60043fc866039d760e5357c17f6d}{partition\+\_\+settings} {\bfseries partition} = partition\+\_\+settings\+::partition\+\_\+regular
+\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_ab1be4bd623b4cf1c8999160e753752ff}\label{structSchwarzWrappers_1_1Settings_ab1be4bd623b4cf1c8999160e753752ff}} 
+gko\+::int32 \hyperlink{structSchwarzWrappers_1_1Settings_ab1be4bd623b4cf1c8999160e753752ff}{overlap} = 2
+\begin{DoxyCompactList}\small\item\em The overlap between the subdomains. \end{DoxyCompactList}\item 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_a120b05467ef07d770948ccacf12bb1c3}{explicit\+\_\+laplacian} = true
+\begin{DoxyCompactList}\small\item\em Flag if the laplcian matrix should be generated within the library. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_aac87fe7e2f41dcf9ea0abc9d4f919c8b}\label{structSchwarzWrappers_1_1Settings_aac87fe7e2f41dcf9ea0abc9d4f919c8b}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_aac87fe7e2f41dcf9ea0abc9d4f919c8b}{enable\+\_\+random\+\_\+rhs} = false
+\begin{DoxyCompactList}\small\item\em Flag to enable a random rhs. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_ac4141f6be1a3117eb77bcd7af6bc9424}\label{structSchwarzWrappers_1_1Settings_ac4141f6be1a3117eb77bcd7af6bc9424}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_ac4141f6be1a3117eb77bcd7af6bc9424}{print\+\_\+matrices} = false
+\begin{DoxyCompactList}\small\item\em Flag to enable printing of matrices. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_a88048419dd7eb9a21ac3aa8f64986016}\label{structSchwarzWrappers_1_1Settings_a88048419dd7eb9a21ac3aa8f64986016}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_a88048419dd7eb9a21ac3aa8f64986016}{debug\+\_\+print} = false
+\begin{DoxyCompactList}\small\item\em Flag to enable some debug printing. \end{DoxyCompactList}\item 
+\hyperlink{structSchwarzWrappers_1_1Settings_abb00a70a7c715c93a2e7570ad6dc1bbe}{local\+\_\+solver\+\_\+settings} {\bfseries local\+\_\+solver}
+\item 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_afd0d2bf6e98da07012fd08260114de17}{naturally\+\_\+ordered\+\_\+factor} = false
+\begin{DoxyCompactList}\small\item\em Disables the re-\/ordering of the matrix before computing the triangular factors during the C\+H\+O\+L\+M\+OD factorization. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_abbfee6b651293973f478e70ae656d6d0}\label{structSchwarzWrappers_1_1Settings_abbfee6b651293973f478e70ae656d6d0}} 
+std\+::string \hyperlink{structSchwarzWrappers_1_1Settings_abbfee6b651293973f478e70ae656d6d0}{metis\+\_\+objtype}
+\begin{DoxyCompactList}\small\item\em This setting defines the objective type for the metis partitioning. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_a91f3a3c6eb903baace2d424285777cb8}\label{structSchwarzWrappers_1_1Settings_a91f3a3c6eb903baace2d424285777cb8}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_a91f3a3c6eb903baace2d424285777cb8}{use\+\_\+precond} = false
+\begin{DoxyCompactList}\small\item\em Enable the block jacobi local preconditioner for the local solver. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_a22d2c317d86d5388178b5003bcc52b98}\label{structSchwarzWrappers_1_1Settings_a22d2c317d86d5388178b5003bcc52b98}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_a22d2c317d86d5388178b5003bcc52b98}{write\+\_\+debug\+\_\+out} = false
+\begin{DoxyCompactList}\small\item\em Enable the writing of debug out to file. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_a04ee69460b8c946710ef15af70f086b4}\label{structSchwarzWrappers_1_1Settings_a04ee69460b8c946710ef15af70f086b4}} 
+bool \hyperlink{structSchwarzWrappers_1_1Settings_a04ee69460b8c946710ef15af70f086b4}{write\+\_\+perm\+\_\+data} = false
+\begin{DoxyCompactList}\small\item\em Enable the local permutations from C\+H\+O\+L\+M\+OD to a file. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_ac6c824118e57cdcd238cb3aa51d9eef2}\label{structSchwarzWrappers_1_1Settings_ac6c824118e57cdcd238cb3aa51d9eef2}} 
+int \hyperlink{structSchwarzWrappers_1_1Settings_ac6c824118e57cdcd238cb3aa51d9eef2}{shifted\+\_\+iter} = 1
+\begin{DoxyCompactList}\small\item\em Iteration shift for node local communication. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_ae1249cc74cfee69b680a32ab4a7f19dd}\label{structSchwarzWrappers_1_1Settings_ae1249cc74cfee69b680a32ab4a7f19dd}} 
+\hyperlink{structSchwarzWrappers_1_1Settings_1_1comm__settings}{comm\+\_\+settings} {\bfseries comm\+\_\+settings}
+\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_ac33419832f34b51869eaaac7422cfce8}\label{structSchwarzWrappers_1_1Settings_ac33419832f34b51869eaaac7422cfce8}} 
+\hyperlink{structSchwarzWrappers_1_1Settings_1_1convergence__settings}{convergence\+\_\+settings} {\bfseries convergence\+\_\+settings}
+\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_aad5c51cd5a726e41c008229886ee61b9}\label{structSchwarzWrappers_1_1Settings_aad5c51cd5a726e41c008229886ee61b9}} 
+std\+::string \hyperlink{structSchwarzWrappers_1_1Settings_aad5c51cd5a726e41c008229886ee61b9}{reorder}
+\begin{DoxyCompactList}\small\item\em The reordering for the local solve. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The struct that contains the solver settings and the parameters to be set by the user. 
+
+settings 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_a120b05467ef07d770948ccacf12bb1c3}\label{structSchwarzWrappers_1_1Settings_a120b05467ef07d770948ccacf12bb1c3}} 
+\index{Schwarz\+Wrappers\+::\+Settings@{Schwarz\+Wrappers\+::\+Settings}!explicit\+\_\+laplacian@{explicit\+\_\+laplacian}}
+\index{explicit\+\_\+laplacian@{explicit\+\_\+laplacian}!Schwarz\+Wrappers\+::\+Settings@{Schwarz\+Wrappers\+::\+Settings}}
+\subsubsection{\texorpdfstring{explicit\+\_\+laplacian}{explicit\_laplacian}}
+{\footnotesize\ttfamily bool Schwarz\+Wrappers\+::\+Settings\+::explicit\+\_\+laplacian = true}
+
+
+
+Flag if the laplcian matrix should be generated within the library. 
+
+If false, an external matrix and rhs needs to be provided 
+
+Referenced by Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize().
+
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_a8c46d1dc895b72927f7393c79c1ee342}\label{structSchwarzWrappers_1_1Settings_a8c46d1dc895b72927f7393c79c1ee342}} 
+\index{Schwarz\+Wrappers\+::\+Settings@{Schwarz\+Wrappers\+::\+Settings}!local\+\_\+solver@{local\+\_\+solver}}
+\index{local\+\_\+solver@{local\+\_\+solver}!Schwarz\+Wrappers\+::\+Settings@{Schwarz\+Wrappers\+::\+Settings}}
+\subsubsection{\texorpdfstring{local\+\_\+solver}{local\_solver}}
+{\footnotesize\ttfamily \hyperlink{structSchwarzWrappers_1_1Settings_abb00a70a7c715c93a2e7570ad6dc1bbe}{local\+\_\+solver\+\_\+settings} Schwarz\+Wrappers\+::\+Settings\+::local\+\_\+solver}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+        local\_solver\_settings::iterative\_solver\_ginkgo
+\end{DoxyCode}
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_afd0d2bf6e98da07012fd08260114de17}\label{structSchwarzWrappers_1_1Settings_afd0d2bf6e98da07012fd08260114de17}} 
+\index{Schwarz\+Wrappers\+::\+Settings@{Schwarz\+Wrappers\+::\+Settings}!naturally\+\_\+ordered\+\_\+factor@{naturally\+\_\+ordered\+\_\+factor}}
+\index{naturally\+\_\+ordered\+\_\+factor@{naturally\+\_\+ordered\+\_\+factor}!Schwarz\+Wrappers\+::\+Settings@{Schwarz\+Wrappers\+::\+Settings}}
+\subsubsection{\texorpdfstring{naturally\+\_\+ordered\+\_\+factor}{naturally\_ordered\_factor}}
+{\footnotesize\ttfamily bool Schwarz\+Wrappers\+::\+Settings\+::naturally\+\_\+ordered\+\_\+factor = false}
+
+
+
+Disables the re-\/ordering of the matrix before computing the triangular factors during the C\+H\+O\+L\+M\+OD factorization. 
+
+\begin{DoxyNote}{Note}
+This is mainly to allow compatibility with G\+PU solution. 
+\end{DoxyNote}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+settings.\+hpp (d6ef4fd)\end{DoxyCompactItemize}

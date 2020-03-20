@@ -1,0 +1,180 @@
+\hypertarget{classSchwarzWrappers_1_1SchwarzBase}{}\section{Schwarz\+Wrappers\+:\+:Schwarz\+Base$<$ Value\+Type, Index\+Type $>$ Class Template Reference}
+\label{classSchwarzWrappers_1_1SchwarzBase}\index{Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$@{Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$}}
+
+
+The Base solver class is meant to be the class implementing the common implementations for all the schwarz methods.  
+
+
+
+
+{\ttfamily \#include $<$schwarz\+\_\+base.\+hpp$>$}
+
+
+
+Collaboration diagram for Schwarz\+Wrappers\+:\+:Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classSchwarzWrappers_1_1SchwarzBase__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classSchwarzWrappers_1_1SchwarzBase_a158b6450f7b00d3128c39365cde780d0}{Schwarz\+Base} (\hyperlink{structSchwarzWrappers_1_1Settings}{Settings} \&settings, \hyperlink{structSchwarzWrappers_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata)
+\begin{DoxyCompactList}\small\item\em The constructor that takes in the user settings and a metadata struct containing the solver metadata. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a048a3a63407befc9aed09ceb0e4d0709}\label{classSchwarzWrappers_1_1SchwarzBase_a048a3a63407befc9aed09ceb0e4d0709}} 
+void \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a048a3a63407befc9aed09ceb0e4d0709}{initialize} ()
+\begin{DoxyCompactList}\small\item\em \hyperlink{classSchwarzWrappers_1_1Initialize}{Initialize} the matrix and vectors. \end{DoxyCompactList}\item 
+void \hyperlink{classSchwarzWrappers_1_1SchwarzBase_aebea3613aa52c69427081f8cb0965d9c}{run} (std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&solution)
+\begin{DoxyCompactList}\small\item\em The function that runs the actual solver and obtains the final solution. \end{DoxyCompactList}\item 
+void \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a505c5388da6cb1082412bfe5ef3675df}{print\+\_\+vector} (const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&vector, int subd, std\+::string name)
+\begin{DoxyCompactList}\small\item\em The auxiliary function that prints a passed in vector. \end{DoxyCompactList}\item 
+void \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a7f738c1b03eba45f57cf72bb123febd8}{print\+\_\+matrix} (const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&matrix, int rank, std\+::string name)
+\begin{DoxyCompactList}\small\item\em The auxiliary function that prints a passed in C\+SR matrix. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_acb13eabad587af925145b408946b8c2d}\label{classSchwarzWrappers_1_1SchwarzBase_acb13eabad587af925145b408946b8c2d}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_acb13eabad587af925145b408946b8c2d}{local\+\_\+matrix}
+\begin{DoxyCompactList}\small\item\em The local subdomain matrix. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a8cd51eb96cdf7f84de772fda54566a09}\label{classSchwarzWrappers_1_1SchwarzBase_a8cd51eb96cdf7f84de772fda54566a09}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a8cd51eb96cdf7f84de772fda54566a09}{local\+\_\+perm}
+\begin{DoxyCompactList}\small\item\em The local subdomain permutation matrix/array. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_ae8862a67facde156ffef342410f979ba}\label{classSchwarzWrappers_1_1SchwarzBase_ae8862a67facde156ffef342410f979ba}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_ae8862a67facde156ffef342410f979ba}{local\+\_\+inv\+\_\+perm}
+\begin{DoxyCompactList}\small\item\em The local subdomain inverse permutation matrix/array. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a3a11ec2c6d980ab0fcc0dc784e9244df}\label{classSchwarzWrappers_1_1SchwarzBase_a3a11ec2c6d980ab0fcc0dc784e9244df}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a3a11ec2c6d980ab0fcc0dc784e9244df}{triangular\+\_\+factor}
+\begin{DoxyCompactList}\small\item\em The local triangular factor used for the triangular solves. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_aea6575d93a87dec1f97ef2f40ff87199}\label{classSchwarzWrappers_1_1SchwarzBase_aea6575d93a87dec1f97ef2f40ff87199}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_aea6575d93a87dec1f97ef2f40ff87199}{interface\+\_\+matrix}
+\begin{DoxyCompactList}\small\item\em The local interface matrix. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a7dc6207713163fb9298ff2667da9a11f}\label{classSchwarzWrappers_1_1SchwarzBase_a7dc6207713163fb9298ff2667da9a11f}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a7dc6207713163fb9298ff2667da9a11f}{global\+\_\+matrix}
+\begin{DoxyCompactList}\small\item\em The global matrix. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a7b77d55b8b5fc2c301036c2c621b002e}\label{classSchwarzWrappers_1_1SchwarzBase_a7b77d55b8b5fc2c301036c2c621b002e}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a7b77d55b8b5fc2c301036c2c621b002e}{local\+\_\+rhs}
+\begin{DoxyCompactList}\small\item\em The local right hand side. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_aa44d6d84a22c165ac30a61e47a126465}\label{classSchwarzWrappers_1_1SchwarzBase_aa44d6d84a22c165ac30a61e47a126465}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_aa44d6d84a22c165ac30a61e47a126465}{global\+\_\+rhs}
+\begin{DoxyCompactList}\small\item\em The global right hand side. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_aa7acfcc9c34eeebc9727e00b62450c8e}\label{classSchwarzWrappers_1_1SchwarzBase_aa7acfcc9c34eeebc9727e00b62450c8e}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_aa7acfcc9c34eeebc9727e00b62450c8e}{local\+\_\+solution}
+\begin{DoxyCompactList}\small\item\em The local solution vector. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a0c7d2f1b2a97968bd662ba3cbac800f6}\label{classSchwarzWrappers_1_1SchwarzBase_a0c7d2f1b2a97968bd662ba3cbac800f6}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a0c7d2f1b2a97968bd662ba3cbac800f6}{global\+\_\+solution}
+\begin{DoxyCompactList}\small\item\em The global solution vector. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Value\+Type = gko\+::default\+\_\+precision, typename Index\+Type = gko\+::int32$>$\newline
+class Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$}
+
+The Base solver class is meant to be the class implementing the common implementations for all the schwarz methods. 
+
+It derives from the Initialization class, the Communication class and the \hyperlink{classSchwarzWrappers_1_1Solve}{Solve} class all of which are templated.
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Value\+Type} & The type of the floating point values. \\
+\hline
+{\em Index\+Type} & The type of the index type values. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a158b6450f7b00d3128c39365cde780d0}\label{classSchwarzWrappers_1_1SchwarzBase_a158b6450f7b00d3128c39365cde780d0}} 
+\index{Schwarz\+Wrappers\+::\+Schwarz\+Base@{Schwarz\+Wrappers\+::\+Schwarz\+Base}!Schwarz\+Base@{Schwarz\+Base}}
+\index{Schwarz\+Base@{Schwarz\+Base}!Schwarz\+Wrappers\+::\+Schwarz\+Base@{Schwarz\+Wrappers\+::\+Schwarz\+Base}}
+\subsubsection{\texorpdfstring{Schwarz\+Base()}{SchwarzBase()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+\hyperlink{classSchwarzWrappers_1_1SchwarzBase}{Schwarz\+Wrappers\+::\+Schwarz\+Base}$<$ Value\+Type, Index\+Type $>$\+::\hyperlink{classSchwarzWrappers_1_1SchwarzBase}{Schwarz\+Base} (\begin{DoxyParamCaption}\item[{\hyperlink{structSchwarzWrappers_1_1Settings}{Settings} \&}]{settings,  }\item[{\hyperlink{structSchwarzWrappers_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata }\end{DoxyParamCaption})}
+
+
+
+The constructor that takes in the user settings and a metadata struct containing the solver metadata. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+\end{DoxyParams}
+
+
+References Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+size, Schwarz\+Wrappers\+::\+Settings\+::cuda\+\_\+device\+\_\+guard, Schwarz\+Wrappers\+::\+Settings\+::executor, Schwarz\+Wrappers\+::\+Settings\+::executor\+\_\+string, Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::first\+\_\+row, Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::get\+\_\+displacements, Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::global\+\_\+get, Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::global\+\_\+put, Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+size, Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+to\+\_\+local, Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::i\+\_\+permutation, Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::is\+\_\+local\+\_\+neighbor, Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+neighbors\+\_\+in, Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+neighbors\+\_\+out, Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+num\+\_\+procs, Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+to\+\_\+global, Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::mpi\+\_\+communicator, Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::my\+\_\+local\+\_\+rank, Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::my\+\_\+rank, Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::neighbors\+\_\+in, Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::neighbors\+\_\+out, Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::num\+\_\+subdomains, Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::permutation, and Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::put\+\_\+displacements.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a7f738c1b03eba45f57cf72bb123febd8}\label{classSchwarzWrappers_1_1SchwarzBase_a7f738c1b03eba45f57cf72bb123febd8}} 
+\index{Schwarz\+Wrappers\+::\+Schwarz\+Base@{Schwarz\+Wrappers\+::\+Schwarz\+Base}!print\+\_\+matrix@{print\+\_\+matrix}}
+\index{print\+\_\+matrix@{print\+\_\+matrix}!Schwarz\+Wrappers\+::\+Schwarz\+Base@{Schwarz\+Wrappers\+::\+Schwarz\+Base}}
+\subsubsection{\texorpdfstring{print\+\_\+matrix()}{print\_matrix()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type  = gko\+::default\+\_\+precision, typename Index\+Type  = gko\+::int32$>$ \\
+void \hyperlink{classSchwarzWrappers_1_1SchwarzBase}{Schwarz\+Wrappers\+::\+Schwarz\+Base}$<$ Value\+Type, Index\+Type $>$\+::print\+\_\+matrix (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{matrix,  }\item[{int}]{rank,  }\item[{std\+::string}]{name }\end{DoxyParamCaption})}
+
+
+
+The auxiliary function that prints a passed in C\+SR matrix. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em matrix} & The matrix to be printed. \\
+\hline
+{\em subd} & The subdomain on which the vector exists. \\
+\hline
+{\em name} & The name of the matrix as a string. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a505c5388da6cb1082412bfe5ef3675df}\label{classSchwarzWrappers_1_1SchwarzBase_a505c5388da6cb1082412bfe5ef3675df}} 
+\index{Schwarz\+Wrappers\+::\+Schwarz\+Base@{Schwarz\+Wrappers\+::\+Schwarz\+Base}!print\+\_\+vector@{print\+\_\+vector}}
+\index{print\+\_\+vector@{print\+\_\+vector}!Schwarz\+Wrappers\+::\+Schwarz\+Base@{Schwarz\+Wrappers\+::\+Schwarz\+Base}}
+\subsubsection{\texorpdfstring{print\+\_\+vector()}{print\_vector()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type  = gko\+::default\+\_\+precision, typename Index\+Type  = gko\+::int32$>$ \\
+void \hyperlink{classSchwarzWrappers_1_1SchwarzBase}{Schwarz\+Wrappers\+::\+Schwarz\+Base}$<$ Value\+Type, Index\+Type $>$\+::print\+\_\+vector (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{vector,  }\item[{int}]{subd,  }\item[{std\+::string}]{name }\end{DoxyParamCaption})}
+
+
+
+The auxiliary function that prints a passed in vector. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vector} & The vector to be printed. \\
+\hline
+{\em subd} & The subdomain on which the vector exists. \\
+\hline
+{\em name} & The name of the vector as a string. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_aebea3613aa52c69427081f8cb0965d9c}\label{classSchwarzWrappers_1_1SchwarzBase_aebea3613aa52c69427081f8cb0965d9c}} 
+\index{Schwarz\+Wrappers\+::\+Schwarz\+Base@{Schwarz\+Wrappers\+::\+Schwarz\+Base}!run@{run}}
+\index{run@{run}!Schwarz\+Wrappers\+::\+Schwarz\+Base@{Schwarz\+Wrappers\+::\+Schwarz\+Base}}
+\subsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classSchwarzWrappers_1_1SchwarzBase}{Schwarz\+Wrappers\+::\+Schwarz\+Base}$<$ Value\+Type, Index\+Type $>$\+::run (\begin{DoxyParamCaption}\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{solution }\end{DoxyParamCaption})}
+
+
+
+The function that runs the actual solver and obtains the final solution. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em solution} & The solution vector. \\
+\hline
+\end{DoxyParams}
+
+
+References Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::exchange\+\_\+boundary(), Schwarz\+Wrappers\+::\+Settings\+::executor, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+matrix, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+rhs, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::interface\+\_\+matrix, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+inv\+\_\+perm, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+matrix, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+perm, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+rhs, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+solution, Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows(), Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::triangular\+\_\+factor, and Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::update\+\_\+boundary().
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+schwarz\+\_\+base.\+hpp (ac94b4a)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/schwarz\+\_\+base.\+cpp (ac94b4a)\end{DoxyCompactItemize}

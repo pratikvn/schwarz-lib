@@ -25,7 +25,7 @@ mkdir build; cd build
 cmake -G "Unix Makefiles" .. && make
 ```
 
-By default, `SCHWARZ_BUILD_BENCHMARKING` is enabled. This allows you to quickly run an example with the timings if needed. For a detailed list of options available see the [Benchmarking page](./benchmarking/BENCHMARKING.md).
+By default, `SCHWARZ_BUILD_BENCHMARKING` is enabled. This allows you to quickly run an example with the timings if needed. For a detailed list of options available see the [Benchmarking page](./BENCHMARKING.md).
 
 For more CMake options please refer to the [Installation page](./INSTALL.md)
 

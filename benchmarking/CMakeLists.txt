@@ -7,8 +7,7 @@ include_directories(
 
 add_executable(${BENCH_TARGET} bench_ras.cpp)
 
-target_link_libraries(${BENCH_TARGET} schwarz)
-
+target_link_libraries(${BENCH_TARGET} PUBLIC schwarz-lib)
 if(SCHWARZ_BUILD_DEALII)
   DEAL_II_SETUP_TARGET(${BENCH_TARGET})
 endif()

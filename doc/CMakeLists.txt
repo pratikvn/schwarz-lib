@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 2.8)
+include(helpers.cmake)
+find_package(Doxygen REQUIRED)
+find_package(Perl REQUIRED)
+option(SCHWARZ_DOC_GENERATE_PDF "Generate PDF documentation" OFF)
+option(SCHWARZ_DOC_GENERATE_DEV "Generate internal documentation" OFF)
+
+if (SCHWARZ_DOC_GENERATE_PDF)
+    find_package(LATEX COMPONENTS PDFLATEX REQUIRED)
+endif()
+
+schwarz_doc_gen(usr Doxyfile-usr.in OFF USR_DOC.md)
+if (SCHWARZ_DOC_GENERATE_DEV)
+    schwarz_doc_gen(dev Doxyfile-dev.in OFF DEV_DOC.md)
+endif()
+if (SCHWARZ_DOC_GENERATE_PDF)
+    schwarz_doc_gen(pdf Doxyfile-pdf.in ON PDF_DOC.md)
+endif()

@@ -38,9 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 
-
-#include <comm_tools.hpp>
-
+#include <conv_tools.hpp>
 
 #include <communicate.hpp>
 #include <settings.hpp>
@@ -56,6 +54,9 @@ namespace SchwarzWrappers {
  *
  * @tparam ValueType  The type of the floating point values.
  * @tparam IndexType  The type of the index type values.
+ *
+ * @ref solve
+ * @ingroup solve
  */
 template <typename ValueType = gko::default_precision,
           typename IndexType = gko::int32>
@@ -109,6 +110,8 @@ protected:
             &local_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &triangular_factor,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs);
 
     /**
@@ -125,6 +128,8 @@ protected:
         const Metadata<ValueType, IndexType> &metadata,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &triangular_factor,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution);
 

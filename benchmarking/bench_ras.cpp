@@ -40,10 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <communicate.hpp>
 #include <initialization.hpp>
-#include <schwarz_solver.hpp>
+#include <restricted_schwarz.hpp>
 #include <solve.hpp>
 
 
+DEFINE_bool(debug, false, "Enable some possibly expensive debug checks");
 DEFINE_uint32(num_iters, 100, "Number of Schwarz iterations");
 DEFINE_double(set_tol, 1e-6, "Tolerance for the Schwarz solver");
 DEFINE_double(local_tol, 1e-12, "Tolerance for the local solver");
@@ -52,20 +53,33 @@ DEFINE_uint32(set_1d_laplacian_size, 16,
 DEFINE_uint32(
     num_refine_cycles, 1,
     "Number of refinement cycles for the adaptive refinement within deal.ii");
+DEFINE_uint32(shifted_iter, 1,
+              "Use a shifted communication after every x iterations.");
+DEFINE_bool(enable_debug_write, false, "Enable some debug writes.");
 DEFINE_bool(enable_onesided, false,
             "Use the onesided communication version for the solver");
 DEFINE_bool(enable_twosided, true,
             "Use the twosided communication version for the solver");
-DEFINE_bool(enable_push_one_by_one, false,
-            "Enable push one element after another in onesided");
+DEFINE_bool(enable_one_by_one, false,
+            "Enable one element after another in onesided");
+DEFINE_string(remote_comm_type, "get",
+              " The remote memory function to use, MPI_Put / MPI_Get, options "
+              "are put or get");
 DEFINE_bool(enable_put_all_local_residual_norms, false,
             "Enable putting of all local residual norms");
 DEFINE_bool(enable_comm_overlap, false,
             "Enable overlap of communication and computation");
 DEFINE_bool(enable_global_check, false,
             "Use the global convergence check for twosided");
-DEFINE_bool(enable_global_tree_check, false,
-            "Use the global convergence tree check for onesided");
+DEFINE_string(global_convergence_type, "centralized-tree",
+              "The type of global convergence check strategy for onesided. "
+              "Choices are centralized-tree or decentralized");
+DEFINE_bool(
+    enable_decentralized_accumulate, false,
+    "Use accumulate strategy for decentralized global convergence check");
+DEFINE_bool(enable_global_check_iter_offset, false,
+            "Enable global convergence check only after a certain number of "
+            "iterations");
 DEFINE_bool(explicit_laplacian, false,
             "Use the explicit laplacian instead of deal.ii's matrix");
 DEFINE_bool(enable_random_rhs, false,
@@ -74,14 +88,27 @@ DEFINE_uint32(overlap, 2, "Overlap between the domains");
 DEFINE_string(
     executor, "reference",
     "The executor used to run the solver, one of reference, cuda or omp");
-DEFINE_string(enable_flush, "flush_all",
-              "The window flush. The choices are flush_local and flush_all");
+DEFINE_string(flush_type, "flush-all",
+              "The window flush. The choices are flush-local and flush-all");
+DEFINE_string(lock_type, "lock-all",
+              "The window locking. The choices are lock-local and lock-all");
 DEFINE_string(timings_file, "null", "The filename for the timings");
-DEFINE_string(partition, "naive",
-              "The partitioner used. The choices are metis or naive");
-DEFINE_string(local_solver, "direct_cholmod",
+DEFINE_bool(write_comm_data, false,
+            "Write the number of elements sent and received by each subdomain "
+            "to a file.");
+DEFINE_bool(write_perm_data, false,
+            "Write the permutation from CHOLMOD to a file");
+DEFINE_bool(print_config, true, "Print the configuration of the run ");
+DEFINE_string(
+    partition, "regular",
+    "The partitioner used. The choices are metis, regular, regular2d");
+DEFINE_string(local_solver, "iterative-ginkgo",
               "The local solver used in the local domains. The current choices "
-              "include direct_cholmod , direct_ginkgo or iterative_ginkgo");
+              "include direct-cholmod , direct-ginkgo or iterative-ginkgo");
+DEFINE_string(local_reordering, "none",
+              "The reordering for the local direct solver. Choices"
+              "include none , rcm_reordering (symmetric matrices) or "
+              "metis_reordering (all)");
 DEFINE_uint32(num_threads, 1, "Number of threads to bind to a process");
 DEFINE_bool(factor_ordering_natural, false,
             "If true uses natural ordering instead of the default optimized "
@@ -91,6 +118,9 @@ DEFINE_bool(enable_local_precond, false,
             "iterative solver. ");
 DEFINE_uint32(precond_max_block_size, 16,
               "Maximum size of the blocks for the block jacobi preconditioner");
+DEFINE_string(metis_objtype, "null",
+              "Defines the objective type for the metis partitioning, options "
+              "are edgecut and totalvol ");
 
 
 void initialize_argument_parsing(int *argc, char **argv[])
@@ -112,16 +142,64 @@ private:
     void write_timings(
         std::vector<std::tuple<int, int, int, std::string,
                                std::vector<ValueType>>> &time_struct,
-        std::string filename);
+        std::string filename, bool enable_onesided);
+    void write_comm_data(
+        int num_subd, int my_rank,
+        std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
+                               std::vector<std::tuple<int, int>>, int, int>>
+            &comm_data_struct,
+        std::string filename_send, std::string filename_recv);
     int get_local_rank(MPI_Comm mpi_communicator);
+    void print_config();
 };
+
+
+template <typename ValueType, typename IndexType>
+void BenchRas<ValueType, IndexType>::write_comm_data(
+    int num_subd, int my_rank,
+    std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
+                           std::vector<std::tuple<int, int>>, int, int>>
+        &comm_data_struct,
+    std::string filename_send, std::string filename_recv)
+{
+    {
+        std::ofstream file;
+        file.open(filename_send);
+        file << "subdomain " << my_rank << " has "
+             << std::get<4>(comm_data_struct[my_rank]) << " neighbors\n";
+        file << "my_id,to_id,num_send\n";
+        for (auto i = 0; i < num_subd; ++i) {
+            file << my_rank << ","
+                 << std::get<0>(std::get<2>(comm_data_struct[my_rank])[i])
+                 << ","
+                 << std::get<1>(std::get<2>(comm_data_struct[my_rank])[i])
+                 << "\n";
+        }
+        file.close();
+    }
+    {
+        std::ofstream file;
+        file.open(filename_recv);
+        file << "subdomain " << my_rank << " has "
+             << std::get<3>(comm_data_struct[my_rank]) << " neighbors\n";
+        file << "my_id,from_id,num_recv\n";
+        for (auto i = 0; i < num_subd; ++i) {
+            file << my_rank << ","
+                 << std::get<0>(std::get<1>(comm_data_struct[my_rank])[i])
+                 << ","
+                 << std::get<1>(std::get<1>(comm_data_struct[my_rank])[i])
+                 << "\n";
+        }
+        file.close();
+    }
+}
 
 
 template <typename ValueType, typename IndexType>
 void BenchRas<ValueType, IndexType>::write_timings(
     std::vector<std::tuple<int, int, int, std::string, std::vector<ValueType>>>
         &time_struct,
-    std::string filename)
+    std::string filename, bool enable_onesided)
 {
     std::ofstream file;
     file.open(filename);
@@ -129,20 +207,45 @@ void BenchRas<ValueType, IndexType>::write_timings(
         std::sort(std::get<4>(time_struct[id]).begin(),
                   std::get<4>(time_struct[id]).end());
     file << "func,total,avg,min,med,max\n";
+    auto vec_size = time_struct.size() + 1;
+    std::vector<std::string> func_name(vec_size);
+    std::vector<ValueType> avg_time(vec_size), med_time(vec_size),
+        min_time(vec_size), max_time(vec_size), total_time(vec_size);
     for (auto id = 0; id < time_struct.size(); id++) {
-        ValueType total_time =
+        func_name[id] = std::get<3>(time_struct[id]);
+        total_time[id] =
             std::accumulate(std::get<4>(time_struct[id]).begin(),
                             std::get<4>(time_struct[id]).end(), 0.0);
-        file << std::get<3>(time_struct[id]) << "," << total_time << ","
-             << total_time / (std::get<2>(time_struct[id])) << ","
-             << *std::min_element(std::get<4>(time_struct[id]).begin(),
-                                  std::get<4>(time_struct[id]).end())
-             << ","
-             << std::get<4>(
-                    time_struct[id])[std::get<4>(time_struct[id]).size() / 2]
-             << ","
-             << *std::max_element(std::get<4>(time_struct[id]).begin(),
-                                  std::get<4>(time_struct[id]).end())
+        avg_time[id] = total_time[id] / (std::get<2>(time_struct[id]));
+        min_time[id] = *std::min_element(std::get<4>(time_struct[id]).begin(),
+                                         std::get<4>(time_struct[id]).end());
+        med_time[id] = std::get<4>(
+            time_struct[id])[std::get<4>(time_struct[id]).size() / 2];
+        max_time[id] = *std::max_element(std::get<4>(time_struct[id]).begin(),
+                                         std::get<4>(time_struct[id]).end());
+    }
+    func_name[time_struct.size()] = "other";
+    if (enable_onesided) {
+        total_time[time_struct.size()] = total_time[0] + total_time[2];
+        total_time[0] = 0.0;
+        total_time[2] = 0.0;
+        avg_time[time_struct.size()] = avg_time[0] + avg_time[2];
+        avg_time[0] = 0.0;
+        avg_time[2] = 0.0;
+        min_time[time_struct.size()] = min_time[0] + min_time[2];
+        min_time[0] = 0.0;
+        min_time[2] = 0.0;
+        max_time[time_struct.size()] = max_time[0] + max_time[2];
+        max_time[0] = 0.0;
+        max_time[2] = 0.0;
+        med_time[time_struct.size()] = med_time[0] + med_time[2];
+        med_time[0] = 0.0;
+        med_time[2] = 0.0;
+    }
+
+    for (auto i = 0; i < func_name.size(); ++i) {
+        file << func_name[i] << "," << total_time[i] << "," << avg_time[i]
+             << "," << min_time[i] << "," << med_time[i] << "," << max_time[i]
              << "\n";
     }
     file.close();
@@ -158,6 +261,19 @@ int BenchRas<ValueType, IndexType>::get_local_rank(MPI_Comm mpi_communicator)
                         MPI_INFO_NULL, &local_comm);
     MPI_Comm_rank(local_comm, &rank);
     return rank;
+}
+
+
+template <typename ValueType, typename IndexType>
+void BenchRas<ValueType, IndexType>::print_config()
+{
+    std::cout << " Executor: " << FLAGS_executor << "\n"
+              << " Comm type: "
+              << (FLAGS_enable_onesided ? "onesided" : "twosided") << "\n"
+              << " Remote comm type: " << FLAGS_remote_comm_type << "\n"
+              << " Element sending strategy:  "
+              << (FLAGS_enable_one_by_one ? "one by one" : "gathered") << "\n"
+              << std::endl;
 }
 
 
@@ -179,25 +295,51 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     metadata.global_size =
         metadata.oned_laplacian_size * metadata.oned_laplacian_size;
 
+    // Generic settings
+    settings.write_debug_out = FLAGS_enable_debug_write;
+    settings.write_perm_data = FLAGS_write_perm_data;
+    settings.shifted_iter = FLAGS_shifted_iter;
+
     // Set solver settings from command line args.
     // Comm settings
     settings.comm_settings.enable_onesided = FLAGS_enable_onesided;
-    settings.comm_settings.enable_push_one_by_one =
-        FLAGS_enable_push_one_by_one;
+    if (FLAGS_remote_comm_type == "put") {
+        settings.comm_settings.enable_put = true;
+        settings.comm_settings.enable_get = false;
+    } else if (FLAGS_remote_comm_type == "get") {
+        settings.comm_settings.enable_put = false;
+        settings.comm_settings.enable_get = true;
+    }
+    settings.comm_settings.enable_one_by_one = FLAGS_enable_one_by_one;
     settings.comm_settings.enable_overlap = FLAGS_enable_comm_overlap;
-    if (FLAGS_enable_flush == "flush_all") {
+    if (FLAGS_flush_type == "flush-all") {
         settings.comm_settings.enable_flush_all = true;
-    } else if (FLAGS_enable_flush == "flush_local") {
+    } else if (FLAGS_flush_type == "flush-local") {
         settings.comm_settings.enable_flush_all = false;
         settings.comm_settings.enable_flush_local = true;
     }
+    if (FLAGS_lock_type == "lock-all") {
+        settings.comm_settings.enable_lock_all = true;
+    } else if (FLAGS_lock_type == "lock-local") {
+        settings.comm_settings.enable_lock_all = false;
+        settings.comm_settings.enable_lock_local = true;
+    }
+
     // Convergence settings
     settings.convergence_settings.put_all_local_residual_norms =
         FLAGS_enable_put_all_local_residual_norms;
+    settings.convergence_settings.enable_global_check_iter_offset =
+        FLAGS_enable_global_check_iter_offset;
     settings.convergence_settings.enable_global_check =
         FLAGS_enable_global_check;
-    settings.convergence_settings.enable_global_simple_tree =
-        FLAGS_enable_global_tree_check;
+    if (FLAGS_global_convergence_type == "centralized-tree") {
+        settings.convergence_settings.enable_global_simple_tree = true;
+    } else if (FLAGS_global_convergence_type == "decentralized") {
+        settings.convergence_settings.enable_decentralized_leader_election =
+            true;
+        settings.convergence_settings.enable_accumulate =
+            FLAGS_enable_decentralized_accumulate;
+    }
 
     // General solver settings
     metadata.local_solver_tolerance = FLAGS_local_tol;
@@ -207,23 +349,29 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     settings.enable_random_rhs = FLAGS_enable_random_rhs;
     settings.overlap = FLAGS_overlap;
     settings.naturally_ordered_factor = FLAGS_factor_ordering_natural;
+    settings.reorder = FLAGS_local_reordering;
     if (FLAGS_partition == "metis") {
         settings.partition =
             SchwarzWrappers::Settings::partition_settings::partition_metis;
-    } else if (FLAGS_partition == "naive") {
+        settings.metis_objtype = FLAGS_metis_objtype;
+    } else if (FLAGS_partition == "regular") {
         settings.partition =
-            SchwarzWrappers::Settings::partition_settings::partition_naive;
+            SchwarzWrappers::Settings::partition_settings::partition_regular;
+    } else if (FLAGS_partition == "regular2d") {
+        settings.partition =
+            SchwarzWrappers::Settings::partition_settings::partition_regular2d;
     }
-    if (FLAGS_local_solver == "iterative_ginkgo") {
+    if (FLAGS_local_solver == "iterative-ginkgo") {
         settings.local_solver = SchwarzWrappers::Settings::
             local_solver_settings::iterative_solver_ginkgo;
-    } else if (FLAGS_local_solver == "direct_cholmod") {
+    } else if (FLAGS_local_solver == "direct-cholmod") {
         settings.local_solver = SchwarzWrappers::Settings::
             local_solver_settings::direct_solver_cholmod;
-    } else if (FLAGS_local_solver == "direct_ginkgo") {
+    } else if (FLAGS_local_solver == "direct-ginkgo") {
         settings.local_solver = SchwarzWrappers::Settings::
             local_solver_settings::direct_solver_ginkgo;
     }
+    settings.debug_print = FLAGS_debug;
 
     // The global solution vector to be passed in to the RAS solver.
     std::shared_ptr<gko::matrix::Dense<ValueType>> explicit_laplacian_solution =
@@ -237,14 +385,34 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
                   << FLAGS_num_threads << " threads" << std::endl;
         std::cout << " Problem Size: " << metadata.global_size << std::endl;
     }
-    SchwarzWrappers::SolverRAS<ValueType, IndexType> solver(settings, metadata);
+    if (FLAGS_print_config) {
+        if (metadata.my_rank == 0) {
+            print_config();
+        }
+    }
 
+    SchwarzWrappers::SolverRAS<ValueType, IndexType> solver(settings, metadata);
     solver.initialize();
     solver.run(explicit_laplacian_solution);
     if (FLAGS_timings_file != "null") {
-        std::string filename = FLAGS_timings_file + "_" +
-                               std::to_string(metadata.my_rank) + ".csv";
-        write_timings(metadata.time_struct, filename);
+        std::string rank_string = std::to_string(metadata.my_rank);
+        if (metadata.my_rank < 10) {
+            rank_string = "0" + std::to_string(metadata.my_rank);
+        }
+        std::string filename = FLAGS_timings_file + "_" + rank_string + ".csv";
+        write_timings(metadata.time_struct, filename,
+                      settings.comm_settings.enable_onesided);
+    }
+    if (FLAGS_write_comm_data) {
+        std::string rank_string = std::to_string(metadata.my_rank);
+        if (metadata.my_rank < 10) {
+            rank_string = "0" + std::to_string(metadata.my_rank);
+        }
+        std::string filename_send = "num_send_" + rank_string + ".csv";
+        std::string filename_recv = "num_recv_" + rank_string + ".csv";
+        write_comm_data(metadata.num_subdomains, metadata.my_rank,
+                        metadata.comm_data_struct, filename_send,
+                        filename_recv);
     }
 }
 
@@ -262,21 +430,19 @@ int main(int argc, char *argv[])
         initialize_argument_parsing(&argc, &argv);
         BenchRas<double, int> laplace_problem_2d;
 
-        int req_thread_support = MPI_THREAD_SINGLE;
-        int prov_thread_support = MPI_THREAD_SINGLE;
         if (FLAGS_num_threads > 1) {
-            req_thread_support = MPI_THREAD_MULTIPLE;
-            prov_thread_support = MPI_THREAD_MULTIPLE;
-        } else {
-            req_thread_support = MPI_THREAD_SINGLE;
-            prov_thread_support = MPI_THREAD_SINGLE;
-        }
+            int req_thread_support = MPI_THREAD_MULTIPLE;
+            int prov_thread_support = MPI_THREAD_MULTIPLE;
 
-        MPI_Init_thread(&argc, &argv, req_thread_support, &prov_thread_support);
-        if (prov_thread_support != req_thread_support) {
-            std::cout << "Required thread support is " << req_thread_support
-                      << " but provided thread support is only "
-                      << prov_thread_support << std::endl;
+            MPI_Init_thread(&argc, &argv, req_thread_support,
+                            &prov_thread_support);
+            if (prov_thread_support != req_thread_support) {
+                std::cout << "Required thread support is " << req_thread_support
+                          << " but provided thread support is only "
+                          << prov_thread_support << std::endl;
+            }
+        } else {
+            MPI_Init(&argc, &argv);
         }
         laplace_problem_2d.run();
         MPI_Finalize();

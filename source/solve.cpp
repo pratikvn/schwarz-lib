@@ -72,10 +72,13 @@ void Solve<ValueType, IndexType>::setup_local_solver(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &triangular_factor,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs)
 {
     using mtx = gko::matrix::Csr<ValueType, IndexType>;
     using vec = gko::matrix::Dense<ValueType>;
+    using perm_type = gko::matrix::Permutation<IndexType>;
 
     const auto solver_settings =
         settings.local_solver &
@@ -109,21 +112,16 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                       << std::endl;
         // CHOLMOD setup.
         cholmod_start(&(cholmod.settings));
-        // Option to not re-order the matrix. This is currently required as we
-        // dont know the ordering from CHOLMOD and if we are using a direct
-        // solver other than CHOLMOD, we need to explictly use the re-ordering
-        // for the rhs as well.
+        cholmod.settings.final_ll = 1;
+        cholmod.settings.supernodal = 0;
+        cholmod.settings.final_super = 0;
+        cholmod.settings.prefer_upper = 0;
+        cholmod.settings.final_monotonic = 0;
+
+        // Option to not re-order the matrix.
         if (settings.naturally_ordered_factor) {
-            cholmod.settings.final_ll = 1;
-            cholmod.settings.supernodal = 0;
-            cholmod.settings.final_super = 0;
-            cholmod.settings.prefer_upper = 0;
-            // cholmod.settings.final_monotonic = 0;
-            // Change in ordering messes with gpu solution. Do not change
-            // ordering yet.
             cholmod.settings.nmethods = 1;
             cholmod.settings.method[0].ordering = CHOLMOD_NATURAL;
-            cholmod.settings.postorder = 0;
         }
         auto temp_local_matrix = mtx::create(settings.executor->get_master());
         // Need to copy the matrix back to the CPU for the factorization.
@@ -166,13 +164,71 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         // analyze
         cholmod.L_factor =
             cholmod_analyze(cholmod.system_matrix, &(cholmod.settings));
+        auto chol_perm = (IndexType *)(cholmod.L_factor->Perm);
+        local_perm = perm_type::create(
+            settings.executor, gko::dim<2>(num_rows),
+            gko::Array<IndexType>(
+                settings.executor, (IndexType *)(cholmod.L_factor->Perm),
+                num_rows + (IndexType *)(cholmod.L_factor->Perm)),
+            gko::matrix::row_permute);
+        local_inv_perm = perm_type::create(
+            settings.executor, gko::dim<2>(num_rows),
+            gko::Array<IndexType>(
+                settings.executor, (IndexType *)(cholmod.L_factor->Perm),
+                num_rows + (IndexType *)(cholmod.L_factor->Perm)),
+            gko::matrix::row_permute | gko::matrix::inverse_permute);
+
+        if (settings.executor_string != "cuda") {
+            if (settings.debug_print) {
+                if (Utils<ValueType, IndexType>::assert_correct_permutation(
+                        local_perm.get())) {
+                    std::cout << " Here " << __LINE__ << " Rank "
+                              << metadata.my_rank << " Permutation is correct"
+                              << std::endl;
+                } else {
+                    std::cout << " Here " << __LINE__ << " Rank "
+                              << metadata.my_rank << " Permutation is incorrect"
+                              << std::endl;
+                }
+                if (Utils<ValueType, IndexType>::assert_correct_permutation(
+                        local_inv_perm.get())) {
+                    std::cout << " Here " << __LINE__ << " Rank "
+                              << metadata.my_rank
+                              << " Inverse Permutation is correct" << std::endl;
+                } else {
+                    std::cout
+                        << " Here " << __LINE__ << " Rank " << metadata.my_rank
+                        << " Inverse Permutation is incorrect" << std::endl;
+                }
+            }
+            if (settings.write_perm_data) {
+                std::ofstream file;
+                std::string fname =
+                    "perm_" + std::to_string(metadata.my_rank) + ".csv";
+                file.open(fname);
+                for (auto i = 0; i < num_rows; ++i) {
+                    file << local_perm->get_permutation()[i] << "\n";
+                }
+                file << std::endl;
+                file.close();
+                fname = "inv_perm_" + std::to_string(metadata.my_rank) + ".csv";
+                file.open(fname);
+                for (auto i = 0; i < num_rows; ++i) {
+                    file << local_inv_perm->get_permutation()[i] << "\n";
+                }
+                file << std::endl;
+                file.close();
+            }
+        }
+
         // factor
         cholmod_factorize(cholmod.system_matrix, cholmod.L_factor,
                           &(cholmod.settings));
         auto factor_nnz =
             (static_cast<IndexType *>(cholmod.L_factor->p))[num_rows];
         std::cout << " Process " << metadata.my_rank << " has factor with "
-                  << factor_nnz << " non-zeros " << std::endl;
+                  << num_rows << " rows and " << factor_nnz << " non-zeros "
+                  << std::endl;
         if (solver_settings ==
             Settings::local_solver_settings::direct_solver_cholmod) {
             if (metadata.my_rank == 0) {
@@ -274,6 +330,8 @@ void Solve<ValueType, IndexType>::local_solve(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &triangular_factor,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
@@ -292,8 +350,15 @@ void Solve<ValueType, IndexType>::local_solve(
 #endif
     } else if (solver_settings ==
                Settings::local_solver_settings::direct_solver_ginkgo) {
+        auto perm_sol = gko::matrix::Dense<ValueType>::create(
+            settings.executor, local_solution->get_size());
+
+        local_perm->apply(local_solution.get(), perm_sol.get());
         SolverTools::solve_direct_ginkgo(settings, metadata, this->L_solver,
-                                         this->U_solver, local_solution);
+                                         this->U_solver, perm_sol.get());
+        // local_solution->copy_from(perm_sol.get());
+        local_inv_perm->apply(perm_sol.get(), local_solution.get());
+
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
         SolverTools::solve_iterative_ginkgo(settings, metadata, this->solver,
@@ -355,7 +420,10 @@ bool Solve<ValueType, IndexType>::check_local_convergence(
 
         if (local_resnorm0 < 0.0) local_resnorm0 = local_resnorm;
 
-        locally_converged = (local_resnorm) / (local_resnorm0) < tolerance;
+        // locally_converged = (local_resnorm) / (local_resnorm0) < tolerance;
+        locally_converged = (local_resnorm * local_resnorm) /
+                                (local_resnorm0 * local_resnorm0) <
+                            (tolerance * tolerance);
     }
     return locally_converged;
 }
@@ -431,11 +499,16 @@ void Solve<ValueType, IndexType>::check_global_convergence(
             ConvergenceTools::global_convergence_check_onesided_tree(
                 settings, metadata, convergence_vector, converged_all_local,
                 num_converged_procs, window_convergence);
-        } else {  // propagate to neighbors
-            ConvergenceTools::global_convergence_check_onesided_propagate(
+        } else if (settings.convergence_settings
+                       .enable_decentralized_leader_election) {
+            ConvergenceTools::global_convergence_decentralized(
                 settings, metadata, comm_struct, convergence_vector,
                 convergence_sent, convergence_local, converged_all_local,
                 num_converged_procs, window_convergence);
+        } else {
+            std::cout << "Global Convergence check type unspecified"
+                      << std::endl;
+            std::exit(-1);
         }
     } else {  // two-sided MPI
         if (settings.convergence_settings.enable_global_check) {
@@ -448,7 +521,7 @@ void Solve<ValueType, IndexType>::check_global_convergence(
                           MPI_SUM, MPI_COMM_WORLD);
         }
     }
-}
+}  // namespace SchwarzWrappers
 
 
 template <typename ValueType, typename IndexType>
@@ -479,14 +552,19 @@ void Solve<ValueType, IndexType>::check_convergence(
         (iter == 0 ? local_residual_norm
                    : std::min(local_residual_norm, metadata.min_residual_norm));
 
-    if (tolerance > 0.0) {
+    auto iter_cond =
+        settings.convergence_settings.enable_global_check_iter_offset
+            ? ((iter > (metadata.max_iters * 0.05)) ||
+               metadata.max_iters < 1000)
+            : true;
+    if (tolerance > 0.0 && iter_cond) {
         int converged_all_local = 0;
         check_global_convergence(
             settings, metadata, comm_struct, convergence_vector,
             local_residual_norm, local_residual_norm0, global_residual_norm,
             global_residual_norm0, converged_all_local, num_converged_p);
+        num_converged_procs = num_converged_p;
     }
-    num_converged_procs = num_converged_p;
 }
 
 

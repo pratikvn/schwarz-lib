@@ -63,6 +63,9 @@ namespace SchwarzWrappers {
  *
  * @tparam ValueType  The type of the floating point values.
  * @tparam IndexType  The type of the index type values.
+ *
+ * @ref init
+ * @ingroup init
  */
 template <typename ValueType = gko::default_precision,
           typename IndexType = gko::int32>
@@ -106,7 +109,7 @@ public:
 
     /**
      * The partitioning function. Allows the partition of the global matrix
-     * depending with METIS and a naive 1D decomposition.
+     * depending with METIS and a regular 1D decomposition.
      *
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.
@@ -151,6 +154,7 @@ public:
      * @param interface_matrix The interface matrix containing the interface and
      *                         the overlap data mainly used for exchanging
      *                         values between different sub-domains.
+     * @param local_perm  The local permutation, obtained through RCM or METIS.
      */
     virtual void setup_local_matrices(
         Settings &settings, Metadata<ValueType, IndexType> &metadata,
@@ -158,7 +162,10 @@ public:
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
-            &interface_matrix) = 0;
+            &interface_matrix,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>>
+            &local_inv_perm) = 0;
 
 private:
     Settings &settings;

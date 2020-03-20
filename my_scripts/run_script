@@ -7,9 +7,9 @@ do
   do 
     for size in 64 128 256 512
     do
-      for part in "metis" "naive"
+      for part in "metis" "regular"
       do 
-        ./gpu_batch $num_nodes 6 $comm cuda $size 20000 direct_ginkgo $part
+        ./gpu_batch $num_nodes 6 $comm cuda $size 20000 direct-ginkgo $part
       done
     done
   done

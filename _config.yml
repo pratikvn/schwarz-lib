@@ -1,1 +1,5 @@
+title: Schwarz Library
+description: Schwarz Library is an implementation of the asynchronous Schwarz methods using Ginkgo.
+show_downloads: true
+google_analytics:
 theme: jekyll-theme-minimal

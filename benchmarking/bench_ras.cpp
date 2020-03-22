@@ -109,6 +109,9 @@ DEFINE_string(local_reordering, "none",
               "The reordering for the local direct solver. Choices"
               "include none , rcm_reordering (symmetric matrices) or "
               "metis_reordering (all)");
+DEFINE_string(local_factorization, "cholmod",
+              "The factorization for the local direct solver. Choices"
+              "include cholmod or umfpack");
 DEFINE_uint32(num_threads, 1, "Number of threads to bind to a process");
 DEFINE_bool(factor_ordering_natural, false,
             "If true uses natural ordering instead of the default optimized "
@@ -350,6 +353,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     settings.overlap = FLAGS_overlap;
     settings.naturally_ordered_factor = FLAGS_factor_ordering_natural;
     settings.reorder = FLAGS_local_reordering;
+    settings.factorization = FLAGS_local_factorization;
     if (FLAGS_partition == "metis") {
         settings.partition =
             SchwarzWrappers::Settings::partition_settings::partition_metis;
@@ -367,6 +371,9 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     } else if (FLAGS_local_solver == "direct-cholmod") {
         settings.local_solver = SchwarzWrappers::Settings::
             local_solver_settings::direct_solver_cholmod;
+    } else if (FLAGS_local_solver == "direct-umfpack") {
+        settings.local_solver = SchwarzWrappers::Settings::
+            local_solver_settings::direct_solver_umfpack;
     } else if (FLAGS_local_solver == "direct-ginkgo") {
         settings.local_solver = SchwarzWrappers::Settings::
             local_solver_settings::direct_solver_ginkgo;

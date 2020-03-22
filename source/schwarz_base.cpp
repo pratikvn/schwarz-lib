@@ -348,6 +348,7 @@ void SchwarzBase<ValueType, IndexType>::run(
 
     const auto solver_settings =
         (Settings::local_solver_settings::direct_solver_cholmod |
+         Settings::local_solver_settings::direct_solver_umfpack |
          Settings::local_solver_settings::direct_solver_ginkgo |
          Settings::local_solver_settings::iterative_solver_dealii |
          Settings::local_solver_settings::iterative_solver_ginkgo) &
@@ -397,9 +398,9 @@ void SchwarzBase<ValueType, IndexType>::run(
         } else {
             MEASURE_ELAPSED_FUNC_TIME(
                 (Solve<ValueType, IndexType>::local_solve(
-                    settings, metadata, this->triangular_factor,
-                    this->local_perm, this->local_inv_perm, init_guess,
-                    this->local_solution)),
+                    settings, metadata, this->local_matrix,
+                    this->triangular_factor, this->local_perm,
+                    this->local_inv_perm, init_guess, this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
             // init_guess->copy_from(this->local_solution.get());
             // Gather the local vector into the locally global vector for

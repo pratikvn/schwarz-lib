@@ -8,10 +8,15 @@
 
 #include <schwarz/config.hpp>
 #include <settings.hpp>
+#include <utils.hpp>
 
 
-#if SCHWARZ_BUILD_CHOLMOD
+#if SCHW_HAVE_CHOLMOD
 #include <cholmod.h>
+#endif
+
+#if SCHW_HAVE_UMFPACK
+#include <umfpack.h>
 #endif
 
 
@@ -22,7 +27,6 @@ namespace SchwarzWrappers {
  * @ingroup solve
  */
 namespace SolverTools {
-
 
 #if SCHW_HAVE_CHOLMOD
 template <typename ValueType, typename IndexType>
@@ -48,6 +52,18 @@ void solve_direct_cholmod(
     cholmod_free_dense(&sol, &ch_settings);
 }
 #endif
+
+
+#if SCHW_HAVE_UMFPACK
+template <typename ValueType, typename IndexType>
+void solve_direct_umfpack(
+    const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
+    void *umfpack_numeric,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
+{}
+#endif
+
 
 template <typename ValueType, typename IndexType>
 void solve_direct_ginkgo(

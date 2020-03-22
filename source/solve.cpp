@@ -32,6 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************<SCHWARZ LIB LICENSE>*************************/
 
 
+#if SCHW_HAVE_CHOLMOD
+#include <cholmod.h>
+#endif
+
 #include <exception_helpers.hpp>
 #include <solve.hpp>
 #include <utils.hpp>
@@ -68,49 +72,27 @@ double get_relative_error(const gko::matrix::Dense<ValueType> *first,
 
 
 template <typename ValueType, typename IndexType>
-void Solve<ValueType, IndexType>::setup_local_solver(
+void Solve<ValueType, IndexType>::compute_local_factors(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
-    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &triangular_factor,
     std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs)
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm)
 {
     using mtx = gko::matrix::Csr<ValueType, IndexType>;
     using vec = gko::matrix::Dense<ValueType>;
     using perm_type = gko::matrix::Permutation<IndexType>;
+    auto temp_local_matrix = mtx::create(settings.executor->get_master());
+    // Need to copy the matrix back to the CPU for the factorization.
+    temp_local_matrix->copy_from(gko::lend(local_matrix));
+    auto num_rows = temp_local_matrix->get_size()[0];
+    auto num_nonzeros = temp_local_matrix->get_const_row_ptrs()[num_rows];
 
-    const auto solver_settings =
-        settings.local_solver &
-        (Settings::local_solver_settings::direct_solver_cholmod |
-         Settings::local_solver_settings::direct_solver_ginkgo |
-         Settings::local_solver_settings::iterative_solver_dealii |
-         Settings::local_solver_settings::iterative_solver_ginkgo);
+    const IndexType *row_ptrs = temp_local_matrix->get_const_row_ptrs();
+    const IndexType *col_idxs = temp_local_matrix->get_const_col_idxs();
+    const ValueType *lmat_values = temp_local_matrix->get_const_values();
 
-    local_residual_vector = vec::create(settings.executor->get_master(),
-                                        gko::dim<2>(metadata.max_iters + 1, 1));
-    local_residual_vector_out =
-        vec::create(settings.executor->get_master(),
-                    gko::dim<2>(metadata.max_iters + 1, 1));
-    global_residual_vector_out = vec::create(
-        settings.executor->get_master(),
-        gko::dim<2>(metadata.max_iters + 1, metadata.num_subdomains));
-
-    // If direct solver is chosen, then we need to compute a factorization as a
-    // first step. Only the triangular solves are done in the loop.
-    if ((solver_settings ==
-         Settings::local_solver_settings::direct_solver_cholmod) ||
-        (solver_settings ==
-         Settings::local_solver_settings::direct_solver_ginkgo)) {
-#if !SCHW_HAVE_CHOLMOD
-        SCHWARZ_MODULE_NOT_IMPLEMENTED("cholmod");
-#endif
-
+    if (settings.factorization == "cholmod") {
 #if SCHW_HAVE_CHOLMOD
-        if (metadata.my_rank == 0)
-            std::cout << " Local direct factorization with CHOLMOD "
-                      << std::endl;
-        // CHOLMOD setup.
         cholmod_start(&(cholmod.settings));
         cholmod.settings.final_ll = 1;
         cholmod.settings.supernodal = 0;
@@ -123,20 +105,12 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             cholmod.settings.nmethods = 1;
             cholmod.settings.method[0].ordering = CHOLMOD_NATURAL;
         }
-        auto temp_local_matrix = mtx::create(settings.executor->get_master());
-        // Need to copy the matrix back to the CPU for the factorization.
-        temp_local_matrix->copy_from(gko::lend(local_matrix));
-        auto num_rows = temp_local_matrix->get_size()[0];
-        auto num_nonzeros = temp_local_matrix->get_const_row_ptrs()[num_rows];
         auto sorted = 1;
         auto packed = 1;
         auto stype = 1;
         cholmod.system_matrix = cholmod_allocate_sparse(
             num_rows, num_rows, num_nonzeros, sorted, packed, stype,
             CHOLMOD_REAL, &(cholmod.settings));
-        const IndexType *row_ptrs = temp_local_matrix->get_const_row_ptrs();
-        const IndexType *col_idxs = temp_local_matrix->get_const_col_idxs();
-        const ValueType *lmat_values = temp_local_matrix->get_const_values();
 
         IndexType *col_ptrs =
             static_cast<IndexType *>(cholmod.system_matrix->p);
@@ -178,77 +152,173 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                 num_rows + (IndexType *)(cholmod.L_factor->Perm)),
             gko::matrix::row_permute | gko::matrix::inverse_permute);
 
-        if (settings.executor_string != "cuda") {
-            if (settings.debug_print) {
-                if (Utils<ValueType, IndexType>::assert_correct_permutation(
-                        local_perm.get())) {
-                    std::cout << " Here " << __LINE__ << " Rank "
-                              << metadata.my_rank << " Permutation is correct"
-                              << std::endl;
-                } else {
-                    std::cout << " Here " << __LINE__ << " Rank "
-                              << metadata.my_rank << " Permutation is incorrect"
-                              << std::endl;
-                }
-                if (Utils<ValueType, IndexType>::assert_correct_permutation(
-                        local_inv_perm.get())) {
-                    std::cout << " Here " << __LINE__ << " Rank "
-                              << metadata.my_rank
-                              << " Inverse Permutation is correct" << std::endl;
-                } else {
-                    std::cout
-                        << " Here " << __LINE__ << " Rank " << metadata.my_rank
-                        << " Inverse Permutation is incorrect" << std::endl;
-                }
-            }
-            if (settings.write_perm_data) {
-                std::ofstream file;
-                std::string fname =
-                    "perm_" + std::to_string(metadata.my_rank) + ".csv";
-                file.open(fname);
-                for (auto i = 0; i < num_rows; ++i) {
-                    file << local_perm->get_permutation()[i] << "\n";
-                }
-                file << std::endl;
-                file.close();
-                fname = "inv_perm_" + std::to_string(metadata.my_rank) + ".csv";
-                file.open(fname);
-                for (auto i = 0; i < num_rows; ++i) {
-                    file << local_inv_perm->get_permutation()[i] << "\n";
-                }
-                file << std::endl;
-                file.close();
-            }
-        }
 
         // factor
         cholmod_factorize(cholmod.system_matrix, cholmod.L_factor,
                           &(cholmod.settings));
-        auto factor_nnz =
-            (static_cast<IndexType *>(cholmod.L_factor->p))[num_rows];
-        std::cout << " Process " << metadata.my_rank << " has factor with "
-                  << num_rows << " rows and " << factor_nnz << " non-zeros "
-                  << std::endl;
+#endif
+    } else if (settings.factorization == "umfpack") {
+#if SCHW_HAVE_UMFPACK
+        double *null = (double *)NULL;
+        void *symbolic;
+        umfpack_di_symbolic(num_rows, num_rows, (const int *)row_ptrs,
+                            (const int *)col_idxs, (const double *)lmat_values,
+                            &symbolic, null, null);
+        umfpack_di_numeric((const int *)row_ptrs, (const int *)col_idxs,
+                           (const double *)lmat_values, symbolic,
+                           &umfpack.numeric, null, null);
+        umfpack_di_free_symbolic(&symbolic);
+    }
+#endif
+
+    if (settings.executor_string != "cuda") {
+        if (settings.debug_print) {
+            if (Utils<ValueType, IndexType>::assert_correct_permutation(
+                    local_perm.get())) {
+                std::cout << " Here " << __LINE__ << " Rank "
+                          << metadata.my_rank << " Permutation is correct"
+                          << std::endl;
+            } else {
+                std::cout << " Here " << __LINE__ << " Rank "
+                          << metadata.my_rank << " Permutation is incorrect"
+                          << std::endl;
+            }
+            if (Utils<ValueType, IndexType>::assert_correct_permutation(
+                    local_inv_perm.get())) {
+                std::cout << " Here " << __LINE__ << " Rank "
+                          << metadata.my_rank
+                          << " Inverse Permutation is correct" << std::endl;
+            } else {
+                std::cout << " Here " << __LINE__ << " Rank "
+                          << metadata.my_rank
+                          << " Inverse Permutation is incorrect" << std::endl;
+            }
+        }
+        if (settings.write_perm_data) {
+            std::ofstream file;
+            std::string fname =
+                "perm_" + std::to_string(metadata.my_rank) + ".csv";
+            file.open(fname);
+            for (auto i = 0; i < num_rows; ++i) {
+                file << local_perm->get_permutation()[i] << "\n";
+            }
+            file << std::endl;
+            file.close();
+            fname = "inv_perm_" + std::to_string(metadata.my_rank) + ".csv";
+            file.open(fname);
+            for (auto i = 0; i < num_rows; ++i) {
+                file << local_inv_perm->get_permutation()[i] << "\n";
+            }
+            file << std::endl;
+            file.close();
+        }
+    }
+}
+
+template <typename ValueType, typename IndexType>
+void Solve<ValueType, IndexType>::setup_local_solver(
+    const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
+    const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
+    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &triangular_factor,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs)
+{
+    using mtx = gko::matrix::Csr<ValueType, IndexType>;
+    using vec = gko::matrix::Dense<ValueType>;
+    using perm_type = gko::matrix::Permutation<IndexType>;
+
+    const auto solver_settings =
+        settings.local_solver &
+        (Settings::local_solver_settings::direct_solver_cholmod |
+         Settings::local_solver_settings::direct_solver_umfpack |
+         Settings::local_solver_settings::direct_solver_ginkgo |
+         Settings::local_solver_settings::iterative_solver_dealii |
+         Settings::local_solver_settings::iterative_solver_ginkgo);
+
+    local_residual_vector = vec::create(settings.executor->get_master(),
+                                        gko::dim<2>(metadata.max_iters + 1, 1));
+    local_residual_vector_out =
+        vec::create(settings.executor->get_master(),
+                    gko::dim<2>(metadata.max_iters + 1, 1));
+    global_residual_vector_out = vec::create(
+        settings.executor->get_master(),
+        gko::dim<2>(metadata.max_iters + 1, metadata.num_subdomains));
+
+    // If direct solver is chosen, then we need to compute a factorization as a
+    // first step. Only the triangular solves are done in the loop.
+    if ((solver_settings ==
+         Settings::local_solver_settings::direct_solver_cholmod) ||
+        (solver_settings ==
+         Settings::local_solver_settings::direct_solver_umfpack) ||
+        (solver_settings ==
+         Settings::local_solver_settings::direct_solver_ginkgo)) {
+#if (!SCHW_HAVE_CHOLMOD && !SCHW_HAVE_UMFPACK)
+        SCHWARZ_MODULE_NOT_IMPLEMENTED("cholmod and umfpack");
+#endif
+
+        // Factorize the matrix.
+        compute_local_factors(settings, metadata, local_matrix, local_perm,
+                              local_inv_perm);
+        auto num_rows = local_matrix->get_size()[0];
         if (solver_settings ==
             Settings::local_solver_settings::direct_solver_cholmod) {
+            auto factor_nnz =
+                (static_cast<IndexType *>(cholmod.L_factor->p))[num_rows];
+            std::cout << " Process " << metadata.my_rank << " has factor with "
+                      << num_rows << " rows and " << factor_nnz << " non-zeros "
+                      << std::endl;
             if (metadata.my_rank == 0) {
                 std::cout << " Local direct solve with CHOLMOD" << std::endl;
+            }
+        } else if (solver_settings ==
+                   Settings::local_solver_settings::direct_solver_umfpack) {
+            if (metadata.my_rank == 0) {
+                std::cout << " Local direct solve with UMFPACK" << std::endl;
             }
         }
         if (solver_settings ==
             Settings::local_solver_settings::direct_solver_ginkgo) {
             // Copy the triangular factor to the current executor.
-            triangular_factor = mtx::create(
-                settings.executor, gko::dim<2>(num_rows),
-                gko::Array<ValueType>(
-                    (settings.executor->get_master()), factor_nnz,
-                    (static_cast<ValueType *>(cholmod.L_factor->x))),
-                gko::Array<IndexType>(
-                    (settings.executor->get_master()), factor_nnz,
-                    (static_cast<IndexType *>(cholmod.L_factor->i))),
-                gko::Array<IndexType>(
-                    (settings.executor->get_master()), num_rows + 1,
-                    (static_cast<IndexType *>(cholmod.L_factor->p))));
+            if (settings.factorization == "cholmod") {
+#if (SCHW_HAVE_CHOLMOD)
+                auto factor_nnz =
+                    (static_cast<IndexType *>(cholmod.L_factor->p))[num_rows];
+                if (metadata.my_rank == 0)
+                    std::cout << " Local direct factorization with CHOLMOD"
+                              << std::endl;
+                triangular_factor = mtx::create(
+                    settings.executor, gko::dim<2>(num_rows),
+                    gko::Array<ValueType>(
+                        (settings.executor->get_master()), factor_nnz,
+                        (static_cast<ValueType *>(cholmod.L_factor->x))),
+                    gko::Array<IndexType>(
+                        (settings.executor->get_master()), factor_nnz,
+                        (static_cast<IndexType *>(cholmod.L_factor->i))),
+                    gko::Array<IndexType>(
+                        (settings.executor->get_master()), num_rows + 1,
+                        (static_cast<IndexType *>(cholmod.L_factor->p))));
+#endif
+            } else if (settings.factorization == "umfpack") {
+#if (SCHW_HAVE_UMFPACK)
+                if (metadata.my_rank == 0)
+                    std::cout << " Local direct factorization with UMFPACK"
+                              << std::endl;
+                    // triangular_factor = mtx::create(
+                    //     settings.executor, gko::dim<2>(num_rows),
+                    //     gko::Array<ValueType>(
+                    //         (settings.executor->get_master()), factor_nnz,
+                    //         (static_cast<ValueType *>(cholmod.L_factor->x))),
+                    //     gko::Array<IndexType>(
+                    //         (settings.executor->get_master()), factor_nnz,
+                    //         (static_cast<IndexType *>(cholmod.L_factor->i))),
+                    //     gko::Array<IndexType>(
+                    //         (settings.executor->get_master()), num_rows + 1,
+                    //         (static_cast<IndexType
+                    //         *>(cholmod.L_factor->p))));
+#endif
+            }
+
             if (metadata.my_rank == 0) {
                 std::cout << " Local direct solve with Ginkgo TRS" << std::endl;
             }
@@ -271,7 +341,6 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                     "L_mat");
             }
         }
-#endif
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
         if (metadata.my_rank == 0) {
@@ -328,6 +397,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
 template <typename ValueType, typename IndexType>
 void Solve<ValueType, IndexType>::local_solve(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
+    const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &triangular_factor,
     std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
@@ -337,6 +407,7 @@ void Solve<ValueType, IndexType>::local_solve(
 {
     const auto solver_settings =
         (Settings::local_solver_settings::direct_solver_cholmod |
+         Settings::local_solver_settings::direct_solver_umfpack |
          Settings::local_solver_settings::direct_solver_ginkgo |
          Settings::local_solver_settings::iterative_solver_dealii |
          Settings::local_solver_settings::iterative_solver_ginkgo) &
@@ -347,6 +418,22 @@ void Solve<ValueType, IndexType>::local_solve(
         SolverTools::solve_direct_cholmod(settings, metadata, cholmod.settings,
                                           cholmod.L_factor, cholmod.rhs,
                                           local_solution);
+#endif
+    } else if (solver_settings ==
+               Settings::local_solver_settings::direct_solver_umfpack) {
+#if SCHW_HAVE_UMFPACK
+        double *null = (double *)NULL;
+        auto temp_sol = gko::matrix::Dense<ValueType>::create(
+            settings.executor, local_solution->get_size());
+        temp_sol->copy_from(local_solution.get());
+        umfpack_di_solve(
+            UMFPACK_A, (const int *)local_matrix->get_const_row_ptrs(),
+            (const int *)local_matrix->get_const_col_idxs(),
+            (const double *)local_matrix->get_const_values(),
+            (double *)local_solution->get_values(),
+            (double *)temp_sol->get_values(), umfpack.numeric, null, null);
+        // SolverTools::solve_direct_umfpack(settings, metadata, umfpack,
+        //                                   local_solution);
 #endif
     } else if (solver_settings ==
                Settings::local_solver_settings::direct_solver_ginkgo) {

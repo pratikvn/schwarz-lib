@@ -39,12 +39,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <vector>
 
-
 #include <mpi.h>
+
+#if SCHW_HAVE_CHOLMOD
+#include <cholmod.h>
+#endif
 
 
 #include <exception_helpers.hpp>
 #include <initialization.hpp>
+#include <solve.hpp>
 #include <solver_tools.hpp>
 
 

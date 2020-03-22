@@ -38,9 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 
-#include <conv_tools.hpp>
-
 #include <communicate.hpp>
+#include <conv_tools.hpp>
 #include <settings.hpp>
 #include <solver_tools.hpp>
 
@@ -94,13 +93,15 @@ protected:
     MPI_Win window_convergence;
 
     /**
-     * Sets up the local solver from the user settings and computes the
-     * triangular factors if needed.
+     * Sets up the local solver from the user settings
      *
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.
      * @param local_matrix  The local sudomain matrix.
      * @param triangular_factor  The triangular factor.
+     * @param local_perm  The local permutation vector in the subdomain.
+     * @param local_inv_perm  The local inverse permutation vector in the
+     * subdomain.
      * @param local_rhs  The local right hand side vector in the subdomain.
      */
     void setup_local_solver(
@@ -114,6 +115,26 @@ protected:
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs);
 
+
+    /**
+     * Computes the triangular factors based on the factorization type needed..
+     *
+     * @param settings  The settings struct.
+     * @param metadata  The metadata struct.
+     * @param local_matrix  The local sudomain matrix.
+     * @param local_perm  The local permutation vector in the subdomain.
+     * @param local_inv_perm  The local inverse permutation vector in the
+     * subdomain.
+     */
+    void compute_local_factors(
+        const Settings &settings,
+        const Metadata<ValueType, IndexType> &metadata,
+        const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
+            &local_matrix,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm);
+
+
     /**
      * Computes the local solution.
      *
@@ -126,6 +147,8 @@ protected:
     void local_solve(
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
+        const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
+            &local_matrix,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &triangular_factor,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
@@ -287,6 +310,18 @@ private:
         int xtype;
     };
     cholmod cholmod;
+#endif
+
+#if SCHW_HAVE_UMFPACK
+    struct umfpack {
+        int num_nonzeros;
+        int num_rows;
+        void *numeric;
+        int status;
+        double control[UMFPACK_CONTROL];
+        double info[UMFPACK_INFO];
+    };
+    umfpack umfpack;
 #endif
 
     Settings settings;

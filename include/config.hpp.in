@@ -43,6 +43,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // clang-format on
 
 // clang-format off
+#define SCHW_HAVE_UMFPACK @SCHWARZ_HAVE_UMFPACK@
+// clang-format on
+
+// clang-format off
 #define SCHW_HAVE_DEALII @SCHWARZ_HAVE_DEALII@
 // clang-format on
 

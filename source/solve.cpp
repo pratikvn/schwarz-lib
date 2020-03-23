@@ -84,6 +84,7 @@ void Solve<ValueType, IndexType>::compute_local_factors(
     auto temp_local_matrix = mtx::create(settings.executor->get_master());
     // Need to copy the matrix back to the CPU for the factorization.
     temp_local_matrix->copy_from(gko::lend(local_matrix));
+    temp_local_matrix->sort_by_column_index();
     auto num_rows = temp_local_matrix->get_size()[0];
     auto num_nonzeros = temp_local_matrix->get_const_row_ptrs()[num_rows];
 
@@ -152,24 +153,40 @@ void Solve<ValueType, IndexType>::compute_local_factors(
                 num_rows + (IndexType *)(cholmod.L_factor->Perm)),
             gko::matrix::row_permute | gko::matrix::inverse_permute);
 
-
         // factor
         cholmod_factorize(cholmod.system_matrix, cholmod.L_factor,
                           &(cholmod.settings));
 #endif
     } else if (settings.factorization == "umfpack") {
 #if SCHW_HAVE_UMFPACK
-        double *null = (double *)NULL;
+        std::vector<IndexType> col_ptrs(num_rows + 1, 0);
+        std::vector<IndexType> row_idxs(local_matrix->get_num_stored_elements(),
+                                        0);
+        std::vector<ValueType> umat_values(
+            local_matrix->get_num_stored_elements(), 0);
+
+        int row_nnz = 0;
+        col_ptrs[0] = row_nnz;
+        for (auto i = 0; i < num_rows; ++i) {
+            for (auto j = row_ptrs[i]; j < row_ptrs[i + 1]; ++j) {
+                row_idxs[row_nnz] = col_idxs[j];
+                umat_values[row_nnz] = lmat_values[j];
+                row_nnz++;
+            }
+            col_ptrs[i + 1] = row_nnz;
+        }
         void *symbolic;
-        umfpack_di_symbolic(num_rows, num_rows, (const int *)row_ptrs,
-                            (const int *)col_idxs, (const double *)lmat_values,
-                            &symbolic, null, null);
-        umfpack_di_numeric((const int *)row_ptrs, (const int *)col_idxs,
-                           (const double *)lmat_values, symbolic,
-                           &umfpack.numeric, null, null);
+        SCHWARZ_ASSERT_NO_UMFPACK_ERRORS(umfpack_di_symbolic(
+            num_rows, num_rows, (const int *)row_ptrs, (const int *)col_idxs,
+            (const double *)lmat_values, &symbolic, umfpack.control,
+            umfpack.info));
+        SCHWARZ_ASSERT_NO_UMFPACK_ERRORS(umfpack_di_numeric(
+            (const int *)row_ptrs, (const int *)col_idxs,
+            (const double *)lmat_values, symbolic, &umfpack.numeric,
+            umfpack.control, umfpack.info));
         umfpack_di_free_symbolic(&symbolic);
-    }
 #endif
+    }
 
     if (settings.executor_string != "cuda") {
         if (settings.debug_print) {
@@ -263,6 +280,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         auto num_rows = local_matrix->get_size()[0];
         if (solver_settings ==
             Settings::local_solver_settings::direct_solver_cholmod) {
+#if (SCHW_HAVE_CHOLMOD)
             auto factor_nnz =
                 (static_cast<IndexType *>(cholmod.L_factor->p))[num_rows];
             std::cout << " Process " << metadata.my_rank << " has factor with "
@@ -271,6 +289,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             if (metadata.my_rank == 0) {
                 std::cout << " Local direct solve with CHOLMOD" << std::endl;
             }
+#endif
         } else if (solver_settings ==
                    Settings::local_solver_settings::direct_solver_umfpack) {
             if (metadata.my_rank == 0) {
@@ -422,18 +441,16 @@ void Solve<ValueType, IndexType>::local_solve(
     } else if (solver_settings ==
                Settings::local_solver_settings::direct_solver_umfpack) {
 #if SCHW_HAVE_UMFPACK
-        double *null = (double *)NULL;
         auto temp_sol = gko::matrix::Dense<ValueType>::create(
             settings.executor, local_solution->get_size());
         temp_sol->copy_from(local_solution.get());
-        umfpack_di_solve(
+        SCHWARZ_ASSERT_NO_UMFPACK_ERRORS(umfpack_di_solve(
             UMFPACK_A, (const int *)local_matrix->get_const_row_ptrs(),
             (const int *)local_matrix->get_const_col_idxs(),
             (const double *)local_matrix->get_const_values(),
             (double *)local_solution->get_values(),
-            (double *)temp_sol->get_values(), umfpack.numeric, null, null);
-        // SolverTools::solve_direct_umfpack(settings, metadata, umfpack,
-        //                                   local_solution);
+            (const double *)temp_sol->get_const_values(), umfpack.numeric,
+            umfpack.control, umfpack.info));
 #endif
     } else if (solver_settings ==
                Settings::local_solver_settings::direct_solver_ginkgo) {

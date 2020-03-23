@@ -295,6 +295,8 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     local_matrix->copy_from(gko::lend(local_matrix_compute));
     interface_matrix = mtx::create(settings.executor);
     interface_matrix->copy_from(gko::lend(interface_matrix_compute));
+    local_matrix->sort_by_column_index();
+    interface_matrix->sort_by_column_index();
 }
 
 

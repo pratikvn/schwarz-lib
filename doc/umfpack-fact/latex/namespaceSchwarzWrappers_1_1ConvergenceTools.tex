@@ -1,0 +1,28 @@
+\hypertarget{namespaceSchwarzWrappers_1_1ConvergenceTools}{}\section{Schwarz\+Wrappers\+:\+:Convergence\+Tools Namespace Reference}
+\label{namespaceSchwarzWrappers_1_1ConvergenceTools}\index{Schwarz\+Wrappers\+::\+Convergence\+Tools@{Schwarz\+Wrappers\+::\+Convergence\+Tools}}
+
+
+The \hyperlink{namespaceSchwarzWrappers_1_1ConvergenceTools}{Convergence\+Tools} namespace .  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespaceSchwarzWrappers_1_1ConvergenceTools_ae72ff932e1c374c8e77c997414a3fc85}\label{namespaceSchwarzWrappers_1_1ConvergenceTools_ae72ff932e1c374c8e77c997414a3fc85}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries put\+\_\+all\+\_\+local\+\_\+residual\+\_\+norms} (const \hyperlink{structSchwarzWrappers_1_1Settings}{Settings} \&settings, const \hyperlink{structSchwarzWrappers_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, Value\+Type \&local\+\_\+resnorm, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+residual\+\_\+vector, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+residual\+\_\+vector\+\_\+out, M\+P\+I\+\_\+\+Win \&window\+\_\+residual\+\_\+vector)
+\item 
+\mbox{\Hypertarget{namespaceSchwarzWrappers_1_1ConvergenceTools_a718521115937438b471adc63289446b8}\label{namespaceSchwarzWrappers_1_1ConvergenceTools_a718521115937438b471adc63289446b8}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries propagate\+\_\+all\+\_\+local\+\_\+residual\+\_\+norms} (const \hyperlink{structSchwarzWrappers_1_1Settings}{Settings} \&settings, const \hyperlink{structSchwarzWrappers_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, struct \hyperlink{classSchwarzWrappers_1_1Communicate}{Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct \&comm\+\_\+s, Value\+Type \&local\+\_\+resnorm, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+residual\+\_\+vector, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+residual\+\_\+vector\+\_\+out, M\+P\+I\+\_\+\+Win \&window\+\_\+residual\+\_\+vector)
+\item 
+\mbox{\Hypertarget{namespaceSchwarzWrappers_1_1ConvergenceTools_a2bbfdfa60ee30a70517adf7c18fc8f3a}\label{namespaceSchwarzWrappers_1_1ConvergenceTools_a2bbfdfa60ee30a70517adf7c18fc8f3a}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries global\+\_\+convergence\+\_\+check\+\_\+onesided\+\_\+tree} (const \hyperlink{structSchwarzWrappers_1_1Settings}{Settings} \&settings, const \hyperlink{structSchwarzWrappers_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$$>$ \&convergence\+\_\+vector, int \&converged\+\_\+all\+\_\+local, int \&num\+\_\+converged\+\_\+procs, M\+P\+I\+\_\+\+Win \&window\+\_\+convergence)
+\item 
+\mbox{\Hypertarget{namespaceSchwarzWrappers_1_1ConvergenceTools_aaf911f0ed21e7a44cdce5dfc0554eff7}\label{namespaceSchwarzWrappers_1_1ConvergenceTools_aaf911f0ed21e7a44cdce5dfc0554eff7}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries global\+\_\+convergence\+\_\+decentralized} (const \hyperlink{structSchwarzWrappers_1_1Settings}{Settings} \&settings, const \hyperlink{structSchwarzWrappers_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, struct \hyperlink{classSchwarzWrappers_1_1Communicate}{Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct \&comm\+\_\+s, std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$$>$ \&convergence\+\_\+vector, std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$$>$ \&convergence\+\_\+sent, std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$$>$ \&convergence\+\_\+local, int \&converged\+\_\+all\+\_\+local, int \&num\+\_\+converged\+\_\+procs, M\+P\+I\+\_\+\+Win \&window\+\_\+convergence)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The \hyperlink{namespaceSchwarzWrappers_1_1ConvergenceTools}{Convergence\+Tools} namespace . 
+
+conv\+\_\+tools 

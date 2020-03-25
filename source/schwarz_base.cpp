@@ -211,8 +211,9 @@ void SchwarzBase<ValueType, IndexType>::initialize()
 
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
-        this->settings, metadata, this->local_matrix, this->triangular_factor,
-        this->local_perm, this->local_inv_perm, this->local_rhs);
+        this->settings, metadata, this->local_matrix, this->triangular_factor_l,
+        this->triangular_factor_u, this->local_perm, this->local_inv_perm,
+        this->local_rhs);
 
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
@@ -274,8 +275,9 @@ void SchwarzBase<ValueType, IndexType>::initialize(
 
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
-        this->settings, metadata, this->local_matrix, this->triangular_factor,
-        this->local_perm, this->local_inv_perm, this->local_rhs);
+        this->settings, metadata, this->local_matrix, this->triangular_factor_l,
+        this->triangular_factor_u, this->local_perm, this->local_inv_perm,
+        this->local_rhs);
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
@@ -399,8 +401,9 @@ void SchwarzBase<ValueType, IndexType>::run(
             MEASURE_ELAPSED_FUNC_TIME(
                 (Solve<ValueType, IndexType>::local_solve(
                     settings, metadata, this->local_matrix,
-                    this->triangular_factor, this->local_perm,
-                    this->local_inv_perm, init_guess, this->local_solution)),
+                    this->triangular_factor_l, this->triangular_factor_u,
+                    this->local_perm, this->local_inv_perm, init_guess,
+                    this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
             // init_guess->copy_from(this->local_solution.get());
             // Gather the local vector into the locally global vector for

@@ -236,7 +236,10 @@ template <typename ValueType, typename IndexType>
 void Solve<ValueType, IndexType>::setup_local_solver(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
-    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &triangular_factor,
+    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
+        &triangular_factor_l,
+    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
+        &triangular_factor_u,
     std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
     std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs)
@@ -278,18 +281,41 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         compute_local_factors(settings, metadata, local_matrix, local_perm,
                               local_inv_perm);
         auto num_rows = local_matrix->get_size()[0];
-        if (solver_settings ==
-            Settings::local_solver_settings::direct_solver_cholmod) {
+        if (settings.factorization == "cholmod") {
 #if (SCHW_HAVE_CHOLMOD)
+            if (metadata.my_rank == 0)
+                std::cout << " Local direct factorization with CHOLMOD"
+                          << std::endl;
             auto factor_nnz =
                 (static_cast<IndexType *>(cholmod.L_factor->p))[num_rows];
             std::cout << " Process " << metadata.my_rank << " has factor with "
                       << num_rows << " rows and " << factor_nnz << " non-zeros "
                       << std::endl;
+#else
+            SCHWARZ_MODULE_NOT_IMPLEMENTED("cholmod");
+#endif
+        } else if (settings.factorization == "umfpack") {
+#if (SCHW_HAVE_UMFPACK)
+            if (metadata.my_rank == 0)
+                std::cout << " Local direct factorization with UMFPACK"
+                          << std::endl;
+            SCHWARZ_ASSERT_NO_UMFPACK_ERRORS(umfpack_di_get_lunz(
+                &umfpack.factor_l_nnz, &umfpack.factor_u_nnz, &umfpack.n_row,
+                &umfpack.n_col, &umfpack.nz_udiag, umfpack.numeric));
+            std::cout << " Process " << metadata.my_rank << " has factor with "
+                      << umfpack.n_row << " rows; L has "
+                      << umfpack.factor_l_nnz << " non-zeros "
+                      << "; U has " << umfpack.factor_u_nnz << " non-zeros "
+                      << std::endl;
+#else
+            SCHWARZ_MODULE_NOT_IMPLEMENTED("umfpack");
+#endif
+        }
+        if (solver_settings ==
+            Settings::local_solver_settings::direct_solver_cholmod) {
             if (metadata.my_rank == 0) {
                 std::cout << " Local direct solve with CHOLMOD" << std::endl;
             }
-#endif
         } else if (solver_settings ==
                    Settings::local_solver_settings::direct_solver_umfpack) {
             if (metadata.my_rank == 0) {
@@ -303,11 +329,8 @@ void Solve<ValueType, IndexType>::setup_local_solver(
 #if (SCHW_HAVE_CHOLMOD)
                 auto factor_nnz =
                     (static_cast<IndexType *>(cholmod.L_factor->p))[num_rows];
-                if (metadata.my_rank == 0)
-                    std::cout << " Local direct factorization with CHOLMOD"
-                              << std::endl;
-                triangular_factor = mtx::create(
-                    settings.executor, gko::dim<2>(num_rows),
+                triangular_factor_u = mtx::create(
+                    settings.executor->get_master(), gko::dim<2>(num_rows),
                     gko::Array<ValueType>(
                         (settings.executor->get_master()), factor_nnz,
                         (static_cast<ValueType *>(cholmod.L_factor->x))),
@@ -317,24 +340,72 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                     gko::Array<IndexType>(
                         (settings.executor->get_master()), num_rows + 1,
                         (static_cast<IndexType *>(cholmod.L_factor->p))));
+
+                triangular_factor_l =
+                    mtx::create(settings.executor->get_master(),
+                                gko::dim<2>(num_rows), factor_nnz);
+                triangular_factor_l->copy_from(
+                    triangular_factor_u->transpose());
+                //= mtx::create(settings.executor, gko::dim<2>(num_rows))
 #endif
             } else if (settings.factorization == "umfpack") {
 #if (SCHW_HAVE_UMFPACK)
-                if (metadata.my_rank == 0)
-                    std::cout << " Local direct factorization with UMFPACK"
-                              << std::endl;
-                    // triangular_factor = mtx::create(
-                    //     settings.executor, gko::dim<2>(num_rows),
-                    //     gko::Array<ValueType>(
-                    //         (settings.executor->get_master()), factor_nnz,
-                    //         (static_cast<ValueType *>(cholmod.L_factor->x))),
-                    //     gko::Array<IndexType>(
-                    //         (settings.executor->get_master()), factor_nnz,
-                    //         (static_cast<IndexType *>(cholmod.L_factor->i))),
-                    //     gko::Array<IndexType>(
-                    //         (settings.executor->get_master()), num_rows + 1,
-                    //         (static_cast<IndexType
-                    //         *>(cholmod.L_factor->p))));
+                // std::vector<int> Lp(umfpack.n_row + 1, 0);
+                // std::vector<int> Li(umfpack.factor_l_nnz, 0);
+                // std::vector<double> Lx(umfpack.factor_l_nnz, 0);
+                // std::vector<int> Up(umfpack.n_col + 1, 0);
+                // std::vector<int> Ui(umfpack.factor_u_nnz, 0);
+                // std::vector<double> Ux(umfpack.factor_u_nnz, 0);
+                // std::vector<int> umf_row_perm(umfpack.n_row, 0);
+                // std::vector<int> umf_col_perm(umfpack.n_col, 0);
+
+                // SCHWARZ_ASSERT_NO_UMFPACK_ERRORS(umfpack_di_get_numeric(
+                //     Lp.data(), Li.data(), Lx.data(), Up.data(), Ui.data(),
+                //     Ux.data(), umf_row_perm.data(), umf_col_perm.data(),
+                //     (double *)NULL, (int *)NULL, (double *)NULL,
+                //     umfpack.numeric));
+
+                // local_perm = perm_type::create(
+                //     settings.executor, gko::dim<2>(num_rows),
+                //     gko::Array<IndexType>(
+                //         settings.executor, (IndexType
+                //         *)(umf_row_perm.data()), num_rows + (IndexType
+                //         *)(umf_row_perm.data())),
+                //     gko::matrix::row_permute);
+                // local_inv_perm = perm_type::create(
+                //     settings.executor, gko::dim<2>(num_rows),
+                //     gko::Array<IndexType>(
+                //         settings.executor, (IndexType
+                //         *)(umf_row_perm.data()), num_rows + (IndexType
+                //         *)(umf_row_perm.data())),
+                //     gko::matrix::row_permute | gko::matrix::inverse_permute);
+
+                // triangular_factor_l = mtx::create(
+                //     settings.executor, gko::dim<2>(umfpack.n_row),
+                //     gko::Array<ValueType>(
+                //         (settings.executor->get_master()),
+                //         umfpack.factor_l_nnz, (static_cast<ValueType
+                //         *>(Lx.data()))),
+                //     gko::Array<IndexType>(
+                //         (settings.executor->get_master()),
+                //         umfpack.factor_l_nnz, (static_cast<IndexType
+                //         *>(Li.data()))),
+                //     gko::Array<IndexType>(
+                //         (settings.executor->get_master()), umfpack.n_row + 1,
+                //         (static_cast<IndexType *>(Lp.data()))));
+                // triangular_factor_u = mtx::create(
+                //     settings.executor, gko::dim<2>(umfpack.n_col),
+                //     gko::Array<ValueType>(
+                //         (settings.executor->get_master()),
+                //         umfpack.factor_u_nnz, (static_cast<ValueType
+                //         *>(Ux.data()))),
+                //     gko::Array<IndexType>(
+                //         (settings.executor->get_master()),
+                //         umfpack.factor_u_nnz, (static_cast<IndexType
+                //         *>(Ui.data()))),
+                //     gko::Array<IndexType>(
+                //         (settings.executor->get_master()), umfpack.n_col + 1,
+                //         (static_cast<IndexType *>(Up.data()))));
 #endif
             }
 
@@ -346,10 +417,10 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             // Setup the Ginkgo triangular solver.
             this->U_solver = u_trs::build()
                                  .on(settings.executor)
-                                 ->generate((triangular_factor));
+                                 ->generate((triangular_factor_u));
             this->L_solver = l_trs::build()
                                  .on(settings.executor)
-                                 ->generate(triangular_factor->transpose());
+                                 ->generate(triangular_factor_l);
 
             if (settings.print_matrices && settings.executor_string != "cuda") {
                 Utils<ValueType, IndexType>::print_matrix(
@@ -418,7 +489,9 @@ void Solve<ValueType, IndexType>::local_solve(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
-        &triangular_factor,
+        &triangular_factor_l,
+    const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
+        &triangular_factor_u,
     std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
     std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,

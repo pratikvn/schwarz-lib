@@ -110,7 +110,9 @@ protected:
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &local_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
-            &triangular_factor,
+            &triangular_factor_l,
+        std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
+            &triangular_factor_u,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs);
@@ -150,7 +152,9 @@ protected:
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &local_matrix,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
-            &triangular_factor,
+            &triangular_factor_l,
+        const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
+            &triangular_factor_u,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
@@ -314,8 +318,11 @@ private:
 
 #if SCHW_HAVE_UMFPACK
     struct umfpack {
-        int num_nonzeros;
-        int num_rows;
+        int factor_l_nnz;
+        int factor_u_nnz;
+        int nz_udiag;
+        int n_row;
+        int n_col;
         void *numeric;
         int status;
         double control[UMFPACK_CONTROL];

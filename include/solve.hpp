@@ -113,8 +113,12 @@ protected:
             &triangular_factor_l,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &triangular_factor_u,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_row_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>>
+            &local_inv_row_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_col_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>>
+            &local_inv_col_perm,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs);
 
 
@@ -132,9 +136,7 @@ protected:
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
-            &local_matrix,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm);
+            &local_matrix);
 
 
     /**
@@ -155,8 +157,12 @@ protected:
             &triangular_factor_l,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &triangular_factor_u,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_row_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>>
+            &local_inv_row_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_col_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>>
+            &local_inv_col_perm,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution);
 

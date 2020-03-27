@@ -74,9 +74,7 @@ double get_relative_error(const gko::matrix::Dense<ValueType> *first,
 template <typename ValueType, typename IndexType>
 void Solve<ValueType, IndexType>::compute_local_factors(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
-    const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm)
+    const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix)
 {
     using mtx = gko::matrix::Csr<ValueType, IndexType>;
     using vec = gko::matrix::Dense<ValueType>;
@@ -139,19 +137,6 @@ void Solve<ValueType, IndexType>::compute_local_factors(
         // analyze
         cholmod.L_factor =
             cholmod_analyze(cholmod.system_matrix, &(cholmod.settings));
-        auto chol_perm = (IndexType *)(cholmod.L_factor->Perm);
-        local_perm = perm_type::create(
-            settings.executor, gko::dim<2>(num_rows),
-            gko::Array<IndexType>(
-                settings.executor, (IndexType *)(cholmod.L_factor->Perm),
-                num_rows + (IndexType *)(cholmod.L_factor->Perm)),
-            gko::matrix::row_permute);
-        local_inv_perm = perm_type::create(
-            settings.executor, gko::dim<2>(num_rows),
-            gko::Array<IndexType>(
-                settings.executor, (IndexType *)(cholmod.L_factor->Perm),
-                num_rows + (IndexType *)(cholmod.L_factor->Perm)),
-            gko::matrix::row_permute | gko::matrix::inverse_permute);
 
         // factor
         cholmod_factorize(cholmod.system_matrix, cholmod.L_factor,
@@ -187,49 +172,6 @@ void Solve<ValueType, IndexType>::compute_local_factors(
         umfpack_di_free_symbolic(&symbolic);
 #endif
     }
-
-    if (settings.executor_string != "cuda") {
-        if (settings.debug_print) {
-            if (Utils<ValueType, IndexType>::assert_correct_permutation(
-                    local_perm.get())) {
-                std::cout << " Here " << __LINE__ << " Rank "
-                          << metadata.my_rank << " Permutation is correct"
-                          << std::endl;
-            } else {
-                std::cout << " Here " << __LINE__ << " Rank "
-                          << metadata.my_rank << " Permutation is incorrect"
-                          << std::endl;
-            }
-            if (Utils<ValueType, IndexType>::assert_correct_permutation(
-                    local_inv_perm.get())) {
-                std::cout << " Here " << __LINE__ << " Rank "
-                          << metadata.my_rank
-                          << " Inverse Permutation is correct" << std::endl;
-            } else {
-                std::cout << " Here " << __LINE__ << " Rank "
-                          << metadata.my_rank
-                          << " Inverse Permutation is incorrect" << std::endl;
-            }
-        }
-        if (settings.write_perm_data) {
-            std::ofstream file;
-            std::string fname =
-                "perm_" + std::to_string(metadata.my_rank) + ".csv";
-            file.open(fname);
-            for (auto i = 0; i < num_rows; ++i) {
-                file << local_perm->get_permutation()[i] << "\n";
-            }
-            file << std::endl;
-            file.close();
-            fname = "inv_perm_" + std::to_string(metadata.my_rank) + ".csv";
-            file.open(fname);
-            for (auto i = 0; i < num_rows; ++i) {
-                file << local_inv_perm->get_permutation()[i] << "\n";
-            }
-            file << std::endl;
-            file.close();
-        }
-    }
 }
 
 template <typename ValueType, typename IndexType>
@@ -240,8 +182,10 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         &triangular_factor_l,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &triangular_factor_u,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_row_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_row_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_col_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_col_perm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs)
 {
     using mtx = gko::matrix::Csr<ValueType, IndexType>;
@@ -278,8 +222,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
 #endif
 
         // Factorize the matrix.
-        compute_local_factors(settings, metadata, local_matrix, local_perm,
-                              local_inv_perm);
+        compute_local_factors(settings, metadata, local_matrix);
         auto num_rows = local_matrix->get_size()[0];
         if (settings.factorization == "cholmod") {
 #if (SCHW_HAVE_CHOLMOD)
@@ -302,11 +245,11 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             SCHWARZ_ASSERT_NO_UMFPACK_ERRORS(umfpack_di_get_lunz(
                 &umfpack.factor_l_nnz, &umfpack.factor_u_nnz, &umfpack.n_row,
                 &umfpack.n_col, &umfpack.nz_udiag, umfpack.numeric));
-            std::cout << " Process " << metadata.my_rank << " has factor with "
-                      << umfpack.n_row << " rows; L has "
-                      << umfpack.factor_l_nnz << " non-zeros "
-                      << "; U has " << umfpack.factor_u_nnz << " non-zeros "
-                      << std::endl;
+            std::cout << " Process " << metadata.my_rank << " has factors "
+                      << " L(rows, nnz): (" << umfpack.n_row << ","
+                      << umfpack.factor_l_nnz << ") "
+                      << ";  U(cols, nnz): (" << umfpack.n_col << ","
+                      << umfpack.factor_u_nnz << ") " << std::endl;
 #else
             SCHWARZ_MODULE_NOT_IMPLEMENTED("umfpack");
 #endif
@@ -346,66 +289,96 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                                 gko::dim<2>(num_rows), factor_nnz);
                 triangular_factor_l->copy_from(
                     triangular_factor_u->transpose());
-                //= mtx::create(settings.executor, gko::dim<2>(num_rows))
+
+                local_row_perm = perm_type::create(
+                    settings.executor, gko::dim<2>(num_rows),
+                    gko::Array<IndexType>(
+                        settings.executor,
+                        (IndexType *)(cholmod.L_factor->Perm),
+                        num_rows + (IndexType *)(cholmod.L_factor->Perm)),
+                    gko::matrix::row_permute);
+                local_inv_row_perm = perm_type::create(
+                    settings.executor, gko::dim<2>(num_rows),
+                    gko::Array<IndexType>(
+                        settings.executor,
+                        (IndexType *)(cholmod.L_factor->Perm),
+                        num_rows + (IndexType *)(cholmod.L_factor->Perm)),
+                    gko::matrix::row_permute | gko::matrix::inverse_permute);
 #endif
             } else if (settings.factorization == "umfpack") {
 #if (SCHW_HAVE_UMFPACK)
-                // std::vector<int> Lp(umfpack.n_row + 1, 0);
-                // std::vector<int> Li(umfpack.factor_l_nnz, 0);
-                // std::vector<double> Lx(umfpack.factor_l_nnz, 0);
-                // std::vector<int> Up(umfpack.n_col + 1, 0);
-                // std::vector<int> Ui(umfpack.factor_u_nnz, 0);
-                // std::vector<double> Ux(umfpack.factor_u_nnz, 0);
-                // std::vector<int> umf_row_perm(umfpack.n_row, 0);
-                // std::vector<int> umf_col_perm(umfpack.n_col, 0);
+                std::vector<IndexType> Lp(umfpack.n_row + 1, 0);
+                std::vector<IndexType> Li(umfpack.factor_l_nnz, 0);
+                std::vector<ValueType> Lx(umfpack.factor_l_nnz, 0);
+                std::vector<IndexType> Up(umfpack.n_col + 1, 0);
+                std::vector<IndexType> Ui(umfpack.factor_u_nnz, 0);
+                std::vector<ValueType> Ux(umfpack.factor_u_nnz, 0);
+                std::vector<IndexType> umf_row_perm(umfpack.n_row, 0);
+                std::vector<IndexType> umf_col_perm(umfpack.n_col, 0);
 
-                // SCHWARZ_ASSERT_NO_UMFPACK_ERRORS(umfpack_di_get_numeric(
-                //     Lp.data(), Li.data(), Lx.data(), Up.data(), Ui.data(),
-                //     Ux.data(), umf_row_perm.data(), umf_col_perm.data(),
-                //     (double *)NULL, (int *)NULL, (double *)NULL,
-                //     umfpack.numeric));
+                SCHWARZ_ASSERT_NO_UMFPACK_ERRORS(umfpack_di_get_numeric(
+                    (int *)Lp.data(), (int *)Li.data(), (double *)Lx.data(),
+                    (int *)Up.data(), (int *)Ui.data(), (double *)Ux.data(),
+                    (int *)umf_row_perm.data(), (int *)umf_col_perm.data(),
+                    (double *)NULL, (int *)NULL, (double *)NULL,
+                    umfpack.numeric));
 
-                // local_perm = perm_type::create(
-                //     settings.executor, gko::dim<2>(num_rows),
-                //     gko::Array<IndexType>(
-                //         settings.executor, (IndexType
-                //         *)(umf_row_perm.data()), num_rows + (IndexType
-                //         *)(umf_row_perm.data())),
-                //     gko::matrix::row_permute);
-                // local_inv_perm = perm_type::create(
-                //     settings.executor, gko::dim<2>(num_rows),
-                //     gko::Array<IndexType>(
-                //         settings.executor, (IndexType
-                //         *)(umf_row_perm.data()), num_rows + (IndexType
-                //         *)(umf_row_perm.data())),
-                //     gko::matrix::row_permute | gko::matrix::inverse_permute);
 
-                // triangular_factor_l = mtx::create(
-                //     settings.executor, gko::dim<2>(umfpack.n_row),
-                //     gko::Array<ValueType>(
-                //         (settings.executor->get_master()),
-                //         umfpack.factor_l_nnz, (static_cast<ValueType
-                //         *>(Lx.data()))),
-                //     gko::Array<IndexType>(
-                //         (settings.executor->get_master()),
-                //         umfpack.factor_l_nnz, (static_cast<IndexType
-                //         *>(Li.data()))),
-                //     gko::Array<IndexType>(
-                //         (settings.executor->get_master()), umfpack.n_row + 1,
-                //         (static_cast<IndexType *>(Lp.data()))));
-                // triangular_factor_u = mtx::create(
-                //     settings.executor, gko::dim<2>(umfpack.n_col),
-                //     gko::Array<ValueType>(
-                //         (settings.executor->get_master()),
-                //         umfpack.factor_u_nnz, (static_cast<ValueType
-                //         *>(Ux.data()))),
-                //     gko::Array<IndexType>(
-                //         (settings.executor->get_master()),
-                //         umfpack.factor_u_nnz, (static_cast<IndexType
-                //         *>(Ui.data()))),
-                //     gko::Array<IndexType>(
-                //         (settings.executor->get_master()), umfpack.n_col + 1,
-                //         (static_cast<IndexType *>(Up.data()))));
+                local_row_perm = perm_type::create(
+                    settings.executor, gko::dim<2>(num_rows),
+                    gko::Array<IndexType>(settings.executor,
+                                          (umf_row_perm.data()),
+                                          num_rows + (umf_row_perm.data())),
+                    gko::matrix::row_permute);
+                local_col_perm = perm_type::create(
+                    settings.executor, gko::dim<2>(num_rows),
+                    gko::Array<IndexType>(settings.executor,
+                                          (umf_col_perm.data()),
+                                          num_rows + (umf_col_perm.data())),
+                    gko::matrix::row_permute);
+
+                local_inv_row_perm = perm_type::create(
+                    settings.executor, gko::dim<2>(num_rows),
+                    gko::Array<IndexType>(settings.executor,
+                                          (umf_row_perm.data()),
+                                          num_rows + (umf_row_perm.data())),
+                    gko::matrix::row_permute | gko::matrix::inverse_permute);
+
+                local_inv_col_perm = perm_type::create(
+                    settings.executor, gko::dim<2>(num_rows),
+                    gko::Array<IndexType>(settings.executor,
+                                          (umf_col_perm.data()),
+                                          num_rows + (umf_col_perm.data())),
+                    gko::matrix::row_permute | gko::matrix::inverse_permute);
+
+                triangular_factor_l = mtx::create(
+                    settings.executor, gko::dim<2>(umfpack.n_row),
+                    gko::Array<ValueType>(settings.executor->get_master(),
+                                          Lx.data(),
+                                          umfpack.factor_l_nnz + Lx.data()),
+                    gko::Array<IndexType>(settings.executor->get_master(),
+                                          Li.data(),
+                                          umfpack.factor_l_nnz + Li.data()),
+                    gko::Array<IndexType>((settings.executor->get_master()),
+                                          Lp.data(),
+                                          Lp.data() + umfpack.n_row + 1));
+
+                triangular_factor_u = mtx::create(
+                    settings.executor, gko::dim<2>(umfpack.n_row),
+                    gko::Array<ValueType>(settings.executor->get_master(),
+                                          Ux.data(),
+                                          umfpack.factor_u_nnz + Ux.data()),
+                    gko::Array<IndexType>(settings.executor->get_master(),
+                                          Ui.data(),
+                                          umfpack.factor_u_nnz + Ui.data()),
+                    gko::Array<IndexType>(settings.executor->get_master(),
+                                          Up.data(),
+                                          Up.data() + umfpack.n_row + 1));
+                // triangular_factor_u =
+                //   mtx::create(settings.executor->get_master(),
+                //               gko::dim<2>(num_rows), umfpack.factor_l_nnz);
+                // triangular_factor_u->copy_from(
+                //     triangular_factor_l->transpose());
 #endif
             }
 
@@ -417,7 +390,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             // Setup the Ginkgo triangular solver.
             this->U_solver = u_trs::build()
                                  .on(settings.executor)
-                                 ->generate((triangular_factor_u));
+                                 ->generate(triangular_factor_u);
             this->L_solver = l_trs::build()
                                  .on(settings.executor)
                                  ->generate(triangular_factor_l);
@@ -429,6 +402,53 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                 Utils<ValueType, IndexType>::print_matrix(
                     this->L_solver->get_system_matrix().get(), metadata.my_rank,
                     "L_mat");
+            }
+
+            if (settings.executor_string != "cuda") {
+                if (settings.debug_print) {
+                    if (Utils<ValueType, IndexType>::assert_correct_permutation(
+                            local_row_perm.get())) {
+                        std::cout << " Here " << __LINE__ << " Rank "
+                                  << metadata.my_rank
+                                  << " Permutation is correct" << std::endl;
+                    } else {
+                        std::cout << " Here " << __LINE__ << " Rank "
+                                  << metadata.my_rank
+                                  << " Permutation is incorrect" << std::endl;
+                    }
+                    if (Utils<ValueType, IndexType>::assert_correct_permutation(
+                            local_inv_row_perm.get())) {
+                        std::cout << " Here " << __LINE__ << " Rank "
+                                  << metadata.my_rank
+                                  << " Inverse Permutation is correct"
+                                  << std::endl;
+                    } else {
+                        std::cout << " Here " << __LINE__ << " Rank "
+                                  << metadata.my_rank
+                                  << " Inverse Permutation is incorrect"
+                                  << std::endl;
+                    }
+                }
+                if (settings.write_perm_data) {
+                    std::ofstream file;
+                    std::string fname =
+                        "perm_" + std::to_string(metadata.my_rank) + ".csv";
+                    file.open(fname);
+                    for (auto i = 0; i < num_rows; ++i) {
+                        file << local_row_perm->get_permutation()[i] << "\n";
+                    }
+                    file << std::endl;
+                    file.close();
+                    fname =
+                        "inv_perm_" + std::to_string(metadata.my_rank) + ".csv";
+                    file.open(fname);
+                    for (auto i = 0; i < num_rows; ++i) {
+                        file << local_inv_row_perm->get_permutation()[i]
+                             << "\n";
+                    }
+                    file << std::endl;
+                    file.close();
+                }
             }
         }
     } else if (solver_settings ==
@@ -492,8 +512,10 @@ void Solve<ValueType, IndexType>::local_solve(
         &triangular_factor_l,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &triangular_factor_u,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_row_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_row_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_col_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_col_perm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
@@ -529,13 +551,12 @@ void Solve<ValueType, IndexType>::local_solve(
                Settings::local_solver_settings::direct_solver_ginkgo) {
         auto perm_sol = gko::matrix::Dense<ValueType>::create(
             settings.executor, local_solution->get_size());
-
-        local_perm->apply(local_solution.get(), perm_sol.get());
+        local_col_perm->apply(local_solution.get(), perm_sol.get());
         SolverTools::solve_direct_ginkgo(settings, metadata, this->L_solver,
-                                         this->U_solver, perm_sol.get());
+                                         this->U_solver, local_row_perm,
+                                         local_inv_row_perm, perm_sol.get());
         // local_solution->copy_from(perm_sol.get());
-        local_inv_perm->apply(perm_sol.get(), local_solution.get());
-
+        local_inv_col_perm->apply(perm_sol.get(), local_solution.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
         SolverTools::solve_iterative_ginkgo(settings, metadata, this->solver,

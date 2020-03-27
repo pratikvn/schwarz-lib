@@ -194,8 +194,7 @@ void SchwarzBase<ValueType, IndexType>::initialize()
     // Setup the local matrices on each of the subddomains.
     this->setup_local_matrices(this->settings, this->metadata,
                                this->partition_indices, this->global_matrix,
-                               this->local_matrix, this->interface_matrix,
-                               this->local_perm, this->local_inv_perm);
+                               this->local_matrix, this->interface_matrix);
     // Debug to print matrices.
     if (settings.print_matrices && settings.executor_string != "cuda") {
         Utils<ValueType, IndexType>::print_matrix(
@@ -212,8 +211,9 @@ void SchwarzBase<ValueType, IndexType>::initialize()
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
         this->settings, metadata, this->local_matrix, this->triangular_factor_l,
-        this->triangular_factor_u, this->local_perm, this->local_inv_perm,
-        this->local_rhs);
+        this->triangular_factor_u, this->local_row_perm,
+        this->local_inv_row_perm, this->local_col_perm,
+        this->local_inv_col_perm, this->local_rhs);
 
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
@@ -258,8 +258,7 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     // Setup the local matrices on each of the subddomains.
     this->setup_local_matrices(this->settings, this->metadata,
                                this->partition_indices, this->global_matrix,
-                               this->local_matrix, this->interface_matrix,
-                               this->local_perm, this->local_inv_perm);
+                               this->local_matrix, this->interface_matrix);
     // Debug to print matrices.
     if (settings.print_matrices && settings.executor_string != "cuda") {
         Utils<ValueType, IndexType>::print_matrix(
@@ -276,8 +275,9 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
         this->settings, metadata, this->local_matrix, this->triangular_factor_l,
-        this->triangular_factor_u, this->local_perm, this->local_inv_perm,
-        this->local_rhs);
+        this->triangular_factor_u, this->local_row_perm,
+        this->local_inv_row_perm, this->local_col_perm,
+        this->local_inv_col_perm, this->local_rhs);
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
@@ -402,7 +402,8 @@ void SchwarzBase<ValueType, IndexType>::run(
                 (Solve<ValueType, IndexType>::local_solve(
                     settings, metadata, this->local_matrix,
                     this->triangular_factor_l, this->triangular_factor_u,
-                    this->local_perm, this->local_inv_perm, init_guess,
+                    this->local_row_perm, this->local_inv_row_perm,
+                    this->local_col_perm, this->local_inv_col_perm, init_guess,
                     this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
             // init_guess->copy_from(this->local_solution.get());

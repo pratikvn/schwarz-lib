@@ -136,14 +136,24 @@ public:
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> local_matrix;
 
     /**
-     * The local subdomain permutation matrix/array.
+     * The local subdomain row permutation matrix/array.
      */
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> local_perm;
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> local_row_perm;
 
     /**
-     * The local subdomain inverse permutation matrix/array.
+     * The local subdomain inverse row permutation matrix/array.
      */
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> local_inv_perm;
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> local_inv_row_perm;
+
+    /**
+     * The local subdomain column permutation matrix/array.
+     */
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> local_col_perm;
+
+    /**
+     * The local subdomain inverse column permutation matrix/array.
+     */
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> local_inv_col_perm;
 
     /**
      * The local lower triangular factor used for the triangular solves.

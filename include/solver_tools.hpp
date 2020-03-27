@@ -84,10 +84,10 @@ void solve_direct_ginkgo(
     if (settings.factorization == "cholmod") {
         U_solver->apply(gko::lend(temp_rhs), gko::lend(local_solution));
     } else if (settings.factorization == "umfpack") {
-        // U_solver->apply(gko::lend(temp_rhs), gko::lend(local_solution));
-        local_col_perm->apply(temp_rhs.get(), local_solution);
-        U_solver->apply(gko::lend(local_solution), gko::lend(temp_rhs));
-        local_inv_col_perm->apply(temp_rhs.get(), local_solution);
+        U_solver->apply(gko::lend(temp_rhs), gko::lend(local_solution));
+        // local_col_perm->apply(temp_rhs.get(), local_solution);
+        // U_solver->apply(gko::lend(local_solution), gko::lend(temp_rhs));
+        // local_inv_col_perm->apply(temp_rhs.get(), local_solution);
     }
 }
 

@@ -329,7 +329,9 @@ private:
         int nz_udiag;
         int n_row;
         int n_col;
+        int do_reciproc;
         void *numeric;
+        std::shared_ptr<gko::matrix::Dense<ValueType>> row_scale;
         int status;
         double control[UMFPACK_CONTROL];
         double info[UMFPACK_INFO];

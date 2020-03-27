@@ -174,6 +174,29 @@ void Solve<ValueType, IndexType>::compute_local_factors(
     }
 }
 
+
+template <typename ValueType, typename IndexType>
+void update_diagonals(
+    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &matrix,
+    std::vector<ValueType> &diags)
+{
+    auto num_rows = matrix->get_size()[0];
+    auto row_ptrs = matrix->get_row_ptrs();
+    auto col_idxs = matrix->get_col_idxs();
+    auto values = matrix->get_values();
+    for (auto i = 0; i < num_rows; ++i) {
+        for (auto j = row_ptrs[i]; j < row_ptrs[i + 1]; ++j) {
+            if (i == col_idxs[j]) {
+                std::cout << num_rows << " diag value at (i,j): (" << i << ","
+                          << j << ") " << values[j] << ", " << diags.data()[i]
+                          << std::endl;
+                // values[j] = diags.data()[i];
+            }
+        }
+    }
+}
+
+
 template <typename ValueType, typename IndexType>
 void Solve<ValueType, IndexType>::setup_local_solver(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
@@ -311,19 +334,21 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                 std::vector<IndexType> Li(umfpack.factor_l_nnz, 0);
                 std::vector<ValueType> Lx(umfpack.factor_l_nnz, 0);
                 std::vector<IndexType> Up(umfpack.n_col + 1, 0);
+                std::vector<ValueType> diag(umfpack.n_col, 0);
                 std::vector<IndexType> Ui(umfpack.factor_u_nnz, 0);
                 std::vector<ValueType> Ux(umfpack.factor_u_nnz, 0);
                 std::vector<IndexType> umf_row_perm(umfpack.n_row, 0);
                 std::vector<IndexType> umf_col_perm(umfpack.n_col, 0);
-
+                umfpack.row_scale = gko::matrix::Dense<ValueType>::create(
+                    settings.executor->get_master(),
+                    gko::dim<2>(1, umfpack.n_row));
                 SCHWARZ_ASSERT_NO_UMFPACK_ERRORS(umfpack_di_get_numeric(
                     (int *)Lp.data(), (int *)Li.data(), (double *)Lx.data(),
                     (int *)Up.data(), (int *)Ui.data(), (double *)Ux.data(),
                     (int *)umf_row_perm.data(), (int *)umf_col_perm.data(),
-                    (double *)NULL, (int *)NULL, (double *)NULL,
+                    (double *)diag.data(), &umfpack.do_reciproc,
+                    (double *)umfpack.row_scale->get_values(),
                     umfpack.numeric));
-
-
                 local_row_perm = perm_type::create(
                     settings.executor, gko::dim<2>(num_rows),
                     gko::Array<IndexType>(settings.executor,
@@ -363,7 +388,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                                           Lp.data(),
                                           Lp.data() + umfpack.n_row + 1));
 
-                triangular_factor_u = mtx::create(
+                auto temp_u = mtx::create(
                     settings.executor, gko::dim<2>(umfpack.n_row),
                     gko::Array<ValueType>(settings.executor->get_master(),
                                           Ux.data(),
@@ -374,11 +399,10 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                     gko::Array<IndexType>(settings.executor->get_master(),
                                           Up.data(),
                                           Up.data() + umfpack.n_row + 1));
-                // triangular_factor_u =
-                //   mtx::create(settings.executor->get_master(),
-                //               gko::dim<2>(num_rows), umfpack.factor_l_nnz);
-                // triangular_factor_u->copy_from(
-                //     triangular_factor_l->transpose());
+                triangular_factor_u =
+                    mtx::create(settings.executor->get_master(),
+                                gko::dim<2>(num_rows), umfpack.factor_l_nnz);
+                triangular_factor_u->copy_from(temp_u->transpose());
 #endif
             }
 
@@ -551,12 +575,15 @@ void Solve<ValueType, IndexType>::local_solve(
                Settings::local_solver_settings::direct_solver_ginkgo) {
         auto perm_sol = gko::matrix::Dense<ValueType>::create(
             settings.executor, local_solution->get_size());
-        local_col_perm->apply(local_solution.get(), perm_sol.get());
-        SolverTools::solve_direct_ginkgo(settings, metadata, this->L_solver,
-                                         this->U_solver, local_row_perm,
-                                         local_inv_row_perm, perm_sol.get());
+        local_row_perm->apply(local_solution.get(), perm_sol.get());
+        // local_col_perm->apply(perm_sol.get(), local_solution.get());
+        SolverTools::solve_direct_ginkgo(
+            settings, metadata, this->L_solver, this->U_solver, local_col_perm,
+            // local_inv_row_perm, local_solution.get());
+            local_inv_col_perm, perm_sol.get());
         // local_solution->copy_from(perm_sol.get());
-        local_inv_col_perm->apply(perm_sol.get(), local_solution.get());
+        // local_inv_col_perm->apply(local_solution.get(), perm_sol.get());
+        local_inv_row_perm->apply(perm_sol.get(), local_solution.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
         SolverTools::solve_iterative_ginkgo(settings, metadata, this->solver,

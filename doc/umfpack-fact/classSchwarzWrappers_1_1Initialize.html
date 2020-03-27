@@ -101,9 +101,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a33d71c2f18d2f23057091e3f95e52532"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1Initialize.html#a33d71c2f18d2f23057091e3f95e52532">setup_vectors</a> (const <a class="el" href="structSchwarzWrappers_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structSchwarzWrappers_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::vector&lt; ValueType &gt; &amp;rhs, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;local_rhs, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_rhs, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;local_solution, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution)</td></tr>
 <tr class="memdesc:a33d71c2f18d2f23057091e3f95e52532"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup the vectors with default values and allocate mameory if not allocated.  <a href="#a33d71c2f18d2f23057091e3f95e52532">More...</a><br /></td></tr>
 <tr class="separator:a33d71c2f18d2f23057091e3f95e52532"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67029ec6f266735f579b219402bf317a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1Initialize.html#a67029ec6f266735f579b219402bf317a">setup_local_matrices</a> (<a class="el" href="structSchwarzWrappers_1_1Settings.html">Settings</a> &amp;settings, <a class="el" href="structSchwarzWrappers_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::vector&lt; unsigned int &gt; &amp;<a class="el" href="classSchwarzWrappers_1_1Initialize.html#a9ad20884882db7c28560d9f9755e571e">partition_indices</a>, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;global_matrix, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;local_matrix, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;interface_matrix, std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt;&gt; &amp;local_perm, std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt;&gt; &amp;local_inv_perm)=0</td></tr>
-<tr class="memdesc:a67029ec6f266735f579b219402bf317a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the local and the interface matrices from the global matrix and the partition indices.  <a href="#a67029ec6f266735f579b219402bf317a">More...</a><br /></td></tr>
-<tr class="separator:a67029ec6f266735f579b219402bf317a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ddd2c8688b884b62f74f390b4114377"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1Initialize.html#a7ddd2c8688b884b62f74f390b4114377">setup_local_matrices</a> (<a class="el" href="structSchwarzWrappers_1_1Settings.html">Settings</a> &amp;settings, <a class="el" href="structSchwarzWrappers_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::vector&lt; unsigned int &gt; &amp;<a class="el" href="classSchwarzWrappers_1_1Initialize.html#a9ad20884882db7c28560d9f9755e571e">partition_indices</a>, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;global_matrix, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;local_matrix, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;interface_matrix)=0</td></tr>
+<tr class="memdesc:a7ddd2c8688b884b62f74f390b4114377"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the local and the interface matrices from the global matrix and the partition indices.  <a href="#a7ddd2c8688b884b62f74f390b4114377">More...</a><br /></td></tr>
+<tr class="separator:a7ddd2c8688b884b62f74f390b4114377"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structSchwarzWrappers_1_1Settings"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structSchwarzWrappers_1_1Settings')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structSchwarzWrappers_1_1Settings.html">SchwarzWrappers::Settings</a></td></tr>
 <tr class="memitem:a72edc489ebfe5ad7e8c2bb8424860f2a inherit pub_methods_structSchwarzWrappers_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="a72edc489ebfe5ad7e8c2bb8424860f2a"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Settings</b> (std::string <a class="el" href="structSchwarzWrappers_1_1Settings.html#a737e5de9833ab6f27606103b907ec06e">executor_string</a>=&quot;reference&quot;)</td></tr>
@@ -475,8 +475,8 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
 
 </div>
 </div>
-<a id="a67029ec6f266735f579b219402bf317a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a67029ec6f266735f579b219402bf317a">&#9670;&nbsp;</a></span>setup_local_matrices()</h2>
+<a id="a7ddd2c8688b884b62f74f390b4114377"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ddd2c8688b884b62f74f390b4114377">&#9670;&nbsp;</a></span>setup_local_matrices()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -520,19 +520,7 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;&#160;</td>
-          <td class="paramname"><em>interface_matrix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt;&gt; &amp;&#160;</td>
-          <td class="paramname"><em>local_perm</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt;&gt; &amp;&#160;</td>
-          <td class="paramname"><em>local_inv_perm</em>&#160;</td>
+          <td class="paramname"><em>interface_matrix</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -561,7 +549,7 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classSchwarzWrappers_1_1SolverRAS.html#ab44245cb5dede72cd11502cf59593626">SchwarzWrappers::SolverRAS&lt; ValueType, IndexType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classSchwarzWrappers_1_1SolverRAS.html#a089d372b0b3d9829eb64f2394c035e8b">SchwarzWrappers::SolverRAS&lt; ValueType, IndexType &gt;</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a048a3a63407befc9aed09ceb0e4d0709">SchwarzWrappers::SchwarzBase&lt; ValueType, IndexType &gt;::initialize()</a>.</p>
 
@@ -645,8 +633,8 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li><a class="el" href="include_2initialization_8hpp_source.html">initialization.hpp (ba4de8c)</a></li>
-<li>/home/runner/work/schwarz-lib/schwarz-lib/source/initialization.cpp (ba4de8c)</li>
+<li><a class="el" href="include_2initialization_8hpp_source.html">initialization.hpp (98a7980)</a></li>
+<li>/home/runner/work/schwarz-lib/schwarz-lib/source/initialization.cpp (98a7980)</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

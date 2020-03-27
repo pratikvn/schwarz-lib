@@ -88,9 +88,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4bd8f19ab2a959f1d56bac3939aa5f5f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1SolverRAS.html#a4bd8f19ab2a959f1d56bac3939aa5f5f">SolverRAS</a> (<a class="el" href="structSchwarzWrappers_1_1Settings.html">Settings</a> &amp;settings, <a class="el" href="structSchwarzWrappers_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata)</td></tr>
 <tr class="memdesc:a4bd8f19ab2a959f1d56bac3939aa5f5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor that takes in the user settings and a metadata struct containing the solver metadata.  <a href="#a4bd8f19ab2a959f1d56bac3939aa5f5f">More...</a><br /></td></tr>
 <tr class="separator:a4bd8f19ab2a959f1d56bac3939aa5f5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab44245cb5dede72cd11502cf59593626"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1SolverRAS.html#ab44245cb5dede72cd11502cf59593626">setup_local_matrices</a> (<a class="el" href="structSchwarzWrappers_1_1Settings.html">Settings</a> &amp;settings, <a class="el" href="structSchwarzWrappers_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::vector&lt; unsigned int &gt; &amp;<a class="el" href="classSchwarzWrappers_1_1Initialize.html#a9ad20884882db7c28560d9f9755e571e">partition_indices</a>, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;<a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a7dc6207713163fb9298ff2667da9a11f">global_matrix</a>, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;<a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#acb13eabad587af925145b408946b8c2d">local_matrix</a>, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;<a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#aea6575d93a87dec1f97ef2f40ff87199">interface_matrix</a>, std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt;&gt; &amp;<a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a8cd51eb96cdf7f84de772fda54566a09">local_perm</a>, std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt;&gt; &amp;<a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#ae8862a67facde156ffef342410f979ba">local_inv_perm</a>) override</td></tr>
-<tr class="memdesc:ab44245cb5dede72cd11502cf59593626"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the local and the interface matrices from the global matrix and the partition indices.  <a href="#ab44245cb5dede72cd11502cf59593626">More...</a><br /></td></tr>
-<tr class="separator:ab44245cb5dede72cd11502cf59593626"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a089d372b0b3d9829eb64f2394c035e8b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1SolverRAS.html#a089d372b0b3d9829eb64f2394c035e8b">setup_local_matrices</a> (<a class="el" href="structSchwarzWrappers_1_1Settings.html">Settings</a> &amp;settings, <a class="el" href="structSchwarzWrappers_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::vector&lt; unsigned int &gt; &amp;<a class="el" href="classSchwarzWrappers_1_1Initialize.html#a9ad20884882db7c28560d9f9755e571e">partition_indices</a>, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;<a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a7dc6207713163fb9298ff2667da9a11f">global_matrix</a>, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;<a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#acb13eabad587af925145b408946b8c2d">local_matrix</a>, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;<a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#aea6575d93a87dec1f97ef2f40ff87199">interface_matrix</a>) override</td></tr>
+<tr class="memdesc:a089d372b0b3d9829eb64f2394c035e8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the local and the interface matrices from the global matrix and the partition indices.  <a href="#a089d372b0b3d9829eb64f2394c035e8b">More...</a><br /></td></tr>
+<tr class="separator:a089d372b0b3d9829eb64f2394c035e8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a552e1216220e2c92a736f33d73e37756"><td class="memItemLeft" align="right" valign="top"><a id="a552e1216220e2c92a736f33d73e37756"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1SolverRAS.html#a552e1216220e2c92a736f33d73e37756">setup_comm_buffers</a> () override</td></tr>
 <tr class="memdesc:a552e1216220e2c92a736f33d73e37756"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the communication buffers needed for the boundary exchange. <br /></td></tr>
@@ -185,14 +185,22 @@ Additional Inherited Members</h2></td></tr>
 std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#acb13eabad587af925145b408946b8c2d">local_matrix</a></td></tr>
 <tr class="memdesc:acb13eabad587af925145b408946b8c2d inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local subdomain matrix. <br /></td></tr>
 <tr class="separator:acb13eabad587af925145b408946b8c2d inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8cd51eb96cdf7f84de772fda54566a09 inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memItemLeft" align="right" valign="top"><a id="a8cd51eb96cdf7f84de772fda54566a09"></a>
-std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a8cd51eb96cdf7f84de772fda54566a09">local_perm</a></td></tr>
-<tr class="memdesc:a8cd51eb96cdf7f84de772fda54566a09 inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local subdomain permutation matrix/array. <br /></td></tr>
-<tr class="separator:a8cd51eb96cdf7f84de772fda54566a09 inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8862a67facde156ffef342410f979ba inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memItemLeft" align="right" valign="top"><a id="ae8862a67facde156ffef342410f979ba"></a>
-std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#ae8862a67facde156ffef342410f979ba">local_inv_perm</a></td></tr>
-<tr class="memdesc:ae8862a67facde156ffef342410f979ba inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local subdomain inverse permutation matrix/array. <br /></td></tr>
-<tr class="separator:ae8862a67facde156ffef342410f979ba inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae19a2ca95cdeaf37c20de4a54fda5788 inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memItemLeft" align="right" valign="top"><a id="ae19a2ca95cdeaf37c20de4a54fda5788"></a>
+std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#ae19a2ca95cdeaf37c20de4a54fda5788">local_row_perm</a></td></tr>
+<tr class="memdesc:ae19a2ca95cdeaf37c20de4a54fda5788 inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local subdomain row permutation matrix/array. <br /></td></tr>
+<tr class="separator:ae19a2ca95cdeaf37c20de4a54fda5788 inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b74328abc29ffd4b0f7e7fdda41692a inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memItemLeft" align="right" valign="top"><a id="a9b74328abc29ffd4b0f7e7fdda41692a"></a>
+std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a9b74328abc29ffd4b0f7e7fdda41692a">local_inv_row_perm</a></td></tr>
+<tr class="memdesc:a9b74328abc29ffd4b0f7e7fdda41692a inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local subdomain inverse row permutation matrix/array. <br /></td></tr>
+<tr class="separator:a9b74328abc29ffd4b0f7e7fdda41692a inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0112de4f0df763f43e0f9c5a455ea8d3 inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memItemLeft" align="right" valign="top"><a id="a0112de4f0df763f43e0f9c5a455ea8d3"></a>
+std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a0112de4f0df763f43e0f9c5a455ea8d3">local_col_perm</a></td></tr>
+<tr class="memdesc:a0112de4f0df763f43e0f9c5a455ea8d3 inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local subdomain column permutation matrix/array. <br /></td></tr>
+<tr class="separator:a0112de4f0df763f43e0f9c5a455ea8d3 inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5315a276cdb89315561390a600c62d8c inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memItemLeft" align="right" valign="top"><a id="a5315a276cdb89315561390a600c62d8c"></a>
+std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a5315a276cdb89315561390a600c62d8c">local_inv_col_perm</a></td></tr>
+<tr class="memdesc:a5315a276cdb89315561390a600c62d8c inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local subdomain inverse column permutation matrix/array. <br /></td></tr>
+<tr class="separator:a5315a276cdb89315561390a600c62d8c inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f605d87eb6f7fd7df7084a9e8fec15b inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="memItemLeft" align="right" valign="top"><a id="a1f605d87eb6f7fd7df7084a9e8fec15b"></a>
 std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a1f605d87eb6f7fd7df7084a9e8fec15b">triangular_factor_l</a></td></tr>
 <tr class="memdesc:a1f605d87eb6f7fd7df7084a9e8fec15b inherit pub_attribs_classSchwarzWrappers_1_1SchwarzBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local lower triangular factor used for the triangular solves. <br /></td></tr>
@@ -536,8 +544,8 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
 
 </div>
 </div>
-<a id="ab44245cb5dede72cd11502cf59593626"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab44245cb5dede72cd11502cf59593626">&#9670;&nbsp;</a></span>setup_local_matrices()</h2>
+<a id="a089d372b0b3d9829eb64f2394c035e8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a089d372b0b3d9829eb64f2394c035e8b">&#9670;&nbsp;</a></span>setup_local_matrices()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -581,19 +589,7 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;&#160;</td>
-          <td class="paramname"><em>interface_matrix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt;&gt; &amp;&#160;</td>
-          <td class="paramname"><em>local_perm</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::shared_ptr&lt; gko::matrix::Permutation&lt; IndexType &gt;&gt; &amp;&#160;</td>
-          <td class="paramname"><em>local_inv_perm</em>&#160;</td>
+          <td class="paramname"><em>interface_matrix</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -622,7 +618,7 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classSchwarzWrappers_1_1Initialize.html#a67029ec6f266735f579b219402bf317a">SchwarzWrappers::Initialize&lt; ValueType, IndexType &gt;</a>.</p>
+<p>Implements <a class="el" href="classSchwarzWrappers_1_1Initialize.html#a7ddd2c8688b884b62f74f390b4114377">SchwarzWrappers::Initialize&lt; ValueType, IndexType &gt;</a>.</p>
 
 <p class="reference">References <a class="el" href="structSchwarzWrappers_1_1Metadata.html#a2ace7a22b6cdab5ec94caa29e570f15c">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::comm_size</a>, <a class="el" href="structSchwarzWrappers_1_1Settings.html#a5fef952364864a479eaab9e44d99b525">SchwarzWrappers::Settings::executor</a>, <a class="el" href="structSchwarzWrappers_1_1Metadata.html#a492432957e6db6cb4a5aa952c50b5e45">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::first_row</a>, <a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a7dc6207713163fb9298ff2667da9a11f">SchwarzWrappers::SchwarzBase&lt; ValueType, IndexType &gt;::global_matrix</a>, <a class="el" href="structSchwarzWrappers_1_1Metadata.html#ae1fffa220f515a866b9631268407ed95">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::global_size</a>, <a class="el" href="structSchwarzWrappers_1_1Metadata.html#aa12f9a6e8e1fefb40887078d7a857d97">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::global_to_local</a>, <a class="el" href="structSchwarzWrappers_1_1Metadata.html#a24ac4e79378f3913bc0ec332cff1a28c">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::i_permutation</a>, <a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#aea6575d93a87dec1f97ef2f40ff87199">SchwarzWrappers::SchwarzBase&lt; ValueType, IndexType &gt;::interface_matrix</a>, <a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#acb13eabad587af925145b408946b8c2d">SchwarzWrappers::SchwarzBase&lt; ValueType, IndexType &gt;::local_matrix</a>, <a class="el" href="structSchwarzWrappers_1_1Metadata.html#ae1b030cca7f74510b2040d1744606a51">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::local_size</a>, <a class="el" href="structSchwarzWrappers_1_1Metadata.html#a76574046d23e8f13d03e9710fe595a27">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::local_size_o</a>, <a class="el" href="structSchwarzWrappers_1_1Metadata.html#a6eab30e376a7ee881a031f7fc1df6153">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::local_size_x</a>, <a class="el" href="structSchwarzWrappers_1_1Metadata.html#ac14f658766f8e345636bc6f37379b202">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::local_to_global</a>, <a class="el" href="structSchwarzWrappers_1_1Metadata.html#a0d2e753bbdb3bf73653f5901f36a2edc">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::my_rank</a>, <a class="el" href="structSchwarzWrappers_1_1Metadata.html#aea4e5889da52417ef54fe3cad0bd547e">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::num_subdomains</a>, <a class="el" href="structSchwarzWrappers_1_1Settings.html#ab1be4bd623b4cf1c8999160e753752ff">SchwarzWrappers::Settings::overlap</a>, <a class="el" href="structSchwarzWrappers_1_1Metadata.html#ad49bbfa09a5d14231fcd10f0f4c6e278">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::overlap_row</a>, <a class="el" href="structSchwarzWrappers_1_1Metadata.html#ad15592ee4d16cbb9bd6d2eba160acca2">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::overlap_size</a>, and <a class="el" href="structSchwarzWrappers_1_1Metadata.html#a4d7e14a2b12922798de1eed07038fabb">SchwarzWrappers::Metadata&lt; ValueType, IndexType &gt;::permutation</a>.</p>
 
@@ -773,8 +769,8 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li><a class="el" href="restricted__schwarz_8hpp_source.html">restricted_schwarz.hpp (ba4de8c)</a></li>
-<li>/home/runner/work/schwarz-lib/schwarz-lib/source/restricted_schwarz.cpp (ba4de8c)</li>
+<li><a class="el" href="restricted__schwarz_8hpp_source.html">restricted_schwarz.hpp (98a7980)</a></li>
+<li>/home/runner/work/schwarz-lib/schwarz-lib/source/restricted_schwarz.cpp (98a7980)</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

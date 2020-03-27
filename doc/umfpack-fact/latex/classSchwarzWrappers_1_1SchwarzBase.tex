@@ -39,12 +39,18 @@ void \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a7f738c1b03eba45f57cf72bb123
 \mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_acb13eabad587af925145b408946b8c2d}\label{classSchwarzWrappers_1_1SchwarzBase_acb13eabad587af925145b408946b8c2d}} 
 std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_acb13eabad587af925145b408946b8c2d}{local\+\_\+matrix}
 \begin{DoxyCompactList}\small\item\em The local subdomain matrix. \end{DoxyCompactList}\item 
-\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a8cd51eb96cdf7f84de772fda54566a09}\label{classSchwarzWrappers_1_1SchwarzBase_a8cd51eb96cdf7f84de772fda54566a09}} 
-std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a8cd51eb96cdf7f84de772fda54566a09}{local\+\_\+perm}
-\begin{DoxyCompactList}\small\item\em The local subdomain permutation matrix/array. \end{DoxyCompactList}\item 
-\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_ae8862a67facde156ffef342410f979ba}\label{classSchwarzWrappers_1_1SchwarzBase_ae8862a67facde156ffef342410f979ba}} 
-std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_ae8862a67facde156ffef342410f979ba}{local\+\_\+inv\+\_\+perm}
-\begin{DoxyCompactList}\small\item\em The local subdomain inverse permutation matrix/array. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_ae19a2ca95cdeaf37c20de4a54fda5788}\label{classSchwarzWrappers_1_1SchwarzBase_ae19a2ca95cdeaf37c20de4a54fda5788}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_ae19a2ca95cdeaf37c20de4a54fda5788}{local\+\_\+row\+\_\+perm}
+\begin{DoxyCompactList}\small\item\em The local subdomain row permutation matrix/array. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a9b74328abc29ffd4b0f7e7fdda41692a}\label{classSchwarzWrappers_1_1SchwarzBase_a9b74328abc29ffd4b0f7e7fdda41692a}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a9b74328abc29ffd4b0f7e7fdda41692a}{local\+\_\+inv\+\_\+row\+\_\+perm}
+\begin{DoxyCompactList}\small\item\em The local subdomain inverse row permutation matrix/array. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a0112de4f0df763f43e0f9c5a455ea8d3}\label{classSchwarzWrappers_1_1SchwarzBase_a0112de4f0df763f43e0f9c5a455ea8d3}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a0112de4f0df763f43e0f9c5a455ea8d3}{local\+\_\+col\+\_\+perm}
+\begin{DoxyCompactList}\small\item\em The local subdomain column permutation matrix/array. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a5315a276cdb89315561390a600c62d8c}\label{classSchwarzWrappers_1_1SchwarzBase_a5315a276cdb89315561390a600c62d8c}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a5315a276cdb89315561390a600c62d8c}{local\+\_\+inv\+\_\+col\+\_\+perm}
+\begin{DoxyCompactList}\small\item\em The local subdomain inverse column permutation matrix/array. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{classSchwarzWrappers_1_1SchwarzBase_a1f605d87eb6f7fd7df7084a9e8fec15b}\label{classSchwarzWrappers_1_1SchwarzBase_a1f605d87eb6f7fd7df7084a9e8fec15b}} 
 std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$ $>$ \hyperlink{classSchwarzWrappers_1_1SchwarzBase_a1f605d87eb6f7fd7df7084a9e8fec15b}{triangular\+\_\+factor\+\_\+l}
 \begin{DoxyCompactList}\small\item\em The local lower triangular factor used for the triangular solves. \end{DoxyCompactList}\item 
@@ -173,11 +179,11 @@ The function that runs the actual solver and obtains the final solution.
 \end{DoxyParams}
 
 
-References Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::exchange\+\_\+boundary(), Schwarz\+Wrappers\+::\+Settings\+::executor, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+matrix, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+rhs, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::interface\+\_\+matrix, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+inv\+\_\+perm, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+matrix, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+perm, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+rhs, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+solution, Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows(), Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::triangular\+\_\+factor\+\_\+l, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::triangular\+\_\+factor\+\_\+u, and Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::update\+\_\+boundary().
+References Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::exchange\+\_\+boundary(), Schwarz\+Wrappers\+::\+Settings\+::executor, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+matrix, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+rhs, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::interface\+\_\+matrix, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+col\+\_\+perm, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+inv\+\_\+col\+\_\+perm, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+inv\+\_\+row\+\_\+perm, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+matrix, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+rhs, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+row\+\_\+perm, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+solution, Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows(), Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::triangular\+\_\+factor\+\_\+l, Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::triangular\+\_\+factor\+\_\+u, and Schwarz\+Wrappers\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::update\+\_\+boundary().
 
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-schwarz\+\_\+base.\+hpp (ba4de8c)\item 
-/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/schwarz\+\_\+base.\+cpp (ba4de8c)\end{DoxyCompactItemize}
+schwarz\+\_\+base.\+hpp (98a7980)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/schwarz\+\_\+base.\+cpp (98a7980)\end{DoxyCompactItemize}

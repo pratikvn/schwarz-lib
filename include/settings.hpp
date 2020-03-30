@@ -108,7 +108,12 @@ struct Settings {
     gko::int32 overlap = MINIMAL_OVERLAP;
 
     /**
-     * Flag if the laplcian matrix should be generated within the library. If
+     * The string that contains the matrix file name to read from .
+     */
+    std::string matrix_filename = "null";
+
+    /**
+     * Flag if the laplacian matrix should be generated within the library. If
      * false, an external matrix and rhs needs to be provided
      */
     bool explicit_laplacian = true;

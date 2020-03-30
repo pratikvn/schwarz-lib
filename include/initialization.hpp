@@ -91,21 +91,22 @@ public:
      */
     void generate_rhs(std::vector<ValueType> &rhs);
 
-#if SCHW_HAVE_DEALII
-    void setup_global_matrix(
-        const dealii::SparseMatrix<ValueType> &matrix,
-        std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix);
-#endif
-
     /**
      * Generates the 2D global laplacian matrix.
      *
      * @param oned_laplacian_size  The size of the one d laplacian grid.
      * @param global_matrix  The global matrix.
      */
-    void setup_global_matrix_laplacian(
-        const gko::size_type &oned_laplacian_size,
+#if SCHW_HAVE_DEALII
+    void setup_global_matrix(
+        const std::string &filename, const gko::size_type &oned_laplacian_size,
+        const dealii::SparseMatrix<ValueType> &matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix);
+#else
+    void setup_global_matrix(
+        const std::string &filename, const gko::size_type &oned_laplacian_size,
+        std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix);
+#endif
 
     /**
      * The partitioning function. Allows the partition of the global matrix

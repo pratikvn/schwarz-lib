@@ -104,11 +104,60 @@ SchwarzBase<ValueType, IndexType>::SchwarzBase(
                 ->get_exec_info();
         exec_info->bind_to_core(my_local_rank);
     }
+}
 
+
+template <typename ValueType, typename IndexType>
+void SchwarzBase<ValueType, IndexType>::initialize(
+#if SCHW_HAVE_DEALII
+    const dealii::SparseMatrix<ValueType> &matrix,
+    const dealii::Vector<ValueType> &system_rhs
+#else
+)
+#endif
+{
+    using vec_vtype = gko::matrix::Dense<ValueType>;
+    using vec_itype = gko::Array<IndexType>;
+    using vec_vecshared = gko::Array<IndexType *>;
+    // Setup the global matrix
+    if (settings.explicit_laplacian || settings.matrix_filename != "null") {
+        Initialize<ValueType, IndexType>::setup_global_matrix(
+            settings.matrix_filename, metadata.oned_laplacian_size,
+            this->global_matrix);
+    } else {
+#if SCHW_HAVE_DEALII
+        Initialize<ValueType, IndexType>::setup_global_matrix(
+            matrix, this->global_matrix);
+#else
+        std::cerr << " Explicit laplacian needs to be enabled with the "
+                     "--explicit_laplacian flag or deal.ii support needs to be "
+                     "enabled to generate the matrices"
+                  << std::endl;
+        std::exit(-1);
+#endif
+    }
+    this->metadata.global_size = this->global_matrix->get_size()[0];
     auto my_rank = this->metadata.my_rank;
     auto comm_size = this->metadata.comm_size;
     auto num_subdomains = this->metadata.num_subdomains;
     auto global_size = this->metadata.global_size;
+
+    // Setup the right hand side vector.
+    std::vector<ValueType> rhs(metadata.global_size, 1.0);
+    if (settings.enable_random_rhs && settings.explicit_laplacian) {
+        if (metadata.my_rank == 0) {
+            Initialize<ValueType, IndexType>::generate_rhs(rhs);
+        }
+    }
+#if SCHW_HAVE_DEALII
+    if (metadata.my_rank == 0 && !settings.explicit_laplacian) {
+        std::copy(system_rhs.begin(), system_rhs.begin() + metadata.global_size,
+                  rhs.begin());
+    }
+#endif
+    auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
+    MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0, MPI_COMM_WORLD);
+
 
     // Some arrays for partitioning and local matrix creation.
     metadata.first_row = std::shared_ptr<vec_itype>(
@@ -157,99 +206,6 @@ SchwarzBase<ValueType, IndexType>::SchwarzBase(
         new vec_itype(settings.executor->get_master(), temp.begin(),
                       temp.end()),
         std::default_delete<vec_itype>());
-}
-
-
-template <typename ValueType, typename IndexType>
-void SchwarzBase<ValueType, IndexType>::initialize()
-{
-    using vec_vtype = gko::matrix::Dense<ValueType>;
-
-    // Setup the right hand side vector.
-    std::vector<ValueType> rhs(metadata.global_size, 1.0);
-    if (settings.enable_random_rhs && settings.explicit_laplacian) {
-        if (metadata.my_rank == 0) {
-            Initialize<ValueType, IndexType>::generate_rhs(rhs);
-        }
-        auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
-        MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
-                  MPI_COMM_WORLD);
-    }
-
-    // Setup the global matrix
-    if (settings.explicit_laplacian) {
-        Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
-            metadata.oned_laplacian_size, this->global_matrix);
-    } else {
-        std::cerr << " Explicit laplacian needs to be enabled with the "
-                     "--explicit_laplacian flag or deal.ii support needs to be "
-                     "enabled to generate the matrices"
-                  << std::endl;
-        std::exit(-1);
-    }
-    // Partition the global matrix.
-    Initialize<ValueType, IndexType>::partition(
-        settings, metadata, this->global_matrix, this->partition_indices);
-
-    // Setup the local matrices on each of the subddomains.
-    this->setup_local_matrices(this->settings, this->metadata,
-                               this->partition_indices, this->global_matrix,
-                               this->local_matrix, this->interface_matrix);
-    // Debug to print matrices.
-    if (settings.print_matrices && settings.executor_string != "cuda") {
-        Utils<ValueType, IndexType>::print_matrix(
-            this->local_matrix.get(), metadata.my_rank, "local_mat");
-        Utils<ValueType, IndexType>::print_matrix(this->interface_matrix.get(),
-                                                  metadata.my_rank, "int_mat");
-    }
-
-    // Setup the local vectors on each of the subddomains.
-    Initialize<ValueType, IndexType>::setup_vectors(
-        this->settings, this->metadata, rhs, this->local_rhs, this->global_rhs,
-        this->local_solution, this->global_solution);
-
-    // Setup the local solver on each of the subddomains.
-    Solve<ValueType, IndexType>::setup_local_solver(
-        this->settings, metadata, this->local_matrix, this->triangular_factor_l,
-        this->triangular_factor_u, this->local_row_perm,
-        this->local_inv_row_perm, this->local_col_perm,
-        this->local_inv_col_perm, this->local_rhs);
-
-    // Setup the communication buffers on each of the subddomains.
-    this->setup_comm_buffers();
-}
-
-#if SCHW_HAVE_DEALII
-template <typename ValueType, typename IndexType>
-void SchwarzBase<ValueType, IndexType>::initialize(
-    const dealii::SparseMatrix<ValueType> &matrix,
-    const dealii::Vector<ValueType> &system_rhs)
-{
-    using vec_vtype = gko::matrix::Dense<ValueType>;
-
-    // Setup the right hand side vector.
-    std::vector<ValueType> rhs(metadata.global_size, 1.0);
-    if (settings.enable_random_rhs && settings.explicit_laplacian) {
-        if (metadata.my_rank == 0) {
-            Initialize<ValueType, IndexType>::generate_rhs(rhs);
-        }
-        auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
-        MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
-                  MPI_COMM_WORLD);
-    }
-    if (metadata.my_rank == 0 && !settings.explicit_laplacian) {
-        std::copy(system_rhs.begin(), system_rhs.begin() + metadata.global_size,
-                  rhs.begin());
-    }
-
-    // Setup the global matrix
-    if (settings.explicit_laplacian) {
-        Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
-            metadata.oned_laplacian_size, this->global_matrix);
-    } else {
-        Initialize<ValueType, IndexType>::setup_global_matrix(
-            matrix, this->global_matrix);
-    }
 
     // Partition the global matrix.
     Initialize<ValueType, IndexType>::partition(
@@ -281,7 +237,6 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
-#endif
 
 
 template <typename ValueType, typename IndexType>
@@ -336,17 +291,20 @@ void SchwarzBase<ValueType, IndexType>::run(
     std::shared_ptr<gko::matrix::Dense<ValueType>> &solution)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
+
+    solution = vec_vtype::create(settings.executor->get_master(),
+                                 gko::dim<2>(this->metadata.global_size, 1));
     // The main solution vector
     std::shared_ptr<vec_vtype> solution_vector = vec_vtype::create(
-        settings.executor, gko::dim<2>(metadata.global_size, 1));
+        this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
     // A temp local solution
-    std::shared_ptr<vec_vtype> init_guess =
-        vec_vtype::create(settings.executor, this->local_solution->get_size());
+    std::shared_ptr<vec_vtype> init_guess = vec_vtype::create(
+        this->settings.executor, this->local_solution->get_size());
     // A global gathered solution of the previous iteration.
     std::shared_ptr<vec_vtype> global_old_solution = vec_vtype::create(
-        settings.executor, gko::dim<2>(metadata.global_size, 1));
+        settings.executor, gko::dim<2>(this->metadata.global_size, 1));
     // Setup the windows for the onesided communication.
-    this->setup_windows(settings, metadata, solution_vector);
+    this->setup_windows(this->settings, this->metadata, solution_vector);
 
     const auto solver_settings =
         (Settings::local_solver_settings::direct_solver_cholmod |

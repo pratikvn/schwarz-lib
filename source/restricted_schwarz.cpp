@@ -133,6 +133,7 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
         auto gmat_temp = mtx::create(settings.executor->get_master(),
                                      global_matrix->get_size(),
                                      global_matrix->get_num_stored_elements());
+
         auto nnz = 0;
         gmat_temp->get_row_ptrs()[0] = 0;
         for (auto row = 0; row < metadata.global_size; ++row) {

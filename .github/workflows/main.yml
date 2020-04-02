@@ -13,13 +13,14 @@ jobs:
     - name: install-mpi
       run: |
         sudo apt-get update
-        sudo apt-get -y install mpich
+        sudo apt-get -y install mpich libboost-dev
     - name: info
       run: |
         g++ -v
         export MPI_DIR=$(which mpicxx)
         echo $MPI_DIR
         mpiexec --version
+        dpkg -s libboost-dev | grep 'Version'
         cmake --version
     - name: install-ginkgo
       run: |
@@ -54,7 +55,7 @@ jobs:
     - name: install-mpi
       run: |
         sudo apt-get update
-        sudo apt-get -y install mpich
+        sudo apt-get -y install mpich libboost-dev
     - name: install-cuda
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin

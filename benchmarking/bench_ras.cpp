@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 DEFINE_bool(debug, false, "Enable some possibly expensive debug checks");
+DEFINE_bool(non_symmetric_matrix, false, "The matrix is non-symmetric");
 DEFINE_uint32(num_iters, 100, "Number of Schwarz iterations");
 DEFINE_double(set_tol, 1e-6, "Tolerance for the Schwarz solver");
 DEFINE_double(local_tol, 1e-12, "Tolerance for the local solver");
@@ -349,6 +350,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     // General solver settings
     metadata.local_solver_tolerance = FLAGS_local_tol;
     settings.use_precond = FLAGS_enable_local_precond;
+    settings.non_symmetric_matrix = FLAGS_non_symmetric_matrix;
     metadata.precond_max_block_size = FLAGS_precond_max_block_size;
     settings.matrix_filename = FLAGS_matrix_filename;
     settings.explicit_laplacian = FLAGS_explicit_laplacian;

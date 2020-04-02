@@ -82,7 +82,6 @@ void Solve<ValueType, IndexType>::compute_local_factors(
     auto temp_local_matrix = mtx::create(settings.executor->get_master());
     // Need to copy the matrix back to the CPU for the factorization.
     temp_local_matrix->copy_from(gko::lend(local_matrix));
-    temp_local_matrix->sort_by_column_index();
     auto num_rows = temp_local_matrix->get_size()[0];
     auto num_nonzeros = temp_local_matrix->get_const_row_ptrs()[num_rows];
 
@@ -187,10 +186,7 @@ void update_diagonals(
     for (auto i = 0; i < num_rows; ++i) {
         for (auto j = row_ptrs[i]; j < row_ptrs[i + 1]; ++j) {
             if (i == col_idxs[j]) {
-                std::cout << num_rows << " diag value at (i,j): (" << i << ","
-                          << j << ") " << values[j] << ", " << diags.data()[i]
-                          << std::endl;
-                // values[j] = diags.data()[i];
+                values[j] = diags.data()[i];
             }
         }
     }
@@ -327,6 +323,13 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         (IndexType *)(cholmod.L_factor->Perm),
                         num_rows + (IndexType *)(cholmod.L_factor->Perm)),
                     gko::matrix::row_permute | gko::matrix::inverse_permute);
+                local_inv_col_perm = perm_type::create(
+                    settings.executor, gko::dim<2>(num_rows),
+                    gko::Array<IndexType>(
+                        settings.executor,
+                        (IndexType *)(cholmod.L_factor->Perm),
+                        num_rows + (IndexType *)(cholmod.L_factor->Perm)),
+                    gko::matrix::row_permute | gko::matrix::inverse_permute);
 #endif
             } else if (settings.factorization == "umfpack") {
 #if (SCHW_HAVE_UMFPACK)
@@ -365,8 +368,8 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                 local_inv_row_perm = perm_type::create(
                     settings.executor, gko::dim<2>(num_rows),
                     gko::Array<IndexType>(settings.executor,
-                                          (umf_row_perm.data()),
-                                          num_rows + (umf_row_perm.data())),
+                                          (umf_col_perm.data()),
+                                          num_rows + (umf_col_perm.data())),
                     gko::matrix::row_permute | gko::matrix::inverse_permute);
 
                 local_inv_col_perm = perm_type::create(
@@ -401,7 +404,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                                           Up.data() + umfpack.n_row + 1));
                 triangular_factor_u =
                     mtx::create(settings.executor->get_master(),
-                                gko::dim<2>(num_rows), umfpack.factor_l_nnz);
+                                gko::dim<2>(num_rows), umfpack.factor_u_nnz);
                 triangular_factor_u->copy_from(temp_u->transpose());
 #endif
             }
@@ -478,42 +481,80 @@ void Solve<ValueType, IndexType>::setup_local_solver(
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
         if (metadata.my_rank == 0) {
-            std::cout << " Local iterative solve with Ginkgo CG " << std::endl;
+            std::cout << " Local iterative solve with Ginkgo " << std::endl;
         }
-        using cg = gko::solver::Cg<ValueType>;
-        using bj = gko::preconditioner::Jacobi<ValueType, IndexType>;
-        // Setup the Ginkgo iterative CG solver.
-        if (settings.use_precond) {
-            this->solver =
-                cg::build()
-                    .with_criteria(
-                        gko::stop::Iteration::build()
-                            .with_max_iters(local_matrix->get_size()[0])
-                            .on(settings.executor),
-                        gko::stop::ResidualNormReduction<ValueType>::build()
-                            .with_reduction_factor(
-                                metadata.local_solver_tolerance)
-                            .on(settings.executor))
-                    .with_preconditioner(
-                        bj::build()
-                            .with_max_block_size(
-                                metadata.precond_max_block_size)
-                            .on(settings.executor))
-                    .on(settings.executor)
-                    ->generate(local_matrix);
+        if (settings.non_symmetric_matrix) {
+            using solver = gko::solver::Gmres<ValueType>;
+            using bj = gko::preconditioner::Jacobi<ValueType, IndexType>;
+            // Setup the Ginkgo iterative CG solver.
+            if (settings.use_precond) {
+                this->solver =
+                    solver::build()
+                        .with_criteria(
+                            gko::stop::Iteration::build()
+                                .with_max_iters(local_matrix->get_size()[0])
+                                .on(settings.executor),
+                            gko::stop::ResidualNormReduction<ValueType>::build()
+                                .with_reduction_factor(
+                                    metadata.local_solver_tolerance)
+                                .on(settings.executor))
+                        .with_preconditioner(
+                            bj::build()
+                                .with_max_block_size(
+                                    metadata.precond_max_block_size)
+                                .on(settings.executor))
+                        .on(settings.executor)
+                        ->generate(local_matrix);
+            } else {
+                this->solver =
+                    solver::build()
+                        .with_criteria(
+                            gko::stop::Iteration::build()
+                                .with_max_iters(local_matrix->get_size()[0])
+                                .on(settings.executor),
+                            gko::stop::ResidualNormReduction<ValueType>::build()
+                                .with_reduction_factor(
+                                    metadata.local_solver_tolerance)
+                                .on(settings.executor))
+                        .on(settings.executor)
+                        ->generate(local_matrix);
+            }
         } else {
-            this->solver =
-                cg::build()
-                    .with_criteria(
-                        gko::stop::Iteration::build()
-                            .with_max_iters(local_matrix->get_size()[0])
-                            .on(settings.executor),
-                        gko::stop::ResidualNormReduction<ValueType>::build()
-                            .with_reduction_factor(
-                                metadata.local_solver_tolerance)
-                            .on(settings.executor))
-                    .on(settings.executor)
-                    ->generate(local_matrix);
+            using solver = gko::solver::Cg<ValueType>;
+            using bj = gko::preconditioner::Jacobi<ValueType, IndexType>;
+            // Setup the Ginkgo iterative CG solver.
+            if (settings.use_precond) {
+                this->solver =
+                    solver::build()
+                        .with_criteria(
+                            gko::stop::Iteration::build()
+                                .with_max_iters(local_matrix->get_size()[0])
+                                .on(settings.executor),
+                            gko::stop::ResidualNormReduction<ValueType>::build()
+                                .with_reduction_factor(
+                                    metadata.local_solver_tolerance)
+                                .on(settings.executor))
+                        .with_preconditioner(
+                            bj::build()
+                                .with_max_block_size(
+                                    metadata.precond_max_block_size)
+                                .on(settings.executor))
+                        .on(settings.executor)
+                        ->generate(local_matrix);
+            } else {
+                this->solver =
+                    solver::build()
+                        .with_criteria(
+                            gko::stop::Iteration::build()
+                                .with_max_iters(local_matrix->get_size()[0])
+                                .on(settings.executor),
+                            gko::stop::ResidualNormReduction<ValueType>::build()
+                                .with_reduction_factor(
+                                    metadata.local_solver_tolerance)
+                                .on(settings.executor))
+                        .on(settings.executor)
+                        ->generate(local_matrix);
+            }
         }
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_dealii) {
@@ -576,14 +617,13 @@ void Solve<ValueType, IndexType>::local_solve(
         auto perm_sol = gko::matrix::Dense<ValueType>::create(
             settings.executor, local_solution->get_size());
         local_row_perm->apply(local_solution.get(), perm_sol.get());
-        // local_col_perm->apply(perm_sol.get(), local_solution.get());
+        // perm_sol->copy_from(local_solution.get());
         SolverTools::solve_direct_ginkgo(
             settings, metadata, this->L_solver, this->U_solver, local_col_perm,
             // local_inv_row_perm, local_solution.get());
             local_inv_col_perm, perm_sol.get());
         // local_solution->copy_from(perm_sol.get());
-        // local_inv_col_perm->apply(local_solution.get(), perm_sol.get());
-        local_inv_row_perm->apply(perm_sol.get(), local_solution.get());
+        local_inv_col_perm->apply(perm_sol.get(), local_solution.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
         SolverTools::solve_iterative_ginkgo(settings, metadata, this->solver,

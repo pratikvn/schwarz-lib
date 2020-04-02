@@ -202,11 +202,17 @@ void Initialize<ValueType, IndexType>::setup_global_matrix(
     using mtx = gko::matrix::Csr<value_type, index_type>;
     if (settings.matrix_filename != "null") {
         auto input_file = std::ifstream(filename, std::ios::in);
+        if (!input_file) {
+            std::cerr << "Could not find the file \"" << filename
+                      << "\", which is required for this test.\n";
+        }
         global_matrix =
             gko::read<mtx>(input_file, settings.executor->get_master());
         global_matrix->sort_by_column_index();
+        std::cout << "Matrix from file " << filename << std::endl;
     } else if (settings.matrix_filename == "null" &&
                settings.explicit_laplacian) {
+        std::cout << "Laplacian 2D Matrix (generated in house) " << std::endl;
         gko::size_type global_size = oned_laplacian_size * oned_laplacian_size;
 
         global_matrix = mtx::create(settings.executor->get_master(),

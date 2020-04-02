@@ -147,6 +147,8 @@ struct Settings {
     local_solver_settings local_solver =
         local_solver_settings::iterative_solver_ginkgo;
 
+    bool non_symmetric_matrix = false;
+
     /**
      * Disables the re-ordering of the matrix before computing the triangular
      * factors during the CHOLMOD factorization

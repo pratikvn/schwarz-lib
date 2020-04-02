@@ -1,4 +1,4 @@
-   %clear all
+   clear all
 % % 
 % A = delsq(numgrid('S',20));
 % N = length(A);
@@ -41,61 +41,78 @@
 % err2 = norm(abs(x_di2-x_it),2);
 % err3 = norm(abs(x_di3-x_it),2);
 
-Lmat=load("L_mat_1.csv");
-Umat=load("U_mat_1.csv");
- localmat=load("local_mat_1.csv");
- localmat1=load("local_mat_0.csv");
- intermat=load("int_mat_1.csv");
+% Lmat=load("L_mat_0.csv");
+% Umat=load("U_mat_0.csv");
+ localmat=load("local_mat_0.csv");
+%  localmat1=load("local_mat_0.csv");
+%  intermat=load("int_mat_0.csv");
 % 
-L=sparse(Lmat(:,1),Lmat(:,2),Lmat(:,3));
-U=sparse(Umat(:,1),Umat(:,2),Umat(:,3));
+% L=sparse(Lmat(:,1),Lmat(:,2),Lmat(:,3));
+% U=sparse(Umat(:,1),Umat(:,2),Umat(:,3));
  mat=sparse(localmat(:,1),localmat(:,2),localmat(:,3));
-  mat0=sparse(localmat1(:,1),localmat1(:,2),localmat1(:,3));
+%   mat0=sparse(localmat1(:,1),localmat1(:,2),localmat1(:,3));
+% 
+%  imat=sparse(intermat(:,1),intermat(:,2),intermat(:,3));
+% 
+% 
+% r=load("perm_0.csv");
+% c=load("inv_perm_0.csv");
+% ur=load("umfperm_0.csv");
+% qw=r-ur;
+% r2=r;
+% r=perm1.VarName1+1;
+% ir=perm1.VarName1+1;
+% r=r+1;
+% c=c+1;
+% ir=r;
+% ic=c;
 
- imat=sparse(intermat(:,1),intermat(:,2),intermat(:,3));
-
-
-r=load("perm_1.csv");
-%ur=load("umfperm_0.csv");
-%qw=r-ur;
-r2=r;
-%r=perm1.VarName1+1;
-%ir=perm1.VarName1+1;
-r=r+1;
-ir=r;
-for i=1:length(r)
-    ir(r(i,1)) = i;
-end
 b = rand(size(mat,1),1);
-br = b(r,1);
+
+[L,U,P,Q] = lu(mat,'vector');
+for i=1:length(P)
+    ip(P(1,i)) = i;
+end
+for i=1:length(Q)
+    iq(Q(1,i)) = i;
+end
+bp = b(P,1);
+bq = b(Q,1);
+bpq=bp(Q,1);
+bqp=bq(P,1);
+errpq = norm(abs(bpq-bqp),2);
 
 fmat = L*U;
-% fmat = fmat;
+
 subplot(2,2,1),spy(L),title('L')
 subplot(2,2,2),spy(U),title('U')
-% subplot(2,2,3),spy(L(ir,ir)*U(ir,ir)),title('L*U')
-subplot(2,2,3),spy(fmat(ir,ir)),title('L*U')
-subplot(2,2,4),spy(mat0),title('A')
-err = max(max(full(fmat(ir,ir))-full(mat)))
-% Lt = transpose(L);
-% U = transpose(U);
-% x_it = pcg(mat,b,1e-10,3000);
-% y=(L\b(r,1));
-% x_di2 = U\y;
-% x_di4 = (L\(Lt\br));
-% x_di3 = mat(r,r)\br;
-% x_di2 = x_di2(ir,1);
-% x_di3 = x_di3(ir,1);
-% x_di4 = x_di4(ir,1);
-% 
-% %err = norm(abs(x_di-x_it),2);
-% err2 = norm(abs(x_di2-x_it),2);
-% err3 = norm(abs(x_di3-x_it),2);
-% err4 = norm(abs(x_di4-x_it),2);
-% 
-% for i=1:size(U,1) 
-% diagU(i) = U(i,i);
-% end
-% for i=1:size(L,1) 
-% diagL(i) = L(i,i);
-% end
+subplot(2,2,3),spy(fmat),title('L*U')
+subplot(2,2,4),spy(mat(P,Q)),title('A')
+
+x_di2 = mat(P,Q)\bp;
+x_di2 = x_di2(iq,1); 
+x_di3 = mat\b;
+y4 = L\bp;
+x_di4 = U\y4;
+x_di4 = x_di4(iq,1);
+
+x_it = gmres(mat,b,10,1e-6,3000);
+
+err2 = norm(abs(x_di2-x_it),2);
+err3 = norm(abs(x_di3-x_it),2);
+err4 = norm(abs(x_di4-x_it),2);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

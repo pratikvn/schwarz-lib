@@ -81,14 +81,7 @@ void solve_direct_ginkgo(
     auto temp_rhs = vec::create(settings.executor, local_solution->get_size());
     L_solver->apply(gko::lend(local_solution), gko::lend(temp_rhs));
 
-    if (settings.factorization == "cholmod") {
-        U_solver->apply(gko::lend(temp_rhs), gko::lend(local_solution));
-    } else if (settings.factorization == "umfpack") {
-        U_solver->apply(gko::lend(temp_rhs), gko::lend(local_solution));
-        // local_col_perm->apply(temp_rhs.get(), local_solution);
-        // U_solver->apply(gko::lend(local_solution), gko::lend(temp_rhs));
-        // local_inv_col_perm->apply(temp_rhs.get(), local_solution);
-    }
+    U_solver->apply(gko::lend(temp_rhs), gko::lend(local_solution));
 }
 
 template <typename ValueType, typename IndexType>
@@ -120,7 +113,6 @@ void extract_local_vector(
         gko::Array<ValueType>::view(settings.executor, metadata.local_size,
                                     &(sub_vector->at(0))),
         1);
-    // TODO: GPU (DONE)
     tmp2->copy_from(gko::lend(tmp));
     settings.executor->run(GatherScatter<ValueType, IndexType>(
         true, metadata.overlap_size, metadata.overlap_row->get_data(),

@@ -207,6 +207,10 @@ void SchwarzBase<ValueType, IndexType>::initialize(
                       temp.end()),
         std::default_delete<vec_itype>());
 
+    std::cout << " HERE " << __LINE__ << " rank " << metadata.my_rank
+              << " g size " << metadata.global_size << " num nnz "
+              << this->global_matrix->get_num_stored_elements() << std::endl;
+
     // Partition the global matrix.
     Initialize<ValueType, IndexType>::partition(
         settings, metadata, this->global_matrix, this->partition_indices);

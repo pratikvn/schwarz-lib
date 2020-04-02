@@ -98,7 +98,8 @@ protected:
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.
      * @param local_matrix  The local sudomain matrix.
-     * @param triangular_factor  The triangular factor.
+     * @param triangular_factor_l  The lower triangular factor.
+     * @param triangular_factor_u  The upper triangular factor.
      * @param local_perm  The local permutation vector in the subdomain.
      * @param local_inv_perm  The local inverse permutation vector in the
      * subdomain.
@@ -113,12 +114,8 @@ protected:
             &triangular_factor_l,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &triangular_factor_u,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_row_perm,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>>
-            &local_inv_row_perm,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_col_perm,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>>
-            &local_inv_col_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs);
 
 
@@ -128,8 +125,6 @@ protected:
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.
      * @param local_matrix  The local sudomain matrix.
-     * @param local_perm  The local permutation vector in the subdomain.
-     * @param local_inv_perm  The local inverse permutation vector in the
      * subdomain.
      */
     void compute_local_factors(
@@ -144,7 +139,10 @@ protected:
      *
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.
-     * @param triangular_factor  The triangular factor.
+     * @param triangular_factor_l  The lower triangular factor.
+     * @param triangular_factor_u  The upper triangular factor.
+     * @param local_perm  The local permutation vector in the subdomain.
+     * @param local_inv_perm  The local inverse permutation vector in the
      * @param init_guess  The initial solution for the local iterative solver.
      * @param local_solution The local solution vector in the subdomain.
      */
@@ -157,12 +155,8 @@ protected:
             &triangular_factor_l,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &triangular_factor_u,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_row_perm,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>>
-            &local_inv_row_perm,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_col_perm,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>>
-            &local_inv_col_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution);
 

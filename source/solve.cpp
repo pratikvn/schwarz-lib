@@ -201,10 +201,8 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         &triangular_factor_l,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &triangular_factor_u,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_row_perm,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_row_perm,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_col_perm,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_col_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs)
 {
     using mtx = gko::matrix::Csr<ValueType, IndexType>;
@@ -309,21 +307,14 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                 triangular_factor_l->copy_from(
                     triangular_factor_u->transpose());
 
-                local_row_perm = perm_type::create(
+                local_perm = perm_type::create(
                     settings.executor, gko::dim<2>(num_rows),
                     gko::Array<IndexType>(
                         settings.executor,
                         (IndexType *)(cholmod.L_factor->Perm),
                         num_rows + (IndexType *)(cholmod.L_factor->Perm)),
                     gko::matrix::row_permute);
-                local_inv_row_perm = perm_type::create(
-                    settings.executor, gko::dim<2>(num_rows),
-                    gko::Array<IndexType>(
-                        settings.executor,
-                        (IndexType *)(cholmod.L_factor->Perm),
-                        num_rows + (IndexType *)(cholmod.L_factor->Perm)),
-                    gko::matrix::row_permute | gko::matrix::inverse_permute);
-                local_inv_col_perm = perm_type::create(
+                local_inv_perm = perm_type::create(
                     settings.executor, gko::dim<2>(num_rows),
                     gko::Array<IndexType>(
                         settings.executor,
@@ -352,35 +343,24 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                     (double *)diag.data(), &umfpack.do_reciproc,
                     (double *)umfpack.row_scale->get_values(),
                     umfpack.numeric));
-                local_row_perm = perm_type::create(
+
+                local_perm = perm_type::create(
                     settings.executor, gko::dim<2>(num_rows),
                     gko::Array<IndexType>(settings.executor,
                                           (umf_row_perm.data()),
                                           num_rows + (umf_row_perm.data())),
                     gko::matrix::row_permute);
-                local_col_perm = perm_type::create(
-                    settings.executor, gko::dim<2>(num_rows),
-                    gko::Array<IndexType>(settings.executor,
-                                          (umf_col_perm.data()),
-                                          num_rows + (umf_col_perm.data())),
-                    gko::matrix::row_permute);
-
-                local_inv_row_perm = perm_type::create(
+                local_inv_perm = perm_type::create(
                     settings.executor, gko::dim<2>(num_rows),
                     gko::Array<IndexType>(settings.executor,
                                           (umf_col_perm.data()),
                                           num_rows + (umf_col_perm.data())),
                     gko::matrix::row_permute | gko::matrix::inverse_permute);
 
-                local_inv_col_perm = perm_type::create(
-                    settings.executor, gko::dim<2>(num_rows),
-                    gko::Array<IndexType>(settings.executor,
-                                          (umf_col_perm.data()),
-                                          num_rows + (umf_col_perm.data())),
-                    gko::matrix::row_permute | gko::matrix::inverse_permute);
-
+                // The matrices can be on the CPU because the solver creates the
+                // matrix on the executor anyway.
                 triangular_factor_l = mtx::create(
-                    settings.executor, gko::dim<2>(umfpack.n_row),
+                    settings.executor->get_master(), gko::dim<2>(umfpack.n_row),
                     gko::Array<ValueType>(settings.executor->get_master(),
                                           Lx.data(),
                                           umfpack.factor_l_nnz + Lx.data()),
@@ -392,7 +372,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                                           Lp.data() + umfpack.n_row + 1));
 
                 auto temp_u = mtx::create(
-                    settings.executor, gko::dim<2>(umfpack.n_row),
+                    settings.executor->get_master(), gko::dim<2>(umfpack.n_row),
                     gko::Array<ValueType>(settings.executor->get_master(),
                                           Ux.data(),
                                           umfpack.factor_u_nnz + Ux.data()),
@@ -434,7 +414,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             if (settings.executor_string != "cuda") {
                 if (settings.debug_print) {
                     if (Utils<ValueType, IndexType>::assert_correct_permutation(
-                            local_row_perm.get())) {
+                            local_perm.get())) {
                         std::cout << " Here " << __LINE__ << " Rank "
                                   << metadata.my_rank
                                   << " Permutation is correct" << std::endl;
@@ -444,7 +424,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                                   << " Permutation is incorrect" << std::endl;
                     }
                     if (Utils<ValueType, IndexType>::assert_correct_permutation(
-                            local_inv_row_perm.get())) {
+                            local_inv_perm.get())) {
                         std::cout << " Here " << __LINE__ << " Rank "
                                   << metadata.my_rank
                                   << " Inverse Permutation is correct"
@@ -462,7 +442,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         "perm_" + std::to_string(metadata.my_rank) + ".csv";
                     file.open(fname);
                     for (auto i = 0; i < num_rows; ++i) {
-                        file << local_row_perm->get_permutation()[i] << "\n";
+                        file << local_perm->get_permutation()[i] << "\n";
                     }
                     file << std::endl;
                     file.close();
@@ -470,8 +450,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         "inv_perm_" + std::to_string(metadata.my_rank) + ".csv";
                     file.open(fname);
                     for (auto i = 0; i < num_rows; ++i) {
-                        file << local_inv_row_perm->get_permutation()[i]
-                             << "\n";
+                        file << local_inv_perm->get_permutation()[i] << "\n";
                     }
                     file << std::endl;
                     file.close();
@@ -577,10 +556,8 @@ void Solve<ValueType, IndexType>::local_solve(
         &triangular_factor_l,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &triangular_factor_u,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_row_perm,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_row_perm,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_col_perm,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_col_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
+    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
@@ -616,14 +593,10 @@ void Solve<ValueType, IndexType>::local_solve(
                Settings::local_solver_settings::direct_solver_ginkgo) {
         auto perm_sol = gko::matrix::Dense<ValueType>::create(
             settings.executor, local_solution->get_size());
-        local_row_perm->apply(local_solution.get(), perm_sol.get());
-        // perm_sol->copy_from(local_solution.get());
-        SolverTools::solve_direct_ginkgo(
-            settings, metadata, this->L_solver, this->U_solver, local_col_perm,
-            // local_inv_row_perm, local_solution.get());
-            local_inv_col_perm, perm_sol.get());
-        // local_solution->copy_from(perm_sol.get());
-        local_inv_col_perm->apply(perm_sol.get(), local_solution.get());
+        local_perm->apply(local_solution.get(), perm_sol.get());
+        SolverTools::solve_direct_ginkgo(settings, metadata, this->L_solver,
+                                         this->U_solver, perm_sol.get());
+        local_inv_perm->apply(perm_sol.get(), local_solution.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
         SolverTools::solve_iterative_ginkgo(settings, metadata, this->solver,

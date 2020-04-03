@@ -85,6 +85,8 @@ struct Utils {
 
     static bool assert_correct_permutation(
         const gko::matrix::Permutation<IndexType> *input_perm);
+
+    static bool assert_correct_cuda_devices(int num_devices, int my_rank);
 };
 
 

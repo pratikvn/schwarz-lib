@@ -152,6 +152,23 @@ bool Utils<ValueType, IndexType>::assert_correct_permutation(
 }
 
 
+template <typename ValueType, typename IndexType>
+bool Utils<ValueType, IndexType>::assert_correct_cuda_devices(int num_devices,
+                                                              int my_rank)
+{
+    if (num_devices > 0) {
+        if (my_rank == 0) {
+            std::cout << " Number of available devices: " << num_devices
+                      << std::endl;
+        }
+    } else {
+        std::cout << " No CUDA devices available for rank " << my_rank
+                  << std::endl;
+        std::exit(-1);
+    }
+}
+
+
 #define DECLARE_UTILS(ValueType, IndexType) struct Utils<ValueType, IndexType>
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_UTILS);
 #undef DECLARE_UTILS

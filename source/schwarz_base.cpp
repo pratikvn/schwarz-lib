@@ -72,16 +72,8 @@ SchwarzBase<ValueType, IndexType>::SchwarzBase(
 #else
         SCHWARZ_NOT_IMPLEMENTED;
 #endif
-        if (num_devices > 0) {
-            if (metadata.my_rank == 0) {
-                std::cout << " Number of available devices: " << num_devices
-                          << std::endl;
-            }
-        } else {
-            std::cout << " No CUDA devices available for rank "
-                      << metadata.my_rank << std::endl;
-            std::exit(-1);
-        }
+        Utils<ValueType, IndexType>::assert_correct_cuda_devices(
+            num_devices, metadata.my_rank);
         settings.executor = gko::CudaExecutor::create(
             my_local_rank, gko::OmpExecutor::create());
         auto exec_info = static_cast<gko::OmpExecutor *>(
@@ -120,11 +112,14 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     using vec_itype = gko::Array<IndexType>;
     using vec_vecshared = gko::Array<IndexType *>;
     // Setup the global matrix
+    // if explicit_laplacian has been enabled or an external matrix has been
+    // provided.
     if (settings.explicit_laplacian || settings.matrix_filename != "null") {
         Initialize<ValueType, IndexType>::setup_global_matrix(
             settings.matrix_filename, metadata.oned_laplacian_size,
             this->global_matrix);
     } else {
+        // If not, then check if deal.ii has been enabled for matrix generation.
 #if SCHW_HAVE_DEALII
         Initialize<ValueType, IndexType>::setup_global_matrix(
             matrix, this->global_matrix);
@@ -137,6 +132,8 @@ void SchwarzBase<ValueType, IndexType>::initialize(
 #endif
     }
     this->metadata.global_size = this->global_matrix->get_size()[0];
+    // MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
+    // MPI_COMM_WORLD);
     auto my_rank = this->metadata.my_rank;
     auto comm_size = this->metadata.comm_size;
     auto num_subdomains = this->metadata.num_subdomains;

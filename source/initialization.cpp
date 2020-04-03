@@ -39,12 +39,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <vector>
 
-
 #include <mpi.h>
+
+#if SCHW_HAVE_CHOLMOD
+#include <cholmod.h>
+#endif
 
 
 #include <exception_helpers.hpp>
 #include <initialization.hpp>
+#include <solve.hpp>
 #include <solver_tools.hpp>
 
 
@@ -68,9 +72,7 @@ void Initialize<ValueType, IndexType>::setup_local_matrices(
     std::vector<unsigned int> &partition_indices,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
-    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &interface_matrix,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm)
+    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &interface_matrix)
     SCHWARZ_NOT_IMPLEMENTED;
 
 
@@ -86,8 +88,6 @@ void Initialize<ValueType, IndexType>::generate_rhs(std::vector<ValueType> &rhs)
 
 
 #if SCHW_HAVE_DEALII
-
-
 template <typename ValueType, typename IndexType>
 void Initialize<ValueType, IndexType>::setup_global_matrix(
     const dealii::SparseMatrix<ValueType> &matrix,
@@ -181,8 +181,6 @@ void Initialize<ValueType, IndexType>::setup_global_matrix(
               MPI_COMM_WORLD);
     global_matrix->copy_from(global_matrix_compute.get());
 }
-
-
 #endif
 
 
@@ -195,61 +193,80 @@ inline gko::size_type linearize_index(const gko::size_type row,
 
 
 template <typename ValueType, typename IndexType>
-void Initialize<ValueType, IndexType>::setup_global_matrix_laplacian(
-    const gko::size_type &oned_laplacian_size,
+void Initialize<ValueType, IndexType>::setup_global_matrix(
+    const std::string &filename, const gko::size_type &oned_laplacian_size,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix)
 {
     using index_type = IndexType;
     using value_type = ValueType;
     using mtx = gko::matrix::Csr<value_type, index_type>;
-    gko::size_type global_size = oned_laplacian_size * oned_laplacian_size;
-
-    global_matrix = mtx::create(settings.executor->get_master(),
-                                gko::dim<2>(global_size), 5 * global_size);
-    value_type *values = global_matrix->get_values();
-    index_type *row_ptrs = global_matrix->get_row_ptrs();
-    index_type *col_idxs = global_matrix->get_col_idxs();
-
-    std::vector<gko::size_type> exclusion_set;
-
-    std::map<IndexType, ValueType> stencil_map = {
-        {-oned_laplacian_size, -1}, {-1, -1}, {0, 4}, {1, -1},
-        {oned_laplacian_size, -1},
-    };
-    for (auto i = 2; i < global_size; ++i) {
-        gko::size_type index = (i - 1) * oned_laplacian_size;
-        if (index * index < global_size * global_size) {
-            exclusion_set.push_back(
-                linearize_index(index, index - 1, global_size));
-            exclusion_set.push_back(
-                linearize_index(index - 1, index, global_size));
+    if (settings.matrix_filename != "null") {
+        auto input_file = std::ifstream(filename, std::ios::in);
+        if (!input_file) {
+            std::cerr << "Could not find the file \"" << filename
+                      << "\", which is required for this test.\n";
         }
-    }
+        global_matrix =
+            gko::read<mtx>(input_file, settings.executor->get_master());
+        global_matrix->sort_by_column_index();
+        std::cout << "Matrix from file " << filename << std::endl;
+    } else if (settings.matrix_filename == "null" &&
+               settings.explicit_laplacian) {
+        std::cout << "Laplacian 2D Matrix (generated in house) " << std::endl;
+        gko::size_type global_size = oned_laplacian_size * oned_laplacian_size;
 
-    std::sort(exclusion_set.begin(),
-              exclusion_set.begin() + exclusion_set.size());
+        global_matrix = mtx::create(settings.executor->get_master(),
+                                    gko::dim<2>(global_size), 5 * global_size);
+        value_type *values = global_matrix->get_values();
+        index_type *row_ptrs = global_matrix->get_row_ptrs();
+        index_type *col_idxs = global_matrix->get_col_idxs();
 
-    IndexType pos = 0;
-    IndexType col_idx = 0;
-    row_ptrs[0] = pos;
-    gko::size_type cur_idx = 0;
-    for (IndexType i = 0; i < global_size; ++i) {
-        for (auto ofs : stencil_map) {
-            auto in_exclusion_flag =
-                (exclusion_set[cur_idx] ==
-                 linearize_index(i, i + ofs.first, global_size));
-            if (0 <= i + ofs.first && i + ofs.first < global_size &&
-                !in_exclusion_flag) {
-                values[pos] = ofs.second;
-                col_idxs[pos] = i + ofs.first;
-                ++pos;
+        std::vector<gko::size_type> exclusion_set;
+
+        std::map<IndexType, ValueType> stencil_map = {
+            {-oned_laplacian_size, -1}, {-1, -1}, {0, 4}, {1, -1},
+            {oned_laplacian_size, -1},
+        };
+        for (auto i = 2; i < global_size; ++i) {
+            gko::size_type index = (i - 1) * oned_laplacian_size;
+            if (index * index < global_size * global_size) {
+                exclusion_set.push_back(
+                    linearize_index(index, index - 1, global_size));
+                exclusion_set.push_back(
+                    linearize_index(index - 1, index, global_size));
             }
-            if (in_exclusion_flag) {
-                cur_idx++;
-            }
-            col_idx = row_ptrs[i + 1] - pos;
         }
-        row_ptrs[i + 1] = pos;
+
+        std::sort(exclusion_set.begin(),
+                  exclusion_set.begin() + exclusion_set.size());
+
+        IndexType pos = 0;
+        IndexType col_idx = 0;
+        row_ptrs[0] = pos;
+        gko::size_type cur_idx = 0;
+        for (IndexType i = 0; i < global_size; ++i) {
+            for (auto ofs : stencil_map) {
+                auto in_exclusion_flag =
+                    (exclusion_set[cur_idx] ==
+                     linearize_index(i, i + ofs.first, global_size));
+                if (0 <= i + ofs.first && i + ofs.first < global_size &&
+                    !in_exclusion_flag) {
+                    values[pos] = ofs.second;
+                    col_idxs[pos] = i + ofs.first;
+                    ++pos;
+                }
+                if (in_exclusion_flag) {
+                    cur_idx++;
+                }
+                col_idx = row_ptrs[i + 1] - pos;
+            }
+            row_ptrs[i + 1] = pos;
+        }
+    } else {
+        std::cerr << " Need to provide a matrix or enable the default "
+                     "laplacian matrix."
+                  << std::endl;
+        std::exit(-1);
     }
 }
 

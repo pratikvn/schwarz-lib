@@ -13,7 +13,7 @@ jobs:
     - name: install-doxygen
       run: |
         sudo apt-get update
-        sudo apt-get -y install mpich texlive texlive-generic-recommended texlive-latex-extra doxygen graphviz ghostscript
+        sudo apt-get -y install mpich texlive texlive-generic-recommended texlive-latex-extra doxygen graphviz ghostscript libboost-dev
     - name: info
       run: |
         doxygen -v
@@ -38,7 +38,7 @@ jobs:
       run: |
         mkdir -p build-doc && pushd build-doc
         export CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-        cmake -DCMAKE_PREFIX_PATH=${HOME}/install -DSCHWARZ_BUILD_CHOLMOD=off -DSCHWARZ_BUILD_METIS=off -DSCHWARZ_WITH_HWLOC=off -DSCHWARZ_BUILD_CUDA=off -DSCHWARZ_BUILD_BENCHMARKING=off -DSCHWARZ_DEVEL_TOOLS=off -DSCHWARZ_BUILD_DOC=on -DSCHWARZ_DOC_GENERATE_PDF=on ..
+        cmake -DCMAKE_PREFIX_PATH=${HOME}/install -DSCHWARZ_BUILD_CHOLMOD=off -DSCHWARZ_BUILD_UMFPACK=off -DSCHWARZ_BUILD_METIS=off -DSCHWARZ_WITH_HWLOC=off -DSCHWARZ_BUILD_CUDA=off -DSCHWARZ_BUILD_BENCHMARKING=off -DSCHWARZ_DEVEL_TOOLS=off -DSCHWARZ_BUILD_DOC=on -DSCHWARZ_DOC_GENERATE_PDF=on ..
         make usr
         make pdf
         popd

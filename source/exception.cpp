@@ -46,6 +46,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 
+#if SCHW_HAVE_UMFPACK
+#include <umfpack.h>
+#endif
+
+
 #include <exception.hpp>
 
 
@@ -88,15 +93,37 @@ std::string CusparseError::get_error(int error_code)
 std::string MetisError::get_error(int error_code)
 {
 #if SCHW_HAVE_METIS
-#define GKO_REGISTER_METIS_ERROR(error_name)          \
+#define SCHWARZ_REGISTER_METIS_ERROR(error_name)      \
     if (error_code == static_cast<int>(error_name)) { \
         return #error_name;                           \
     }
-    GKO_REGISTER_METIS_ERROR(METIS_ERROR_INPUT);
-    GKO_REGISTER_METIS_ERROR(METIS_ERROR_MEMORY);
-    GKO_REGISTER_METIS_ERROR(METIS_ERROR);
+    SCHWARZ_REGISTER_METIS_ERROR(METIS_ERROR_INPUT);
+    SCHWARZ_REGISTER_METIS_ERROR(METIS_ERROR_MEMORY);
+    SCHWARZ_REGISTER_METIS_ERROR(METIS_ERROR);
     return "Unknown error";
 #else
     return "Metis is not linked/built";
+#endif
+}
+
+
+std::string UmfpackError::get_error(int error_code)
+{
+#if SCHW_HAVE_UMFPACK
+#define SCHWARZ_REGISTER_UMFPACK_ERROR(error_name)    \
+    if (error_code == static_cast<int>(error_name)) { \
+        return #error_name;                           \
+    }
+    SCHWARZ_REGISTER_UMFPACK_ERROR(UMFPACK_ERROR_n_nonpositive);
+    SCHWARZ_REGISTER_UMFPACK_ERROR(UMFPACK_ERROR_invalid_matrix);
+    SCHWARZ_REGISTER_UMFPACK_ERROR(UMFPACK_ERROR_out_of_memory);
+    SCHWARZ_REGISTER_UMFPACK_ERROR(UMFPACK_ERROR_argument_missing);
+    SCHWARZ_REGISTER_UMFPACK_ERROR(UMFPACK_ERROR_internal_error);
+    SCHWARZ_REGISTER_UMFPACK_ERROR(UMFPACK_WARNING_singular_matrix);
+    SCHWARZ_REGISTER_UMFPACK_ERROR(UMFPACK_ERROR_invalid_Symbolic_object);
+    SCHWARZ_REGISTER_UMFPACK_ERROR(UMFPACK_ERROR_different_pattern);
+    return "Unknown error";
+#else
+    return "Umfpack is not linked/built";
 #endif
 }

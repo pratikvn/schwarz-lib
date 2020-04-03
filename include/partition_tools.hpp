@@ -37,12 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 
-
-#if SCHW_HAVE_CHOLMOD
-#include <cholmod.h>
-#endif
-
-
 #if SCHW_HAVE_METIS
 #include <metis.h>
 #endif

@@ -38,9 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 
-#include <conv_tools.hpp>
-
 #include <communicate.hpp>
+#include <conv_tools.hpp>
 #include <settings.hpp>
 #include <solver_tools.hpp>
 
@@ -94,13 +93,16 @@ protected:
     MPI_Win window_convergence;
 
     /**
-     * Sets up the local solver from the user settings and computes the
-     * triangular factors if needed.
+     * Sets up the local solver from the user settings
      *
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.
      * @param local_matrix  The local sudomain matrix.
-     * @param triangular_factor  The triangular factor.
+     * @param triangular_factor_l  The lower triangular factor.
+     * @param triangular_factor_u  The upper triangular factor.
+     * @param local_perm  The local permutation vector in the subdomain.
+     * @param local_inv_perm  The local inverse permutation vector in the
+     * subdomain.
      * @param local_rhs  The local right hand side vector in the subdomain.
      */
     void setup_local_solver(
@@ -109,17 +111,38 @@ protected:
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &local_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
-            &triangular_factor,
+            &triangular_factor_l,
+        std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
+            &triangular_factor_u,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs);
+
+
+    /**
+     * Computes the triangular factors based on the factorization type needed..
+     *
+     * @param settings  The settings struct.
+     * @param metadata  The metadata struct.
+     * @param local_matrix  The local sudomain matrix.
+     * subdomain.
+     */
+    void compute_local_factors(
+        const Settings &settings,
+        const Metadata<ValueType, IndexType> &metadata,
+        const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
+            &local_matrix);
+
 
     /**
      * Computes the local solution.
      *
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.
-     * @param triangular_factor  The triangular factor.
+     * @param triangular_factor_l  The lower triangular factor.
+     * @param triangular_factor_u  The upper triangular factor.
+     * @param local_perm  The local permutation vector in the subdomain.
+     * @param local_inv_perm  The local inverse permutation vector in the
      * @param init_guess  The initial solution for the local iterative solver.
      * @param local_solution The local solution vector in the subdomain.
      */
@@ -127,7 +150,11 @@ protected:
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
-            &triangular_factor,
+            &local_matrix,
+        const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
+            &triangular_factor_l,
+        const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
+            &triangular_factor_u,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
@@ -287,6 +314,23 @@ private:
         int xtype;
     };
     cholmod cholmod;
+#endif
+
+#if SCHW_HAVE_UMFPACK
+    struct umfpack {
+        int factor_l_nnz;
+        int factor_u_nnz;
+        int nz_udiag;
+        int n_row;
+        int n_col;
+        int do_reciproc;
+        void *numeric;
+        std::shared_ptr<gko::matrix::Dense<ValueType>> row_scale;
+        int status;
+        double control[UMFPACK_CONTROL];
+        double info[UMFPACK_INFO];
+    };
+    umfpack umfpack;
 #endif
 
     Settings settings;

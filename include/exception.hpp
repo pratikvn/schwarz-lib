@@ -187,4 +187,27 @@ private:
 };
 
 
+/**
+ * UmfpackError is thrown when a METIS routine throws a non-zero error code.
+ */
+class UmfpackError : public Error {
+public:
+    /**
+     * Initializes a METIS error.
+     *
+     * @param file The name of the offending source file
+     * @param line The source code line number where the error occurred
+     * @param func The name of the METIS routine that failed
+     * @param error_code The resulting METIS error code
+     */
+    UmfpackError(const std::string &file, int line, const std::string &func,
+                 int error_code)
+        : Error(file, line, func + ": " + get_error(error_code))
+    {}
+
+private:
+    static std::string get_error(int error_code);
+};
+
+
 #endif  // exception.hpp

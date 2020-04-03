@@ -108,7 +108,12 @@ struct Settings {
     gko::int32 overlap = MINIMAL_OVERLAP;
 
     /**
-     * Flag if the laplcian matrix should be generated within the library. If
+     * The string that contains the matrix file name to read from .
+     */
+    std::string matrix_filename = "null";
+
+    /**
+     * Flag if the laplacian matrix should be generated within the library. If
      * false, an external matrix and rhs needs to be provided
      */
     bool explicit_laplacian = true;
@@ -133,6 +138,7 @@ struct Settings {
      */
     enum local_solver_settings {
         direct_solver_cholmod = 0x0,
+        direct_solver_umfpack = 0x5,
         direct_solver_ginkgo = 0x1,
         iterative_solver_ginkgo = 0x2,
         iterative_solver_dealii = 0x3,
@@ -140,6 +146,8 @@ struct Settings {
     };
     local_solver_settings local_solver =
         local_solver_settings::iterative_solver_ginkgo;
+
+    bool non_symmetric_matrix = false;
 
     /**
      * Disables the re-ordering of the matrix before computing the triangular
@@ -246,6 +254,11 @@ struct Settings {
             local_convergence_crit::solution_based;
     };
     convergence_settings convergence_settings;
+
+    /**
+     * The factorization for the local direct solver.
+     */
+    std::string factorization = "cholmod";
 
     /**
      * The reordering for the local solve.

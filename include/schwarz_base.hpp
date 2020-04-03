@@ -146,9 +146,14 @@ public:
     std::shared_ptr<gko::matrix::Permutation<IndexType>> local_inv_perm;
 
     /**
-     * The local triangular factor used for the triangular solves.
+     * The local lower triangular factor used for the triangular solves.
      */
-    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> triangular_factor;
+    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> triangular_factor_l;
+
+    /**
+     * The local upper triangular factor used for the triangular solves.
+     */
+    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> triangular_factor_u;
 
     /**
      * The local interface matrix.

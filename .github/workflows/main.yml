@@ -13,13 +13,14 @@ jobs:
     - name: install-mpi
       run: |
         sudo apt-get update
-        sudo apt-get -y install mpich
+        sudo apt-get -y install mpich libboost-dev
     - name: info
       run: |
         g++ -v
         export MPI_DIR=$(which mpicxx)
         echo $MPI_DIR
         mpiexec --version
+        dpkg -s libboost-dev | grep 'Version'
         cmake --version
     - name: install-ginkgo
       run: |
@@ -41,7 +42,7 @@ jobs:
       run: |
         mkdir build
         cd build/
-        cmake -DCMAKE_PREFIX_PATH=${HOME}/install -DSCHWARZ_BUILD_CHOLMOD=off -DSCHWARZ_BUILD_METIS=off -DSCHWARZ_WITH_HWLOC=off -DSCHWARZ_BUILD_CUDA=off ..
+        cmake -DCMAKE_PREFIX_PATH=${HOME}/install -DSCHWARZ_BUILD_CHOLMOD=off -DSCHWARZ_BUILD_UMFPACK=off -DSCHWARZ_BUILD_METIS=off -DSCHWARZ_WITH_HWLOC=off -DSCHWARZ_BUILD_CUDA=off ..
         make -j10
 
   cuda-build:
@@ -54,7 +55,7 @@ jobs:
     - name: install-mpi
       run: |
         sudo apt-get update
-        sudo apt-get -y install mpich
+        sudo apt-get -y install mpich libboost-dev
     - name: install-cuda
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
@@ -100,5 +101,5 @@ jobs:
                          ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
         mkdir build
         cd build/
-        cmake -DCMAKE_PREFIX_PATH="${HOME}/install;/usr/local/cuda-10.2" -DSCHWARZ_BUILD_CHOLMOD=off -DSCHWARZ_BUILD_METIS=off -DSCHWARZ_WITH_HWLOC=off -DSCHWARZ_BUILD_CUDA=on ..
+        cmake -DCMAKE_PREFIX_PATH="${HOME}/install;/usr/local/cuda-10.2" -DSCHWARZ_BUILD_CHOLMOD=off -DSCHWARZ_BUILD_UMFPACK=off -DSCHWARZ_BUILD_METIS=off -DSCHWARZ_WITH_HWLOC=off -DSCHWARZ_BUILD_CUDA=on ..
         make -j10

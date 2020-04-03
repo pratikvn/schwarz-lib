@@ -8,10 +8,15 @@
 
 #include <schwarz/config.hpp>
 #include <settings.hpp>
+#include <utils.hpp>
 
 
-#if SCHWARZ_BUILD_CHOLMOD
+#if SCHW_HAVE_CHOLMOD
 #include <cholmod.h>
+#endif
+
+#if SCHW_HAVE_UMFPACK
+#include <umfpack.h>
 #endif
 
 
@@ -22,7 +27,6 @@ namespace SchwarzWrappers {
  * @ingroup solve
  */
 namespace SolverTools {
-
 
 #if SCHW_HAVE_CHOLMOD
 template <typename ValueType, typename IndexType>
@@ -49,6 +53,18 @@ void solve_direct_cholmod(
 }
 #endif
 
+
+#if SCHW_HAVE_UMFPACK
+template <typename ValueType, typename IndexType>
+void solve_direct_umfpack(
+    const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
+    void *umfpack_numeric,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
+{}
+#endif
+
+
 template <typename ValueType, typename IndexType>
 void solve_direct_ginkgo(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
@@ -59,9 +75,9 @@ void solve_direct_ginkgo(
     gko::matrix::Dense<ValueType> *local_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;
+
     auto temp_rhs = vec::create(settings.executor, local_solution->get_size());
     L_solver->apply(gko::lend(local_solution), gko::lend(temp_rhs));
-
     U_solver->apply(gko::lend(temp_rhs), gko::lend(local_solution));
 }
 
@@ -94,7 +110,6 @@ void extract_local_vector(
         gko::Array<ValueType>::view(settings.executor, metadata.local_size,
                                     &(sub_vector->at(0))),
         1);
-    // TODO: GPU (DONE)
     tmp2->copy_from(gko::lend(tmp));
     settings.executor->run(GatherScatter<ValueType, IndexType>(
         true, metadata.overlap_size, metadata.overlap_row->get_data(),

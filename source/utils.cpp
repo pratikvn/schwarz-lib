@@ -148,6 +148,7 @@ bool Utils<ValueType, IndexType>::assert_correct_permutation(
             return false;
         }
     }
+    return true;
 }
 
 

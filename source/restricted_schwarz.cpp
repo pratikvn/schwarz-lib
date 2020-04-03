@@ -57,9 +57,7 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     std::vector<unsigned int> &partition_indices,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
-    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &interface_matrix,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
-    std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm)
+    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &interface_matrix)
 {
     using mtx = gko::matrix::Csr<ValueType, IndexType>;
     using vec_itype = gko::Array<IndexType>;
@@ -102,6 +100,7 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
         first_row[p + 1] = first_row[p] + local_p_size[p];
     }
 
+
     if (partition_settings == Settings::partition_settings::partition_metis ||
         partition_settings ==
             Settings::partition_settings::partition_regular2d) {
@@ -135,6 +134,7 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
         auto gmat_temp = mtx::create(settings.executor->get_master(),
                                      global_matrix->get_size(),
                                      global_matrix->get_num_stored_elements());
+
         auto nnz = 0;
         gmat_temp->get_row_ptrs()[0] = 0;
         for (auto row = 0; row < metadata.global_size; ++row) {
@@ -149,6 +149,8 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
         }
         global_matrix->copy_from(gmat_temp.get());
     }
+
+
     for (auto i = 0; i < global_size; i++) {
         global_to_local[i] = 0;
         local_to_global[i] = 0;
@@ -295,6 +297,9 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
     local_matrix->copy_from(gko::lend(local_matrix_compute));
     interface_matrix = mtx::create(settings.executor);
     interface_matrix->copy_from(gko::lend(interface_matrix_compute));
+
+    local_matrix->sort_by_column_index();
+    interface_matrix->sort_by_column_index();
 }
 
 

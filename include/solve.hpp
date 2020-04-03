@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <solver_tools.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -338,7 +338,7 @@ private:
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // solve.hpp

@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <utils.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 template <typename ValueType, typename IndexType>
@@ -759,7 +759,7 @@ void Solve<ValueType, IndexType>::check_global_convergence(
                           MPI_SUM, MPI_COMM_WORLD);
         }
     }
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 template <typename ValueType, typename IndexType>
@@ -916,4 +916,4 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER);
 #undef DECLARE_SOLVER
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz

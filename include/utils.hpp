@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <settings.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -88,7 +88,7 @@ struct Utils {
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // utils.hpp

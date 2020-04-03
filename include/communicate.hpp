@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "initialization.hpp"
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -289,7 +289,7 @@ public:
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // communicate.hpp

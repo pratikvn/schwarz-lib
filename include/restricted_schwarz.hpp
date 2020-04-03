@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @ingroup schwarz_wrappers
  */
-namespace SchwarzWrappers {
+namespace schwz {
 
 /**
  * An implementation of the solver interface using the RAS solver.
@@ -104,7 +104,7 @@ public:
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // restricted_schwarz.hpp

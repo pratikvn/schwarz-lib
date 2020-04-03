@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <exception_helpers.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -98,7 +98,7 @@ private:
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // SCHWARZ_DEVICE_GUARD_HPP_

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @ingroup schwarz_wrappers
  */
-namespace SchwarzWrappers {
+namespace schwz {
 
 /**
  * The Base solver class is meant to be the class implementing the common
@@ -205,7 +205,7 @@ protected:
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // schwarz_base.hpp

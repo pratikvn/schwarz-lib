@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <solver_tools.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 template <typename ValueType, typename IndexType>
@@ -364,4 +364,4 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_INITIALIZE);
 #undef DECLARE_INITIALIZE
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz

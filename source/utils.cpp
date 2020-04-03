@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <utils.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 template <typename ValueType, typename IndexType>
 int Utils<ValueType, IndexType>::get_local_rank(MPI_Comm mpi_communicator)
@@ -157,4 +157,4 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_UTILS);
 #undef DECLARE_UTILS
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz

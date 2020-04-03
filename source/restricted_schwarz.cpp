@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <utils.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 template <typename ValueType, typename IndexType>
 SolverRAS<ValueType, IndexType>::SolverRAS(
@@ -845,4 +845,4 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_RAS);
 #undef DECLARE_SOLVER_RAS
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz

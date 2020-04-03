@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <settings.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 /**
  * @brief The ConvergenceTools namespace .
  * @ref conv_tools
@@ -327,7 +327,7 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION4);
 #undef DECLARE_FUNCTION4
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // conv_tools.hpp

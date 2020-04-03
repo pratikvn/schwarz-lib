@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <communicate.hpp>
 #include <exception_helpers.hpp>
 
-namespace SchwarzWrappers {
+namespace schwz {
 template <typename ValueType, typename IndexType>
 void Communicate<ValueType, IndexType>::setup_comm_buffers()
     SCHWARZ_NOT_IMPLEMENTED;
@@ -112,4 +112,4 @@ void Communicate<ValueType, IndexType>::clear(Settings &settings)
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_COMMUNICATE);
 #undef DECLARE_COMMUNICATE
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz

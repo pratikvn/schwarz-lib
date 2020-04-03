@@ -20,7 +20,7 @@
 #endif
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 /**
  * @brief The SolverTools namespace .
  * @ref solver_tools
@@ -149,7 +149,7 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
 #undef DECLARE_FUNCTION
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // solver_tools.hpp

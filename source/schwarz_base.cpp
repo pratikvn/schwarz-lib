@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <utils.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 template <typename ValueType, typename IndexType>
@@ -89,7 +89,7 @@ SchwarzBase<ValueType, IndexType>::SchwarzBase(
                              ->get_exec_info();
         exec_info->bind_to_core(my_local_rank);
         settings.cuda_device_guard =
-            std::make_shared<SchwarzWrappers::device_guard>(my_local_rank);
+            std::make_shared<schwz::device_guard>(my_local_rank);
 
         std::cout << " Rank " << metadata.my_rank << " with local rank "
                   << my_local_rank << " has "
@@ -206,10 +206,6 @@ void SchwarzBase<ValueType, IndexType>::initialize(
         new vec_itype(settings.executor->get_master(), temp.begin(),
                       temp.end()),
         std::default_delete<vec_itype>());
-
-    std::cout << " HERE " << __LINE__ << " rank " << metadata.my_rank
-              << " g size " << metadata.global_size << " num nnz "
-              << this->global_matrix->get_num_stored_elements() << std::endl;
 
     // Partition the global matrix.
     Initialize<ValueType, IndexType>::partition(
@@ -418,4 +414,4 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCHWARZ_BASE);
 #undef DECLARE_SCHWARZ_BASE
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz

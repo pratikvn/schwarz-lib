@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <settings.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -171,6 +171,6 @@ private:
     Metadata<ValueType, IndexType> &metadata;
 };
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 #endif  // initialization.hpp

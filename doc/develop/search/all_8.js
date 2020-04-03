@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['matrix_5ffilename',['matrix_filename',['../structSchwarzWrappers_1_1Settings.html#a734222e1021c3e01e6a004e08f081026',1,'SchwarzWrappers::Settings']]],
   ['max_5fiters',['max_iters',['../structSchwarzWrappers_1_1Metadata.html#a78f04f4b7c58c9260d7e79aac6f10cda',1,'SchwarzWrappers::Metadata']]],
   ['metadata',['Metadata',['../structSchwarzWrappers_1_1Metadata.html',1,'SchwarzWrappers']]],
   ['metis_5fobjtype',['metis_objtype',['../structSchwarzWrappers_1_1Settings.html#abbfee6b651293973f478e70ae656d6d0',1,'SchwarzWrappers::Settings']]],

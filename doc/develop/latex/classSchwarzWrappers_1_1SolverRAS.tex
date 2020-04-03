@@ -24,7 +24,7 @@ Collaboration diagram for Schwarz\+Wrappers\+:\+:Solver\+R\+AS$<$ Value\+Type, I
 \item 
 \hyperlink{classSchwarzWrappers_1_1SolverRAS_a4bd8f19ab2a959f1d56bac3939aa5f5f}{Solver\+R\+AS} (\hyperlink{structSchwarzWrappers_1_1Settings}{Settings} \&settings, \hyperlink{structSchwarzWrappers_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata)
 \begin{DoxyCompactList}\small\item\em The constructor that takes in the user settings and a metadata struct containing the solver metadata. \end{DoxyCompactList}\item 
-void \hyperlink{classSchwarzWrappers_1_1SolverRAS_ab44245cb5dede72cd11502cf59593626}{setup\+\_\+local\+\_\+matrices} (\hyperlink{structSchwarzWrappers_1_1Settings}{Settings} \&settings, \hyperlink{structSchwarzWrappers_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::vector$<$ unsigned int $>$ \&\hyperlink{classSchwarzWrappers_1_1Initialize_a9ad20884882db7c28560d9f9755e571e}{partition\+\_\+indices}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&\hyperlink{classSchwarzWrappers_1_1SchwarzBase_a7dc6207713163fb9298ff2667da9a11f}{global\+\_\+matrix}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&\hyperlink{classSchwarzWrappers_1_1SchwarzBase_acb13eabad587af925145b408946b8c2d}{local\+\_\+matrix}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&\hyperlink{classSchwarzWrappers_1_1SchwarzBase_aea6575d93a87dec1f97ef2f40ff87199}{interface\+\_\+matrix}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$$>$ \&\hyperlink{classSchwarzWrappers_1_1SchwarzBase_a8cd51eb96cdf7f84de772fda54566a09}{local\+\_\+perm}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$$>$ \&\hyperlink{classSchwarzWrappers_1_1SchwarzBase_ae8862a67facde156ffef342410f979ba}{local\+\_\+inv\+\_\+perm}) override
+void \hyperlink{classSchwarzWrappers_1_1SolverRAS_a089d372b0b3d9829eb64f2394c035e8b}{setup\+\_\+local\+\_\+matrices} (\hyperlink{structSchwarzWrappers_1_1Settings}{Settings} \&settings, \hyperlink{structSchwarzWrappers_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::vector$<$ unsigned int $>$ \&\hyperlink{classSchwarzWrappers_1_1Initialize_a9ad20884882db7c28560d9f9755e571e}{partition\+\_\+indices}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&\hyperlink{classSchwarzWrappers_1_1SchwarzBase_a7dc6207713163fb9298ff2667da9a11f}{global\+\_\+matrix}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&\hyperlink{classSchwarzWrappers_1_1SchwarzBase_acb13eabad587af925145b408946b8c2d}{local\+\_\+matrix}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&\hyperlink{classSchwarzWrappers_1_1SchwarzBase_aea6575d93a87dec1f97ef2f40ff87199}{interface\+\_\+matrix}) override
 \begin{DoxyCompactList}\small\item\em Sets up the local and the interface matrices from the global matrix and the partition indices. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{classSchwarzWrappers_1_1SolverRAS_a552e1216220e2c92a736f33d73e37756}\label{classSchwarzWrappers_1_1SolverRAS_a552e1216220e2c92a736f33d73e37756}} 
 void \hyperlink{classSchwarzWrappers_1_1SolverRAS_a552e1216220e2c92a736f33d73e37756}{setup\+\_\+comm\+\_\+buffers} () override
@@ -105,12 +105,12 @@ Implements \hyperlink{classSchwarzWrappers_1_1Communicate_af6ef7b0a4d98427c8c0ea
 
 References Schwarz\+Wrappers\+::\+Settings\+::comm\+\_\+settings\+::enable\+\_\+onesided.
 
-\mbox{\Hypertarget{classSchwarzWrappers_1_1SolverRAS_ab44245cb5dede72cd11502cf59593626}\label{classSchwarzWrappers_1_1SolverRAS_ab44245cb5dede72cd11502cf59593626}} 
+\mbox{\Hypertarget{classSchwarzWrappers_1_1SolverRAS_a089d372b0b3d9829eb64f2394c035e8b}\label{classSchwarzWrappers_1_1SolverRAS_a089d372b0b3d9829eb64f2394c035e8b}} 
 \index{Schwarz\+Wrappers\+::\+Solver\+R\+AS@{Schwarz\+Wrappers\+::\+Solver\+R\+AS}!setup\+\_\+local\+\_\+matrices@{setup\+\_\+local\+\_\+matrices}}
 \index{setup\+\_\+local\+\_\+matrices@{setup\+\_\+local\+\_\+matrices}!Schwarz\+Wrappers\+::\+Solver\+R\+AS@{Schwarz\+Wrappers\+::\+Solver\+R\+AS}}
 \subsubsection{\texorpdfstring{setup\+\_\+local\+\_\+matrices()}{setup\_local\_matrices()}}
 {\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
-void \hyperlink{classSchwarzWrappers_1_1SolverRAS}{Schwarz\+Wrappers\+::\+Solver\+R\+AS}$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+local\+\_\+matrices (\begin{DoxyParamCaption}\item[{\hyperlink{structSchwarzWrappers_1_1Settings}{Settings} \&}]{settings,  }\item[{\hyperlink{structSchwarzWrappers_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{std\+::vector$<$ unsigned int $>$ \&}]{partition\+\_\+indices,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{global\+\_\+matrix,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{local\+\_\+matrix,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{interface\+\_\+matrix,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$$>$ \&}]{local\+\_\+perm,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$$>$ \&}]{local\+\_\+inv\+\_\+perm }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+void \hyperlink{classSchwarzWrappers_1_1SolverRAS}{Schwarz\+Wrappers\+::\+Solver\+R\+AS}$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+local\+\_\+matrices (\begin{DoxyParamCaption}\item[{\hyperlink{structSchwarzWrappers_1_1Settings}{Settings} \&}]{settings,  }\item[{\hyperlink{structSchwarzWrappers_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{std\+::vector$<$ unsigned int $>$ \&}]{partition\+\_\+indices,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{global\+\_\+matrix,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{local\+\_\+matrix,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{interface\+\_\+matrix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
 
 
 
@@ -135,7 +135,7 @@ Sets up the local and the interface matrices from the global matrix and the part
 \end{DoxyParams}
 
 
-Implements \hyperlink{classSchwarzWrappers_1_1Initialize_a67029ec6f266735f579b219402bf317a}{Schwarz\+Wrappers\+::\+Initialize$<$ Value\+Type, Index\+Type $>$}.
+Implements \hyperlink{classSchwarzWrappers_1_1Initialize_a7ddd2c8688b884b62f74f390b4114377}{Schwarz\+Wrappers\+::\+Initialize$<$ Value\+Type, Index\+Type $>$}.
 
 
 
@@ -209,5 +209,5 @@ References Schwarz\+Wrappers\+::\+Settings\+::executor, Schwarz\+Wrappers\+::\+S
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-restricted\+\_\+schwarz.\+hpp (ac94b4a)\item 
-/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/restricted\+\_\+schwarz.\+cpp (ac94b4a)\end{DoxyCompactItemize}
+restricted\+\_\+schwarz.\+hpp (f54e8c2)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/restricted\+\_\+schwarz.\+cpp (f54e8c2)\end{DoxyCompactItemize}

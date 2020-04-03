@@ -74,8 +74,11 @@ std\+::shared\+\_\+ptr$<$ \hyperlink{classSchwarzWrappers_1_1device__guard}{devi
 \mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_ab1be4bd623b4cf1c8999160e753752ff}\label{structSchwarzWrappers_1_1Settings_ab1be4bd623b4cf1c8999160e753752ff}} 
 gko\+::int32 \hyperlink{structSchwarzWrappers_1_1Settings_ab1be4bd623b4cf1c8999160e753752ff}{overlap} = 2
 \begin{DoxyCompactList}\small\item\em The overlap between the subdomains. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_a734222e1021c3e01e6a004e08f081026}\label{structSchwarzWrappers_1_1Settings_a734222e1021c3e01e6a004e08f081026}} 
+std\+::string \hyperlink{structSchwarzWrappers_1_1Settings_a734222e1021c3e01e6a004e08f081026}{matrix\+\_\+filename} = \char`\"{}null\char`\"{}
+\begin{DoxyCompactList}\small\item\em The string that contains the matrix file name to read from . \end{DoxyCompactList}\item 
 bool \hyperlink{structSchwarzWrappers_1_1Settings_a120b05467ef07d770948ccacf12bb1c3}{explicit\+\_\+laplacian} = true
-\begin{DoxyCompactList}\small\item\em Flag if the laplcian matrix should be generated within the library. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Flag if the laplacian matrix should be generated within the library. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_aac87fe7e2f41dcf9ea0abc9d4f919c8b}\label{structSchwarzWrappers_1_1Settings_aac87fe7e2f41dcf9ea0abc9d4f919c8b}} 
 bool \hyperlink{structSchwarzWrappers_1_1Settings_aac87fe7e2f41dcf9ea0abc9d4f919c8b}{enable\+\_\+random\+\_\+rhs} = false
 \begin{DoxyCompactList}\small\item\em Flag to enable a random rhs. \end{DoxyCompactList}\item 
@@ -86,6 +89,9 @@ bool \hyperlink{structSchwarzWrappers_1_1Settings_ac4141f6be1a3117eb77bcd7af6bc9
 bool \hyperlink{structSchwarzWrappers_1_1Settings_a88048419dd7eb9a21ac3aa8f64986016}{debug\+\_\+print} = false
 \begin{DoxyCompactList}\small\item\em Flag to enable some debug printing. \end{DoxyCompactList}\item 
 \hyperlink{structSchwarzWrappers_1_1Settings_abb00a70a7c715c93a2e7570ad6dc1bbe}{local\+\_\+solver\+\_\+settings} {\bfseries local\+\_\+solver}
+\item 
+\mbox{\Hypertarget{structSchwarzWrappers_1_1Settings_af61f404ed315a3e2c93adc92ef020c78}\label{structSchwarzWrappers_1_1Settings_af61f404ed315a3e2c93adc92ef020c78}} 
+bool {\bfseries non\+\_\+symmetric\+\_\+matrix} = false
 \item 
 bool \hyperlink{structSchwarzWrappers_1_1Settings_afd0d2bf6e98da07012fd08260114de17}{naturally\+\_\+ordered\+\_\+factor} = false
 \begin{DoxyCompactList}\small\item\em Disables the re-\/ordering of the matrix before computing the triangular factors during the C\+H\+O\+L\+M\+OD factorization. \end{DoxyCompactList}\item 
@@ -132,7 +138,7 @@ settings
 
 
 
-Flag if the laplcian matrix should be generated within the library. 
+Flag if the laplacian matrix should be generated within the library. 
 
 If false, an external matrix and rhs needs to be provided 
 
@@ -166,4 +172,4 @@ This is mainly to allow compatibility with G\+PU solution.
 
 The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-settings.\+hpp (4da3021)\end{DoxyCompactItemize}
+settings.\+hpp (a4aae12)\end{DoxyCompactItemize}

@@ -27,7 +27,7 @@ Collaboration diagram for Schwarz\+Wrappers\+:\+:Initialize$<$ Value\+Type, Inde
 \item 
 void \hyperlink{classSchwarzWrappers_1_1Initialize_a96fdb68e6a32c55e411b9a9e11a276f9}{generate\+\_\+rhs} (std\+::vector$<$ Value\+Type $>$ \&rhs)
 \begin{DoxyCompactList}\small\item\em Generates the right hand side vector. \end{DoxyCompactList}\item 
-void \hyperlink{classSchwarzWrappers_1_1Initialize_abb6b1f844e9f334b2baf07f114506a77}{setup\+\_\+global\+\_\+matrix\+\_\+laplacian} (const gko\+::size\+\_\+type \&\hyperlink{structSchwarzWrappers_1_1Metadata_a273537397c2735f54f4e50701f3e2c1d}{oned\+\_\+laplacian\+\_\+size}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix)
+void \hyperlink{classSchwarzWrappers_1_1Initialize_a7463e23c00e298ea5c9ad0d4afabe8d4}{setup\+\_\+global\+\_\+matrix} (const std\+::string \&filename, const gko\+::size\+\_\+type \&\hyperlink{structSchwarzWrappers_1_1Metadata_a273537397c2735f54f4e50701f3e2c1d}{oned\+\_\+laplacian\+\_\+size}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix)
 \begin{DoxyCompactList}\small\item\em Generates the 2D global laplacian matrix. \end{DoxyCompactList}\item 
 void \hyperlink{classSchwarzWrappers_1_1Initialize_a2a7a5d4e8ac0312541c3e82ce9d2ae7f}{partition} (const \hyperlink{structSchwarzWrappers_1_1Settings}{Settings} \&settings, const \hyperlink{structSchwarzWrappers_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix, std\+::vector$<$ unsigned int $>$ \&\hyperlink{classSchwarzWrappers_1_1Initialize_a9ad20884882db7c28560d9f9755e571e}{partition\+\_\+indices})
 \begin{DoxyCompactList}\small\item\em The partitioning function. \end{DoxyCompactList}\item 
@@ -81,6 +81,10 @@ Generates the right hand side vector.
 \end{DoxyParams}
 
 
+References Schwarz\+Wrappers\+::\+Initialize$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+global\+\_\+matrix().
+
+
+
 Referenced by Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize().
 
 \mbox{\Hypertarget{classSchwarzWrappers_1_1Initialize_a2a7a5d4e8ac0312541c3e82ce9d2ae7f}\label{classSchwarzWrappers_1_1Initialize_a2a7a5d4e8ac0312541c3e82ce9d2ae7f}} 
@@ -115,12 +119,12 @@ References Schwarz\+Wrappers\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::gl
 
 Referenced by Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize().
 
-\mbox{\Hypertarget{classSchwarzWrappers_1_1Initialize_abb6b1f844e9f334b2baf07f114506a77}\label{classSchwarzWrappers_1_1Initialize_abb6b1f844e9f334b2baf07f114506a77}} 
-\index{Schwarz\+Wrappers\+::\+Initialize@{Schwarz\+Wrappers\+::\+Initialize}!setup\+\_\+global\+\_\+matrix\+\_\+laplacian@{setup\+\_\+global\+\_\+matrix\+\_\+laplacian}}
-\index{setup\+\_\+global\+\_\+matrix\+\_\+laplacian@{setup\+\_\+global\+\_\+matrix\+\_\+laplacian}!Schwarz\+Wrappers\+::\+Initialize@{Schwarz\+Wrappers\+::\+Initialize}}
-\subsubsection{\texorpdfstring{setup\+\_\+global\+\_\+matrix\+\_\+laplacian()}{setup\_global\_matrix\_laplacian()}}
+\mbox{\Hypertarget{classSchwarzWrappers_1_1Initialize_a7463e23c00e298ea5c9ad0d4afabe8d4}\label{classSchwarzWrappers_1_1Initialize_a7463e23c00e298ea5c9ad0d4afabe8d4}} 
+\index{Schwarz\+Wrappers\+::\+Initialize@{Schwarz\+Wrappers\+::\+Initialize}!setup\+\_\+global\+\_\+matrix@{setup\+\_\+global\+\_\+matrix}}
+\index{setup\+\_\+global\+\_\+matrix@{setup\+\_\+global\+\_\+matrix}!Schwarz\+Wrappers\+::\+Initialize@{Schwarz\+Wrappers\+::\+Initialize}}
+\subsubsection{\texorpdfstring{setup\+\_\+global\+\_\+matrix()}{setup\_global\_matrix()}}
 {\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
-void \hyperlink{classSchwarzWrappers_1_1Initialize}{Schwarz\+Wrappers\+::\+Initialize}$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+global\+\_\+matrix\+\_\+laplacian (\begin{DoxyParamCaption}\item[{const gko\+::size\+\_\+type \&}]{oned\+\_\+laplacian\+\_\+size,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{global\+\_\+matrix }\end{DoxyParamCaption})}
+void \hyperlink{classSchwarzWrappers_1_1Initialize}{Schwarz\+Wrappers\+::\+Initialize}$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+global\+\_\+matrix (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{filename,  }\item[{const gko\+::size\+\_\+type \&}]{oned\+\_\+laplacian\+\_\+size,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{global\+\_\+matrix }\end{DoxyParamCaption})}
 
 
 
@@ -135,7 +139,7 @@ Generates the 2D global laplacian matrix.
 \end{DoxyParams}
 
 
-Referenced by Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize().
+Referenced by Schwarz\+Wrappers\+::\+Initialize$<$ Value\+Type, Index\+Type $>$\+::generate\+\_\+rhs(), and Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize().
 
 \mbox{\Hypertarget{classSchwarzWrappers_1_1Initialize_a7ddd2c8688b884b62f74f390b4114377}\label{classSchwarzWrappers_1_1Initialize_a7ddd2c8688b884b62f74f390b4114377}} 
 \index{Schwarz\+Wrappers\+::\+Initialize@{Schwarz\+Wrappers\+::\+Initialize}!setup\+\_\+local\+\_\+matrices@{setup\+\_\+local\+\_\+matrices}}
@@ -211,5 +215,5 @@ Referenced by Schwarz\+Wrappers\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-initialization.\+hpp (4da3021)\item 
-/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/initialization.\+cpp (4da3021)\end{DoxyCompactItemize}
+initialization.\+hpp (a4aae12)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/initialization.\+cpp (a4aae12)\end{DoxyCompactItemize}

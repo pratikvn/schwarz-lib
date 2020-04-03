@@ -1,9 +1,9 @@
 <map id="SchwarzWrappers::Initialize&lt; ValueType, IndexType &gt;" name="SchwarzWrappers::Initialize&lt; ValueType, IndexType &gt;">
-<area shape="rect" id="node2" href="$structSchwarzWrappers_1_1Settings.html" title="The struct that contains the solver settings and the parameters to be set by the user. " alt="" coords="1019,125,1204,151"/>
+<area shape="rect" id="node2" href="$structSchwarzWrappers_1_1Settings.html" title="The struct that contains the solver settings and the parameters to be set by the user. " alt="" coords="1019,139,1204,166"/>
 <area shape="rect" id="node3" href="$structSchwarzWrappers_1_1Settings_1_1convergence__settings.html" title="The various convergence settings available. " alt="" coords="610,5,795,47"/>
-<area shape="rect" id="node4" title="STL class. " alt="" coords="663,89,743,115"/>
-<area shape="rect" id="node6" title="STL class. " alt="" coords="5,81,132,123"/>
-<area shape="rect" id="node7" href="$structSchwarzWrappers_1_1Settings_1_1comm__settings.html" title="The settings for the various available communication paradigms. " alt="" coords="610,140,795,181"/>
-<area shape="rect" id="node8" href="$structSchwarzWrappers_1_1Metadata.html" title="The solver metadata struct. " alt="" coords="1016,233,1207,275"/>
-<area shape="rect" id="node10" title="STL class. " alt="" coords="239,325,355,351"/>
+<area shape="rect" id="node4" title="STL class. " alt="" coords="663,103,743,130"/>
+<area shape="rect" id="node6" title="STL class. " alt="" coords="5,96,132,137"/>
+<area shape="rect" id="node7" href="$structSchwarzWrappers_1_1Settings_1_1comm__settings.html" title="The settings for the various available communication paradigms. " alt="" coords="610,155,795,196"/>
+<area shape="rect" id="node8" href="$structSchwarzWrappers_1_1Metadata.html" title="The solver metadata struct. " alt="" coords="1016,280,1207,321"/>
+<area shape="rect" id="node10" title="STL class. " alt="" coords="239,339,355,366"/>
 </map>

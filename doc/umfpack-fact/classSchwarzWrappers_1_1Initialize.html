@@ -92,9 +92,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a96fdb68e6a32c55e411b9a9e11a276f9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1Initialize.html#a96fdb68e6a32c55e411b9a9e11a276f9">generate_rhs</a> (std::vector&lt; ValueType &gt; &amp;rhs)</td></tr>
 <tr class="memdesc:a96fdb68e6a32c55e411b9a9e11a276f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the right hand side vector.  <a href="#a96fdb68e6a32c55e411b9a9e11a276f9">More...</a><br /></td></tr>
 <tr class="separator:a96fdb68e6a32c55e411b9a9e11a276f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb6b1f844e9f334b2baf07f114506a77"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1Initialize.html#abb6b1f844e9f334b2baf07f114506a77">setup_global_matrix_laplacian</a> (const gko::size_type &amp;<a class="el" href="structSchwarzWrappers_1_1Metadata.html#a273537397c2735f54f4e50701f3e2c1d">oned_laplacian_size</a>, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;global_matrix)</td></tr>
-<tr class="memdesc:abb6b1f844e9f334b2baf07f114506a77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the 2D global laplacian matrix.  <a href="#abb6b1f844e9f334b2baf07f114506a77">More...</a><br /></td></tr>
-<tr class="separator:abb6b1f844e9f334b2baf07f114506a77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7463e23c00e298ea5c9ad0d4afabe8d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1Initialize.html#a7463e23c00e298ea5c9ad0d4afabe8d4">setup_global_matrix</a> (const std::string &amp;filename, const gko::size_type &amp;<a class="el" href="structSchwarzWrappers_1_1Metadata.html#a273537397c2735f54f4e50701f3e2c1d">oned_laplacian_size</a>, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;global_matrix)</td></tr>
+<tr class="memdesc:a7463e23c00e298ea5c9ad0d4afabe8d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the 2D global laplacian matrix.  <a href="#a7463e23c00e298ea5c9ad0d4afabe8d4">More...</a><br /></td></tr>
+<tr class="separator:a7463e23c00e298ea5c9ad0d4afabe8d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a7a5d4e8ac0312541c3e82ce9d2ae7f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSchwarzWrappers_1_1Initialize.html#a2a7a5d4e8ac0312541c3e82ce9d2ae7f">partition</a> (const <a class="el" href="structSchwarzWrappers_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structSchwarzWrappers_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, const std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;global_matrix, std::vector&lt; unsigned int &gt; &amp;<a class="el" href="classSchwarzWrappers_1_1Initialize.html#a9ad20884882db7c28560d9f9755e571e">partition_indices</a>)</td></tr>
 <tr class="memdesc:a2a7a5d4e8ac0312541c3e82ce9d2ae7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The partitioning function.  <a href="#a2a7a5d4e8ac0312541c3e82ce9d2ae7f">More...</a><br /></td></tr>
 <tr class="separator:a2a7a5d4e8ac0312541c3e82ce9d2ae7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -139,8 +139,12 @@ std::shared_ptr&lt; <a class="el" href="classSchwarzWrappers_1_1device__guard.ht
 gko::int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSchwarzWrappers_1_1Settings.html#ab1be4bd623b4cf1c8999160e753752ff">overlap</a> = 2</td></tr>
 <tr class="memdesc:ab1be4bd623b4cf1c8999160e753752ff inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">The overlap between the subdomains. <br /></td></tr>
 <tr class="separator:ab1be4bd623b4cf1c8999160e753752ff inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a734222e1021c3e01e6a004e08f081026 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="a734222e1021c3e01e6a004e08f081026"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSchwarzWrappers_1_1Settings.html#a734222e1021c3e01e6a004e08f081026">matrix_filename</a> = &quot;null&quot;</td></tr>
+<tr class="memdesc:a734222e1021c3e01e6a004e08f081026 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">The string that contains the matrix file name to read from . <br /></td></tr>
+<tr class="separator:a734222e1021c3e01e6a004e08f081026 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a120b05467ef07d770948ccacf12bb1c3 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSchwarzWrappers_1_1Settings.html#a120b05467ef07d770948ccacf12bb1c3">explicit_laplacian</a> = true</td></tr>
-<tr class="memdesc:a120b05467ef07d770948ccacf12bb1c3 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag if the laplcian matrix should be generated within the library.  <a href="structSchwarzWrappers_1_1Settings.html#a120b05467ef07d770948ccacf12bb1c3">More...</a><br /></td></tr>
+<tr class="memdesc:a120b05467ef07d770948ccacf12bb1c3 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag if the laplacian matrix should be generated within the library.  <a href="structSchwarzWrappers_1_1Settings.html#a120b05467ef07d770948ccacf12bb1c3">More...</a><br /></td></tr>
 <tr class="separator:a120b05467ef07d770948ccacf12bb1c3 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac87fe7e2f41dcf9ea0abc9d4f919c8b inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="aac87fe7e2f41dcf9ea0abc9d4f919c8b"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSchwarzWrappers_1_1Settings.html#aac87fe7e2f41dcf9ea0abc9d4f919c8b">enable_random_rhs</a> = false</td></tr>
@@ -156,6 +160,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 <tr class="separator:a88048419dd7eb9a21ac3aa8f64986016 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c46d1dc895b72927f7393c79c1ee342 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structSchwarzWrappers_1_1Settings.html#abb00a70a7c715c93a2e7570ad6dc1bbe">local_solver_settings</a>&#160;</td><td class="memItemRight" valign="bottom"><b>local_solver</b></td></tr>
 <tr class="separator:a8c46d1dc895b72927f7393c79c1ee342 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af61f404ed315a3e2c93adc92ef020c78 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="af61f404ed315a3e2c93adc92ef020c78"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>non_symmetric_matrix</b> = false</td></tr>
+<tr class="separator:af61f404ed315a3e2c93adc92ef020c78 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd0d2bf6e98da07012fd08260114de17 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSchwarzWrappers_1_1Settings.html#afd0d2bf6e98da07012fd08260114de17">naturally_ordered_factor</a> = false</td></tr>
 <tr class="memdesc:afd0d2bf6e98da07012fd08260114de17 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disables the re-ordering of the matrix before computing the triangular factors during the CHOLMOD factorization.  <a href="structSchwarzWrappers_1_1Settings.html#afd0d2bf6e98da07012fd08260114de17">More...</a><br /></td></tr>
 <tr class="separator:afd0d2bf6e98da07012fd08260114de17 inherit pub_attribs_structSchwarzWrappers_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -372,6 +379,8 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
   </dd>
 </dl>
 
+<p class="reference">References <a class="el" href="classSchwarzWrappers_1_1Initialize.html#a7463e23c00e298ea5c9ad0d4afabe8d4">SchwarzWrappers::Initialize&lt; ValueType, IndexType &gt;::setup_global_matrix()</a>.</p>
+
 <p class="reference">Referenced by <a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a048a3a63407befc9aed09ceb0e4d0709">SchwarzWrappers::SchwarzBase&lt; ValueType, IndexType &gt;::initialize()</a>.</p>
 
 </div>
@@ -434,8 +443,8 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
 
 </div>
 </div>
-<a id="abb6b1f844e9f334b2baf07f114506a77"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb6b1f844e9f334b2baf07f114506a77">&#9670;&nbsp;</a></span>setup_global_matrix_laplacian()</h2>
+<a id="a7463e23c00e298ea5c9ad0d4afabe8d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7463e23c00e298ea5c9ad0d4afabe8d4">&#9670;&nbsp;</a></span>setup_global_matrix()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -443,8 +452,14 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
 template&lt;typename ValueType , typename IndexType &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classSchwarzWrappers_1_1Initialize.html">SchwarzWrappers::Initialize</a>&lt; ValueType, IndexType &gt;::setup_global_matrix_laplacian </td>
+          <td class="memname">void <a class="el" href="classSchwarzWrappers_1_1Initialize.html">SchwarzWrappers::Initialize</a>&lt; ValueType, IndexType &gt;::setup_global_matrix </td>
           <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>filename</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const gko::size_type &amp;&#160;</td>
           <td class="paramname"><em>oned_laplacian_size</em>, </td>
         </tr>
@@ -471,7 +486,7 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
   </dd>
 </dl>
 
-<p class="reference">Referenced by <a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a048a3a63407befc9aed09ceb0e4d0709">SchwarzWrappers::SchwarzBase&lt; ValueType, IndexType &gt;::initialize()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="classSchwarzWrappers_1_1Initialize.html#a96fdb68e6a32c55e411b9a9e11a276f9">SchwarzWrappers::Initialize&lt; ValueType, IndexType &gt;::generate_rhs()</a>, and <a class="el" href="classSchwarzWrappers_1_1SchwarzBase.html#a048a3a63407befc9aed09ceb0e4d0709">SchwarzWrappers::SchwarzBase&lt; ValueType, IndexType &gt;::initialize()</a>.</p>
 
 </div>
 </div>
@@ -633,8 +648,8 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li><a class="el" href="include_2initialization_8hpp_source.html">initialization.hpp (4da3021)</a></li>
-<li>/home/runner/work/schwarz-lib/schwarz-lib/source/initialization.cpp (4da3021)</li>
+<li><a class="el" href="include_2initialization_8hpp_source.html">initialization.hpp (a4aae12)</a></li>
+<li>/home/runner/work/schwarz-lib/schwarz-lib/source/initialization.cpp (a4aae12)</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

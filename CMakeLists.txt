@@ -22,6 +22,7 @@ ginkgo_find_package(gflags gflags FALSE 2.2.2)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 set(Schwarz_SOURCE_DIR "${CMAKE_SOURCE_DIR}")
+set(Schwarz_BINARY_DIR "${CMAKE_BINARY_DIR}")
 
 set(SCHWARZ_HAVE_CHOLMOD 0)
 if(SCHWARZ_BUILD_CHOLMOD)
@@ -75,6 +76,10 @@ if(SCHWARZ_WITH_HWLOC)
   find_package(HWLOC)
   set(SCHWARZ_HAVE_HWLOC 1)
 endif()
+
+# Add some matrices for configuration.
+add_subdirectory(matrices)
+
 
 set(SCHWARZ_HAVE_CUDA 0)
 if(SCHWARZ_BUILD_CUDA)

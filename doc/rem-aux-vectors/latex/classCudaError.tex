@@ -1,0 +1,59 @@
+\hypertarget{classCudaError}{}\section{Cuda\+Error Class Reference}
+\label{classCudaError}\index{Cuda\+Error@{Cuda\+Error}}
+
+
+\hyperlink{classCudaError}{Cuda\+Error} is thrown when a C\+U\+DA routine throws a non-\/zero error code.  
+
+
+
+
+{\ttfamily \#include $<$exception.\+hpp$>$}
+
+
+
+Collaboration diagram for Cuda\+Error\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=158pt]{classCudaError__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCudaError_a90e176d63d838031cb364cdb54532aaf}{Cuda\+Error} (const std\+::string \&file, int line, const std\+::string \&func, int error\+\_\+code)
+\begin{DoxyCompactList}\small\item\em Initializes a C\+U\+DA error. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classCudaError}{Cuda\+Error} is thrown when a C\+U\+DA routine throws a non-\/zero error code. 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classCudaError_a90e176d63d838031cb364cdb54532aaf}\label{classCudaError_a90e176d63d838031cb364cdb54532aaf}} 
+\index{Cuda\+Error@{Cuda\+Error}!Cuda\+Error@{Cuda\+Error}}
+\index{Cuda\+Error@{Cuda\+Error}!Cuda\+Error@{Cuda\+Error}}
+\subsubsection{\texorpdfstring{Cuda\+Error()}{CudaError()}}
+{\footnotesize\ttfamily Cuda\+Error\+::\+Cuda\+Error (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{file,  }\item[{int}]{line,  }\item[{const std\+::string \&}]{func,  }\item[{int}]{error\+\_\+code }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Initializes a C\+U\+DA error. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file} & The name of the offending source file \\
+\hline
+{\em line} & The source code line number where the error occurred \\
+\hline
+{\em func} & The name of the C\+U\+DA routine that failed \\
+\hline
+{\em error\+\_\+code} & The resulting C\+U\+DA error code \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+exception.\+hpp (5a15602)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/exception.\+cpp (5a15602)\end{DoxyCompactItemize}

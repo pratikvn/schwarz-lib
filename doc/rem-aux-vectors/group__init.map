@@ -1,0 +1,4 @@
+<map id="Initialization" name="Initialization">
+<area shape="rect" id="node1" href="$group__solve.html" title="A module dedicated to the solvers including local solution and convergence detection in schwarz&#45;lib..." alt="" coords="269,5,324,32"/>
+<area shape="rect" id="node2" href="$group__comm.html" title="A module dedicated to the Communication interface in schwarz&#45;lib. " alt="" coords="245,76,348,103"/>
+</map>

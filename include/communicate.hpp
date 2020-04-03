@@ -158,6 +158,17 @@ public:
         std::shared_ptr<gko::matrix::Dense<ValueType>> recv_buffer;
 
         //CHANGED
+
+        /**
+         * The last received boundary values for each of the in neighbors for extrapolation
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> last_recv_bdy;
+
+        /**
+         * The second last received boundary values for each of the in neighbors for extrapolation
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> sec_last_recv_bdy;
+
         /**
          * Average of values in the send buffer for each of the out neighbors
          */
@@ -169,9 +180,30 @@ public:
         std::shared_ptr<gko::matrix::Dense<ValueType>> last_send_avg;
 
         /**
+         * Average of values in the recv buffer for each of the out neighbors
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> curr_recv_avg;
+
+        /**
+         * Average of values in the last recv buffer for each of the out neighbors
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> last_recv_avg;
+
+        /**
          * Number of messages sent
          */
         std::shared_ptr<gko::Array<IndexType>> msg_count;
+
+        /**
+         * Iteration stamp of last received values
+         */
+        std::shared_ptr<gko::Array<IndexType>> last_recv_iter;
+
+        /**
+         * Iteration stamp of second last received values
+         */
+        std::shared_ptr<gko::Array<IndexType>> sec_last_recv_iter;
+
         //END CHANGED
 
         /**
@@ -226,7 +258,8 @@ public:
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution_vector) = 0;
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution_vector,
+        std::ofstream &fps, std::ofstream &fpr) = 0;
 
     /**
      * Transforms data from a local vector to a global vector

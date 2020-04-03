@@ -50,7 +50,8 @@ template <typename ValueType, typename IndexType>
 void Communicate<ValueType, IndexType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution_vector)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution_vector,
+    std::ofstream &fp, std::ofstream &fpr)
     SCHWARZ_NOT_IMPLEMENTED;
 
 template <typename ValueType, typename IndexType>
@@ -97,7 +98,7 @@ void Communicate<ValueType, IndexType>::local_to_global_vector(
 template <typename ValueType, typename IndexType>
 void Communicate<ValueType, IndexType>::clear(Settings &settings) {
   if (settings.comm_settings.enable_onesided) {
-    MPI_Win_unlock_all(comm_struct.window_buffer);
+    //MPI_Win_unlock_all(comm_struct.window_buffer);
     //MPI_Win_unlock_all(comm_struct.window_x);
 
     MPI_Win_free(&comm_struct.window_x);

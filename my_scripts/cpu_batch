@@ -60,7 +60,7 @@ then
 fi
 
 export run_exec=$PARENT_DIR/build/benchmarking/bench_ras
-export run_flags="--executor=${EXEC} --num_iters=${NUM_ITERS} --explicit_laplacian --set_1d_laplacian_size=${PROB_SIZE} --set_tol=1e-6 --local_tol=1e-12 --partition=${PARTITION} --local_solver=${LOCAL_SOLVE} ${COMM_TYPE_FLAG} --enable_flush=flush-local --write_comm_data --timings_file=subd --enable_global_check --constant=${CONSTANT} --gamma=${GAMMA}"  
+export run_flags="--executor=${EXEC} --num_iters=${NUM_ITERS} --explicit_laplacian --set_1d_laplacian_size=${PROB_SIZE} --set_tol=1e-4 --local_tol=1e-8 --partition=${PARTITION} --local_solver=${LOCAL_SOLVE} ${COMM_TYPE_FLAG} --enable_flush=flush-local --write_comm_data --timings_file=subd --enable_global_check --constant=${CONSTANT} --gamma=${GAMMA}"  
 
 NUM_PE_NODES="$((${NUM_NODES}*48))"
 echo "#!/bin/csh" > job_script.sh

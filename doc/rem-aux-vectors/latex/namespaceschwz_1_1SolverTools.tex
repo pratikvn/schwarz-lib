@@ -8,14 +8,14 @@ The \hyperlink{namespaceschwz_1_1SolverTools}{Solver\+Tools} namespace .
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\Hypertarget{namespaceschwz_1_1SolverTools_aa0dfc9506e3813443c3923bceb608b97}\label{namespaceschwz_1_1SolverTools_aa0dfc9506e3813443c3923bceb608b97}} 
-{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries solve\+\_\+direct\+\_\+ginkgo} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, const std\+::shared\+\_\+ptr$<$ gko\+::solver\+::\+Lower\+Trs$<$ Value\+Type, Index\+Type $>$$>$ \&L\+\_\+solver, const std\+::shared\+\_\+ptr$<$ gko\+::solver\+::\+Upper\+Trs$<$ Value\+Type, Index\+Type $>$$>$ \&U\+\_\+solver, gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $\ast$local\+\_\+solution)
+\mbox{\Hypertarget{namespaceschwz_1_1SolverTools_ae0eb9798ac886b0e45c304a97fe70176}\label{namespaceschwz_1_1SolverTools_ae0eb9798ac886b0e45c304a97fe70176}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries solve\+\_\+direct\+\_\+ginkgo} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, const std\+::shared\+\_\+ptr$<$ gko\+::solver\+::\+Lower\+Trs$<$ Value\+Type, Index\+Type $>$$>$ \&L\+\_\+solver, const std\+::shared\+\_\+ptr$<$ gko\+::solver\+::\+Upper\+Trs$<$ Value\+Type, Index\+Type $>$$>$ \&U\+\_\+solver, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&work\+\_\+vector, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+solution)
 \item 
 \mbox{\Hypertarget{namespaceschwz_1_1SolverTools_a246fa524f65b66c548ecd16a74124356}\label{namespaceschwz_1_1SolverTools_a246fa524f65b66c548ecd16a74124356}} 
 {\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries solve\+\_\+iterative\+\_\+ginkgo} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, const std\+::shared\+\_\+ptr$<$ gko\+::\+Lin\+Op $>$ \&solver, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+rhs, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+solution)
 \item 
-\mbox{\Hypertarget{namespaceschwz_1_1SolverTools_a3537014bf1cbd8e0b1c3895a2aaac891}\label{namespaceschwz_1_1SolverTools_a3537014bf1cbd8e0b1c3895a2aaac891}} 
-{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries extract\+\_\+local\+\_\+vector} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&sub\+\_\+vector, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&vector, const Index\+Type \&vec\+\_\+index)
+\mbox{\Hypertarget{namespaceschwz_1_1SolverTools_a193e789c220cc7675b4cd7da073f3779}\label{namespaceschwz_1_1SolverTools_a193e789c220cc7675b4cd7da073f3779}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries extract\+\_\+local\+\_\+vector} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $\ast$sub\+\_\+vector, const gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $\ast$vector, const Index\+Type \&vec\+\_\+index)
 \end{DoxyCompactItemize}
 
 

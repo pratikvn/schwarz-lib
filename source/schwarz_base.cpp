@@ -132,8 +132,6 @@ void SchwarzBase<ValueType, IndexType>::initialize(
 #endif
     }
     this->metadata.global_size = this->global_matrix->get_size()[0];
-    // MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0,
-    // MPI_COMM_WORLD);
     auto my_rank = this->metadata.my_rank;
     auto comm_size = this->metadata.comm_size;
     auto num_subdomains = this->metadata.num_subdomains;
@@ -293,12 +291,12 @@ void SchwarzBase<ValueType, IndexType>::run(
     // The main solution vector
     std::shared_ptr<vec_vtype> solution_vector = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
-    // A temp local solution
-    std::shared_ptr<vec_vtype> init_guess = vec_vtype::create(
-        this->settings.executor, this->local_solution->get_size());
     // A global gathered solution of the previous iteration.
     std::shared_ptr<vec_vtype> global_old_solution = vec_vtype::create(
         settings.executor, gko::dim<2>(this->metadata.global_size, 1));
+    // A global gathered solution of the previous iteration.
+    std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
+        settings.executor, gko::dim<2>(2 * this->metadata.local_size_x, 1));
     // Setup the windows for the onesided communication.
     this->setup_windows(this->settings, this->metadata, solution_vector);
 
@@ -336,8 +334,9 @@ void SchwarzBase<ValueType, IndexType>::run(
             (Solve<ValueType, IndexType>::check_convergence(
                 settings, metadata, this->comm_struct, this->convergence_vector,
                 global_old_solution, this->local_solution, this->local_matrix,
-                local_residual_norm, local_residual_norm0, global_residual_norm,
-                global_residual_norm0, num_converged_procs)),
+                work_vector, local_residual_norm, local_residual_norm0,
+                global_residual_norm, global_residual_norm0,
+                num_converged_procs)),
             2, metadata.my_rank, convergence_check, metadata.iter_count);
 
         // break if the solution diverges.
@@ -356,7 +355,7 @@ void SchwarzBase<ValueType, IndexType>::run(
                 (Solve<ValueType, IndexType>::local_solve(
                     settings, metadata, this->local_matrix,
                     this->triangular_factor_l, this->triangular_factor_u,
-                    this->local_perm, this->local_inv_perm, init_guess,
+                    this->local_perm, this->local_inv_perm, work_vector,
                     this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
             // init_guess->copy_from(this->local_solution.get());

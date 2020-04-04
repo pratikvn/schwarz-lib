@@ -558,9 +558,10 @@ void Solve<ValueType, IndexType>::local_solve(
         &triangular_factor_u,
     std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
     std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
+    using vec = gko::matrix::Dense<ValueType>;
     const auto solver_settings =
         (Settings::local_solver_settings::direct_solver_cholmod |
          Settings::local_solver_settings::direct_solver_umfpack |
@@ -591,17 +592,27 @@ void Solve<ValueType, IndexType>::local_solve(
 #endif
     } else if (solver_settings ==
                Settings::local_solver_settings::direct_solver_ginkgo) {
-        auto perm_sol = gko::matrix::Dense<ValueType>::create(
-            settings.executor, local_solution->get_size());
+        auto vec_size = local_solution->get_size()[0];
+        std::shared_ptr<vec> perm_sol =
+            vec::create(settings.executor, gko::dim<2>(vec_size, 1),
+                        gko::Array<ValueType>::view(settings.executor, vec_size,
+                                                    work_vector->get_values()),
+                        1);
         local_perm->apply(local_solution.get(), perm_sol.get());
         SolverTools::solve_direct_ginkgo(settings, metadata, this->L_solver,
-                                         this->U_solver, perm_sol.get());
+                                         this->U_solver, work_vector, perm_sol);
         local_inv_perm->apply(perm_sol.get(), local_solution.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
+        auto vec_size = local_solution->get_size()[0];
+        std::shared_ptr<vec> local_rhs =
+            vec::create(settings.executor, gko::dim<2>(vec_size, 1),
+                        gko::Array<ValueType>::view(settings.executor, vec_size,
+                                                    work_vector->get_values()),
+                        1);
+        local_rhs->copy_from(local_solution.get());
         SolverTools::solve_iterative_ginkgo(settings, metadata, this->solver,
-                                            local_solution, init_guess);
-        local_solution->copy_from(init_guess.get());
+                                            local_rhs, local_solution);
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_dealii) {
         SCHWARZ_NOT_IMPLEMENTED
@@ -621,6 +632,7 @@ bool Solve<ValueType, IndexType>::check_local_convergence(
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_old_solution,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
     ValueType &local_resnorm, ValueType &local_resnorm0)
 {
     using vec = gko::matrix::Dense<ValueType>;
@@ -633,15 +645,23 @@ bool Solve<ValueType, IndexType>::check_local_convergence(
     // tol = 0.0 (compute local residual, but no global convergence check)
     // tol < 0.0 (no local residual computation)
     if (tolerance >= 0.0) {
-        std::shared_ptr<vec> local_b = vec::create(
-            settings.executor, gko::dim<2>(metadata.local_size_x, 1));
-        std::shared_ptr<vec> local_x = vec::create(
-            settings.executor, gko::dim<2>(metadata.local_size_x, 1));
+        auto local_b = vec::create(settings.executor,
+                                   gko::dim<2>(metadata.local_size_x, 1),
+                                   gko::Array<ValueType>::view(
+                                       settings.executor, metadata.local_size_x,
+                                       work_vector->get_values()),
+                                   1);
+        auto local_x = vec::create(
+            settings.executor, gko::dim<2>(metadata.local_size_x, 1),
+            gko::Array<ValueType>::view(
+                settings.executor, metadata.local_size_x,
+                work_vector->get_values() + metadata.local_size_x),
+            1);
         // extract local parts of b and x (with local matrix (interior+overlap),
         // but only with the interior part)
         local_b->copy_from(local_solution.get());
         SolverTools::extract_local_vector(
-            settings, metadata, local_x, global_old_solution,
+            settings, metadata, local_x.get(), global_old_solution.get(),
             metadata.first_row->get_data()[metadata.my_rank]);
 
         // SpMV with interior including overlap, b - A*x
@@ -759,7 +779,7 @@ void Solve<ValueType, IndexType>::check_global_convergence(
                           MPI_SUM, MPI_COMM_WORLD);
         }
     }
-}  // namespace schwz
+}
 
 
 template <typename ValueType, typename IndexType>
@@ -770,6 +790,7 @@ void Solve<ValueType, IndexType>::check_convergence(
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_old_solution,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
     ValueType &local_residual_norm, ValueType &local_residual_norm0,
     ValueType &global_residual_norm, ValueType &global_residual_norm0,
     int &num_converged_procs)
@@ -778,7 +799,7 @@ void Solve<ValueType, IndexType>::check_convergence(
     auto tolerance = metadata.tolerance;
     auto iter = metadata.iter_count;
     if (check_local_convergence(settings, metadata, local_solution,
-                                global_old_solution, local_matrix,
+                                global_old_solution, local_matrix, work_vector,
                                 local_residual_norm, local_residual_norm0)) {
         num_converged_p = 1;
     } else {

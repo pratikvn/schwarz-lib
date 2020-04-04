@@ -349,8 +349,8 @@ void Initialize<ValueType, IndexType>::setup_vectors(
         vec::create(settings.executor, gko::dim<2>(metadata.local_size_x, 1));
     // Extract the local rhs from the global rhs. Also takes into account the
     // overlap.
-    SolverTools::extract_local_vector(settings, metadata, local_rhs, global_rhs,
-                                      first_row);
+    SolverTools::extract_local_vector(settings, metadata, local_rhs.get(),
+                                      global_rhs.get(), first_row);
 
     local_solution =
         vec::create(settings.executor, gko::dim<2>(metadata.local_size_x, 1));

@@ -186,6 +186,7 @@ protected:
         const std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &local_matrix,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
         ValueType &local_residual_norm, ValueType &local_residual_norm0,
         ValueType &global_residual_norm, ValueType &global_residual_norm0,
         int &num_converged_procs);
@@ -236,6 +237,7 @@ protected:
             &global_old_solution,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &local_matrix,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
         ValueType &local_resnorm, ValueType &local_resnorm0);
 
     /**

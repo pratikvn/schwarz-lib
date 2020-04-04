@@ -630,7 +630,7 @@ template <typename ValueType, typename IndexType>
 bool Solve<ValueType, IndexType>::check_local_convergence(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
-    const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_old_solution,
+    const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
     ValueType &local_resnorm, ValueType &local_resnorm0)
@@ -661,7 +661,7 @@ bool Solve<ValueType, IndexType>::check_local_convergence(
         // but only with the interior part)
         local_b->copy_from(local_solution.get());
         SolverTools::extract_local_vector(
-            settings, metadata, local_x.get(), global_old_solution.get(),
+            settings, metadata, local_x.get(), global_solution.get(),
             metadata.first_row->get_data()[metadata.my_rank]);
 
         // SpMV with interior including overlap, b - A*x
@@ -787,7 +787,7 @@ void Solve<ValueType, IndexType>::check_convergence(
     const Settings &settings, Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
     std::shared_ptr<gko::Array<IndexType>> &convergence_vector,
-    const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_old_solution,
+    const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
@@ -799,7 +799,7 @@ void Solve<ValueType, IndexType>::check_convergence(
     auto tolerance = metadata.tolerance;
     auto iter = metadata.iter_count;
     if (check_local_convergence(settings, metadata, local_solution,
-                                global_old_solution, local_matrix, work_vector,
+                                global_solution, local_matrix, work_vector,
                                 local_residual_norm, local_residual_norm0)) {
         num_converged_p = 1;
     } else {
@@ -832,14 +832,14 @@ void Solve<ValueType, IndexType>::update_residual(
     const Settings &settings,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
-    const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_old_solution)
+    const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;
     auto one = gko::initialize<vec>({1.0}, settings.executor);
     auto neg_one = gko::initialize<vec>({-1.0}, settings.executor);
 
-    local_matrix->apply(neg_one.get(), gko::lend(global_old_solution),
-                        one.get(), gko::lend(solution_vector));
+    local_matrix->apply(neg_one.get(), gko::lend(global_solution), one.get(),
+                        gko::lend(solution_vector));
 }
 
 
@@ -849,7 +849,7 @@ void Solve<ValueType, IndexType>::compute_residual_norm(
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &global_matrix,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_rhs,
-    const std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
+    const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
     ValueType &mat_norm, ValueType &rhs_norm, ValueType &sol_norm,
     ValueType &residual_norm)
 {
@@ -873,7 +873,7 @@ void Solve<ValueType, IndexType>::compute_residual_norm(
         vec::create(settings.executor, gko::dim<2>(metadata.local_size, 1),
                     (gko::Array<ValueType>::view(
                         settings.executor, metadata.local_size,
-                        &solution_vector->get_values()[first_row])),
+                        &global_solution->get_values()[first_row])),
                     1);
     temp_vector->copy_from(temp_vector2.get());
     auto mpi_vtype = boost::mpi::get_mpi_datatype(local_sol->get_values()[0]);
@@ -894,11 +894,11 @@ void Solve<ValueType, IndexType>::compute_residual_norm(
     global_sol->compute_norm2(xnorm.get());
     cpu_solnorm->copy_from(gko::lend(xnorm));
     sol_norm = cpu_solnorm->at(0);
-    solution_vector->copy_from(global_sol.get());
+    global_solution->copy_from(global_sol.get());
     auto one = gko::initialize<vec>({1.0}, settings.executor);
     auto neg_one = gko::initialize<vec>({-1.0}, settings.executor);
 
-    global_matrix->apply(neg_one.get(), gko::lend(solution_vector), one.get(),
+    global_matrix->apply(neg_one.get(), gko::lend(global_solution), one.get(),
                          gko::lend(global_rhs));
 
     global_rhs->compute_norm2(rnorm.get());

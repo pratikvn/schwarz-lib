@@ -709,7 +709,7 @@ template <typename ValueType, typename IndexType>
 void exchange_boundary_twosided(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;
     MPI_Status status;
@@ -733,7 +733,7 @@ void exchange_boundary_twosided(
             auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
             settings.executor->run(GatherScatter<ValueType, IndexType>(
                 true, (global_put[p])[0], &((local_put[p])[1]),
-                solution_vector->get_values(), &send_buffer[num_put]));
+                global_solution->get_values(), &send_buffer[num_put]));
 
             MPI_Isend(&send_buffer[num_put], (global_put[p])[0], mpi_vtype,
                       neighbors_out[p], 0, MPI_COMM_WORLD, &put_request[p]);
@@ -752,8 +752,7 @@ void exchange_boundary_twosided(
             // receive
             if ((global_get[p])[0] > 0) {
                 auto recv_buffer = comm_struct.recv_buffer->get_values();
-                auto mpi_vtype = boost::mpi::get_mpi_datatype(
-                    recv_buffer[0]);  // works for GPU buffers ?
+                auto mpi_vtype = boost::mpi::get_mpi_datatype(recv_buffer[0]);
                 MPI_Irecv(&recv_buffer[num_get], (global_get[p])[0], mpi_vtype,
                           neighbors_in[p], 0, MPI_COMM_WORLD, &get_request[p]);
                 num_get += (global_get[p])[0];
@@ -766,11 +765,10 @@ void exchange_boundary_twosided(
     for (auto p = 0; p < num_neighbors_in; p++) {
         if ((global_get[p])[0] > 0) {
             auto recv_buffer = comm_struct.recv_buffer->get_values();
-            auto mpi_vtype = boost::mpi::get_mpi_datatype(
-                recv_buffer[0]);  // works for GPU buffers ?
+            auto mpi_vtype = boost::mpi::get_mpi_datatype(recv_buffer[0]);
             settings.executor->run(GatherScatter<ValueType, IndexType>(
                 false, (global_get[p])[0], &((local_get[p])[1]),
-                &recv_buffer[num_get], solution_vector->get_values()));
+                &recv_buffer[num_get], global_solution->get_values()));
 
             if (settings.comm_settings.enable_overlap) {
                 // start the next receive
@@ -796,14 +794,14 @@ void exchange_boundary_twosided(
 template <typename ValueType, typename IndexType>
 void SolverRAS<ValueType, IndexType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     if (settings.comm_settings.enable_onesided) {
         exchange_boundary_onesided<ValueType, IndexType>(
-            settings, metadata, this->comm_struct, solution_vector);
+            settings, metadata, this->comm_struct, global_solution);
     } else {
         exchange_boundary_twosided<ValueType, IndexType>(
-            settings, metadata, this->comm_struct, solution_vector);
+            settings, metadata, this->comm_struct, global_solution);
     }
 }
 
@@ -813,8 +811,7 @@ void SolverRAS<ValueType, IndexType>::update_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
-    const std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_old_solution,
+    const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &interface_matrix)
 {
@@ -825,16 +822,15 @@ void SolverRAS<ValueType, IndexType>::update_boundary(
         {-1.0}, settings.executor);
     auto local_size_x = metadata.local_size_x;
     local_solution->copy_from(local_rhs.get());
-    global_old_solution->copy_from(solution_vector.get());
     if (metadata.num_subdomains > 1 && settings.overlap > 0) {
         auto temp_solution = vec_vtype::create(
             settings.executor, local_solution->get_size(),
-            gko::Array<ValueType>::view(
-                settings.executor, local_solution->get_size()[0],
-                &(global_old_solution->get_values()[0])),
+            gko::Array<ValueType>::view(settings.executor,
+                                        local_solution->get_size()[0],
+                                        global_solution->get_values()),
             1);
         interface_matrix->apply(neg_one.get(), temp_solution.get(), one.get(),
-                                (local_solution).get());
+                                local_solution.get());
     }
 }
 

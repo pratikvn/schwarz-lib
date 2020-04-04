@@ -49,7 +49,7 @@ void Communicate<ValueType, IndexType>::setup_windows(
 template <typename ValueType, typename IndexType>
 void Communicate<ValueType, IndexType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
     SCHWARZ_NOT_IMPLEMENTED;
 
 template <typename ValueType, typename IndexType>
@@ -57,8 +57,7 @@ void Communicate<ValueType, IndexType>::update_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
-    const std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_old_solution,
+    const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &interface_matrix) SCHWARZ_NOT_IMPLEMENTED;
 
@@ -73,16 +72,16 @@ void Communicate<ValueType, IndexType>::local_to_global_vector(
         {1.0}, settings.executor);
     auto temp_vector = vec::create(
         settings.executor, gko::dim<2>(metadata.local_size, 1),
-        (gko::Array<ValueType>::view(
+        gko::Array<ValueType>::view(
             settings.executor, metadata.local_size,
             &global_vector->get_values()[metadata.first_row
-                                             ->get_data()[metadata.my_rank]])),
+                                             ->get_data()[metadata.my_rank]]),
         1);
 
     auto temp_vector2 = vec::create(
         settings.executor, gko::dim<2>(metadata.local_size, 1),
-        (gko::Array<ValueType>::view(settings.executor, metadata.local_size,
-                                     &local_vector->get_values()[0])),
+        gko::Array<ValueType>::view(settings.executor, metadata.local_size,
+                                    local_vector->get_values()),
         1);
     if (settings.convergence_settings.convergence_crit ==
         Settings::convergence_settings::local_convergence_crit::
@@ -90,7 +89,6 @@ void Communicate<ValueType, IndexType>::local_to_global_vector(
         local_vector->add_scaled(alpha.get(), temp_vector.get());
         temp_vector->add_scaled(alpha.get(), local_vector.get());
     } else {
-        // TODO GPU: DONE
         temp_vector->copy_from(temp_vector2.get());
     }
 }

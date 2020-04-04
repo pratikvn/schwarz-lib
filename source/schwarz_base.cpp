@@ -289,16 +289,13 @@ void SchwarzBase<ValueType, IndexType>::run(
     solution = vec_vtype::create(settings.executor->get_master(),
                                  gko::dim<2>(this->metadata.global_size, 1));
     // The main solution vector
-    std::shared_ptr<vec_vtype> solution_vector = vec_vtype::create(
+    std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
-    // A global gathered solution of the previous iteration.
-    std::shared_ptr<vec_vtype> global_old_solution = vec_vtype::create(
-        settings.executor, gko::dim<2>(this->metadata.global_size, 1));
-    // A global gathered solution of the previous iteration.
+    // A work vector.
     std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
         settings.executor, gko::dim<2>(2 * this->metadata.local_size_x, 1));
     // Setup the windows for the onesided communication.
-    this->setup_windows(this->settings, this->metadata, solution_vector);
+    this->setup_windows(this->settings, this->metadata, global_solution);
 
     const auto solver_settings =
         (Settings::local_solver_settings::direct_solver_cholmod |
@@ -317,23 +314,23 @@ void SchwarzBase<ValueType, IndexType>::run(
     for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
         // Exchange the boundary values. The communication part.
         MEASURE_ELAPSED_FUNC_TIME(
-            this->exchange_boundary(settings, metadata, solution_vector), 0,
+            this->exchange_boundary(settings, metadata, global_solution), 0,
             metadata.my_rank, boundary_exchange, metadata.iter_count);
 
         // Update the boundary and interior values after the exchanging from
         // other processes.
         MEASURE_ELAPSED_FUNC_TIME(
             this->update_boundary(settings, metadata, this->local_solution,
-                                  this->local_rhs, solution_vector,
-                                  global_old_solution, this->interface_matrix),
+                                  this->local_rhs, global_solution,
+                                  this->interface_matrix),
             1, metadata.my_rank, boundary_update, metadata.iter_count);
 
         // Check for the convergence of the solver.
-        num_converged_procs = 0;
+        // num_converged_procs = 0;
         MEASURE_ELAPSED_FUNC_TIME(
             (Solve<ValueType, IndexType>::check_convergence(
                 settings, metadata, this->comm_struct, this->convergence_vector,
-                global_old_solution, this->local_solution, this->local_matrix,
+                global_solution, this->local_solution, this->local_matrix,
                 work_vector, local_residual_norm, local_residual_norm0,
                 global_residual_norm, global_residual_norm0,
                 num_converged_procs)),
@@ -363,7 +360,7 @@ void SchwarzBase<ValueType, IndexType>::run(
             // communication.
             MEASURE_ELAPSED_FUNC_TIME(
                 (Communicate<ValueType, IndexType>::local_to_global_vector(
-                    settings, metadata, this->local_solution, solution_vector)),
+                    settings, metadata, this->local_solution, global_solution)),
                 4, metadata.my_rank, expand_local_vec, metadata.iter_count);
         }
     }
@@ -377,7 +374,7 @@ void SchwarzBase<ValueType, IndexType>::run(
     // Compute the final residual norm. Also gathers the solution from all
     // subdomains.
     Solve<ValueType, IndexType>::compute_residual_norm(
-        settings, metadata, global_matrix, global_rhs, solution_vector,
+        settings, metadata, global_matrix, global_rhs, global_solution,
         mat_norm, rhs_norm, sol_norm, residual_norm);
     gather_comm_data<ValueType, IndexType>(
         metadata.num_subdomains, this->comm_struct, metadata.comm_data_struct);
@@ -398,7 +395,7 @@ void SchwarzBase<ValueType, IndexType>::run(
       }
     // clang-format on
     if (metadata.my_rank == 0) {
-        solution->copy_from(solution_vector.get());
+        solution->copy_from(global_solution.get());
     }
 
     // Communicate<ValueType, IndexType>::clear(settings);

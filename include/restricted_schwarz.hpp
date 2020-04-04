@@ -90,15 +90,14 @@ public:
     void exchange_boundary(const Settings &settings,
                            const Metadata<ValueType, IndexType> &metadata,
                            std::shared_ptr<gko::matrix::Dense<ValueType>>
-                               &solution_vector) override;
+                               &global_solution) override;
 
     void update_boundary(
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
         const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
-        const std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &global_old_solution,
+        const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &interface_matrix) override;
 };

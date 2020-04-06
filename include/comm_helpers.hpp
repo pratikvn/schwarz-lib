@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <settings.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 /**
  * @brief The CommHelper namespace .
  * @ref comm_helpers
@@ -184,7 +184,7 @@ void unpack_buffer(const Settings &settings, ValueType *buffer,
 }
 
 }  // namespace CommHelpers
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // comm_helpers.hpp

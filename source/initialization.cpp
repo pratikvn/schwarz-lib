@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <solver_tools.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 template <typename ValueType, typename IndexType>
@@ -99,6 +99,7 @@ void Initialize<ValueType, IndexType>::setup_global_matrix(
     auto metadata = this->metadata;
     int N = 0;
     int numnnz = 0;
+    // Needs to be a square matrix
     if (metadata.my_rank == 0) {
         Assert(matrix.m() == matrix.n(), dealii::ExcNotQuadratic());
         N = matrix.m();
@@ -108,18 +109,16 @@ void Initialize<ValueType, IndexType>::setup_global_matrix(
     MPI_Bcast(&numnnz, 1, MPI_INT, 0, MPI_COMM_WORLD);
     global_matrix =
         mtx::create(settings.executor->get_master(), gko::dim<2>(N), numnnz);
-    std::shared_ptr<mtx> global_matrix_compute;
-    global_matrix_compute =
-        mtx::create(settings.executor->get_master(), gko::dim<2>(N), numnnz);
+    // std::shared_ptr<mtx> global_matrix_compute;
+    // global_matrix_compute =
+    //     mtx::create(settings.executor->get_master(), gko::dim<2>(N), numnnz);
     if (metadata.my_rank == 0) {
-        // Needs to be a square matrix
-
         // TODO: Templatize using the the matrix type.
         // TODO: Maybe can make it a friend class of the deal.ii Matrix class to
         // avoid copies ?
-        value_type *mat_values = global_matrix_compute->get_values();
-        index_type *mat_row_ptrs = global_matrix_compute->get_row_ptrs();
-        index_type *mat_col_idxs = global_matrix_compute->get_col_idxs();
+        value_type *mat_values = global_matrix->get_values();
+        index_type *mat_row_ptrs = global_matrix->get_row_ptrs();
+        index_type *mat_col_idxs = global_matrix->get_col_idxs();
 
         // copy over the data from the matrix to the data structures Schwarz
         // needs.
@@ -143,8 +142,8 @@ void Initialize<ValueType, IndexType>::setup_global_matrix(
             // have an array that for each row points to the first entry not yet
             // written to
             std::vector<index_type> row_pointers(N + 1);
-            std::copy(global_matrix_compute->get_row_ptrs(),
-                      global_matrix_compute->get_row_ptrs() + N + 1,
+            std::copy(global_matrix->get_row_ptrs(),
+                      global_matrix->get_row_ptrs() + N + 1,
                       row_pointers.begin());
 
             // loop over the elements of the matrix row by row, as suggested in
@@ -170,16 +169,16 @@ void Initialize<ValueType, IndexType>::setup_global_matrix(
         }
     }
     auto mpi_itype =
-        boost::mpi::get_mpi_datatype(global_matrix_compute->get_row_ptrs()[0]);
+        boost::mpi::get_mpi_datatype(global_matrix->get_row_ptrs()[0]);
     auto mpi_vtype =
-        boost::mpi::get_mpi_datatype(global_matrix_compute->get_values()[0]);
-    MPI_Bcast(global_matrix_compute->get_row_ptrs(), N + 1, mpi_itype, 0,
+        boost::mpi::get_mpi_datatype(global_matrix->get_values()[0]);
+    MPI_Bcast(global_matrix->get_row_ptrs(), N + 1, mpi_itype, 0,
               MPI_COMM_WORLD);
-    MPI_Bcast(global_matrix_compute->get_col_idxs(), numnnz, mpi_itype, 0,
+    MPI_Bcast(global_matrix->get_col_idxs(), numnnz, mpi_itype, 0,
               MPI_COMM_WORLD);
-    MPI_Bcast(global_matrix_compute->get_values(), numnnz, mpi_vtype, 0,
+    MPI_Bcast(global_matrix->get_values(), numnnz, mpi_vtype, 0,
               MPI_COMM_WORLD);
-    global_matrix->copy_from(global_matrix_compute.get());
+    // global_matrix->copy_from(global_matrix_compute.get());
 }
 #endif
 
@@ -350,8 +349,8 @@ void Initialize<ValueType, IndexType>::setup_vectors(
         vec::create(settings.executor, gko::dim<2>(metadata.local_size_x, 1));
     // Extract the local rhs from the global rhs. Also takes into account the
     // overlap.
-    SolverTools::extract_local_vector(settings, metadata, local_rhs, global_rhs,
-                                      first_row);
+    SolverTools::extract_local_vector(settings, metadata, local_rhs.get(),
+                                      global_rhs.get(), first_row);
 
     local_solution =
         vec::create(settings.executor, gko::dim<2>(metadata.local_size_x, 1));
@@ -364,4 +363,4 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_INITIALIZE);
 #undef DECLARE_INITIALIZE
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz

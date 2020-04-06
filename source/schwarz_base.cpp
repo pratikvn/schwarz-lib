@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <utils.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 template <typename ValueType, typename IndexType>
@@ -72,16 +72,8 @@ SchwarzBase<ValueType, IndexType>::SchwarzBase(
 #else
         SCHWARZ_NOT_IMPLEMENTED;
 #endif
-        if (num_devices > 0) {
-            if (metadata.my_rank == 0) {
-                std::cout << " Number of available devices: " << num_devices
-                          << std::endl;
-            }
-        } else {
-            std::cout << " No CUDA devices available for rank "
-                      << metadata.my_rank << std::endl;
-            std::exit(-1);
-        }
+        Utils<ValueType, IndexType>::assert_correct_cuda_devices(
+            num_devices, metadata.my_rank);
         settings.executor = gko::CudaExecutor::create(
             my_local_rank, gko::OmpExecutor::create());
         auto exec_info = static_cast<gko::OmpExecutor *>(
@@ -89,7 +81,7 @@ SchwarzBase<ValueType, IndexType>::SchwarzBase(
                              ->get_exec_info();
         exec_info->bind_to_core(my_local_rank);
         settings.cuda_device_guard =
-            std::make_shared<SchwarzWrappers::device_guard>(my_local_rank);
+            std::make_shared<schwz::device_guard>(my_local_rank);
 
         std::cout << " Rank " << metadata.my_rank << " with local rank "
                   << my_local_rank << " has "
@@ -120,11 +112,14 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     using vec_itype = gko::Array<IndexType>;
     using vec_vecshared = gko::Array<IndexType *>;
     // Setup the global matrix
+    // if explicit_laplacian has been enabled or an external matrix has been
+    // provided.
     if (settings.explicit_laplacian || settings.matrix_filename != "null") {
         Initialize<ValueType, IndexType>::setup_global_matrix(
             settings.matrix_filename, metadata.oned_laplacian_size,
             this->global_matrix);
     } else {
+        // If not, then check if deal.ii has been enabled for matrix generation.
 #if SCHW_HAVE_DEALII
         Initialize<ValueType, IndexType>::setup_global_matrix(
             matrix, this->global_matrix);
@@ -206,10 +201,6 @@ void SchwarzBase<ValueType, IndexType>::initialize(
         new vec_itype(settings.executor->get_master(), temp.begin(),
                       temp.end()),
         std::default_delete<vec_itype>());
-
-    std::cout << " HERE " << __LINE__ << " rank " << metadata.my_rank
-              << " g size " << metadata.global_size << " num nnz "
-              << this->global_matrix->get_num_stored_elements() << std::endl;
 
     // Partition the global matrix.
     Initialize<ValueType, IndexType>::partition(
@@ -298,16 +289,13 @@ void SchwarzBase<ValueType, IndexType>::run(
     solution = vec_vtype::create(settings.executor->get_master(),
                                  gko::dim<2>(this->metadata.global_size, 1));
     // The main solution vector
-    std::shared_ptr<vec_vtype> solution_vector = vec_vtype::create(
+    std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
-    // A temp local solution
-    std::shared_ptr<vec_vtype> init_guess = vec_vtype::create(
-        this->settings.executor, this->local_solution->get_size());
-    // A global gathered solution of the previous iteration.
-    std::shared_ptr<vec_vtype> global_old_solution = vec_vtype::create(
-        settings.executor, gko::dim<2>(this->metadata.global_size, 1));
+    // A work vector.
+    std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
+        settings.executor, gko::dim<2>(2 * this->metadata.local_size_x, 1));
     // Setup the windows for the onesided communication.
-    this->setup_windows(this->settings, this->metadata, solution_vector);
+    this->setup_windows(this->settings, this->metadata, global_solution);
 
     const auto solver_settings =
         (Settings::local_solver_settings::direct_solver_cholmod |
@@ -326,25 +314,26 @@ void SchwarzBase<ValueType, IndexType>::run(
     for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
         // Exchange the boundary values. The communication part.
         MEASURE_ELAPSED_FUNC_TIME(
-            this->exchange_boundary(settings, metadata, solution_vector), 0,
+            this->exchange_boundary(settings, metadata, global_solution), 0,
             metadata.my_rank, boundary_exchange, metadata.iter_count);
 
         // Update the boundary and interior values after the exchanging from
         // other processes.
         MEASURE_ELAPSED_FUNC_TIME(
             this->update_boundary(settings, metadata, this->local_solution,
-                                  this->local_rhs, solution_vector,
-                                  global_old_solution, this->interface_matrix),
+                                  this->local_rhs, global_solution,
+                                  this->interface_matrix),
             1, metadata.my_rank, boundary_update, metadata.iter_count);
 
         // Check for the convergence of the solver.
-        num_converged_procs = 0;
+        // num_converged_procs = 0;
         MEASURE_ELAPSED_FUNC_TIME(
             (Solve<ValueType, IndexType>::check_convergence(
                 settings, metadata, this->comm_struct, this->convergence_vector,
-                global_old_solution, this->local_solution, this->local_matrix,
-                local_residual_norm, local_residual_norm0, global_residual_norm,
-                global_residual_norm0, num_converged_procs)),
+                global_solution, this->local_solution, this->local_matrix,
+                work_vector, local_residual_norm, local_residual_norm0,
+                global_residual_norm, global_residual_norm0,
+                num_converged_procs)),
             2, metadata.my_rank, convergence_check, metadata.iter_count);
 
         // break if the solution diverges.
@@ -363,7 +352,7 @@ void SchwarzBase<ValueType, IndexType>::run(
                 (Solve<ValueType, IndexType>::local_solve(
                     settings, metadata, this->local_matrix,
                     this->triangular_factor_l, this->triangular_factor_u,
-                    this->local_perm, this->local_inv_perm, init_guess,
+                    this->local_perm, this->local_inv_perm, work_vector,
                     this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
             // init_guess->copy_from(this->local_solution.get());
@@ -371,7 +360,7 @@ void SchwarzBase<ValueType, IndexType>::run(
             // communication.
             MEASURE_ELAPSED_FUNC_TIME(
                 (Communicate<ValueType, IndexType>::local_to_global_vector(
-                    settings, metadata, this->local_solution, solution_vector)),
+                    settings, metadata, this->local_solution, global_solution)),
                 4, metadata.my_rank, expand_local_vec, metadata.iter_count);
         }
     }
@@ -385,7 +374,7 @@ void SchwarzBase<ValueType, IndexType>::run(
     // Compute the final residual norm. Also gathers the solution from all
     // subdomains.
     Solve<ValueType, IndexType>::compute_residual_norm(
-        settings, metadata, global_matrix, global_rhs, solution_vector,
+        settings, metadata, global_matrix, global_rhs, global_solution,
         mat_norm, rhs_norm, sol_norm, residual_norm);
     gather_comm_data<ValueType, IndexType>(
         metadata.num_subdomains, this->comm_struct, metadata.comm_data_struct);
@@ -406,7 +395,7 @@ void SchwarzBase<ValueType, IndexType>::run(
       }
     // clang-format on
     if (metadata.my_rank == 0) {
-        solution->copy_from(solution_vector.get());
+        solution->copy_from(global_solution.get());
     }
 
     // Communicate<ValueType, IndexType>::clear(settings);
@@ -418,4 +407,4 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCHWARZ_BASE);
 #undef DECLARE_SCHWARZ_BASE
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz

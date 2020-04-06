@@ -20,7 +20,7 @@
 #endif
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 /**
  * @brief The SolverTools namespace .
  * @ref solver_tools
@@ -72,14 +72,20 @@ void solve_direct_ginkgo(
         &L_solver,
     const std::shared_ptr<gko::solver::UpperTrs<ValueType, IndexType>>
         &U_solver,
-    gko::matrix::Dense<ValueType> *local_solution)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;
-
-    auto temp_rhs = vec::create(settings.executor, local_solution->get_size());
+    auto vec_size = local_solution->get_size()[0];
+    auto temp_rhs = vec::create(
+        settings.executor, gko::dim<2>(vec_size, 1),
+        gko::Array<ValueType>::view(settings.executor, vec_size,
+                                    work_vector->get_values() + vec_size),
+        1);
     L_solver->apply(gko::lend(local_solution), gko::lend(temp_rhs));
     U_solver->apply(gko::lend(temp_rhs), gko::lend(local_solution));
 }
+
 
 template <typename ValueType, typename IndexType>
 void solve_iterative_ginkgo(
@@ -91,30 +97,23 @@ void solve_iterative_ginkgo(
     solver->apply(gko::lend(local_rhs), gko::lend(local_solution));
 }
 
+
 template <typename ValueType, typename IndexType>
-void extract_local_vector(
-    const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &sub_vector,
-    const std::shared_ptr<gko::matrix::Dense<ValueType>> &vector,
-    const IndexType &vec_index)
+void extract_local_vector(const Settings &settings,
+                          const Metadata<ValueType, IndexType> &metadata,
+                          gko::matrix::Dense<ValueType> *sub_vector,
+                          const gko::matrix::Dense<ValueType> *vector,
+                          const IndexType &vec_index)
 {
-    using vec = gko::matrix::Dense<ValueType>;
-    auto local_size = metadata.local_size;
-    auto tmp = vec::create(
-        settings.executor, gko::dim<2>(metadata.local_size, 1),
-        gko::Array<ValueType>::view(settings.executor, metadata.local_size,
-                                    &(vector->at(vec_index))),
-        1);
-    auto tmp2 = vec::create(
-        settings.executor, gko::dim<2>(metadata.local_size, 1),
-        gko::Array<ValueType>::view(settings.executor, metadata.local_size,
-                                    &(sub_vector->at(0))),
-        1);
-    tmp2->copy_from(gko::lend(tmp));
+    sub_vector->get_executor()->get_mem_space()->copy_from(
+        settings.executor->get_mem_space().get(), metadata.local_size,
+        vector->get_const_values() + vec_index, sub_vector->get_values());
     settings.executor->run(GatherScatter<ValueType, IndexType>(
         true, metadata.overlap_size, metadata.overlap_row->get_data(),
-        vector->get_values(), &(sub_vector->get_values()[local_size])));
+        vector->get_const_values(),
+        &(sub_vector->get_values()[metadata.local_size])));
 }
+
 
 }  // namespace SolverTools
 
@@ -133,9 +132,8 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
 #define DECLARE_FUNCTION(ValueType, IndexType)                    \
     void SolverTools::extract_local_vector(                       \
         const Settings &, const Metadata<ValueType, IndexType> &, \
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &,         \
-        const std::shared_ptr<gko::matrix::Dense<ValueType>> &,   \
-        const IndexType &)
+        gko::matrix::Dense<ValueType> *,                          \
+        const gko::matrix::Dense<ValueType> *, const IndexType &)
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
 #undef DECLARE_FUNCTION
 
@@ -149,7 +147,7 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
 #undef DECLARE_FUNCTION
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // solver_tools.hpp

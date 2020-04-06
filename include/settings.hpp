@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MINIMAL_OVERLAP 2
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -466,14 +466,14 @@ struct Metadata {
     template _macro(float, gko::int64);                   \
     template _macro(double, gko::int64);
 
-// explicit instantiations for SchwarzWrappers
+// explicit instantiations for schwz
 #define DECLARE_METADATA(ValueType, IndexType) \
     struct Metadata<ValueType, IndexType>
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_METADATA);
 #undef DECLARE_METADATA
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // settings.hpp

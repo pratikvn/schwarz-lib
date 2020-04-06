@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <settings.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 /**
  * @brief The PartitionTools namespace .
  * @ref part_tools
@@ -219,6 +219,6 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
 #undef DECLARE_FUNCTION
 
 }  // namespace PartitionTools
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 #endif  // partition_tool_hpp

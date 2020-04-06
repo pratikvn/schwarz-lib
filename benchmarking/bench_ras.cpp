@@ -287,8 +287,8 @@ void BenchRas<ValueType, IndexType>::print_config()
 template <typename ValueType, typename IndexType>
 void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
 {
-    SchwarzWrappers::Metadata<ValueType, IndexType> metadata;
-    SchwarzWrappers::Settings settings(FLAGS_executor);
+    schwz::Metadata<ValueType, IndexType> metadata;
+    schwz::Settings settings(FLAGS_executor);
 
     // Set solver metadata from command line args.
     metadata.mpi_communicator = mpi_communicator;
@@ -361,27 +361,27 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     settings.factorization = FLAGS_local_factorization;
     if (FLAGS_partition == "metis") {
         settings.partition =
-            SchwarzWrappers::Settings::partition_settings::partition_metis;
+            schwz::Settings::partition_settings::partition_metis;
         settings.metis_objtype = FLAGS_metis_objtype;
     } else if (FLAGS_partition == "regular") {
         settings.partition =
-            SchwarzWrappers::Settings::partition_settings::partition_regular;
+            schwz::Settings::partition_settings::partition_regular;
     } else if (FLAGS_partition == "regular2d") {
         settings.partition =
-            SchwarzWrappers::Settings::partition_settings::partition_regular2d;
+            schwz::Settings::partition_settings::partition_regular2d;
     }
     if (FLAGS_local_solver == "iterative-ginkgo") {
-        settings.local_solver = SchwarzWrappers::Settings::
-            local_solver_settings::iterative_solver_ginkgo;
+        settings.local_solver =
+            schwz::Settings::local_solver_settings::iterative_solver_ginkgo;
     } else if (FLAGS_local_solver == "direct-cholmod") {
-        settings.local_solver = SchwarzWrappers::Settings::
-            local_solver_settings::direct_solver_cholmod;
+        settings.local_solver =
+            schwz::Settings::local_solver_settings::direct_solver_cholmod;
     } else if (FLAGS_local_solver == "direct-umfpack") {
-        settings.local_solver = SchwarzWrappers::Settings::
-            local_solver_settings::direct_solver_umfpack;
+        settings.local_solver =
+            schwz::Settings::local_solver_settings::direct_solver_umfpack;
     } else if (FLAGS_local_solver == "direct-ginkgo") {
-        settings.local_solver = SchwarzWrappers::Settings::
-            local_solver_settings::direct_solver_ginkgo;
+        settings.local_solver =
+            schwz::Settings::local_solver_settings::direct_solver_ginkgo;
     }
     settings.debug_print = FLAGS_debug;
 
@@ -400,7 +400,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
         }
     }
 
-    SchwarzWrappers::SolverRAS<ValueType, IndexType> solver(settings, metadata);
+    schwz::SolverRAS<ValueType, IndexType> solver(settings, metadata);
     solver.initialize();
     solver.run(explicit_laplacian_solution);
     if (FLAGS_timings_file != "null") {

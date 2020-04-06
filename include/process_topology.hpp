@@ -65,7 +65,7 @@ namespace ProcessTopology {
 
 
 static void bind_gpus_to_process(
-    std::shared_ptr<SchwarzWrappers::device_guard> &dev_guard, int &local_rank,
+    std::shared_ptr<schwz::device_guard> &dev_guard, int &local_rank,
     int &local_num_procs, int &num_threads)
 {
     // SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaSetDevice(local_rank));

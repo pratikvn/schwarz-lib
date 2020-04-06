@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <solver_tools.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -169,7 +169,7 @@ protected:
      * @param convergence_vector  The array containing the convergence data.
      * @param global_old_solution  The global solution vector of the previous
      *                             iteration.
-     * @param solution_vector  The workspace solution vector.
+     * @param global_solution  The workspace solution vector.
      * @param local_matrix  The local subdomain matrix.
      * @param local_residual_norm  The local residual norm.
      * @param local_residual_norm0  The initial local residual norm.
@@ -183,9 +183,10 @@ protected:
         std::shared_ptr<gko::Array<IndexType>> &convergence_vector,
         const std::shared_ptr<gko::matrix::Dense<ValueType>>
             &global_old_solution,
-        const std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
+        const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &local_matrix,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
         ValueType &local_residual_norm, ValueType &local_residual_norm0,
         ValueType &global_residual_norm, ValueType &global_residual_norm0,
         int &num_converged_procs);
@@ -219,7 +220,7 @@ protected:
      *
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.
-     * @param solution_vector  The workspace solution vector.
+     * @param global_solution  The workspace solution vector.
      * @param global_old_solution  The global solution vector of the previous
      *                             iteration.
      * @param local_matrix  The local subdomain matrix.
@@ -231,25 +232,26 @@ protected:
     bool check_local_convergence(
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
-        const std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
+        const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
         const std::shared_ptr<gko::matrix::Dense<ValueType>>
             &global_old_solution,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &local_matrix,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
         ValueType &local_resnorm, ValueType &local_resnorm0);
 
     /**
      * Updates the residual.
      *
      * @param settings  The settings struct.
-     * @param solution_vector  The workspace solution vector.
+     * @param global_solution  The workspace solution vector.
      * @param local_matrix  The local subdomain matrix.
      * @param global_old_solution  The global solution vector of the previous
      *                             iteration.
      */
     void update_residual(
         const Settings &settings,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &local_matrix,
         const std::shared_ptr<gko::matrix::Dense<ValueType>>
@@ -261,7 +263,7 @@ protected:
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.
      * @param global_matrix  The global matrix.
-     * @param solution_vector  The workspace solution vector.
+     * @param global_solution  The workspace solution vector.
      * @param global_rhs  The global right hand side vector.
      * @param mat_norm  The matrix norm of the global matrix.
      * @param rhs_norm  The rhs norm of the input rhs.
@@ -273,7 +275,7 @@ protected:
         const Metadata<ValueType, IndexType> &metadata,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &global_matrix,
-        const std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
+        const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
         const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_rhs,
         ValueType &mat_norm, ValueType &rhs_norm, ValueType &sol_norm,
         ValueType &residual_norm);
@@ -338,7 +340,7 @@ private:
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // solve.hpp

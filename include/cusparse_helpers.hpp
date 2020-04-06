@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <solve.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 namespace CusparseWrappers {
 
 
@@ -258,6 +258,6 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
         struct Solve<ValueType, IndexType>::cusparse &);
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
 #undef DECLARE_FUNCTION
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 #endif

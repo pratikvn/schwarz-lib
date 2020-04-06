@@ -1,0 +1,193 @@
+\hypertarget{classschwz_1_1Communicate}{}\section{schwz\+:\+:Communicate$<$ Value\+Type, Index\+Type $>$ Class Template Reference}
+\label{classschwz_1_1Communicate}\index{schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$@{schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$}}
+
+
+The communication class that provides the methods for the communication between the subdomains.  
+
+
+
+
+{\ttfamily \#include $<$communicate.\+hpp$>$}
+
+
+
+Collaboration diagram for schwz\+:\+:Communicate$<$ Value\+Type, Index\+Type $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{classschwz_1_1Communicate__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structschwz_1_1Communicate_1_1comm__struct}{comm\+\_\+struct}
+\begin{DoxyCompactList}\small\item\em The communication struct used to store the communication data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classschwz_1_1Communicate_ad77bbc19111a7b6ff79962d3a659a2cc}\label{classschwz_1_1Communicate_ad77bbc19111a7b6ff79962d3a659a2cc}} 
+virtual void \hyperlink{classschwz_1_1Communicate_ad77bbc19111a7b6ff79962d3a659a2cc}{setup\+\_\+comm\+\_\+buffers} ()=0
+\begin{DoxyCompactList}\small\item\em Sets up the communication buffers needed for the boundary exchange. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classschwz_1_1Communicate_ab41e8e19e90ce2d53234cbec2cdb3b38}{setup\+\_\+windows} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&main\+\_\+buffer)=0
+\begin{DoxyCompactList}\small\item\em Sets up the windows needed for the asynchronous communication. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classschwz_1_1Communicate_a9f305bc37b86b1cf9369acdf6fe32f7d}{exchange\+\_\+boundary} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+solution)=0
+\begin{DoxyCompactList}\small\item\em Exchanges the elements of the solution vector. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1Communicate_af951ced18d73fb0a8c81713fd87422fe}{local\+\_\+to\+\_\+global\+\_\+vector} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+vector, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+vector)
+\begin{DoxyCompactList}\small\item\em Transforms data from a local vector to a global vector. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classschwz_1_1Communicate_aa1332376dfc67f5384527be90df7cbea}{update\+\_\+boundary} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+solution, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+rhs, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+solution, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&interface\+\_\+matrix)=0
+\begin{DoxyCompactList}\small\item\em Update the values into local vector from obtained from the neighboring sub-\/domains using the interface matrix. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1Communicate_a50833af98dd50e2c05029f16ab97479f}\label{classschwz_1_1Communicate_a50833af98dd50e2c05029f16ab97479f}} 
+void \hyperlink{classschwz_1_1Communicate_a50833af98dd50e2c05029f16ab97479f}{clear} (\hyperlink{structschwz_1_1Settings}{Settings} \&settings)
+\begin{DoxyCompactList}\small\item\em Clears the data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classschwz_1_1Communicate_a67f6d576d2bd14434247f8a9a9c99927}\label{classschwz_1_1Communicate_a67f6d576d2bd14434247f8a9a9c99927}} 
+\hyperlink{structschwz_1_1Communicate_1_1comm__struct}{comm\+\_\+struct} {\bfseries comm\+\_\+struct}
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classschwz_1_1Communicate_a7044b349fe5363eeace2d1a56b38f650}\label{classschwz_1_1Communicate_a7044b349fe5363eeace2d1a56b38f650}} 
+class {\bfseries Initialize$<$ Value\+Type, Index\+Type $>$}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Value\+Type, typename Index\+Type$>$\newline
+class schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$}
+
+The communication class that provides the methods for the communication between the subdomains. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Value\+Type} & The type of the floating point values. \\
+\hline
+{\em Index\+Type} & The type of the index type values.\\
+\hline
+\end{DoxyTemplParams}
+\hyperlink{group__comm}{Communicate} 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classschwz_1_1Communicate_a9f305bc37b86b1cf9369acdf6fe32f7d}\label{classschwz_1_1Communicate_a9f305bc37b86b1cf9369acdf6fe32f7d}} 
+\index{schwz\+::\+Communicate@{schwz\+::\+Communicate}!exchange\+\_\+boundary@{exchange\+\_\+boundary}}
+\index{exchange\+\_\+boundary@{exchange\+\_\+boundary}!schwz\+::\+Communicate@{schwz\+::\+Communicate}}
+\subsubsection{\texorpdfstring{exchange\+\_\+boundary()}{exchange\_boundary()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type $>$\+::exchange\+\_\+boundary (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{global\+\_\+solution }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Exchanges the elements of the solution vector. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+{\em global\+\_\+solution} & The solution vector being exchanged between the subdomains. \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{classschwz_1_1SolverRAS_a30a7b9e8ae4852fce06e407ea620ddbb}{schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$}.
+
+
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::run().
+
+\mbox{\Hypertarget{classschwz_1_1Communicate_af951ced18d73fb0a8c81713fd87422fe}\label{classschwz_1_1Communicate_af951ced18d73fb0a8c81713fd87422fe}} 
+\index{schwz\+::\+Communicate@{schwz\+::\+Communicate}!local\+\_\+to\+\_\+global\+\_\+vector@{local\+\_\+to\+\_\+global\+\_\+vector}}
+\index{local\+\_\+to\+\_\+global\+\_\+vector@{local\+\_\+to\+\_\+global\+\_\+vector}!schwz\+::\+Communicate@{schwz\+::\+Communicate}}
+\subsubsection{\texorpdfstring{local\+\_\+to\+\_\+global\+\_\+vector()}{local\_to\_global\_vector()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+to\+\_\+global\+\_\+vector (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{local\+\_\+vector,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{global\+\_\+vector }\end{DoxyParamCaption})}
+
+
+
+Transforms data from a local vector to a global vector. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+{\em local\+\_\+vector} & The local vector in question. \\
+\hline
+{\em global\+\_\+vector} & The global vector in question. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classschwz_1_1Communicate_ab41e8e19e90ce2d53234cbec2cdb3b38}\label{classschwz_1_1Communicate_ab41e8e19e90ce2d53234cbec2cdb3b38}} 
+\index{schwz\+::\+Communicate@{schwz\+::\+Communicate}!setup\+\_\+windows@{setup\+\_\+windows}}
+\index{setup\+\_\+windows@{setup\+\_\+windows}!schwz\+::\+Communicate@{schwz\+::\+Communicate}}
+\subsubsection{\texorpdfstring{setup\+\_\+windows()}{setup\_windows()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{main\+\_\+buffer }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Sets up the windows needed for the asynchronous communication. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+{\em main\+\_\+buffer} & The main buffer being exchanged between the subdomains. \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{classschwz_1_1SolverRAS_a8cd640aa073c0890d6121dc3afb3eaac}{schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$}.
+
+
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::run().
+
+\mbox{\Hypertarget{classschwz_1_1Communicate_aa1332376dfc67f5384527be90df7cbea}\label{classschwz_1_1Communicate_aa1332376dfc67f5384527be90df7cbea}} 
+\index{schwz\+::\+Communicate@{schwz\+::\+Communicate}!update\+\_\+boundary@{update\+\_\+boundary}}
+\index{update\+\_\+boundary@{update\+\_\+boundary}!schwz\+::\+Communicate@{schwz\+::\+Communicate}}
+\subsubsection{\texorpdfstring{update\+\_\+boundary()}{update\_boundary()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type $>$\+::update\+\_\+boundary (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{local\+\_\+solution,  }\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{local\+\_\+rhs,  }\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{global\+\_\+solution,  }\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{interface\+\_\+matrix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Update the values into local vector from obtained from the neighboring sub-\/domains using the interface matrix. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+{\em local\+\_\+solution} & The local solution vector in the subdomain. \\
+\hline
+{\em local\+\_\+rhs} & The local right hand side vector in the subdomain. \\
+\hline
+{\em global\+\_\+solution} & The workspace solution vector. \\
+\hline
+{\em global\+\_\+old\+\_\+solution} & The global solution vector of the previous iteration. \\
+\hline
+{\em interface\+\_\+matrix} & The interface matrix containing the interface and the overlap data mainly used for exchanging values between different sub-\/domains. \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{classschwz_1_1SolverRAS_a974f6e6be558338a37bdc65f34afdb26}{schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$}.
+
+
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::run().
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+communicate.\+hpp (10144ad)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/communicate.\+cpp (10144ad)\end{DoxyCompactItemize}

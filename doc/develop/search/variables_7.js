@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['matrix_5ffilename',['matrix_filename',['../structSchwarzWrappers_1_1Settings.html#a734222e1021c3e01e6a004e08f081026',1,'SchwarzWrappers::Settings']]],
-  ['max_5fiters',['max_iters',['../structSchwarzWrappers_1_1Metadata.html#a78f04f4b7c58c9260d7e79aac6f10cda',1,'SchwarzWrappers::Metadata']]],
-  ['metis_5fobjtype',['metis_objtype',['../structSchwarzWrappers_1_1Settings.html#abbfee6b651293973f478e70ae656d6d0',1,'SchwarzWrappers::Settings']]],
-  ['min_5fresidual_5fnorm',['min_residual_norm',['../structSchwarzWrappers_1_1Metadata.html#a536b647d0c8ec4328e46583a53fa19b3',1,'SchwarzWrappers::Metadata']]],
-  ['mpi_5fcommunicator',['mpi_communicator',['../structSchwarzWrappers_1_1Metadata.html#af18ade10fbd4b520693d14831c4823e0',1,'SchwarzWrappers::Metadata']]],
-  ['my_5flocal_5frank',['my_local_rank',['../structSchwarzWrappers_1_1Metadata.html#adb09627ec8c6ceb81713deeb55c84c39',1,'SchwarzWrappers::Metadata']]],
-  ['my_5frank',['my_rank',['../structSchwarzWrappers_1_1Metadata.html#a0d2e753bbdb3bf73653f5901f36a2edc',1,'SchwarzWrappers::Metadata']]]
+  ['matrix_5ffilename',['matrix_filename',['../structschwz_1_1Settings.html#a30bee3efa70fac8650d1c2837f1ba9c8',1,'schwz::Settings']]],
+  ['max_5fiters',['max_iters',['../structschwz_1_1Metadata.html#aa3fbf70891e008cf810b6480be6607da',1,'schwz::Metadata']]],
+  ['metis_5fobjtype',['metis_objtype',['../structschwz_1_1Settings.html#a8a057e4ac5331c9222ad539ffd1f5c3d',1,'schwz::Settings']]],
+  ['min_5fresidual_5fnorm',['min_residual_norm',['../structschwz_1_1Metadata.html#a04bd75fb60c4085481a3fc3e96269452',1,'schwz::Metadata']]],
+  ['mpi_5fcommunicator',['mpi_communicator',['../structschwz_1_1Metadata.html#a84a525a7a5f5282dcc1ef165e93bad35',1,'schwz::Metadata']]],
+  ['my_5flocal_5frank',['my_local_rank',['../structschwz_1_1Metadata.html#a8e48fee48d4865f2a23782e2bf3e9f5c',1,'schwz::Metadata']]],
+  ['my_5frank',['my_rank',['../structschwz_1_1Metadata.html#ac8ebd3ef6215f782ad5179b46994533f',1,'schwz::Metadata']]]
 ];

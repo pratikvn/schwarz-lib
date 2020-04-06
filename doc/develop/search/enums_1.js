@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['partition_5fsettings',['partition_settings',['../structSchwarzWrappers_1_1Settings.html#a5b3a60043fc866039d760e5357c17f6d',1,'SchwarzWrappers::Settings']]]
+  ['partition_5fsettings',['partition_settings',['../structschwz_1_1Settings.html#a11769093e4aa3ce3340cbf7a67487faa',1,'schwz::Settings']]]
 ];

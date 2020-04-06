@@ -1,4 +1,4 @@
 <map id="Solve" name="Solve">
-<area shape="rect" id="node2" href="$group__comm.html" title="A module dedicated to the Communication interface in schwarz&#45;lib. " alt="" coords="277,5,380,32"/>
-<area shape="rect" id="node3" href="$group__init.html" title="A module dedicated to the initialization and setup and usage of the solvers in schwarz&#45;lib. " alt="" coords="283,56,374,83"/>
+<area shape="rect" id="node2" href="$group__comm.html" title="A module dedicated to the Communication interface in schwarz&#45;lib. " alt="" coords="209,5,312,32"/>
+<area shape="rect" id="node3" href="$group__init.html" title="A module dedicated to the initialization and setup and usage of the solvers in schwarz&#45;lib. " alt="" coords="215,56,306,83"/>
 </map>

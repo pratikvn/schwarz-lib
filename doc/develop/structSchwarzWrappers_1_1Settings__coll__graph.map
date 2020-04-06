@@ -1,6 +1,0 @@
-<map id="SchwarzWrappers::Settings" name="SchwarzWrappers::Settings">
-<area shape="rect" id="node2" href="$structSchwarzWrappers_1_1Settings_1_1convergence__settings.html" title="The various convergence settings available. " alt="" coords="409,5,595,47"/>
-<area shape="rect" id="node3" title="STL class. " alt="" coords="462,110,542,137"/>
-<area shape="rect" id="node5" title="STL class. " alt="" coords="5,103,132,144"/>
-<area shape="rect" id="node6" href="$structSchwarzWrappers_1_1Settings_1_1comm__settings.html" title="The settings for the various available communication paradigms. " alt="" coords="409,161,595,203"/>
-</map>

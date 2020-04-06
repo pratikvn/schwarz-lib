@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['schwarzbase',['SchwarzBase',['../classSchwarzWrappers_1_1SchwarzBase.html#a158b6450f7b00d3128c39365cde780d0',1,'SchwarzWrappers::SchwarzBase']]],
-  ['setup_5fcomm_5fbuffers',['setup_comm_buffers',['../classSchwarzWrappers_1_1Communicate.html#aea258f883ecab5bc4b6f7cd462b5ff4a',1,'SchwarzWrappers::Communicate::setup_comm_buffers()'],['../classSchwarzWrappers_1_1SolverRAS.html#a552e1216220e2c92a736f33d73e37756',1,'SchwarzWrappers::SolverRAS::setup_comm_buffers()']]],
-  ['setup_5fglobal_5fmatrix',['setup_global_matrix',['../classSchwarzWrappers_1_1Initialize.html#a7463e23c00e298ea5c9ad0d4afabe8d4',1,'SchwarzWrappers::Initialize']]],
-  ['setup_5flocal_5fmatrices',['setup_local_matrices',['../classSchwarzWrappers_1_1Initialize.html#a7ddd2c8688b884b62f74f390b4114377',1,'SchwarzWrappers::Initialize::setup_local_matrices()'],['../classSchwarzWrappers_1_1SolverRAS.html#a089d372b0b3d9829eb64f2394c035e8b',1,'SchwarzWrappers::SolverRAS::setup_local_matrices()']]],
-  ['setup_5fvectors',['setup_vectors',['../classSchwarzWrappers_1_1Initialize.html#a33d71c2f18d2f23057091e3f95e52532',1,'SchwarzWrappers::Initialize']]],
-  ['setup_5fwindows',['setup_windows',['../classSchwarzWrappers_1_1Communicate.html#ac8849873c56a267f576f7b9ad559de1b',1,'SchwarzWrappers::Communicate::setup_windows()'],['../classSchwarzWrappers_1_1SolverRAS.html#acfbd89b88e13ad1ba6d6fc46501ced8c',1,'SchwarzWrappers::SolverRAS::setup_windows()']]],
-  ['solverras',['SolverRAS',['../classSchwarzWrappers_1_1SolverRAS.html#a4bd8f19ab2a959f1d56bac3939aa5f5f',1,'SchwarzWrappers::SolverRAS']]]
+  ['schwarzbase',['SchwarzBase',['../classschwz_1_1SchwarzBase.html#ab746eb6bb1c40d110ebd03cef0ddb415',1,'schwz::SchwarzBase']]],
+  ['setup_5fcomm_5fbuffers',['setup_comm_buffers',['../classschwz_1_1Communicate.html#ad77bbc19111a7b6ff79962d3a659a2cc',1,'schwz::Communicate::setup_comm_buffers()'],['../classschwz_1_1SolverRAS.html#a167b67ab0fb9d46244e9de563a682b43',1,'schwz::SolverRAS::setup_comm_buffers()']]],
+  ['setup_5fglobal_5fmatrix',['setup_global_matrix',['../classschwz_1_1Initialize.html#af655816bbed181e0a243efa7e35e942f',1,'schwz::Initialize']]],
+  ['setup_5flocal_5fmatrices',['setup_local_matrices',['../classschwz_1_1Initialize.html#ad24764a4ded54c2af6a5111ba8c8228f',1,'schwz::Initialize::setup_local_matrices()'],['../classschwz_1_1SolverRAS.html#aebbdd245b7019af802606ad95a8e3a5a',1,'schwz::SolverRAS::setup_local_matrices()']]],
+  ['setup_5fvectors',['setup_vectors',['../classschwz_1_1Initialize.html#a361211cdb821674a86b95d552591397c',1,'schwz::Initialize']]],
+  ['setup_5fwindows',['setup_windows',['../classschwz_1_1Communicate.html#ab41e8e19e90ce2d53234cbec2cdb3b38',1,'schwz::Communicate::setup_windows()'],['../classschwz_1_1SolverRAS.html#a8cd640aa073c0890d6121dc3afb3eaac',1,'schwz::SolverRAS::setup_windows()']]],
+  ['solverras',['SolverRAS',['../classschwz_1_1SolverRAS.html#a3af020a3c088ad73024c00b2af4910f0',1,'schwz::SolverRAS']]]
 ];

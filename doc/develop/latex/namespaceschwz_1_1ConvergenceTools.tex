@@ -1,0 +1,28 @@
+\hypertarget{namespaceschwz_1_1ConvergenceTools}{}\section{schwz\+:\+:Convergence\+Tools Namespace Reference}
+\label{namespaceschwz_1_1ConvergenceTools}\index{schwz\+::\+Convergence\+Tools@{schwz\+::\+Convergence\+Tools}}
+
+
+The \hyperlink{namespaceschwz_1_1ConvergenceTools}{Convergence\+Tools} namespace .  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1ConvergenceTools_af5c55552b61e214f090b97cd712943be}\label{namespaceschwz_1_1ConvergenceTools_af5c55552b61e214f090b97cd712943be}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries put\+\_\+all\+\_\+local\+\_\+residual\+\_\+norms} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, Value\+Type \&local\+\_\+resnorm, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+residual\+\_\+vector, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+residual\+\_\+vector\+\_\+out, M\+P\+I\+\_\+\+Win \&window\+\_\+residual\+\_\+vector)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1ConvergenceTools_a305dc50bea8e54b5ec63c720d2a8e798}\label{namespaceschwz_1_1ConvergenceTools_a305dc50bea8e54b5ec63c720d2a8e798}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries propagate\+\_\+all\+\_\+local\+\_\+residual\+\_\+norms} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, struct \hyperlink{classschwz_1_1Communicate}{Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct \&comm\+\_\+s, Value\+Type \&local\+\_\+resnorm, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+residual\+\_\+vector, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+residual\+\_\+vector\+\_\+out, M\+P\+I\+\_\+\+Win \&window\+\_\+residual\+\_\+vector)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1ConvergenceTools_adecfde64c11a5a00f0e254df8cbd093b}\label{namespaceschwz_1_1ConvergenceTools_adecfde64c11a5a00f0e254df8cbd093b}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries global\+\_\+convergence\+\_\+check\+\_\+onesided\+\_\+tree} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$$>$ \&convergence\+\_\+vector, int \&converged\+\_\+all\+\_\+local, int \&num\+\_\+converged\+\_\+procs, M\+P\+I\+\_\+\+Win \&window\+\_\+convergence)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1ConvergenceTools_a7b6608689e7009db675003a98389253d}\label{namespaceschwz_1_1ConvergenceTools_a7b6608689e7009db675003a98389253d}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries global\+\_\+convergence\+\_\+decentralized} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, struct \hyperlink{classschwz_1_1Communicate}{Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct \&comm\+\_\+s, std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$$>$ \&convergence\+\_\+vector, std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$$>$ \&convergence\+\_\+sent, std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$$>$ \&convergence\+\_\+local, int \&converged\+\_\+all\+\_\+local, int \&num\+\_\+converged\+\_\+procs, M\+P\+I\+\_\+\+Win \&window\+\_\+convergence)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The \hyperlink{namespaceschwz_1_1ConvergenceTools}{Convergence\+Tools} namespace . 
+
+conv\+\_\+tools 

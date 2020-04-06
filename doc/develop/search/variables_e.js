@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['use_5fprecond',['use_precond',['../structSchwarzWrappers_1_1Settings.html#a91f3a3c6eb903baace2d424285777cb8',1,'SchwarzWrappers::Settings']]]
+  ['use_5fprecond',['use_precond',['../structschwz_1_1Settings.html#ab51cf8eda75e05280084e89895121ca7',1,'schwz::Settings']]]
 ];

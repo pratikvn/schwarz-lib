@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['initialize',['Initialize',['../classSchwarzWrappers_1_1Initialize.html',1,'SchwarzWrappers']]]
+  ['initialize',['Initialize',['../classschwz_1_1Initialize.html',1,'schwz']]]
 ];

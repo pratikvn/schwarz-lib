@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['recv_5fbuffer',['recv_buffer',['../structSchwarzWrappers_1_1Communicate_1_1comm__struct.html#a24a51462f66fa2792ef1d6bc848678ea',1,'SchwarzWrappers::Communicate::comm_struct']]],
-  ['remote_5fget',['remote_get',['../structSchwarzWrappers_1_1Communicate_1_1comm__struct.html#a64b5eabdeb27f804ff3c0fa81fb8e3a9',1,'SchwarzWrappers::Communicate::comm_struct']]],
-  ['remote_5fput',['remote_put',['../structSchwarzWrappers_1_1Communicate_1_1comm__struct.html#a6059941b0959c17b4264ba0cc7690c4d',1,'SchwarzWrappers::Communicate::comm_struct']]],
-  ['reorder',['reorder',['../structSchwarzWrappers_1_1Settings.html#aad5c51cd5a726e41c008229886ee61b9',1,'SchwarzWrappers::Settings']]]
+  ['recv_5fbuffer',['recv_buffer',['../structschwz_1_1Communicate_1_1comm__struct.html#a78779301f90436a717cc8dcf50a5d717',1,'schwz::Communicate::comm_struct']]],
+  ['remote_5fget',['remote_get',['../structschwz_1_1Communicate_1_1comm__struct.html#a39335cd2ee211817d66189fa6bff7d04',1,'schwz::Communicate::comm_struct']]],
+  ['remote_5fput',['remote_put',['../structschwz_1_1Communicate_1_1comm__struct.html#a977cf8a2800021a50e59ee5cefb2a0ca',1,'schwz::Communicate::comm_struct']]],
+  ['reorder',['reorder',['../structschwz_1_1Settings.html#a429197e8093f3f87664ee6c37f91068e',1,'schwz::Settings']]]
 ];

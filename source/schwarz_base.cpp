@@ -124,7 +124,7 @@ template <typename ValueType, typename IndexType>
 void SchwarzBase<ValueType, IndexType>::initialize(
 #if SCHW_HAVE_DEALII
     const dealii::SparseMatrix<ValueType> &matrix,
-    const dealii::Vector<ValueType> &system_rhs
+    const dealii::Vector<ValueType> &system_rhs)
 #else
 )
 #endif
@@ -136,14 +136,17 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     // if explicit_laplacian has been enabled or an external matrix has been
     // provided.
     if (settings.explicit_laplacian || settings.matrix_filename != "null") {
+#if !SCHW_HAVE_DEALII
         Initialize<ValueType, IndexType>::setup_global_matrix(
             settings.matrix_filename, metadata.oned_laplacian_size,
             this->global_matrix);
+#endif
     } else {
         // If not, then check if deal.ii has been enabled for matrix generation.
 #if SCHW_HAVE_DEALII
         Initialize<ValueType, IndexType>::setup_global_matrix(
-            matrix, this->global_matrix);
+            settings.matrix_filename, metadata.oned_laplacian_size, matrix,
+            this->global_matrix);
 #else
         std::cerr << " Explicit laplacian needs to be enabled with the "
                      "--explicit_laplacian flag or deal.ii support needs to be "

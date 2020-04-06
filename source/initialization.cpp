@@ -55,6 +55,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace schwz {
 
 
+inline gko::size_type linearize_index(const gko::size_type row,
+                                      const gko::size_type col,
+                                      const gko::size_type num_rows)
+{
+    return (row)*num_rows + col;
+}
+
+
 template <typename ValueType, typename IndexType>
 Initialize<ValueType, IndexType>::Initialize(
     Settings &settings, Metadata<ValueType, IndexType> &metadata)
@@ -90,6 +98,7 @@ void Initialize<ValueType, IndexType>::generate_rhs(std::vector<ValueType> &rhs)
 #if SCHW_HAVE_DEALII
 template <typename ValueType, typename IndexType>
 void Initialize<ValueType, IndexType>::setup_global_matrix(
+    const std::string &filename, const gko::size_type &oned_laplacian_size,
     const dealii::SparseMatrix<ValueType> &matrix,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix)
 {
@@ -180,16 +189,8 @@ void Initialize<ValueType, IndexType>::setup_global_matrix(
               MPI_COMM_WORLD);
     // global_matrix->copy_from(global_matrix_compute.get());
 }
-#endif
 
-
-inline gko::size_type linearize_index(const gko::size_type row,
-                                      const gko::size_type col,
-                                      const gko::size_type num_rows)
-{
-    return (row)*num_rows + col;
-}
-
+#else
 
 template <typename ValueType, typename IndexType>
 void Initialize<ValueType, IndexType>::setup_global_matrix(
@@ -268,6 +269,9 @@ void Initialize<ValueType, IndexType>::setup_global_matrix(
         std::exit(-1);
     }
 }
+
+
+#endif
 
 
 template <typename ValueType, typename IndexType>

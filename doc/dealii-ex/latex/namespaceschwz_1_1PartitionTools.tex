@@ -1,0 +1,49 @@
+\hypertarget{namespaceschwz_1_1PartitionTools}{}\section{schwz\+:\+:Partition\+Tools Namespace Reference}
+\label{namespaceschwz_1_1PartitionTools}\index{schwz\+::\+Partition\+Tools@{schwz\+::\+Partition\+Tools}}
+
+
+The \hyperlink{namespaceschwz_1_1PartitionTools}{Partition\+Tools} namespace .  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1PartitionTools_a8704c901dcdadbe942f2efbe118b3755}\label{namespaceschwz_1_1PartitionTools_a8704c901dcdadbe942f2efbe118b3755}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries Partition\+Regular} (const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix, const unsigned int \&n\+\_\+partitions, std\+::vector$<$ unsigned int $>$ \&partition\+\_\+indices)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1PartitionTools_ab7e001c062718aa83b5a4be768c10278}\label{namespaceschwz_1_1PartitionTools_ab7e001c062718aa83b5a4be768c10278}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries Partition\+Regular2D} (const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix, bool write\+\_\+debug\+\_\+out, const unsigned int \&n\+\_\+partitions, std\+::vector$<$ unsigned int $>$ \&partition\+\_\+indices)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1PartitionTools_ad29c7a2a6d130f422f7333886c53332c}\label{namespaceschwz_1_1PartitionTools_ad29c7a2a6d130f422f7333886c53332c}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries Partition\+Metis} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix, const std\+::vector$<$ unsigned int $>$ \&cell\+\_\+weights, const unsigned int \&n\+\_\+partitions, std\+::vector$<$ unsigned int $>$ \&partition\+\_\+indices)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1PartitionTools_ad329e178d7e0ff9228dbec6714fcea45}\label{namespaceschwz_1_1PartitionTools_ad329e178d7e0ff9228dbec6714fcea45}} 
+template void {\bfseries Partition\+Metis} (const \hyperlink{structschwz_1_1Settings}{Settings} \&, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ float, gko\+::int32 $>$$>$ \&, const std\+::vector$<$ unsigned int $>$ \&, const unsigned int \&, std\+::vector$<$ unsigned int $>$ \&)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1PartitionTools_ab8f4fc729053b01f737fa88c06c5595f}\label{namespaceschwz_1_1PartitionTools_ab8f4fc729053b01f737fa88c06c5595f}} 
+template void {\bfseries Partition\+Metis} (const \hyperlink{structschwz_1_1Settings}{Settings} \&, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ double, gko\+::int32 $>$$>$ \&, const std\+::vector$<$ unsigned int $>$ \&, const unsigned int \&, std\+::vector$<$ unsigned int $>$ \&)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1PartitionTools_a5a1fe167c67313ecad2a2aa4546c22a3}\label{namespaceschwz_1_1PartitionTools_a5a1fe167c67313ecad2a2aa4546c22a3}} 
+template void {\bfseries Partition\+Metis} (const \hyperlink{structschwz_1_1Settings}{Settings} \&, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ float, gko\+::int64 $>$$>$ \&, const std\+::vector$<$ unsigned int $>$ \&, const unsigned int \&, std\+::vector$<$ unsigned int $>$ \&)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1PartitionTools_aaedda6a3597838a57a516429662048fb}\label{namespaceschwz_1_1PartitionTools_aaedda6a3597838a57a516429662048fb}} 
+template void {\bfseries Partition\+Metis} (const \hyperlink{structschwz_1_1Settings}{Settings} \&, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ double, gko\+::int64 $>$$>$ \&, const std\+::vector$<$ unsigned int $>$ \&, const unsigned int \&, std\+::vector$<$ unsigned int $>$ \&)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1PartitionTools_afe31b63fd24048da65807e684b809185}\label{namespaceschwz_1_1PartitionTools_afe31b63fd24048da65807e684b809185}} 
+template void {\bfseries Partition\+Regular} (const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ float, gko\+::int32 $>$$>$ \&, const unsigned int \&, std\+::vector$<$ unsigned int $>$ \&)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1PartitionTools_a7b90a8fb50162839c76afddae52331a4}\label{namespaceschwz_1_1PartitionTools_a7b90a8fb50162839c76afddae52331a4}} 
+template void {\bfseries Partition\+Regular} (const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ double, gko\+::int32 $>$$>$ \&, const unsigned int \&, std\+::vector$<$ unsigned int $>$ \&)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1PartitionTools_ae309b46e40996539cab104b01e671af8}\label{namespaceschwz_1_1PartitionTools_ae309b46e40996539cab104b01e671af8}} 
+template void {\bfseries Partition\+Regular} (const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ float, gko\+::int64 $>$$>$ \&, const unsigned int \&, std\+::vector$<$ unsigned int $>$ \&)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1PartitionTools_ac5e6e7e957a85bc5c10ddd051300a3bb}\label{namespaceschwz_1_1PartitionTools_ac5e6e7e957a85bc5c10ddd051300a3bb}} 
+template void {\bfseries Partition\+Regular} (const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ double, gko\+::int64 $>$$>$ \&, const unsigned int \&, std\+::vector$<$ unsigned int $>$ \&)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The \hyperlink{namespaceschwz_1_1PartitionTools}{Partition\+Tools} namespace . 
+
+part\+\_\+tools 

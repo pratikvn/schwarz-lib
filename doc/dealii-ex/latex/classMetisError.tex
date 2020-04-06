@@ -1,0 +1,59 @@
+\hypertarget{classMetisError}{}\section{Metis\+Error Class Reference}
+\label{classMetisError}\index{Metis\+Error@{Metis\+Error}}
+
+
+\hyperlink{classMetisError}{Metis\+Error} is thrown when a M\+E\+T\+IS routine throws a non-\/zero error code.  
+
+
+
+
+{\ttfamily \#include $<$exception.\+hpp$>$}
+
+
+
+Collaboration diagram for Metis\+Error\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=158pt]{classMetisError__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classMetisError_ac75e70bca56efa9b432897dba8e59fda}{Metis\+Error} (const std\+::string \&file, int line, const std\+::string \&func, int error\+\_\+code)
+\begin{DoxyCompactList}\small\item\em Initializes a M\+E\+T\+IS error. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classMetisError}{Metis\+Error} is thrown when a M\+E\+T\+IS routine throws a non-\/zero error code. 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classMetisError_ac75e70bca56efa9b432897dba8e59fda}\label{classMetisError_ac75e70bca56efa9b432897dba8e59fda}} 
+\index{Metis\+Error@{Metis\+Error}!Metis\+Error@{Metis\+Error}}
+\index{Metis\+Error@{Metis\+Error}!Metis\+Error@{Metis\+Error}}
+\subsubsection{\texorpdfstring{Metis\+Error()}{MetisError()}}
+{\footnotesize\ttfamily Metis\+Error\+::\+Metis\+Error (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{file,  }\item[{int}]{line,  }\item[{const std\+::string \&}]{func,  }\item[{int}]{error\+\_\+code }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Initializes a M\+E\+T\+IS error. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file} & The name of the offending source file \\
+\hline
+{\em line} & The source code line number where the error occurred \\
+\hline
+{\em func} & The name of the M\+E\+T\+IS routine that failed \\
+\hline
+{\em error\+\_\+code} & The resulting M\+E\+T\+IS error code \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+exception.\+hpp (87f773a)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/exception.\+cpp (87f773a)\end{DoxyCompactItemize}

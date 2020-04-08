@@ -185,6 +185,16 @@ public:
      */
     std::shared_ptr<gko::matrix::Dense<ValueType>> global_solution;
 
+    /**
+     * The global residual vector.
+     */
+    std::vector<ValueType> local_residual_vector_out;
+
+    /**
+     * The local residual vector.
+     */
+    std::vector<std::vector<ValueType>> global_residual_vector_out;
+
 protected:
     /**
      * The settings struct used to store the solver and other auxiliary

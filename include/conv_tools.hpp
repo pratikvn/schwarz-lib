@@ -55,7 +55,7 @@ void put_all_local_residual_norms(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     ValueType &local_resnorm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_residual_vector,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_residual_vector_out,
+    std::vector<std::vector<ValueType>> &global_residual_vector_out,
     MPI_Win &window_residual_vector)
 {
     auto num_subdomains = metadata.num_subdomains;
@@ -66,9 +66,8 @@ void put_all_local_residual_norms(
 
     l_res_vec[my_rank] = std::min(l_res_vec[my_rank], local_resnorm);
     for (auto j = 0; j < num_subdomains; j++) {
-        if (j != my_rank && iter > 0 &&
-            l_res_vec[my_rank] !=
-                global_residual_vector_out->at(iter - 1, my_rank)) {
+        auto gres = global_residual_vector_out[my_rank];
+        if (j != my_rank && iter > 0 && l_res_vec[my_rank] != gres[iter - 1]) {
             MPI_Put(&l_res_vec[my_rank], 1, mpi_vtype, j, my_rank, 1, mpi_vtype,
                     window_residual_vector);
             if (settings.comm_settings.enable_flush_all) {
@@ -87,7 +86,7 @@ void propagate_all_local_residual_norms(
     struct Communicate<ValueType, IndexType>::comm_struct &comm_s,
     ValueType &local_resnorm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_residual_vector,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_residual_vector_out,
+    std::vector<std::vector<ValueType>> &global_residual_vector_out,
     MPI_Win &window_residual_vector)
 {
     auto num_subdomains = metadata.num_subdomains;
@@ -100,19 +99,17 @@ void propagate_all_local_residual_norms(
     auto mpi_vtype = boost::mpi::get_mpi_datatype(l_res_vec[my_rank]);
 
     l_res_vec[my_rank] = std::min(l_res_vec[my_rank], local_resnorm);
+    auto gres = global_residual_vector_out[my_rank];
     for (auto i = 0; i < comm_s.num_neighbors_out; i++) {
         if ((global_put[i])[0] > 0) {
             auto p = neighbors_out[i];
             int flag = 0;
-            if (iter == 0 ||
-                l_res_vec[my_rank] !=
-                    global_residual_vector_out->at(iter - 1, my_rank))
-                flag = 1;
+            if (iter == 0 || l_res_vec[my_rank] != gres[iter - 1]) flag = 1;
             if (flag == 0) {
                 for (auto j = 0; j < num_subdomains; j++) {
                     if (j != p && iter > 0 && l_res_vec[j] != max_valtype &&
                         l_res_vec[j] !=
-                            global_residual_vector_out->at(iter - 1, j)) {
+                            (global_residual_vector_out[j])[iter - 1]) {
                         flag++;
                     }
                 }
@@ -120,12 +117,10 @@ void propagate_all_local_residual_norms(
             if (flag > 0) {
                 for (auto j = 0; j < num_subdomains; j++) {
                     if ((j == my_rank &&
-                         (iter == 0 ||
-                          l_res_vec[my_rank] != global_residual_vector_out->at(
-                                                    iter - 1, my_rank))) ||
+                         (iter == 0 || l_res_vec[my_rank] != gres[iter - 1])) ||
                         (j != p && iter > 0 && l_res_vec[j] != max_valtype &&
                          l_res_vec[j] !=
-                             global_residual_vector_out->at(iter - 1, j))) {
+                             (global_residual_vector_out[j])[iter - 1])) {
                         // double result;
                         MPI_Accumulate(&l_res_vec[j], 1, mpi_vtype, p, j, 1,
                                        mpi_vtype, MPI_MIN,
@@ -296,7 +291,7 @@ void global_convergence_decentralized(
     void ConvergenceTools::put_all_local_residual_norms(                       \
         const Settings &, const Metadata<ValueType, IndexType> &, ValueType &, \
         std::shared_ptr<gko::matrix::Dense<ValueType>> &,                      \
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &, MPI_Win &);
+        std::vector<std::vector<ValueType>> &, MPI_Win &);
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
 #undef DECLARE_FUNCTION
 
@@ -305,7 +300,7 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
         const Settings &, const Metadata<ValueType, IndexType> &,             \
         struct Communicate<ValueType, IndexType>::comm_struct &, ValueType &, \
         std::shared_ptr<gko::matrix::Dense<ValueType>> &,                     \
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &, MPI_Win &);
+        std::vector<std::vector<ValueType>> &, MPI_Win &);
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION2);
 #undef DECLARE_FUNCTION2
 

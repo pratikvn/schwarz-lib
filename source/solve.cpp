@@ -201,6 +201,8 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         &triangular_factor_l,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &triangular_factor_u,
+    // std::vector<ValueType> &local_residual_vector_out,
+    std::vector<std::vector<ValueType>> &global_residual_vector_out,
     std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
     std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs)
@@ -754,6 +756,7 @@ void Solve<ValueType, IndexType>::check_global_convergence(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
     std::shared_ptr<gko::Array<IndexType>> &convergence_vector,
+    std::vector<std::vector<ValueType>> &global_residual_vector_out,
     ValueType &local_resnorm, ValueType &local_resnorm0,
     ValueType &global_resnorm, ValueType &global_resnorm0,
     int &converged_all_local, int &num_converged_procs)
@@ -769,11 +772,11 @@ void Solve<ValueType, IndexType>::check_global_convergence(
         if (settings.convergence_settings.put_all_local_residual_norms) {
             ConvergenceTools::put_all_local_residual_norms(
                 settings, metadata, local_resnorm, this->local_residual_vector,
-                this->global_residual_vector_out, this->window_residual_vector);
+                global_residual_vector_out, this->window_residual_vector);
         } else {
             ConvergenceTools::propagate_all_local_residual_norms(
                 settings, metadata, comm_struct, local_resnorm,
-                this->local_residual_vector, this->global_residual_vector_out,
+                this->local_residual_vector, global_residual_vector_out,
                 this->window_residual_vector);
         }
     }
@@ -853,6 +856,8 @@ void Solve<ValueType, IndexType>::check_convergence(
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
+    std::vector<ValueType> &local_residual_vector_out,
+    std::vector<std::vector<ValueType>> &global_residual_vector_out,
     ValueType &local_residual_norm, ValueType &local_residual_norm0,
     ValueType &global_residual_norm, ValueType &global_residual_norm0,
     int &num_converged_procs)
@@ -880,10 +885,11 @@ void Solve<ValueType, IndexType>::check_convergence(
             : true;
     if (tolerance > 0.0 && iter_cond) {
         int converged_all_local = 0;
-        check_global_convergence(
-            settings, metadata, comm_struct, convergence_vector,
-            local_residual_norm, local_residual_norm0, global_residual_norm,
-            global_residual_norm0, converged_all_local, num_converged_p);
+        check_global_convergence(settings, metadata, comm_struct,
+                                 convergence_vector, global_residual_vector_out,
+                                 local_residual_norm, local_residual_norm0,
+                                 global_residual_norm, global_residual_norm0,
+                                 converged_all_local, num_converged_p);
         num_converged_procs = num_converged_p;
     }
 }

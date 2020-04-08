@@ -257,8 +257,8 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
         this->settings, metadata, this->local_matrix, this->triangular_factor_l,
-        this->triangular_factor_u, this->local_perm, this->local_inv_perm,
-        this->local_rhs);
+        this->triangular_factor_u, this->global_residual_vector_out,
+        this->local_perm, this->local_inv_perm, this->local_rhs);
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
@@ -366,9 +366,10 @@ void SchwarzBase<ValueType, IndexType>::run(
             (Solve<ValueType, IndexType>::check_convergence(
                 settings, metadata, this->comm_struct, this->convergence_vector,
                 global_solution, this->local_solution, this->local_matrix,
-                work_vector, local_residual_norm, local_residual_norm0,
-                global_residual_norm, global_residual_norm0,
-                num_converged_procs)),
+                work_vector, this->local_residual_vector_out,
+                this->global_residual_vector_out, local_residual_norm,
+                local_residual_norm0, global_residual_norm,
+                global_residual_norm0, num_converged_procs)),
             2, metadata.my_rank, convergence_check, metadata.iter_count);
 
         // break if the solution diverges.
@@ -413,8 +414,8 @@ void SchwarzBase<ValueType, IndexType>::run(
         }
         std::string filename = "iter_res_" + rank_string + ".csv";
         write_iters_and_residuals(metadata.num_subdomains, metadata.my_rank,
-                                  local_res_vec.size(), local_res_vec,
-                                  filename);
+                                  this->local_residual_vector_out.size(),
+                                  this->local_residual_vector_out, filename);
     }
 
     // Compute the final residual norm. Also gathers the solution from all

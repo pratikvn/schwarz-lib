@@ -74,10 +74,6 @@ public:
 protected:
     std::shared_ptr<gko::matrix::Dense<ValueType>> local_residual_vector;
 
-    std::vector<ValueType> local_residual_vector_out;
-
-    std::vector<std::vector<ValueType>> global_residual_vector_out;
-
     std::shared_ptr<gko::matrix::Dense<ValueType>> residual_vector;
 
     std::shared_ptr<gko::Array<IndexType>> convergence_vector;
@@ -118,6 +114,7 @@ protected:
             &triangular_factor_l,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &triangular_factor_u,
+        std::vector<std::vector<ValueType>> &global_residual_vector_out,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs);
@@ -192,6 +189,8 @@ protected:
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &local_matrix,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
+        std::vector<ValueType> &local_residual_vector_out,
+        std::vector<std::vector<ValueType>> &global_residual_vector_out,
         ValueType &local_residual_norm, ValueType &local_residual_norm0,
         ValueType &global_residual_norm, ValueType &global_residual_norm0,
         int &num_converged_procs);
@@ -216,6 +215,7 @@ protected:
         const Metadata<ValueType, IndexType> &metadata,
         struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
         std::shared_ptr<gko::Array<IndexType>> &convergence_vector,
+        std::vector<std::vector<ValueType>> &global_residual_vector_out,
         ValueType &local_resnorm, ValueType &local_resnorm0,
         ValueType &global_resnorm, ValueType &global_resnorm0,
         int &converged_all_local, int &num_converged_procs);

@@ -219,12 +219,14 @@ void Solve<ValueType, IndexType>::setup_local_solver(
 
     local_residual_vector = vec::create(settings.executor->get_master(),
                                         gko::dim<2>(metadata.max_iters + 1, 1));
-    local_residual_vector_out =
-        vec::create(settings.executor->get_master(),
-                    gko::dim<2>(metadata.max_iters + 1, 1));
-    global_residual_vector_out = vec::create(
-        settings.executor->get_master(),
-        gko::dim<2>(metadata.max_iters + 1, metadata.num_subdomains));
+    // local_residual_vector_out =
+    //     vec::create(settings.executor->get_master(),
+    //                 gko::dim<2>(metadata.max_iters + 1, 1));
+    // global_residual_vector_out = vec::create(
+    //     settings.executor->get_master(),
+    //     gko::dim<2>(metadata.max_iters + 1, metadata.num_subdomains));
+    global_residual_vector_out =
+        std::vector<std::vector<ValueType>>(metadata.num_subdomains);
 
     // If direct solver is chosen, then we need to compute a factorization as a
     // first step. Only the triangular solves are done in the loop.
@@ -459,24 +461,38 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         }
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
-        if (metadata.my_rank == 0) {
-            std::cout << " Local iterative solve with Ginkgo " << std::endl;
+        int l_max_iters = 0;
+        if (metadata.local_max_iters == -1) {
+            l_max_iters = local_matrix->get_size()[0];
+        } else {
+            l_max_iters = metadata.local_max_iters;
         }
+        this->iteration_criterion = gko::stop::Iteration::build()
+                                        .with_max_iters(l_max_iters)
+                                        .on(settings.executor);
+        this->residual_criterion =
+            gko::stop::ResidualNormReduction<ValueType>::build()
+                .with_reduction_factor(metadata.local_solver_tolerance)
+                .on(settings.executor);
+        this->record_logger = gko::log::Record::create(
+            settings.executor, settings.executor->get_mem_space(),
+            gko::log::Logger::iteration_complete_mask |
+                gko::log::Logger::criterion_check_completed_mask);
+        this->iteration_criterion->add_logger(this->record_logger);
+        this->residual_criterion->add_logger(this->record_logger);
         if (settings.non_symmetric_matrix) {
             using solver = gko::solver::Gmres<ValueType>;
             using bj = gko::preconditioner::Jacobi<ValueType, IndexType>;
-            // Setup the Ginkgo iterative CG solver.
-            if (settings.use_precond) {
+            // Setup the Ginkgo iterative GMRES solver.
+            if (metadata.local_precond == "block-jacobi") {
+                if (metadata.my_rank == 0) {
+                    std::cout << " Local Ginkgo iterative solve with "
+                                 "Block-Jacobi preconditioning "
+                              << std::endl;
+                }
                 this->solver =
                     solver::build()
-                        .with_criteria(
-                            gko::stop::Iteration::build()
-                                .with_max_iters(local_matrix->get_size()[0])
-                                .on(settings.executor),
-                            gko::stop::ResidualNormReduction<ValueType>::build()
-                                .with_reduction_factor(
-                                    metadata.local_solver_tolerance)
-                                .on(settings.executor))
+                        .with_criteria(iteration_criterion, residual_criterion)
                         .with_preconditioner(
                             bj::build()
                                 .with_max_block_size(
@@ -484,35 +500,59 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                                 .on(settings.executor))
                         .on(settings.executor)
                         ->generate(local_matrix);
-            } else {
+            } else if (metadata.local_precond == "ilu") {
+                if (metadata.my_rank == 0) {
+                    std::cout << " Local Ginkgo iterative solve with ParILU "
+                                 "preconditioning "
+                              << std::endl;
+                }
+                auto exec = settings.executor;
+                auto par_ilu_fact =
+                    gko::factorization::ParIlu<ValueType, IndexType>::build()
+                        .on(exec);
+                auto par_ilu = par_ilu_fact->generate(local_matrix);
+                auto ilu_pre_factory =
+                    gko::preconditioner::Ilu<
+                        gko::solver::LowerTrs<ValueType, IndexType>,
+                        gko::solver::UpperTrs<ValueType, IndexType>,
+                        false>::build()
+                        .on(exec);
+                auto ilu_preconditioner =
+                    ilu_pre_factory->generate(gko::share(par_ilu));
                 this->solver =
                     solver::build()
-                        .with_criteria(
-                            gko::stop::Iteration::build()
-                                .with_max_iters(local_matrix->get_size()[0])
-                                .on(settings.executor),
-                            gko::stop::ResidualNormReduction<ValueType>::build()
-                                .with_reduction_factor(
-                                    metadata.local_solver_tolerance)
-                                .on(settings.executor))
+                        .with_criteria(iteration_criterion, residual_criterion)
+                        .with_generated_preconditioner(
+                            gko::share(ilu_preconditioner))
                         .on(settings.executor)
                         ->generate(local_matrix);
+            } else if (metadata.local_precond == "null") {
+                if (metadata.my_rank == 0) {
+                    std::cout << " Local Ginkgo iterative solve with no "
+                                 "preconditioning "
+                              << std::endl;
+                }
+                this->solver =
+                    solver::build()
+                        .with_criteria(iteration_criterion, residual_criterion)
+                        .on(settings.executor)
+                        ->generate(local_matrix);
+            } else {
+                std::cerr << "Unsupported preconditioner." << std::endl;
             }
         } else {
             using solver = gko::solver::Cg<ValueType>;
             using bj = gko::preconditioner::Jacobi<ValueType, IndexType>;
             // Setup the Ginkgo iterative CG solver.
-            if (settings.use_precond) {
+            if (metadata.local_precond == "block-jacobi") {
+                if (metadata.my_rank == 0) {
+                    std::cout << " Local Ginkgo iterative solve with "
+                                 "Block-Jacobi preconditioning "
+                              << std::endl;
+                }
                 this->solver =
                     solver::build()
-                        .with_criteria(
-                            gko::stop::Iteration::build()
-                                .with_max_iters(local_matrix->get_size()[0])
-                                .on(settings.executor),
-                            gko::stop::ResidualNormReduction<ValueType>::build()
-                                .with_reduction_factor(
-                                    metadata.local_solver_tolerance)
-                                .on(settings.executor))
+                        .with_criteria(iteration_criterion, residual_criterion)
                         .with_preconditioner(
                             bj::build()
                                 .with_max_block_size(
@@ -520,19 +560,45 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                                 .on(settings.executor))
                         .on(settings.executor)
                         ->generate(local_matrix);
-            } else {
+            } else if (metadata.local_precond == "ilu") {
+                if (metadata.my_rank == 0) {
+                    std::cout << " Local Ginkgo iterative solve with ParILU "
+                                 "preconditioning "
+                              << std::endl;
+                }
+                auto exec = settings.executor;
+                auto par_ilu_fact =
+                    gko::factorization::ParIlu<ValueType, IndexType>::build()
+                        .on(exec);
+                auto par_ilu = par_ilu_fact->generate(local_matrix);
+                auto ilu_pre_factory =
+                    gko::preconditioner::Ilu<
+                        gko::solver::LowerTrs<ValueType, IndexType>,
+                        gko::solver::UpperTrs<ValueType, IndexType>,
+                        false>::build()
+                        .on(exec);
+                auto ilu_preconditioner =
+                    ilu_pre_factory->generate(gko::share(par_ilu));
                 this->solver =
                     solver::build()
-                        .with_criteria(
-                            gko::stop::Iteration::build()
-                                .with_max_iters(local_matrix->get_size()[0])
-                                .on(settings.executor),
-                            gko::stop::ResidualNormReduction<ValueType>::build()
-                                .with_reduction_factor(
-                                    metadata.local_solver_tolerance)
-                                .on(settings.executor))
+                        .with_criteria(iteration_criterion, residual_criterion)
+                        .with_generated_preconditioner(
+                            gko::share(ilu_preconditioner))
                         .on(settings.executor)
                         ->generate(local_matrix);
+            } else if (metadata.local_precond == "null") {
+                if (metadata.my_rank == 0) {
+                    std::cout << " Local Ginkgo iterative solve with no "
+                                 "preconditioning "
+                              << std::endl;
+                }
+                this->solver =
+                    solver::build()
+                        .with_criteria(iteration_criterion, residual_criterion)
+                        .on(settings.executor)
+                        ->generate(local_matrix);
+            } else {
+                std::cerr << "Unsupported preconditioner." << std::endl;
             }
         }
     } else if (solver_settings ==
@@ -559,6 +625,7 @@ void Solve<ValueType, IndexType>::local_solve(
     std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
     std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;
@@ -604,15 +671,10 @@ void Solve<ValueType, IndexType>::local_solve(
         local_inv_perm->apply(perm_sol.get(), local_solution.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
-        auto vec_size = local_solution->get_size()[0];
-        std::shared_ptr<vec> local_rhs =
-            vec::create(settings.executor, gko::dim<2>(vec_size, 1),
-                        gko::Array<ValueType>::view(settings.executor, vec_size,
-                                                    work_vector->get_values()),
-                        1);
-        local_rhs->copy_from(local_solution.get());
         SolverTools::solve_iterative_ginkgo(settings, metadata, this->solver,
-                                            local_rhs, local_solution);
+                                            local_solution, init_guess);
+
+        local_solution->copy_from(init_guess.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_dealii) {
         SCHWARZ_NOT_IMPLEMENTED
@@ -724,7 +786,7 @@ void Solve<ValueType, IndexType>::check_global_convergence(
         // norms
         global_resnorm = 0.0;
         for (auto j = 0; j < num_subdomains; j++) {
-            global_residual_vector_out->at(iter, j) = l_res_vec[j];
+            (global_residual_vector_out[j]).push_back(l_res_vec[j]);
             if (l_res_vec[j] != std::numeric_limits<ValueType>::max()) {
                 global_resnorm += l_res_vec[j];
             } else {
@@ -747,7 +809,7 @@ void Solve<ValueType, IndexType>::check_global_convergence(
 
         // save for post-processing
         for (auto j = 0; j < num_subdomains; j++) {
-            global_residual_vector_out->at(iter, j) = l_res_vec[j];
+            (global_residual_vector_out[j]).push_back(l_res_vec[j]);
         }
     }
     // check for global convergence (count how many processes have detected the
@@ -805,7 +867,7 @@ void Solve<ValueType, IndexType>::check_convergence(
     } else {
         num_converged_p = 0;
     }
-    local_residual_vector_out->at(iter) = local_residual_norm;
+    local_residual_vector_out.push_back(local_residual_norm);
     metadata.current_residual_norm = local_residual_norm;
     metadata.min_residual_norm =
         (iter == 0 ? local_residual_norm

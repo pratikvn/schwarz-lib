@@ -43,6 +43,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace schwz {
 
+template <typename ValueType>
+void write_iters_and_residuals(int num_subd, int my_rank, int iter_count,
+                               std::vector<ValueType> &local_res_vec_out,
+                               std::string filename)
+{
+    {
+        std::ofstream file;
+        file.open(filename);
+        file << "iter,resnorm\n";
+        for (auto i = 0; i < iter_count; ++i) {
+            file << i << "," << local_res_vec_out[i] << "\n";
+        }
+        file.close();
+    }
+    // {
+    //     std::ofstream file;
+    //     file.open(filename_recv);
+    //     file << "subdomain " << my_rank << " has "
+    //          << std::get<3>(comm_data_struct[my_rank]) << " neighbors\n";
+    //     file << "my_id,from_id,num_recv\n";
+    //     for (auto i = 0; i < num_subd; ++i) {
+    //         file << my_rank << ","
+    //              << std::get<0>(std::get<1>(comm_data_struct[my_rank])[i])
+    //              << ","
+    //              << std::get<1>(std::get<1>(comm_data_struct[my_rank])[i])
+    //              << "\n";
+    //     }
+    //     file.close();
+    // }
+}
+
 
 template <typename ValueType, typename IndexType>
 SchwarzBase<ValueType, IndexType>::SchwarzBase(
@@ -294,6 +325,10 @@ void SchwarzBase<ValueType, IndexType>::run(
     // A work vector.
     std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
         settings.executor, gko::dim<2>(2 * this->metadata.local_size_x, 1));
+    // An initial guess.
+    std::shared_ptr<vec_vtype> init_guess = vec_vtype::create(
+        settings.executor, gko::dim<2>(this->metadata.local_size_x, 1));
+    init_guess->copy_from(local_rhs.get());
     // Setup the windows for the onesided communication.
     this->setup_windows(this->settings, this->metadata, global_solution);
 
@@ -353,9 +388,8 @@ void SchwarzBase<ValueType, IndexType>::run(
                     settings, metadata, this->local_matrix,
                     this->triangular_factor_l, this->triangular_factor_u,
                     this->local_perm, this->local_inv_perm, work_vector,
-                    this->local_solution)),
+                    init_guess, this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
-            // init_guess->copy_from(this->local_solution.get());
             // Gather the local vector into the locally global vector for
             // communication.
             MEASURE_ELAPSED_FUNC_TIME(
@@ -371,6 +405,18 @@ void SchwarzBase<ValueType, IndexType>::run(
               << metadata.iter_count << " iters " << std::endl;
     ValueType mat_norm = -1.0, rhs_norm = -1.0, sol_norm = -1.0,
               residual_norm = -1.0;
+    // Write the residuals and iterations to files
+    if (settings.write_iters_and_residuals) {
+        std::string rank_string = std::to_string(metadata.my_rank);
+        if (metadata.my_rank < 10) {
+            rank_string = "0" + std::to_string(metadata.my_rank);
+        }
+        std::string filename = "iter_res_" + rank_string + ".csv";
+        write_iters_and_residuals(metadata.num_subdomains, metadata.my_rank,
+                                  local_res_vec.size(), local_res_vec,
+                                  filename);
+    }
+
     // Compute the final residual norm. Also gathers the solution from all
     // subdomains.
     Solve<ValueType, IndexType>::compute_residual_norm(

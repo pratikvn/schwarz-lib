@@ -100,6 +100,8 @@ DEFINE_bool(write_comm_data, false,
             "to a file.");
 DEFINE_bool(write_perm_data, false,
             "Write the permutation from CHOLMOD to a file");
+DEFINE_bool(write_iters_and_residuals, false,
+            "Write the iteration and residual log to a file");
 DEFINE_bool(print_matrices, false,
             "Write the local system matrices for debugging");
 DEFINE_bool(print_config, true, "Print the configuration of the run ");
@@ -120,9 +122,11 @@ DEFINE_uint32(num_threads, 1, "Number of threads to bind to a process");
 DEFINE_bool(factor_ordering_natural, false,
             "If true uses natural ordering instead of the default optimized "
             "ordering. ");
-DEFINE_bool(enable_local_precond, false,
-            "If true uses the Block jacobi preconditioning for the local "
-            "iterative solver. ");
+DEFINE_int32(local_max_iters, -1,
+             "Number of maximum iterations for the local iterative solver");
+DEFINE_string(local_precond, "null",
+              "Choices are ilu, parilu and block-jacobi for the local "
+              "iterative solver. ");
 DEFINE_uint32(precond_max_block_size, 16,
               "Maximum size of the blocks for the block jacobi preconditioner");
 DEFINE_string(metis_objtype, "null",
@@ -303,6 +307,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     // Generic settings
     settings.write_debug_out = FLAGS_enable_debug_write;
     settings.write_perm_data = FLAGS_write_perm_data;
+    settings.write_iters_and_residuals = FLAGS_write_iters_and_residuals;
     settings.print_matrices = FLAGS_print_matrices;
     settings.shifted_iter = FLAGS_shifted_iter;
 
@@ -349,8 +354,10 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
 
     // General solver settings
     metadata.local_solver_tolerance = FLAGS_local_tol;
-    settings.use_precond = FLAGS_enable_local_precond;
+    metadata.local_precond = FLAGS_local_precond;
+    metadata.local_max_iters = FLAGS_local_max_iters;
     settings.non_symmetric_matrix = FLAGS_non_symmetric_matrix;
+    metadata.precond_max_block_size = FLAGS_precond_max_block_size;
     metadata.precond_max_block_size = FLAGS_precond_max_block_size;
     settings.matrix_filename = FLAGS_matrix_filename;
     settings.explicit_laplacian = FLAGS_explicit_laplacian;

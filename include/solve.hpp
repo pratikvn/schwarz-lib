@@ -61,6 +61,10 @@ template <typename ValueType = gko::default_precision,
           typename IndexType = gko::int32>
 class Solve : public Settings {
 public:
+    using ResidualCriterionFactory =
+        typename gko::stop::ResidualNormReduction<ValueType>::Factory;
+    using IterationCriterionFactory = typename gko::stop::Iteration::Factory;
+
     Solve() = default;
 
     Solve(const Settings &settings);
@@ -70,9 +74,9 @@ public:
 protected:
     std::shared_ptr<gko::matrix::Dense<ValueType>> local_residual_vector;
 
-    std::shared_ptr<gko::matrix::Dense<ValueType>> local_residual_vector_out;
+    std::vector<ValueType> local_residual_vector_out;
 
-    std::shared_ptr<gko::matrix::Dense<ValueType>> global_residual_vector_out;
+    std::vector<std::vector<ValueType>> global_residual_vector_out;
 
     std::shared_ptr<gko::matrix::Dense<ValueType>> residual_vector;
 
@@ -157,6 +161,7 @@ protected:
             &triangular_factor_u,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution);
 
@@ -290,6 +295,21 @@ private:
      * The local iterative solver from Ginkgo.
      */
     std::shared_ptr<gko::LinOp> solver;
+
+    /**
+     * The local iterative solver residual criterion.
+     */
+    std::shared_ptr<ResidualCriterionFactory> residual_criterion;
+
+    /**
+     * The local iterative solver iteration criterion.
+     */
+    std::shared_ptr<IterationCriterionFactory> iteration_criterion;
+
+    /**
+     * The local iterative solver iteration criterion.
+     */
+    std::shared_ptr<gko::log::Record> record_logger;
 
     /**
      * The local lower triangular solver from Ginkgo.

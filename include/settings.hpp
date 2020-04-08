@@ -173,6 +173,11 @@ struct Settings {
     bool write_debug_out = false;
 
     /**
+     * Enable writing the iters and residuals to a file.
+     */
+    bool write_iters_and_residuals = false;
+
+    /**
      * Enable the local permutations from CHOLMOD to a file.
      */
     bool write_perm_data = false;
@@ -367,9 +372,19 @@ struct Metadata {
     ValueType local_solver_tolerance;
 
     /**
-     * The maximum iteration count of the solver.
+     * The maximum iteration count of the Schwarz solver.
      */
     IndexType max_iters;
+
+    /**
+     * The maximum iteration count of the local iterative solver.
+     */
+    IndexType local_max_iters;
+
+    /**
+     * Local preconditioner.
+     */
+    std::string local_precond;
 
     /**
      * The maximum block size for the preconditioner.

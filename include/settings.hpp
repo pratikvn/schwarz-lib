@@ -173,6 +173,11 @@ struct Settings {
     bool write_debug_out = false;
 
     /**
+     * Enable writing the iters and residuals to a file.
+     */
+    bool write_iters_and_residuals = false;
+
+    /**
      * Enable the local permutations from CHOLMOD to a file.
      */
     bool write_perm_data = false;
@@ -367,9 +372,19 @@ struct Metadata {
     ValueType local_solver_tolerance;
 
     /**
-     * The maximum iteration count of the solver.
+     * The maximum iteration count of the Schwarz solver.
      */
     IndexType max_iters;
+
+    /**
+     * The maximum iteration count of the local iterative solver.
+     */
+    IndexType local_max_iters;
+
+    /**
+     * Local preconditioner.
+     */
+    std::string local_precond;
 
     /**
      * The maximum block size for the preconditioner.
@@ -400,6 +415,18 @@ struct Metadata {
     std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
                            std::vector<std::tuple<int, int>>, int, int>>
         comm_data_struct;
+
+    /**
+     * The struct used for storing data for post-processing.
+     *
+     */
+    struct post_process_data {
+        std::vector<std::vector<ValueType>> global_residual_vector_out;
+        std::vector<ValueType> local_residual_vector_out;
+        std::vector<ValueType> local_converged_iter_count;
+        std::vector<ValueType> local_converged_resnorm;
+    };
+    post_process_data post_process_data;
 
     /**
      * The mapping containing the global to local indices.

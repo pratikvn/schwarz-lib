@@ -43,19 +43,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace schwz {
 /**
- * @brief The ConvergenceTools namespace .
+ * @brief The conv_tools namespace .
  * @ref conv_tools
  * @ingroup solve
  */
-namespace ConvergenceTools {
+namespace conv_tools {
 
 
 template <typename ValueType, typename IndexType>
 void put_all_local_residual_norms(
-    const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
+    const Settings &settings, Metadata<ValueType, IndexType> &metadata,
     ValueType &local_resnorm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_residual_vector,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_residual_vector_out,
     MPI_Win &window_residual_vector)
 {
     auto num_subdomains = metadata.num_subdomains;
@@ -66,9 +65,9 @@ void put_all_local_residual_norms(
 
     l_res_vec[my_rank] = std::min(l_res_vec[my_rank], local_resnorm);
     for (auto j = 0; j < num_subdomains; j++) {
-        if (j != my_rank && iter > 0 &&
-            l_res_vec[my_rank] !=
-                global_residual_vector_out->at(iter - 1, my_rank)) {
+        auto gres =
+            metadata.post_process_data.global_residual_vector_out[my_rank];
+        if (j != my_rank && iter > 0 && l_res_vec[my_rank] != gres[iter - 1]) {
             MPI_Put(&l_res_vec[my_rank], 1, mpi_vtype, j, my_rank, 1, mpi_vtype,
                     window_residual_vector);
             if (settings.comm_settings.enable_flush_all) {
@@ -83,11 +82,10 @@ void put_all_local_residual_norms(
 
 template <typename ValueType, typename IndexType>
 void propagate_all_local_residual_norms(
-    const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
+    const Settings &settings, Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType>::comm_struct &comm_s,
     ValueType &local_resnorm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_residual_vector,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_residual_vector_out,
     MPI_Win &window_residual_vector)
 {
     auto num_subdomains = metadata.num_subdomains;
@@ -100,19 +98,18 @@ void propagate_all_local_residual_norms(
     auto mpi_vtype = boost::mpi::get_mpi_datatype(l_res_vec[my_rank]);
 
     l_res_vec[my_rank] = std::min(l_res_vec[my_rank], local_resnorm);
+    auto gres = metadata.post_process_data.global_residual_vector_out[my_rank];
     for (auto i = 0; i < comm_s.num_neighbors_out; i++) {
         if ((global_put[i])[0] > 0) {
             auto p = neighbors_out[i];
             int flag = 0;
-            if (iter == 0 ||
-                l_res_vec[my_rank] !=
-                    global_residual_vector_out->at(iter - 1, my_rank))
-                flag = 1;
+            if (iter == 0 || l_res_vec[my_rank] != gres[iter - 1]) flag = 1;
             if (flag == 0) {
                 for (auto j = 0; j < num_subdomains; j++) {
                     if (j != p && iter > 0 && l_res_vec[j] != max_valtype &&
                         l_res_vec[j] !=
-                            global_residual_vector_out->at(iter - 1, j)) {
+                            (metadata.post_process_data
+                                 .global_residual_vector_out[j])[iter - 1]) {
                         flag++;
                     }
                 }
@@ -120,12 +117,11 @@ void propagate_all_local_residual_norms(
             if (flag > 0) {
                 for (auto j = 0; j < num_subdomains; j++) {
                     if ((j == my_rank &&
-                         (iter == 0 ||
-                          l_res_vec[my_rank] != global_residual_vector_out->at(
-                                                    iter - 1, my_rank))) ||
+                         (iter == 0 || l_res_vec[my_rank] != gres[iter - 1])) ||
                         (j != p && iter > 0 && l_res_vec[j] != max_valtype &&
                          l_res_vec[j] !=
-                             global_residual_vector_out->at(iter - 1, j))) {
+                             (metadata.post_process_data
+                                  .global_residual_vector_out[j])[iter - 1])) {
                         // double result;
                         MPI_Accumulate(&l_res_vec[j], 1, mpi_vtype, p, j, 1,
                                        mpi_vtype, MPI_MIN,
@@ -289,44 +285,7 @@ void global_convergence_decentralized(
 }
 
 
-}  // namespace ConvergenceTools
-
-// Explicit Instantiations
-#define DECLARE_FUNCTION(ValueType, IndexType)                                 \
-    void ConvergenceTools::put_all_local_residual_norms(                       \
-        const Settings &, const Metadata<ValueType, IndexType> &, ValueType &, \
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &,                      \
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &, MPI_Win &);
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
-#undef DECLARE_FUNCTION
-
-#define DECLARE_FUNCTION2(ValueType, IndexType)                               \
-    void ConvergenceTools::propagate_all_local_residual_norms(                \
-        const Settings &, const Metadata<ValueType, IndexType> &,             \
-        struct Communicate<ValueType, IndexType>::comm_struct &, ValueType &, \
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &,                     \
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &, MPI_Win &);
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION2);
-#undef DECLARE_FUNCTION2
-
-#define DECLARE_FUNCTION3(ValueType, IndexType)                    \
-    void ConvergenceTools::global_convergence_check_onesided_tree( \
-        const Settings &, const Metadata<ValueType, IndexType> &,  \
-        std::shared_ptr<gko::Array<IndexType>> &, int &, int &, MPI_Win &);
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION3);
-#undef DECLARE_FUNCTION3
-
-#define DECLARE_FUNCTION4(ValueType, IndexType)                   \
-    void ConvergenceTools::global_convergence_decentralized(      \
-        const Settings &, const Metadata<ValueType, IndexType> &, \
-        struct Communicate<ValueType, IndexType>::comm_struct &,  \
-        std::shared_ptr<gko::Array<IndexType>> &,                 \
-        std::shared_ptr<gko::Array<IndexType>> &,                 \
-        std::shared_ptr<gko::Array<IndexType>> &, int &, int &, MPI_Win &);
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION4);
-#undef DECLARE_FUNCTION4
-
-
+}  // namespace conv_tools
 }  // namespace schwz
 
 

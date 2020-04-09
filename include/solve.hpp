@@ -61,6 +61,10 @@ template <typename ValueType = gko::default_precision,
           typename IndexType = gko::int32>
 class Solve : public Settings {
 public:
+    using ResidualCriterionFactory =
+        typename gko::stop::ResidualNormReduction<ValueType>::Factory;
+    using IterationCriterionFactory = typename gko::stop::Iteration::Factory;
+
     Solve() = default;
 
     Solve(const Settings &settings);
@@ -69,10 +73,6 @@ public:
 
 protected:
     std::shared_ptr<gko::matrix::Dense<ValueType>> local_residual_vector;
-
-    std::shared_ptr<gko::matrix::Dense<ValueType>> local_residual_vector_out;
-
-    std::shared_ptr<gko::matrix::Dense<ValueType>> global_residual_vector_out;
 
     std::shared_ptr<gko::matrix::Dense<ValueType>> residual_vector;
 
@@ -106,8 +106,7 @@ protected:
      * @param local_rhs  The local right hand side vector in the subdomain.
      */
     void setup_local_solver(
-        const Settings &settings,
-        const Metadata<ValueType, IndexType> &metadata,
+        const Settings &settings, Metadata<ValueType, IndexType> &metadata,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &local_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
@@ -147,8 +146,7 @@ protected:
      * @param local_solution The local solution vector in the subdomain.
      */
     void local_solve(
-        const Settings &settings,
-        const Metadata<ValueType, IndexType> &metadata,
+        const Settings &settings, Metadata<ValueType, IndexType> &metadata,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &local_matrix,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
@@ -157,6 +155,7 @@ protected:
             &triangular_factor_u,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
         std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &init_guess,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution);
 
@@ -207,8 +206,7 @@ protected:
      * @param num_converged_procs  The number of subdomains that have converged.
      */
     void check_global_convergence(
-        const Settings &settings,
-        const Metadata<ValueType, IndexType> &metadata,
+        const Settings &settings, Metadata<ValueType, IndexType> &metadata,
         struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
         std::shared_ptr<gko::Array<IndexType>> &convergence_vector,
         ValueType &local_resnorm, ValueType &local_resnorm0,
@@ -290,6 +288,21 @@ private:
      * The local iterative solver from Ginkgo.
      */
     std::shared_ptr<gko::LinOp> solver;
+
+    /**
+     * The local iterative solver residual criterion.
+     */
+    std::shared_ptr<ResidualCriterionFactory> residual_criterion;
+
+    /**
+     * The local iterative solver iteration criterion.
+     */
+    std::shared_ptr<IterationCriterionFactory> iteration_criterion;
+
+    /**
+     * The local iterative solver iteration criterion.
+     */
+    std::shared_ptr<gko::log::Record> record_logger;
 
     /**
      * The local lower triangular solver from Ginkgo.

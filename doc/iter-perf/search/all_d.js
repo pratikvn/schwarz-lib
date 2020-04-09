@@ -1,7 +1,7 @@
 var searchData=
 [
   ['commhelpers',['CommHelpers',['../namespaceschwz_1_1CommHelpers.html',1,'schwz']]],
-  ['convergencetools',['ConvergenceTools',['../namespaceschwz_1_1ConvergenceTools.html',1,'schwz']]],
+  ['conv_5ftools',['conv_tools',['../namespaceschwz_1_1conv__tools.html',1,'schwz']]],
   ['partitiontools',['PartitionTools',['../namespaceschwz_1_1PartitionTools.html',1,'schwz']]],
   ['schwarz_20class',['Schwarz Class',['../group__schwarz__class.html',1,'']]],
   ['schwarzbase',['SchwarzBase',['../classschwz_1_1SchwarzBase.html',1,'schwz::SchwarzBase&lt; ValueType, IndexType &gt;'],['../classschwz_1_1SchwarzBase.html#ab746eb6bb1c40d110ebd03cef0ddb415',1,'schwz::SchwarzBase::SchwarzBase()']]],

@@ -1,0 +1,219 @@
+\hypertarget{classschwz_1_1Initialize}{}\section{schwz\+:\+:Initialize$<$ Value\+Type, Index\+Type $>$ Class Template Reference}
+\label{classschwz_1_1Initialize}\index{schwz\+::\+Initialize$<$ Value\+Type, Index\+Type $>$@{schwz\+::\+Initialize$<$ Value\+Type, Index\+Type $>$}}
+
+
+The initialization class that provides methods for initialization of the solver.  
+
+
+
+
+{\ttfamily \#include $<$initialization.\+hpp$>$}
+
+
+
+Collaboration diagram for schwz\+:\+:Initialize$<$ Value\+Type, Index\+Type $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classschwz_1_1Initialize__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classschwz_1_1Initialize_a8ebf7bcf4c67d4ca6af0b5afba5a9a90}\label{classschwz_1_1Initialize_a8ebf7bcf4c67d4ca6af0b5afba5a9a90}} 
+{\bfseries Initialize} (\hyperlink{structschwz_1_1Settings}{Settings} \&settings, \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata)
+\item 
+void \hyperlink{classschwz_1_1Initialize_a9dee6b55c599df30410cdf45819b3e28}{generate\+\_\+rhs} (std\+::vector$<$ Value\+Type $>$ \&rhs)
+\begin{DoxyCompactList}\small\item\em Generates the right hand side vector. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1Initialize_af655816bbed181e0a243efa7e35e942f}{setup\+\_\+global\+\_\+matrix} (const std\+::string \&filename, const gko\+::size\+\_\+type \&\hyperlink{structschwz_1_1Metadata_a1333605c0573688ce4d71173f52ef2b4}{oned\+\_\+laplacian\+\_\+size}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix)
+\begin{DoxyCompactList}\small\item\em Generates the 2D global laplacian matrix. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1Initialize_a23a10058e35a442c564c0748b66dcb08}{partition} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix, std\+::vector$<$ unsigned int $>$ \&\hyperlink{classschwz_1_1Initialize_a007426e21221298b6dca9b7c9fbd1c10}{partition\+\_\+indices})
+\begin{DoxyCompactList}\small\item\em The partitioning function. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1Initialize_a361211cdb821674a86b95d552591397c}{setup\+\_\+vectors} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::vector$<$ Value\+Type $>$ \&rhs, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+rhs, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+rhs, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+solution, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+solution)
+\begin{DoxyCompactList}\small\item\em Setup the vectors with default values and allocate mameory if not allocated. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classschwz_1_1Initialize_ad24764a4ded54c2af6a5111ba8c8228f}{setup\+\_\+local\+\_\+matrices} (\hyperlink{structschwz_1_1Settings}{Settings} \&settings, \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::vector$<$ unsigned int $>$ \&\hyperlink{classschwz_1_1Initialize_a007426e21221298b6dca9b7c9fbd1c10}{partition\+\_\+indices}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&local\+\_\+matrix, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&interface\+\_\+matrix)=0
+\begin{DoxyCompactList}\small\item\em Sets up the local and the interface matrices from the global matrix and the partition indices. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classschwz_1_1Initialize_a007426e21221298b6dca9b7c9fbd1c10}\label{classschwz_1_1Initialize_a007426e21221298b6dca9b7c9fbd1c10}} 
+std\+::vector$<$ unsigned int $>$ \hyperlink{classschwz_1_1Initialize_a007426e21221298b6dca9b7c9fbd1c10}{partition\+\_\+indices}
+\begin{DoxyCompactList}\small\item\em The partition indices containing the subdomains to which each row(vertex) of the matrix(graph) belongs to. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1Initialize_a715b9e3a552f77277492d1c86c600681}\label{classschwz_1_1Initialize_a715b9e3a552f77277492d1c86c600681}} 
+std\+::vector$<$ unsigned int $>$ \hyperlink{classschwz_1_1Initialize_a715b9e3a552f77277492d1c86c600681}{cell\+\_\+weights}
+\begin{DoxyCompactList}\small\item\em The cell weights for the partition algorithm. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Value\+Type = gko\+::default\+\_\+precision, typename Index\+Type = gko\+::int32$>$\newline
+class schwz\+::\+Initialize$<$ Value\+Type, Index\+Type $>$}
+
+The initialization class that provides methods for initialization of the solver. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Value\+Type} & The type of the floating point values. \\
+\hline
+{\em Index\+Type} & The type of the index type values.\\
+\hline
+\end{DoxyTemplParams}
+\hyperlink{group__init}{Initialization} 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classschwz_1_1Initialize_a9dee6b55c599df30410cdf45819b3e28}\label{classschwz_1_1Initialize_a9dee6b55c599df30410cdf45819b3e28}} 
+\index{schwz\+::\+Initialize@{schwz\+::\+Initialize}!generate\+\_\+rhs@{generate\+\_\+rhs}}
+\index{generate\+\_\+rhs@{generate\+\_\+rhs}!schwz\+::\+Initialize@{schwz\+::\+Initialize}}
+\subsubsection{\texorpdfstring{generate\+\_\+rhs()}{generate\_rhs()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classschwz_1_1Initialize}{schwz\+::\+Initialize}$<$ Value\+Type, Index\+Type $>$\+::generate\+\_\+rhs (\begin{DoxyParamCaption}\item[{std\+::vector$<$ Value\+Type $>$ \&}]{rhs }\end{DoxyParamCaption})}
+
+
+
+Generates the right hand side vector. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em rhs} & The rhs vector. \\
+\hline
+\end{DoxyParams}
+
+
+References schwz\+::\+Initialize$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+global\+\_\+matrix().
+
+
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize().
+
+\mbox{\Hypertarget{classschwz_1_1Initialize_a23a10058e35a442c564c0748b66dcb08}\label{classschwz_1_1Initialize_a23a10058e35a442c564c0748b66dcb08}} 
+\index{schwz\+::\+Initialize@{schwz\+::\+Initialize}!partition@{partition}}
+\index{partition@{partition}!schwz\+::\+Initialize@{schwz\+::\+Initialize}}
+\subsubsection{\texorpdfstring{partition()}{partition()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classschwz_1_1Initialize}{schwz\+::\+Initialize}$<$ Value\+Type, Index\+Type $>$\+::partition (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{global\+\_\+matrix,  }\item[{std\+::vector$<$ unsigned int $>$ \&}]{partition\+\_\+indices }\end{DoxyParamCaption})}
+
+
+
+The partitioning function. 
+
+Allows the partition of the global matrix depending with M\+E\+T\+IS and a regular 1D decomposition.
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+{\em global\+\_\+matrix} & The global matrix. \\
+\hline
+{\em partition\+\_\+indices} & The partition indices \mbox{[}O\+U\+T\+P\+UT\mbox{]}. \\
+\hline
+\end{DoxyParams}
+
+
+References schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+size, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::my\+\_\+rank, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::num\+\_\+subdomains, and schwz\+::\+Settings\+::write\+\_\+debug\+\_\+out.
+
+
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize().
+
+\mbox{\Hypertarget{classschwz_1_1Initialize_af655816bbed181e0a243efa7e35e942f}\label{classschwz_1_1Initialize_af655816bbed181e0a243efa7e35e942f}} 
+\index{schwz\+::\+Initialize@{schwz\+::\+Initialize}!setup\+\_\+global\+\_\+matrix@{setup\+\_\+global\+\_\+matrix}}
+\index{setup\+\_\+global\+\_\+matrix@{setup\+\_\+global\+\_\+matrix}!schwz\+::\+Initialize@{schwz\+::\+Initialize}}
+\subsubsection{\texorpdfstring{setup\+\_\+global\+\_\+matrix()}{setup\_global\_matrix()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classschwz_1_1Initialize}{schwz\+::\+Initialize}$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+global\+\_\+matrix (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{filename,  }\item[{const gko\+::size\+\_\+type \&}]{oned\+\_\+laplacian\+\_\+size,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{global\+\_\+matrix }\end{DoxyParamCaption})}
+
+
+
+Generates the 2D global laplacian matrix. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em oned\+\_\+laplacian\+\_\+size} & The size of the one d laplacian grid. \\
+\hline
+{\em global\+\_\+matrix} & The global matrix. \\
+\hline
+\end{DoxyParams}
+
+
+Referenced by schwz\+::\+Initialize$<$ Value\+Type, Index\+Type $>$\+::generate\+\_\+rhs(), and schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize().
+
+\mbox{\Hypertarget{classschwz_1_1Initialize_ad24764a4ded54c2af6a5111ba8c8228f}\label{classschwz_1_1Initialize_ad24764a4ded54c2af6a5111ba8c8228f}} 
+\index{schwz\+::\+Initialize@{schwz\+::\+Initialize}!setup\+\_\+local\+\_\+matrices@{setup\+\_\+local\+\_\+matrices}}
+\index{setup\+\_\+local\+\_\+matrices@{setup\+\_\+local\+\_\+matrices}!schwz\+::\+Initialize@{schwz\+::\+Initialize}}
+\subsubsection{\texorpdfstring{setup\+\_\+local\+\_\+matrices()}{setup\_local\_matrices()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classschwz_1_1Initialize}{schwz\+::\+Initialize}$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+local\+\_\+matrices (\begin{DoxyParamCaption}\item[{\hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{\hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{std\+::vector$<$ unsigned int $>$ \&}]{partition\+\_\+indices,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{global\+\_\+matrix,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{local\+\_\+matrix,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{interface\+\_\+matrix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Sets up the local and the interface matrices from the global matrix and the partition indices. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+{\em partition\+\_\+indices} & The array containing the partition indices. \\
+\hline
+{\em global\+\_\+matrix} & The global system matrix. \\
+\hline
+{\em local\+\_\+matrix} & The local system matrix. \\
+\hline
+{\em interface\+\_\+matrix} & The interface matrix containing the interface and the overlap data mainly used for exchanging values between different sub-\/domains. \\
+\hline
+{\em local\+\_\+perm} & The local permutation, obtained through R\+CM or M\+E\+T\+IS. \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{classschwz_1_1SolverRAS_aebbdd245b7019af802606ad95a8e3a5a}{schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$}.
+
+
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize().
+
+\mbox{\Hypertarget{classschwz_1_1Initialize_a361211cdb821674a86b95d552591397c}\label{classschwz_1_1Initialize_a361211cdb821674a86b95d552591397c}} 
+\index{schwz\+::\+Initialize@{schwz\+::\+Initialize}!setup\+\_\+vectors@{setup\+\_\+vectors}}
+\index{setup\+\_\+vectors@{setup\+\_\+vectors}!schwz\+::\+Initialize@{schwz\+::\+Initialize}}
+\subsubsection{\texorpdfstring{setup\+\_\+vectors()}{setup\_vectors()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classschwz_1_1Initialize}{schwz\+::\+Initialize}$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+vectors (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{std\+::vector$<$ Value\+Type $>$ \&}]{rhs,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{local\+\_\+rhs,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{global\+\_\+rhs,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{local\+\_\+solution,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{global\+\_\+solution }\end{DoxyParamCaption})}
+
+
+
+Setup the vectors with default values and allocate mameory if not allocated. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+{\em local\+\_\+rhs} & The local right hand side vector in the subdomain. \\
+\hline
+{\em global\+\_\+rhs} & The global right hand side vector. \\
+\hline
+{\em local\+\_\+solution} & The local solution vector in the subdomain. \\
+\hline
+{\em global\+\_\+solution} & The global solution vector. \\
+\hline
+\end{DoxyParams}
+
+
+References schwz\+::\+Settings\+::executor, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::first\+\_\+row, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+size, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+size\+\_\+x, and schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::my\+\_\+rank.
+
+
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize().
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+initialization.\+hpp (defa7f2)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/initialization.\+cpp (defa7f2)\end{DoxyCompactItemize}

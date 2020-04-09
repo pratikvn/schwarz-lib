@@ -1,0 +1,59 @@
+\hypertarget{structschwz_1_1Utils}{}\section{schwz\+:\+:Utils$<$ Value\+Type, Index\+Type $>$ Struct Template Reference}
+\label{structschwz_1_1Utils}\index{schwz\+::\+Utils$<$ Value\+Type, Index\+Type $>$@{schwz\+::\+Utils$<$ Value\+Type, Index\+Type $>$}}
+
+
+The utilities class which provides some checks and basic utilities.  
+
+
+
+
+{\ttfamily \#include $<$utils.\+hpp$>$}
+
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structschwz_1_1Utils_a6f65fc83d6270453712a2600bab557ce}\label{structschwz_1_1Utils_a6f65fc83d6270453712a2600bab557ce}} 
+static int {\bfseries get\+\_\+local\+\_\+rank} (M\+P\+I\+\_\+\+Comm mpi\+\_\+communicator)
+\item 
+\mbox{\Hypertarget{structschwz_1_1Utils_a33d613297cb2b53634c1ed2b44fe595c}\label{structschwz_1_1Utils_a33d613297cb2b53634c1ed2b44fe595c}} 
+static int {\bfseries get\+\_\+local\+\_\+num\+\_\+procs} (M\+P\+I\+\_\+\+Comm mpi\+\_\+communicator)
+\item 
+\mbox{\Hypertarget{structschwz_1_1Utils_a18df4f61989071e018f64ac7d7a1d6f1}\label{structschwz_1_1Utils_a18df4f61989071e018f64ac7d7a1d6f1}} 
+static bool {\bfseries check\+\_\+subd\+\_\+locality} (M\+P\+I\+\_\+\+Comm mpi\+\_\+communicator, int neighbor\+\_\+rank, int my\+\_\+rank)
+\item 
+\mbox{\Hypertarget{structschwz_1_1Utils_a6f0494e5c7d6be0585e26efd1d1fa64c}\label{structschwz_1_1Utils_a6f0494e5c7d6be0585e26efd1d1fa64c}} 
+static void {\bfseries print\+\_\+matrix} (const gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$ $\ast$matrix, int rank, std\+::string name)
+\item 
+\mbox{\Hypertarget{structschwz_1_1Utils_a1abe3d1bde2091a0361f8beadb925f70}\label{structschwz_1_1Utils_a1abe3d1bde2091a0361f8beadb925f70}} 
+static void {\bfseries print\+\_\+vector} (const gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $\ast$vector, int rank, std\+::string name)
+\item 
+\mbox{\Hypertarget{structschwz_1_1Utils_a391ddf4f24fb8d7c7ffacf8f046f94b5}\label{structschwz_1_1Utils_a391ddf4f24fb8d7c7ffacf8f046f94b5}} 
+static int {\bfseries find\+\_\+duplicates} (Index\+Type val, std\+::size\+\_\+t index, const Index\+Type $\ast$data, std\+::size\+\_\+t length)
+\item 
+\mbox{\Hypertarget{structschwz_1_1Utils_a324726628a2cc9e0021069f5a060a140}\label{structschwz_1_1Utils_a324726628a2cc9e0021069f5a060a140}} 
+static bool {\bfseries assert\+\_\+correct\+\_\+permutation} (const gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$ $\ast$input\+\_\+perm)
+\item 
+\mbox{\Hypertarget{structschwz_1_1Utils_a6a86d7ed4bb4e8256378d0f5c31a20df}\label{structschwz_1_1Utils_a6a86d7ed4bb4e8256378d0f5c31a20df}} 
+static bool {\bfseries assert\+\_\+correct\+\_\+cuda\+\_\+devices} (int num\+\_\+devices, int my\+\_\+rank)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Value\+Type = gko\+::default\+\_\+precision, typename Index\+Type = gko\+::int32$>$\newline
+struct schwz\+::\+Utils$<$ Value\+Type, Index\+Type $>$}
+
+The utilities class which provides some checks and basic utilities. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Value\+Type} & The type of the floating point values. \\
+\hline
+{\em Index\+Type} & The type of the index type values.\\
+\hline
+\end{DoxyTemplParams}
+\hyperlink{group__utils}{Utils} 
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+utils.\+hpp (defa7f2)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/utils.\+cpp (defa7f2)\end{DoxyCompactItemize}

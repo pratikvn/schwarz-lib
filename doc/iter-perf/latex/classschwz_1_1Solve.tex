@@ -1,0 +1,64 @@
+\hypertarget{classschwz_1_1Solve}{}\section{schwz\+:\+:Solve$<$ Value\+Type, Index\+Type $>$ Class Template Reference}
+\label{classschwz_1_1Solve}\index{schwz\+::\+Solve$<$ Value\+Type, Index\+Type $>$@{schwz\+::\+Solve$<$ Value\+Type, Index\+Type $>$}}
+
+
+The Solver class the provides the solver and the convergence checking methods.  
+
+
+
+
+{\ttfamily \#include $<$solve.\+hpp$>$}
+
+
+
+Collaboration diagram for schwz\+:\+:Solve$<$ Value\+Type, Index\+Type $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classschwz_1_1Solve__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classschwz_1_1Solve_a6a041c5fd6d3439b0203cf6844c0a984}\label{classschwz_1_1Solve_a6a041c5fd6d3439b0203cf6844c0a984}} 
+using {\bfseries Residual\+Criterion\+Factory} = typename gko\+::stop\+::\+Residual\+Norm\+Reduction$<$ Value\+Type $>$\+::Factory
+\item 
+\mbox{\Hypertarget{classschwz_1_1Solve_ad7301198e28c66c6f94d7d717e07d420}\label{classschwz_1_1Solve_ad7301198e28c66c6f94d7d717e07d420}} 
+using {\bfseries Iteration\+Criterion\+Factory} = typename gko\+::stop\+::\+Iteration\+::\+Factory
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classschwz_1_1Solve_a24250987949518cc92649066d3ce147d}\label{classschwz_1_1Solve_a24250987949518cc92649066d3ce147d}} 
+{\bfseries Solve} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings)
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classschwz_1_1Solve_a7044b349fe5363eeace2d1a56b38f650}\label{classschwz_1_1Solve_a7044b349fe5363eeace2d1a56b38f650}} 
+class {\bfseries Initialize$<$ Value\+Type, Index\+Type $>$}
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Value\+Type = gko\+::default\+\_\+precision, typename Index\+Type = gko\+::int32$>$\newline
+class schwz\+::\+Solve$<$ Value\+Type, Index\+Type $>$}
+
+The Solver class the provides the solver and the convergence checking methods. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Value\+Type} & The type of the floating point values. \\
+\hline
+{\em Index\+Type} & The type of the index type values.\\
+\hline
+\end{DoxyTemplParams}
+\hyperlink{group__solve}{Solve} 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+solve.\+hpp (defa7f2)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/solve.\+cpp (defa7f2)\end{DoxyCompactItemize}

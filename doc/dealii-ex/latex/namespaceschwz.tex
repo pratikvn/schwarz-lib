@@ -10,8 +10,8 @@ The Schwarz wrappers namespace.
 \item 
  \hyperlink{namespaceschwz_1_1CommHelpers}{Comm\+Helpers}
 \begin{DoxyCompactList}\small\item\em The Comm\+Helper namespace . \end{DoxyCompactList}\item 
- \hyperlink{namespaceschwz_1_1ConvergenceTools}{Convergence\+Tools}
-\begin{DoxyCompactList}\small\item\em The \hyperlink{namespaceschwz_1_1ConvergenceTools}{Convergence\+Tools} namespace . \end{DoxyCompactList}\item 
+ \hyperlink{namespaceschwz_1_1conv__tools}{conv\+\_\+tools}
+\begin{DoxyCompactList}\small\item\em The \hyperlink{namespaceschwz_1_1conv__tools}{conv\+\_\+tools} namespace . \end{DoxyCompactList}\item 
  \hyperlink{namespaceschwz_1_1PartitionTools}{Partition\+Tools}
 \begin{DoxyCompactList}\small\item\em The \hyperlink{namespaceschwz_1_1PartitionTools}{Partition\+Tools} namespace . \end{DoxyCompactList}\item 
  \hyperlink{namespaceschwz_1_1SolverTools}{Solver\+Tools}
@@ -48,6 +48,9 @@ gko\+::size\+\_\+type {\bfseries linearize\+\_\+index} (const gko\+::size\+\_\+t
 \item 
 \mbox{\Hypertarget{namespaceschwz_a23ebc9e79127b6bb0d6e30e55ce99bfa}\label{namespaceschwz_a23ebc9e79127b6bb0d6e30e55ce99bfa}} 
 {\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries exchange\+\_\+boundary\+\_\+twosided} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, struct \hyperlink{classschwz_1_1Communicate}{Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct \&comm\+\_\+struct, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+solution)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a031a20f3e3f7eb406d4c3c9165edc449}\label{namespaceschwz_a031a20f3e3f7eb406d4c3c9165edc449}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries write\+\_\+iters\+\_\+and\+\_\+residuals} (int num\+\_\+subd, int my\+\_\+rank, int iter\+\_\+count, std\+::vector$<$ Value\+Type $>$ \&local\+\_\+res\+\_\+vec\+\_\+out, std\+::vector$<$ Index\+Type $>$ \&local\+\_\+converged\+\_\+iter\+\_\+count, std\+::vector$<$ Value\+Type $>$ \&local\+\_\+converged\+\_\+resnorm, std\+::string filename)
 \item 
 \mbox{\Hypertarget{namespaceschwz_aa123f4d2e7d96621d22e76cd97784701}\label{namespaceschwz_aa123f4d2e7d96621d22e76cd97784701}} 
 {\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries gather\+\_\+comm\+\_\+data} (int num\+\_\+subdomains, struct \hyperlink{classschwz_1_1Communicate}{Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct \&comm\+\_\+struct, std\+::vector$<$ std\+::tuple$<$ int, std\+::vector$<$ std\+::tuple$<$ int, int $>$$>$, std\+::vector$<$ std\+::tuple$<$ int, int $>$$>$, int, int $>$$>$ \&comm\+\_\+data\+\_\+struct)

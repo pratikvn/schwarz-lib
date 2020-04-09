@@ -68,7 +68,13 @@ std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyper
 \begin{DoxyCompactList}\small\item\em The local solution vector. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{classschwz_1_1SchwarzBase_a8e6f088b8a7112af2ce27285d8d91bcc}\label{classschwz_1_1SchwarzBase_a8e6f088b8a7112af2ce27285d8d91bcc}} 
 std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_a8e6f088b8a7112af2ce27285d8d91bcc}{global\+\_\+solution}
-\begin{DoxyCompactList}\small\item\em The global solution vector. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em The global solution vector. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_a1ecd383f150abee6b3076338ecc5e783}\label{classschwz_1_1SchwarzBase_a1ecd383f150abee6b3076338ecc5e783}} 
+std\+::vector$<$ Value\+Type $>$ \hyperlink{classschwz_1_1SchwarzBase_a1ecd383f150abee6b3076338ecc5e783}{local\+\_\+residual\+\_\+vector\+\_\+out}
+\begin{DoxyCompactList}\small\item\em The global residual vector. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_ae060fc8510ce947d893204693755dd97}\label{classschwz_1_1SchwarzBase_ae060fc8510ce947d893204693755dd97}} 
+std\+::vector$<$ std\+::vector$<$ Value\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_ae060fc8510ce947d893204693755dd97}{global\+\_\+residual\+\_\+vector\+\_\+out}
+\begin{DoxyCompactList}\small\item\em The local residual vector. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Additional Inherited Members}
 
 
@@ -173,11 +179,11 @@ The function that runs the actual solver and obtains the final solution.
 \end{DoxyParams}
 
 
-References schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::exchange\+\_\+boundary(), schwz\+::\+Settings\+::executor, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+matrix, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+rhs, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+solution, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::interface\+\_\+matrix, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+inv\+\_\+perm, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+matrix, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+perm, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+rhs, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+solution, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows(), schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::triangular\+\_\+factor\+\_\+l, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::triangular\+\_\+factor\+\_\+u, and schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::update\+\_\+boundary().
+References schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::exchange\+\_\+boundary(), schwz\+::\+Settings\+::executor, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+matrix, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+rhs, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+solution, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::interface\+\_\+matrix, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+inv\+\_\+perm, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+matrix, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+perm, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+rhs, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+solution, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows(), schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::triangular\+\_\+factor\+\_\+l, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::triangular\+\_\+factor\+\_\+u, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::update\+\_\+boundary(), and schwz\+::\+Settings\+::write\+\_\+iters\+\_\+and\+\_\+residuals.
 
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-schwarz\+\_\+base.\+hpp (96003b3)\item 
-/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/schwarz\+\_\+base.\+cpp (96003b3)\end{DoxyCompactItemize}
+schwarz\+\_\+base.\+hpp (57e6370)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/schwarz\+\_\+base.\+cpp (57e6370)\end{DoxyCompactItemize}

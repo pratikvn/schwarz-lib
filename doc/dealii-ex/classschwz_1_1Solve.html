@@ -65,6 +65,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classschwz_1_1Solve-members.html">List of all members</a>  </div>
@@ -84,24 +85,14 @@ Collaboration diagram for schwz::Solve&lt; ValueType, IndexType &gt;:</div>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:a24250987949518cc92649066d3ce147d"><td class="memItemLeft" align="right" valign="top"><a id="a24250987949518cc92649066d3ce147d"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Solve</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings)</td></tr>
-<tr class="separator:a24250987949518cc92649066d3ce147d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_structschwz_1_1Settings"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structschwz_1_1Settings')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structschwz_1_1Settings.html">schwz::Settings</a></td></tr>
-<tr class="memitem:a00ac65d16e2ef2761fad0095b2ba3086 inherit pub_methods_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="a00ac65d16e2ef2761fad0095b2ba3086"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Settings</b> (std::string <a class="el" href="structschwz_1_1Settings.html#a088ed3524456a1fd40e76b0e2d624c79">executor_string</a>=&quot;reference&quot;)</td></tr>
-<tr class="separator:a00ac65d16e2ef2761fad0095b2ba3086 inherit pub_methods_structschwz_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a7044b349fe5363eeace2d1a56b38f650"><td class="memItemLeft" align="right" valign="top"><a id="a7044b349fe5363eeace2d1a56b38f650"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><b>Initialize&lt; ValueType, IndexType &gt;</b></td></tr>
-<tr class="separator:a7044b349fe5363eeace2d1a56b38f650"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a6a041c5fd6d3439b0203cf6844c0a984"><td class="memItemLeft" align="right" valign="top"><a id="a6a041c5fd6d3439b0203cf6844c0a984"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>ResidualCriterionFactory</b> = typename gko::stop::ResidualNormReduction&lt; ValueType &gt;::Factory</td></tr>
+<tr class="separator:a6a041c5fd6d3439b0203cf6844c0a984"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7301198e28c66c6f94d7d717e07d420"><td class="memItemLeft" align="right" valign="top"><a id="ad7301198e28c66c6f94d7d717e07d420"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>IterationCriterionFactory</b> = typename gko::stop::Iteration::Factory</td></tr>
+<tr class="separator:ad7301198e28c66c6f94d7d717e07d420"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_types_structschwz_1_1Settings"><td colspan="2" onclick="javascript:toggleInherit('pub_types_structschwz_1_1Settings')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="structschwz_1_1Settings.html">schwz::Settings</a></td></tr>
 <tr class="memitem:a11769093e4aa3ce3340cbf7a67487faa inherit pub_types_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="a11769093e4aa3ce3340cbf7a67487faa"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a11769093e4aa3ce3340cbf7a67487faa">partition_settings</a> { <br />
 &#160;&#160;<b>partition_regular</b> = 0x0, 
@@ -126,6 +117,25 @@ Additional Inherited Members</h2></td></tr>
  }<tr class="memdesc:a31e82310ef6aed08168baef78f0db69e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local solver algorithm for the local subdomain solves. <br /></td></tr>
 </td></tr>
 <tr class="separator:a31e82310ef6aed08168baef78f0db69e inherit pub_types_structschwz_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a24250987949518cc92649066d3ce147d"><td class="memItemLeft" align="right" valign="top"><a id="a24250987949518cc92649066d3ce147d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Solve</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings)</td></tr>
+<tr class="separator:a24250987949518cc92649066d3ce147d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_structschwz_1_1Settings"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structschwz_1_1Settings')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structschwz_1_1Settings.html">schwz::Settings</a></td></tr>
+<tr class="memitem:a00ac65d16e2ef2761fad0095b2ba3086 inherit pub_methods_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="a00ac65d16e2ef2761fad0095b2ba3086"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Settings</b> (std::string <a class="el" href="structschwz_1_1Settings.html#a088ed3524456a1fd40e76b0e2d624c79">executor_string</a>=&quot;reference&quot;)</td></tr>
+<tr class="separator:a00ac65d16e2ef2761fad0095b2ba3086 inherit pub_methods_structschwz_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a7044b349fe5363eeace2d1a56b38f650"><td class="memItemLeft" align="right" valign="top"><a id="a7044b349fe5363eeace2d1a56b38f650"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>Initialize&lt; ValueType, IndexType &gt;</b></td></tr>
+<tr class="separator:a7044b349fe5363eeace2d1a56b38f650"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pub_attribs_structschwz_1_1Settings"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_structschwz_1_1Settings')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="structschwz_1_1Settings.html">schwz::Settings</a></td></tr>
 <tr class="memitem:a088ed3524456a1fd40e76b0e2d624c79 inherit pub_attribs_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="a088ed3524456a1fd40e76b0e2d624c79"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a088ed3524456a1fd40e76b0e2d624c79">executor_string</a></td></tr>
@@ -185,6 +195,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#af81ff061a4d7220d380fb7f579d7a6e1">write_debug_out</a> = false</td></tr>
 <tr class="memdesc:af81ff061a4d7220d380fb7f579d7a6e1 inherit pub_attribs_structschwz_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the writing of debug out to file. <br /></td></tr>
 <tr class="separator:af81ff061a4d7220d380fb7f579d7a6e1 inherit pub_attribs_structschwz_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5555cf4340e7918ce22d00b26ccca6a7 inherit pub_attribs_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="a5555cf4340e7918ce22d00b26ccca6a7"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a5555cf4340e7918ce22d00b26ccca6a7">write_iters_and_residuals</a> = false</td></tr>
+<tr class="memdesc:a5555cf4340e7918ce22d00b26ccca6a7 inherit pub_attribs_structschwz_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable writing the iters and residuals to a file. <br /></td></tr>
+<tr class="separator:a5555cf4340e7918ce22d00b26ccca6a7 inherit pub_attribs_structschwz_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af692ca8550d16b538dcfddb5208e73f3 inherit pub_attribs_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="af692ca8550d16b538dcfddb5208e73f3"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#af692ca8550d16b538dcfddb5208e73f3">write_perm_data</a> = false</td></tr>
 <tr class="memdesc:af692ca8550d16b538dcfddb5208e73f3 inherit pub_attribs_structschwz_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the local permutations from CHOLMOD to a file. <br /></td></tr>
@@ -222,8 +236,8 @@ class schwz::Solve&lt; ValueType, IndexType &gt;</h3>
 </dl>
 <p><a class="el" href="group__solve.html">Solve</a> </p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
-<li><a class="el" href="include_2solve_8hpp_source.html">solve.hpp (96003b3)</a></li>
-<li>/home/runner/work/schwarz-lib/schwarz-lib/source/solve.cpp (96003b3)</li>
+<li><a class="el" href="include_2solve_8hpp_source.html">solve.hpp (57e6370)</a></li>
+<li>/home/runner/work/schwarz-lib/schwarz-lib/source/solve.cpp (57e6370)</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

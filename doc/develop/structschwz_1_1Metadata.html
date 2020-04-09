@@ -65,6 +65,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structschwz_1_1Metadata-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -79,10 +80,16 @@ $(function() {
 <div class="dynheader">
 Collaboration diagram for schwz::Metadata&lt; ValueType, IndexType &gt;:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="structschwz_1_1Metadata__coll__graph.svg" width="100%" height="441"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="structschwz_1_1Metadata__coll__graph.svg" width="100%" height="562"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata_1_1post__process__data.html">post_process_data</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The struct used for storing data for post-processing.  <a href="structschwz_1_1Metadata_1_1post__process__data.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a84a525a7a5f5282dcc1ef165e93bad35"><td class="memItemLeft" align="right" valign="top"><a id="a84a525a7a5f5282dcc1ef165e93bad35"></a>
@@ -149,8 +156,16 @@ IndexType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <tr class="separator:a0fec5924fa99f07cabf560cc461887b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3fbf70891e008cf810b6480be6607da"><td class="memItemLeft" align="right" valign="top"><a id="aa3fbf70891e008cf810b6480be6607da"></a>
 IndexType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#aa3fbf70891e008cf810b6480be6607da">max_iters</a></td></tr>
-<tr class="memdesc:aa3fbf70891e008cf810b6480be6607da"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum iteration count of the solver. <br /></td></tr>
+<tr class="memdesc:aa3fbf70891e008cf810b6480be6607da"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum iteration count of the Schwarz solver. <br /></td></tr>
 <tr class="separator:aa3fbf70891e008cf810b6480be6607da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54d674e16789df0e5c226ec669d0c6e4"><td class="memItemLeft" align="right" valign="top"><a id="a54d674e16789df0e5c226ec669d0c6e4"></a>
+IndexType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#a54d674e16789df0e5c226ec669d0c6e4">local_max_iters</a></td></tr>
+<tr class="memdesc:a54d674e16789df0e5c226ec669d0c6e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum iteration count of the local iterative solver. <br /></td></tr>
+<tr class="separator:a54d674e16789df0e5c226ec669d0c6e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ea47eff6a067a4a166d4236a75efe30"><td class="memItemLeft" align="right" valign="top"><a id="a4ea47eff6a067a4a166d4236a75efe30"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#a4ea47eff6a067a4a166d4236a75efe30">local_precond</a></td></tr>
+<tr class="memdesc:a4ea47eff6a067a4a166d4236a75efe30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Local preconditioner. <br /></td></tr>
+<tr class="separator:a4ea47eff6a067a4a166d4236a75efe30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93978e9e4d28fac4ee80fdb5c77a7074"><td class="memItemLeft" align="right" valign="top"><a id="a93978e9e4d28fac4ee80fdb5c77a7074"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#a93978e9e4d28fac4ee80fdb5c77a7074">precond_max_block_size</a></td></tr>
 <tr class="memdesc:a93978e9e4d28fac4ee80fdb5c77a7074"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum block size for the preconditioner. <br /></td></tr>
@@ -171,6 +186,9 @@ std::vector&lt; std::tuple&lt; int, int, int, std::string, std::vector&lt; Value
 std::vector&lt; std::tuple&lt; int, std::vector&lt; std::tuple&lt; int, int &gt; &gt;, std::vector&lt; std::tuple&lt; int, int &gt; &gt;, int, int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#a54f774e70eb42b84f63f702262b99fa6">comm_data_struct</a></td></tr>
 <tr class="memdesc:a54f774e70eb42b84f63f702262b99fa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The struct used to measure the timings of each function within the solver loop. <br /></td></tr>
 <tr class="separator:a54f774e70eb42b84f63f702262b99fa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb52c3cb813542a696cb1a9420503bd6"><td class="memItemLeft" align="right" valign="top"><a id="abb52c3cb813542a696cb1a9420503bd6"></a>
+<a class="el" href="structschwz_1_1Metadata_1_1post__process__data.html">post_process_data</a>&#160;</td><td class="memItemRight" valign="bottom"><b>post_process_data</b></td></tr>
+<tr class="separator:abb52c3cb813542a696cb1a9420503bd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ad24ef496c5e99cb0c5c2e8af3a1fab"><td class="memItemLeft" align="right" valign="top"><a id="a0ad24ef496c5e99cb0c5c2e8af3a1fab"></a>
 std::shared_ptr&lt; gko::Array&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#a0ad24ef496c5e99cb0c5c2e8af3a1fab">global_to_local</a></td></tr>
 <tr class="memdesc:a0ad24ef496c5e99cb0c5c2e8af3a1fab"><td class="mdescLeft">&#160;</td><td class="mdescRight">The mapping containing the global to local indices. <br /></td></tr>
@@ -248,7 +266,7 @@ template&lt;typename ValueType, typename IndexType&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li><a class="el" href="settings_8hpp_source.html">settings.hpp (10144ad)</a></li>
+<li><a class="el" href="settings_8hpp_source.html">settings.hpp (04a42d4)</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

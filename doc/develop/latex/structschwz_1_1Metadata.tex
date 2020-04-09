@@ -19,6 +19,11 @@ Collaboration diagram for schwz\+:\+:Metadata$<$ Value\+Type, Index\+Type $>$\+:
 \includegraphics[width=350pt]{structschwz_1_1Metadata__coll__graph}
 \end{center}
 \end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structschwz_1_1Metadata_1_1post__process__data}{post\+\_\+process\+\_\+data}
+\begin{DoxyCompactList}\small\item\em The struct used for storing data for post-\/processing. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
@@ -70,7 +75,13 @@ Value\+Type \hyperlink{structschwz_1_1Metadata_a0fec5924fa99f07cabf560cc461887b5
 \begin{DoxyCompactList}\small\item\em The tolerance of the local solver in case of an iterative solve. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structschwz_1_1Metadata_aa3fbf70891e008cf810b6480be6607da}\label{structschwz_1_1Metadata_aa3fbf70891e008cf810b6480be6607da}} 
 Index\+Type \hyperlink{structschwz_1_1Metadata_aa3fbf70891e008cf810b6480be6607da}{max\+\_\+iters}
-\begin{DoxyCompactList}\small\item\em The maximum iteration count of the solver. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em The maximum iteration count of the Schwarz solver. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Metadata_a54d674e16789df0e5c226ec669d0c6e4}\label{structschwz_1_1Metadata_a54d674e16789df0e5c226ec669d0c6e4}} 
+Index\+Type \hyperlink{structschwz_1_1Metadata_a54d674e16789df0e5c226ec669d0c6e4}{local\+\_\+max\+\_\+iters}
+\begin{DoxyCompactList}\small\item\em The maximum iteration count of the local iterative solver. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Metadata_a4ea47eff6a067a4a166d4236a75efe30}\label{structschwz_1_1Metadata_a4ea47eff6a067a4a166d4236a75efe30}} 
+std\+::string \hyperlink{structschwz_1_1Metadata_a4ea47eff6a067a4a166d4236a75efe30}{local\+\_\+precond}
+\begin{DoxyCompactList}\small\item\em Local preconditioner. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structschwz_1_1Metadata_a93978e9e4d28fac4ee80fdb5c77a7074}\label{structschwz_1_1Metadata_a93978e9e4d28fac4ee80fdb5c77a7074}} 
 unsigned int \hyperlink{structschwz_1_1Metadata_a93978e9e4d28fac4ee80fdb5c77a7074}{precond\+\_\+max\+\_\+block\+\_\+size}
 \begin{DoxyCompactList}\small\item\em The maximum block size for the preconditioner. \end{DoxyCompactList}\item 
@@ -86,6 +97,9 @@ std\+::vector$<$ std\+::tuple$<$ int, int, int, std\+::string, std\+::vector$<$ 
 \mbox{\Hypertarget{structschwz_1_1Metadata_a54f774e70eb42b84f63f702262b99fa6}\label{structschwz_1_1Metadata_a54f774e70eb42b84f63f702262b99fa6}} 
 std\+::vector$<$ std\+::tuple$<$ int, std\+::vector$<$ std\+::tuple$<$ int, int $>$ $>$, std\+::vector$<$ std\+::tuple$<$ int, int $>$ $>$, int, int $>$ $>$ \hyperlink{structschwz_1_1Metadata_a54f774e70eb42b84f63f702262b99fa6}{comm\+\_\+data\+\_\+struct}
 \begin{DoxyCompactList}\small\item\em The struct used to measure the timings of each function within the solver loop. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Metadata_abb52c3cb813542a696cb1a9420503bd6}\label{structschwz_1_1Metadata_abb52c3cb813542a696cb1a9420503bd6}} 
+\hyperlink{structschwz_1_1Metadata_1_1post__process__data}{post\+\_\+process\+\_\+data} {\bfseries post\+\_\+process\+\_\+data}
+\item 
 \mbox{\Hypertarget{structschwz_1_1Metadata_a0ad24ef496c5e99cb0c5c2e8af3a1fab}\label{structschwz_1_1Metadata_a0ad24ef496c5e99cb0c5c2e8af3a1fab}} 
 std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Metadata_a0ad24ef496c5e99cb0c5c2e8af3a1fab}{global\+\_\+to\+\_\+local}
 \begin{DoxyCompactList}\small\item\em The mapping containing the global to local indices. \end{DoxyCompactList}\item 
@@ -148,4 +162,4 @@ The residual norm reduction required.
 
 The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-settings.\+hpp (10144ad)\end{DoxyCompactItemize}
+settings.\+hpp (04a42d4)\end{DoxyCompactItemize}

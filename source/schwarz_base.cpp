@@ -43,35 +43,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace schwz {
 
-template <typename ValueType>
-void write_iters_and_residuals(int num_subd, int my_rank, int iter_count,
-                               std::vector<ValueType> &local_res_vec_out,
-                               std::string filename)
+
+template <typename ValueType, typename IndexType>
+void write_iters_and_residuals(
+    int num_subd, int my_rank, int iter_count,
+    std::vector<ValueType> &local_res_vec_out,
+    std::vector<IndexType> &local_converged_iter_count,
+    std::vector<ValueType> &local_converged_resnorm, std::string filename)
 {
     {
         std::ofstream file;
         file.open(filename);
-        file << "iter,resnorm\n";
+        file << "iter,resnorm,localiter,localresnorm\n";
         for (auto i = 0; i < iter_count; ++i) {
-            file << i << "," << local_res_vec_out[i] << "\n";
+            file << i << "," << local_res_vec_out[i] << ","
+                 << local_converged_iter_count[i] << ","
+                 << local_converged_resnorm[i] << "\n";
         }
         file.close();
     }
-    // {
-    //     std::ofstream file;
-    //     file.open(filename_recv);
-    //     file << "subdomain " << my_rank << " has "
-    //          << std::get<3>(comm_data_struct[my_rank]) << " neighbors\n";
-    //     file << "my_id,from_id,num_recv\n";
-    //     for (auto i = 0; i < num_subd; ++i) {
-    //         file << my_rank << ","
-    //              << std::get<0>(std::get<1>(comm_data_struct[my_rank])[i])
-    //              << ","
-    //              << std::get<1>(std::get<1>(comm_data_struct[my_rank])[i])
-    //              << "\n";
-    //     }
-    //     file.close();
-    // }
 }
 
 
@@ -257,8 +247,8 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
         this->settings, metadata, this->local_matrix, this->triangular_factor_l,
-        this->triangular_factor_u, this->global_residual_vector_out,
-        this->local_perm, this->local_inv_perm, this->local_rhs);
+        this->triangular_factor_u, this->local_perm, this->local_inv_perm,
+        this->local_rhs);
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
@@ -329,6 +319,9 @@ void SchwarzBase<ValueType, IndexType>::run(
     std::shared_ptr<vec_vtype> init_guess = vec_vtype::create(
         settings.executor, gko::dim<2>(this->metadata.local_size_x, 1));
     init_guess->copy_from(local_rhs.get());
+
+    // std::vector<IndexType> local_converged_iter_count;
+
     // Setup the windows for the onesided communication.
     this->setup_windows(this->settings, this->metadata, global_solution);
 
@@ -366,10 +359,9 @@ void SchwarzBase<ValueType, IndexType>::run(
             (Solve<ValueType, IndexType>::check_convergence(
                 settings, metadata, this->comm_struct, this->convergence_vector,
                 global_solution, this->local_solution, this->local_matrix,
-                work_vector, this->local_residual_vector_out,
-                this->global_residual_vector_out, local_residual_norm,
-                local_residual_norm0, global_residual_norm,
-                global_residual_norm0, num_converged_procs)),
+                work_vector, local_residual_norm, local_residual_norm0,
+                global_residual_norm, global_residual_norm0,
+                num_converged_procs)),
             2, metadata.my_rank, convergence_check, metadata.iter_count);
 
         // break if the solution diverges.
@@ -407,15 +399,20 @@ void SchwarzBase<ValueType, IndexType>::run(
     ValueType mat_norm = -1.0, rhs_norm = -1.0, sol_norm = -1.0,
               residual_norm = -1.0;
     // Write the residuals and iterations to files
-    if (settings.write_iters_and_residuals) {
+    if (settings.write_iters_and_residuals &&
+        solver_settings ==
+            Settings::local_solver_settings::iterative_solver_ginkgo) {
         std::string rank_string = std::to_string(metadata.my_rank);
         if (metadata.my_rank < 10) {
             rank_string = "0" + std::to_string(metadata.my_rank);
         }
         std::string filename = "iter_res_" + rank_string + ".csv";
-        write_iters_and_residuals(metadata.num_subdomains, metadata.my_rank,
-                                  this->local_residual_vector_out.size(),
-                                  this->local_residual_vector_out, filename);
+        write_iters_and_residuals(
+            metadata.num_subdomains, metadata.my_rank,
+            metadata.post_process_data.local_residual_vector_out.size(),
+            metadata.post_process_data.local_residual_vector_out,
+            metadata.post_process_data.local_converged_iter_count,
+            metadata.post_process_data.local_converged_resnorm, filename);
     }
 
     // Compute the final residual norm. Also gathers the solution from all

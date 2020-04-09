@@ -417,6 +417,18 @@ struct Metadata {
         comm_data_struct;
 
     /**
+     * The struct used for storing data for post-processing.
+     *
+     */
+    struct post_process_data {
+        std::vector<std::vector<ValueType>> global_residual_vector_out;
+        std::vector<ValueType> local_residual_vector_out;
+        std::vector<ValueType> local_converged_iter_count;
+        std::vector<ValueType> local_converged_resnorm;
+    };
+    post_process_data post_process_data;
+
+    /**
      * The mapping containing the global to local indices.
      */
     std::shared_ptr<gko::Array<IndexType>> global_to_local;

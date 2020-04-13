@@ -480,7 +480,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             // Setup the Ginkgo iterative GMRES solver.
             if (metadata.local_precond == "block-jacobi") {
                 if (metadata.my_rank == 0) {
-                    std::cout << " Local Ginkgo iterative solve with "
+                    std::cout << " Local Ginkgo iterative solve(GMRES) with "
                                  "Block-Jacobi preconditioning "
                               << std::endl;
                 }
@@ -496,9 +496,10 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         ->generate(local_matrix);
             } else if (metadata.local_precond == "ilu") {
                 if (metadata.my_rank == 0) {
-                    std::cout << " Local Ginkgo iterative solve with ParILU "
-                                 "preconditioning "
-                              << std::endl;
+                    std::cout
+                        << " Local Ginkgo iterative solve(GMRES) with ParILU "
+                           "preconditioning "
+                        << std::endl;
                 }
                 auto exec = settings.executor;
                 auto par_ilu_fact =
@@ -522,7 +523,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         ->generate(local_matrix);
             } else if (metadata.local_precond == "null") {
                 if (metadata.my_rank == 0) {
-                    std::cout << " Local Ginkgo iterative solve with no "
+                    std::cout << " Local Ginkgo iterative solve(GMRES) with no "
                                  "preconditioning "
                               << std::endl;
                 }
@@ -540,7 +541,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             // Setup the Ginkgo iterative CG solver.
             if (metadata.local_precond == "block-jacobi") {
                 if (metadata.my_rank == 0) {
-                    std::cout << " Local Ginkgo iterative solve with "
+                    std::cout << " Local Ginkgo iterative solve(CG) with "
                                  "Block-Jacobi preconditioning "
                               << std::endl;
                 }
@@ -556,9 +557,10 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         ->generate(local_matrix);
             } else if (metadata.local_precond == "ilu") {
                 if (metadata.my_rank == 0) {
-                    std::cout << " Local Ginkgo iterative solve with ParILU "
-                                 "preconditioning "
-                              << std::endl;
+                    std::cout
+                        << " Local Ginkgo iterative solve(CG) with ParILU "
+                           "preconditioning "
+                        << std::endl;
                 }
                 auto exec = settings.executor;
                 auto par_ilu_fact =
@@ -582,7 +584,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         ->generate(local_matrix);
             } else if (metadata.local_precond == "null") {
                 if (metadata.my_rank == 0) {
-                    std::cout << " Local Ginkgo iterative solve with no "
+                    std::cout << " Local Ginkgo iterative solve(CG) with no "
                                  "preconditioning "
                               << std::endl;
                 }

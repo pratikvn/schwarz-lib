@@ -55,6 +55,7 @@ DEFINE_uint32(
     "Number of refinement cycles for the adaptive refinement within deal.ii");
 DEFINE_uint32(init_refine_level, 4,
               "Initial level for the refinement of the mesh.");
+DEFINE_bool(dealii_orig, false, "Solve with dealii iterative GMRES");
 
 #define CHECK_HERE std::cout << "Here " << __LINE__ << std::endl;
 
@@ -139,6 +140,7 @@ class AdvectionProblem : public BenchBase<double, int> {
 public:
     AdvectionProblem();
     void run();
+    void run(MPI_Comm mpi_communicator);
 
 private:
     void setup_system();
@@ -375,21 +377,6 @@ void AdvectionProblem<dim>::copy_local_to_global(
 template <int dim>
 void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
 {
-    // SolverControl solver_control(
-    //     std::max<std::size_t>(1000, system_rhs.size() / 10),
-    //     1e-10 * system_rhs.l2_norm());
-    // SolverGMRES<> solver(solver_control);
-    // PreconditionJacobi<> preconditioner;
-    // preconditioner.initialize(system_matrix, 1.0);
-    // solver.solve(system_matrix, solution, system_rhs, preconditioner);
-    // Vector<double> residual(dof_handler.n_dofs());
-    // system_matrix.vmult(residual, solution);
-    // residual -= system_rhs;
-    // std::cout << "   Iterations required for convergence: "
-    //           << solver_control.last_step() << '\n'
-    //           << "   Max norm of residual:                "
-    //           << residual.linfty_norm() << '\n';
-    // hanging_node_constraints.distribute(solution);
     using ValueType = double;
     using IndexType = int;
     schwz::Metadata<ValueType, IndexType> metadata;
@@ -512,7 +499,14 @@ void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
     std::shared_ptr<vec_vtype> solution_vector;
     schwz::SolverRAS<ValueType, IndexType> solver(settings, metadata);
     solver.initialize(system_matrix, system_rhs);
+    auto start_time = std::chrono::steady_clock::now();
     solver.run(solution_vector);
+    auto elapsed_time = std::chrono::duration<double>(
+        std::chrono::steady_clock::now() - start_time);
+    if (metadata.my_rank == 0) {
+        std::cout << "Time for solve only: " << elapsed_time.count()
+                  << std::endl;
+    }
     if (FLAGS_timings_file != "null") {
         std::string rank_string = std::to_string(metadata.my_rank);
         if (metadata.my_rank < 10) {
@@ -552,7 +546,11 @@ void AdvectionProblem<dim>::solve()
     SolverGMRES<> solver(solver_control);
     PreconditionJacobi<> preconditioner;
     preconditioner.initialize(system_matrix, 1.0);
+    auto start_time = std::chrono::steady_clock::now();
     solver.solve(system_matrix, solution, system_rhs, preconditioner);
+    auto elapsed_time = std::chrono::duration<double>(
+        std::chrono::steady_clock::now() - start_time);
+    std::cout << "Time for solve only: " << elapsed_time.count() << std::endl;
     Vector<double> residual(dof_handler.n_dofs());
     system_matrix.vmult(residual, solution);
     residual -= system_rhs;
@@ -600,7 +598,7 @@ void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
 
 
 template <int dim>
-void AdvectionProblem<dim>::run()
+void AdvectionProblem<dim>::run(MPI_Comm mpi_communicator)
 {
     int num_cycles = FLAGS_num_refine_cycles;
     int mpi_size, mpi_rank;
@@ -626,6 +624,30 @@ void AdvectionProblem<dim>::run()
         if (mpi_rank == 0) {
             output_results(cycle);
         }
+    }
+}
+
+
+template <int dim>
+void AdvectionProblem<dim>::run()
+{
+    int num_cycles = FLAGS_num_refine_cycles;
+    for (unsigned int cycle = 0; cycle < num_cycles; ++cycle) {
+        std::cout << "Cycle " << cycle << ':' << std::endl;
+
+        if (cycle == 0) {
+            GridGenerator::hyper_cube(triangulation, -1, 1);
+            triangulation.refine_global(FLAGS_init_refine_level);
+        } else
+            refine_grid();
+        std::cout << "   Number of active cells:       "
+                  << triangulation.n_active_cells() << std::endl;
+        setup_system();
+        std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+                  << std::endl;
+        assemble_system();
+        this->solve();
+        output_results(cycle);
     }
 }
 
@@ -758,7 +780,28 @@ int main(int argc, char **argv)
         } else {
             MPI_Init(&argc, &argv);
         }
-        advection_problem_2d.run();
+        int rank = 0;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+        if (FLAGS_dealii_orig) {
+            if (rank == 0) {
+                auto start_time = std::chrono::steady_clock::now();
+                advection_problem_2d.run();
+                auto elapsed_time = std::chrono::duration<double>(
+                    std::chrono::steady_clock::now() - start_time);
+                std::cout << "Total Time for setup+solve: "
+                          << elapsed_time.count() << std::endl;
+            }
+        } else {
+            auto start_time = std::chrono::steady_clock::now();
+            advection_problem_2d.run(MPI_COMM_WORLD);
+            auto elapsed_time = std::chrono::duration<double>(
+                std::chrono::steady_clock::now() - start_time);
+            if (rank == 0) {
+                std::cout << "Total Time for setup+solve: "
+                          << elapsed_time.count() << std::endl;
+            }
+        }
         MPI_Finalize();
     } catch (std::exception &exc) {
         std::cerr << std::endl

@@ -46,6 +46,7 @@ DEFINE_uint32(
     "Number of refinement cycles for the adaptive refinement within deal.ii");
 DEFINE_uint32(init_refine_level, 4,
               "Initial level for the refinement of the mesh.");
+DEFINE_bool(dealii_orig, false, "Solve with dealii iterative CG");
 
 #define CHECK_HERE std::cout << "Here " << __LINE__ << std::endl;
 
@@ -56,6 +57,7 @@ class BenchDealiiLaplace : public BenchBase<ValueType, IndexType> {
 public:
     BenchDealiiLaplace();
     void run();
+    void run(MPI_Comm mpi_communicator);
 
 private:
     void setup_system();
@@ -158,7 +160,11 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve()
     SolverCG<> solver(solver_control);
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
+    auto start_time = std::chrono::steady_clock::now();
     solver.solve(system_matrix, solution, system_rhs, preconditioner);
+    auto elapsed_time = std::chrono::duration<double>(
+        std::chrono::steady_clock::now() - start_time);
+    std::cout << "Time for solve only: " << elapsed_time.count() << std::endl;
     constraints.distribute(solution);
 }
 
@@ -287,7 +293,14 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
     std::shared_ptr<vec_vtype> solution_vector;
     schwz::SolverRAS<ValueType, IndexType> solver(settings, metadata);
     solver.initialize(system_matrix, system_rhs);
+    auto start_time = std::chrono::steady_clock::now();
     solver.run(solution_vector);
+    auto elapsed_time = std::chrono::duration<double>(
+        std::chrono::steady_clock::now() - start_time);
+    if (metadata.my_rank == 0) {
+        std::cout << "Time for solve only: " << elapsed_time.count()
+                  << std::endl;
+    }
     if (FLAGS_timings_file != "null") {
         std::string rank_string = std::to_string(metadata.my_rank);
         if (metadata.my_rank < 10) {
@@ -358,9 +371,34 @@ template <int dim, typename ValueType, typename IndexType>
 void BenchDealiiLaplace<dim, ValueType, IndexType>::run()
 {
     int num_cycles = FLAGS_num_refine_cycles;
+
+    for (unsigned int cycle = 0; cycle < num_cycles; ++cycle) {
+        std::cout << "Cycle " << cycle << ':' << std::endl;
+
+        if (cycle == 0) {
+            GridGenerator::hyper_cube(triangulation);
+            triangulation.refine_global(FLAGS_init_refine_level);
+        } else
+            refine_grid();
+        std::cout << "   Number of active cells:       "
+                  << triangulation.n_active_cells() << std::endl;
+        setup_system();
+        std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+                  << std::endl;
+        assemble_system();
+        this->solve();
+        output_results(cycle);
+    }
+}
+
+template <int dim, typename ValueType, typename IndexType>
+void BenchDealiiLaplace<dim, ValueType, IndexType>::run(
+    MPI_Comm mpi_communicator)
+{
+    int num_cycles = FLAGS_num_refine_cycles;
     int mpi_size, mpi_rank;
-    MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
-    MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+    MPI_Comm_size(mpi_communicator, &mpi_size);
+    MPI_Comm_rank(mpi_communicator, &mpi_rank);
 
     for (unsigned int cycle = 0; cycle < num_cycles; ++cycle) {
         if (mpi_rank == 0) {
@@ -405,7 +443,28 @@ int main(int argc, char **argv)
         } else {
             MPI_Init(&argc, &argv);
         }
-        laplace_problem.run();
+
+        int rank = 0;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        if (FLAGS_dealii_orig) {
+            if (rank == 0) {
+                auto start_time = std::chrono::steady_clock::now();
+                laplace_problem.run();
+                auto elapsed_time = std::chrono::duration<double>(
+                    std::chrono::steady_clock::now() - start_time);
+                std::cout << "Total Time for setup+solve: "
+                          << elapsed_time.count() << std::endl;
+            }
+        } else {
+            auto start_time = std::chrono::steady_clock::now();
+            laplace_problem.run(MPI_COMM_WORLD);
+            auto elapsed_time = std::chrono::duration<double>(
+                std::chrono::steady_clock::now() - start_time);
+            if (rank == 0) {
+                std::cout << "Total Time for setup+solve: "
+                          << elapsed_time.count() << std::endl;
+            }
+        }
         MPI_Finalize();
     } catch (std::exception &exc) {
         std::cerr << std::endl

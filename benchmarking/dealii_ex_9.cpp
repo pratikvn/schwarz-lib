@@ -45,8 +45,22 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <fstream>
 #include <iostream>
-namespace Step9 {
+
+
+#include <bench_base.hpp>
+
+
+DEFINE_uint32(
+    num_refine_cycles, 1,
+    "Number of refinement cycles for the adaptive refinement within deal.ii");
+DEFINE_uint32(init_refine_level, 4,
+              "Initial level for the refinement of the mesh.");
+
+#define CHECK_HERE std::cout << "Here " << __LINE__ << std::endl;
+
 using namespace dealii;
+
+
 template <int dim>
 class AdvectionField : public TensorFunction<1, dim> {
 public:
@@ -55,6 +69,8 @@ public:
                    << "The vector has size " << arg1 << " but should have "
                    << arg2 << " elements.");
 };
+
+
 template <int dim>
 Tensor<1, dim> AdvectionField<dim>::value(const Point<dim> &p) const
 {
@@ -64,6 +80,8 @@ Tensor<1, dim> AdvectionField<dim>::value(const Point<dim> &p) const
         value[i] = 1 + 0.8 * std::sin(8. * numbers::PI * p[0]);
     return value;
 }
+
+
 template <int dim>
 class RightHandSide : public Function<dim> {
 public:
@@ -73,12 +91,16 @@ public:
 private:
     static const Point<dim> center_point;
 };
+
+
 template <>
 const Point<1> RightHandSide<1>::center_point = Point<1>(-0.75);
 template <>
 const Point<2> RightHandSide<2>::center_point = Point<2>(-0.75, -0.75);
 template <>
 const Point<3> RightHandSide<3>::center_point = Point<3>(-0.75, -0.75, -0.75);
+
+
 template <int dim>
 double RightHandSide<dim>::value(const Point<dim> &p,
                                  const unsigned int component) const
@@ -90,12 +112,16 @@ double RightHandSide<dim>::value(const Point<dim> &p,
                 ? 0.1 / std::pow(diameter, dim)
                 : 0.0);
 }
+
+
 template <int dim>
 class BoundaryValues : public Function<dim> {
 public:
     virtual double value(const Point<dim> &p,
                          const unsigned int component = 0) const override;
 };
+
+
 template <int dim>
 double BoundaryValues<dim>::value(const Point<dim> &p,
                                   const unsigned int component) const
@@ -106,8 +132,10 @@ double BoundaryValues<dim>::value(const Point<dim> &p,
     const double weight = std::exp(5. * (1. - p.norm_square()));
     return weight * sine_term;
 }
+
+
 template <int dim>
-class AdvectionProblem {
+class AdvectionProblem : public BenchBase<double, int> {
 public:
     AdvectionProblem();
     void run();
@@ -138,6 +166,7 @@ private:
         AssemblyScratchData &scratch, AssemblyCopyData &copy_data);
     void copy_local_to_global(const AssemblyCopyData &copy_data);
     void solve();
+    void solve(MPI_Comm mpi_communicator);
     void refine_grid();
     void output_results(const unsigned int cycle) const;
     Triangulation<dim> triangulation;
@@ -149,6 +178,8 @@ private:
     Vector<double> solution;
     Vector<double> system_rhs;
 };
+
+
 class GradientEstimation {
 public:
     template <int dim>
@@ -182,9 +213,13 @@ private:
         EstimateScratchData<dim> &scratch_data,
         const EstimateCopyData &copy_data);
 };
+
+
 template <int dim>
 AdvectionProblem<dim>::AdvectionProblem() : dof_handler(triangulation), fe(5)
 {}
+
+
 template <int dim>
 void AdvectionProblem<dim>::setup_system()
 {
@@ -201,6 +236,8 @@ void AdvectionProblem<dim>::setup_system()
     solution.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
 }
+
+
 template <int dim>
 void AdvectionProblem<dim>::assemble_system()
 {
@@ -209,6 +246,8 @@ void AdvectionProblem<dim>::assemble_system()
                     &AdvectionProblem::copy_local_to_global,
                     AssemblyScratchData(fe), AssemblyCopyData());
 }
+
+
 template <int dim>
 AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
     const FiniteElement<dim> &fe)
@@ -223,6 +262,8 @@ AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
       face_boundary_values(fe_face_values.get_quadrature().size()),
       face_advection_directions(fe_face_values.get_quadrature().size())
 {}
+
+
 template <int dim>
 AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
     const AssemblyScratchData &scratch_data)
@@ -239,6 +280,8 @@ AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
       face_boundary_values(scratch_data.face_boundary_values.size()),
       face_advection_directions(scratch_data.face_advection_directions.size())
 {}
+
+
 template <int dim>
 void AdvectionProblem<dim>::local_assemble_system(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
@@ -317,6 +360,8 @@ void AdvectionProblem<dim>::local_assemble_system(
         }
     cell->get_dof_indices(copy_data.local_dof_indices);
 }
+
+
 template <int dim>
 void AdvectionProblem<dim>::copy_local_to_global(
     const AssemblyCopyData &copy_data)
@@ -325,6 +370,179 @@ void AdvectionProblem<dim>::copy_local_to_global(
         copy_data.cell_matrix, copy_data.cell_rhs, copy_data.local_dof_indices,
         system_matrix, system_rhs);
 }
+
+
+template <int dim>
+void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
+{
+    // SolverControl solver_control(
+    //     std::max<std::size_t>(1000, system_rhs.size() / 10),
+    //     1e-10 * system_rhs.l2_norm());
+    // SolverGMRES<> solver(solver_control);
+    // PreconditionJacobi<> preconditioner;
+    // preconditioner.initialize(system_matrix, 1.0);
+    // solver.solve(system_matrix, solution, system_rhs, preconditioner);
+    // Vector<double> residual(dof_handler.n_dofs());
+    // system_matrix.vmult(residual, solution);
+    // residual -= system_rhs;
+    // std::cout << "   Iterations required for convergence: "
+    //           << solver_control.last_step() << '\n'
+    //           << "   Max norm of residual:                "
+    //           << residual.linfty_norm() << '\n';
+    // hanging_node_constraints.distribute(solution);
+    using ValueType = double;
+    using IndexType = int;
+    schwz::Metadata<ValueType, IndexType> metadata;
+    schwz::Settings settings(FLAGS_executor);
+
+    // Set solver metadata from command line args.
+    metadata.mpi_communicator = mpi_communicator;
+    MPI_Comm_rank(metadata.mpi_communicator, &metadata.my_rank);
+    MPI_Comm_size(metadata.mpi_communicator, &metadata.comm_size);
+    metadata.tolerance = FLAGS_set_tol;
+    metadata.max_iters = FLAGS_num_iters;
+    metadata.num_subdomains = metadata.comm_size;
+    metadata.num_threads = FLAGS_num_threads;
+    metadata.oned_laplacian_size = FLAGS_set_1d_laplacian_size;
+
+    // Generic settings
+    settings.write_debug_out = FLAGS_enable_debug_write;
+    settings.write_perm_data = FLAGS_write_perm_data;
+    settings.write_iters_and_residuals = FLAGS_write_iters_and_residuals;
+    settings.print_matrices = FLAGS_print_matrices;
+    settings.shifted_iter = FLAGS_shifted_iter;
+
+    // Set solver settings from command line args.
+    // Comm settings
+    settings.comm_settings.enable_onesided = FLAGS_enable_onesided;
+    if (FLAGS_remote_comm_type == "put") {
+        settings.comm_settings.enable_put = true;
+        settings.comm_settings.enable_get = false;
+    } else if (FLAGS_remote_comm_type == "get") {
+        settings.comm_settings.enable_put = false;
+        settings.comm_settings.enable_get = true;
+    }
+    settings.comm_settings.enable_one_by_one = FLAGS_enable_one_by_one;
+    settings.comm_settings.enable_overlap = FLAGS_enable_comm_overlap;
+    if (FLAGS_flush_type == "flush-all") {
+        settings.comm_settings.enable_flush_all = true;
+    } else if (FLAGS_flush_type == "flush-local") {
+        settings.comm_settings.enable_flush_all = false;
+        settings.comm_settings.enable_flush_local = true;
+    }
+    if (FLAGS_lock_type == "lock-all") {
+        settings.comm_settings.enable_lock_all = true;
+    } else if (FLAGS_lock_type == "lock-local") {
+        settings.comm_settings.enable_lock_all = false;
+        settings.comm_settings.enable_lock_local = true;
+    }
+
+    // Convergence settings
+    settings.convergence_settings.put_all_local_residual_norms =
+        FLAGS_enable_put_all_local_residual_norms;
+    settings.convergence_settings.enable_global_check_iter_offset =
+        FLAGS_enable_global_check_iter_offset;
+    settings.convergence_settings.enable_global_check =
+        FLAGS_enable_global_check;
+    if (FLAGS_global_convergence_type == "centralized-tree") {
+        settings.convergence_settings.enable_global_simple_tree = true;
+    } else if (FLAGS_global_convergence_type == "decentralized") {
+        settings.convergence_settings.enable_decentralized_leader_election =
+            true;
+        settings.convergence_settings.enable_accumulate =
+            FLAGS_enable_decentralized_accumulate;
+    }
+
+    // General solver settings
+    metadata.local_solver_tolerance = FLAGS_local_tol;
+    metadata.local_precond = FLAGS_local_precond;
+    metadata.local_max_iters = FLAGS_local_max_iters;
+    settings.non_symmetric_matrix = FLAGS_non_symmetric_matrix;
+    metadata.precond_max_block_size = FLAGS_precond_max_block_size;
+    metadata.precond_max_block_size = FLAGS_precond_max_block_size;
+    settings.matrix_filename = FLAGS_matrix_filename;
+    settings.explicit_laplacian = FLAGS_explicit_laplacian;
+    settings.enable_random_rhs = FLAGS_enable_random_rhs;
+    settings.overlap = FLAGS_overlap;
+    settings.naturally_ordered_factor = FLAGS_factor_ordering_natural;
+    settings.reorder = FLAGS_local_reordering;
+    settings.factorization = FLAGS_local_factorization;
+    if (FLAGS_partition == "metis") {
+        settings.partition =
+            schwz::Settings::partition_settings::partition_metis;
+        settings.metis_objtype = FLAGS_metis_objtype;
+    } else if (FLAGS_partition == "regular") {
+        settings.partition =
+            schwz::Settings::partition_settings::partition_regular;
+    } else if (FLAGS_partition == "regular2d") {
+        settings.partition =
+            schwz::Settings::partition_settings::partition_regular2d;
+    }
+    if (FLAGS_local_solver == "iterative-ginkgo") {
+        settings.local_solver =
+            schwz::Settings::local_solver_settings::iterative_solver_ginkgo;
+    } else if (FLAGS_local_solver == "direct-cholmod") {
+        settings.local_solver =
+            schwz::Settings::local_solver_settings::direct_solver_cholmod;
+    } else if (FLAGS_local_solver == "direct-umfpack") {
+        settings.local_solver =
+            schwz::Settings::local_solver_settings::direct_solver_umfpack;
+    } else if (FLAGS_local_solver == "direct-ginkgo") {
+        settings.local_solver =
+            schwz::Settings::local_solver_settings::direct_solver_ginkgo;
+    }
+    settings.debug_print = FLAGS_debug;
+    int gsize = 0;
+    if (metadata.my_rank == 0) {
+        metadata.global_size = system_matrix.m();
+        std::cout << " Running on the " << FLAGS_executor << " executor on "
+                  << metadata.num_subdomains << " ranks with "
+                  << FLAGS_num_threads << " threads" << std::endl;
+        std::cout << " Problem Size: " << metadata.global_size << std::endl;
+        gsize = metadata.global_size;
+    }
+    MPI_Bcast(&gsize, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    metadata.global_size = gsize;
+    if (FLAGS_print_config) {
+        if (metadata.my_rank == 0) {
+            this->print_config();
+        }
+    }
+    using vec_vtype = gko::matrix::Dense<ValueType>;
+    std::shared_ptr<vec_vtype> solution_vector;
+    schwz::SolverRAS<ValueType, IndexType> solver(settings, metadata);
+    solver.initialize(system_matrix, system_rhs);
+    solver.run(solution_vector);
+    if (FLAGS_timings_file != "null") {
+        std::string rank_string = std::to_string(metadata.my_rank);
+        if (metadata.my_rank < 10) {
+            rank_string = "0" + std::to_string(metadata.my_rank);
+        }
+        std::string filename = FLAGS_timings_file + "_" + rank_string + ".csv";
+        this->write_timings(metadata.time_struct, filename,
+                            settings.comm_settings.enable_onesided);
+    }
+    if (FLAGS_write_comm_data) {
+        std::string rank_string = std::to_string(metadata.my_rank);
+        if (metadata.my_rank < 10) {
+            rank_string = "0" + std::to_string(metadata.my_rank);
+        }
+        std::string filename_send = "num_send_" + rank_string + ".csv";
+        std::string filename_recv = "num_recv_" + rank_string + ".csv";
+        this->write_comm_data(metadata.num_subdomains, metadata.my_rank,
+                              metadata.comm_data_struct, filename_send,
+                              filename_recv);
+    }
+
+    if (metadata.my_rank == 0) {
+        std::copy(solution_vector->get_values(),
+                  solution_vector->get_values() + metadata.global_size,
+                  solution.begin());
+        hanging_node_constraints.distribute(solution);
+    }
+}
+
+
 template <int dim>
 void AdvectionProblem<dim>::solve()
 {
@@ -344,6 +562,8 @@ void AdvectionProblem<dim>::solve()
               << residual.linfty_norm() << '\n';
     hanging_node_constraints.distribute(solution);
 }
+
+
 template <int dim>
 void AdvectionProblem<dim>::refine_grid()
 {
@@ -354,6 +574,8 @@ void AdvectionProblem<dim>::refine_grid()
         triangulation, estimated_error_per_cell, 0.3, 0.03);
     triangulation.execute_coarsening_and_refinement();
 }
+
+
 template <int dim>
 void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
 {
@@ -375,27 +597,39 @@ void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
         data_out.write_vtu(output);
     }
 }
+
+
 template <int dim>
 void AdvectionProblem<dim>::run()
 {
-    for (unsigned int cycle = 0; cycle < 10; ++cycle) {
-        std::cout << "Cycle " << cycle << ':' << std::endl;
-        if (cycle == 0) {
-            GridGenerator::hyper_cube(triangulation, -1, 1);
-            triangulation.refine_global(3);
-        } else {
-            refine_grid();
+    int num_cycles = FLAGS_num_refine_cycles;
+    int mpi_size, mpi_rank;
+    MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+    for (unsigned int cycle = 0; cycle < num_cycles; ++cycle) {
+        if (mpi_rank == 0) {
+            std::cout << "Cycle " << cycle << ':' << std::endl;
+
+            if (cycle == 0) {
+                GridGenerator::hyper_cube(triangulation, -1, 1);
+                triangulation.refine_global(FLAGS_init_refine_level);
+            } else
+                refine_grid();
+            std::cout << "   Number of active cells:       "
+                      << triangulation.n_active_cells() << std::endl;
+            setup_system();
+            std::cout << "   Number of degrees of freedom: "
+                      << dof_handler.n_dofs() << std::endl;
+            assemble_system();
         }
-        std::cout << "   Number of active cells:              "
-                  << triangulation.n_active_cells() << std::endl;
-        setup_system();
-        std::cout << "   Number of degrees of freedom:        "
-                  << dof_handler.n_dofs() << std::endl;
-        assemble_system();
-        solve();
-        output_results(cycle);
+        this->solve(MPI_COMM_WORLD);
+        if (mpi_rank == 0) {
+            output_results(cycle);
+        }
     }
 }
+
+
 template <int dim>
 GradientEstimation::EstimateScratchData<dim>::EstimateScratchData(
     const FiniteElement<dim> &fe, const Vector<double> &solution,
@@ -410,6 +644,8 @@ GradientEstimation::EstimateScratchData<dim>::EstimateScratchData(
     active_neighbors.reserve(GeometryInfo<dim>::faces_per_cell *
                              GeometryInfo<dim>::max_children_per_face);
 }
+
+
 template <int dim>
 GradientEstimation::EstimateScratchData<dim>::EstimateScratchData(
     const EstimateScratchData &scratch_data)
@@ -421,6 +657,8 @@ GradientEstimation::EstimateScratchData<dim>::EstimateScratchData(
       cell_midpoint_value(1),
       neighbor_midpoint_value(1)
 {}
+
+
 template <int dim>
 void GradientEstimation::estimate(const DoFHandler<dim> &dof_handler,
                                   const Vector<double> &solution,
@@ -438,6 +676,8 @@ void GradientEstimation::estimate(const DoFHandler<dim> &dof_handler,
                                              error_per_cell),
                     EstimateCopyData());
 }
+
+
 template <int dim>
 void GradientEstimation::estimate_cell(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
@@ -495,14 +735,31 @@ void GradientEstimation::estimate_cell(
     scratch_data.error_per_cell(cell->active_cell_index()) =
         (std::pow(cell->diameter(), 1 + 1.0 * dim / 2) * gradient.norm());
 }
-}  // namespace Step9
-int main()
+
+
+int main(int argc, char **argv)
 {
     using namespace dealii;
     try {
+        initialize_argument_parsing(&argc, &argv);
         MultithreadInfo::set_thread_limit();
-        Step9::AdvectionProblem<2> advection_problem_2d;
+        AdvectionProblem<2> advection_problem_2d;
+        if (FLAGS_num_threads > 1) {
+            int req_thread_support = MPI_THREAD_MULTIPLE;
+            int prov_thread_support = MPI_THREAD_MULTIPLE;
+
+            MPI_Init_thread(&argc, &argv, req_thread_support,
+                            &prov_thread_support);
+            if (prov_thread_support != req_thread_support) {
+                std::cout << "Required thread support is " << req_thread_support
+                          << " but provided thread support is only "
+                          << prov_thread_support << std::endl;
+            }
+        } else {
+            MPI_Init(&argc, &argv);
+        }
         advection_problem_2d.run();
+        MPI_Finalize();
     } catch (std::exception &exc) {
         std::cerr << std::endl
                   << std::endl

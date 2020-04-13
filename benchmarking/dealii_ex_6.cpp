@@ -44,6 +44,8 @@
 DEFINE_uint32(
     num_refine_cycles, 1,
     "Number of refinement cycles for the adaptive refinement within deal.ii");
+DEFINE_uint32(init_refine_level, 4,
+              "Initial level for the refinement of the mesh.");
 
 #define CHECK_HERE std::cout << "Here " << __LINE__ << std::endl;
 
@@ -366,7 +368,7 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::run()
 
             if (cycle == 0) {
                 GridGenerator::hyper_cube(triangulation);
-                triangulation.refine_global(4);
+                triangulation.refine_global(FLAGS_init_refine_level);
             } else
                 refine_grid();
             std::cout << "   Number of active cells:       "
@@ -378,7 +380,7 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::run()
         }
         this->solve(MPI_COMM_WORLD);
         if (mpi_rank == 0) {
-            output_results(0);
+            output_results(cycle);
         }
     }
 }

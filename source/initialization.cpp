@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <solve.hpp>
 #include <solver_tools.hpp>
 
+#define CHECK_HERE std::cout << "Here " << __LINE__ << std::endl;
 
 namespace schwz {
 

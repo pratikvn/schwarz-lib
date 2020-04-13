@@ -1,16 +1,17 @@
 include_directories(
   include
+  ${CMAKE_SOURCE_DIR}/benchmarking
   ${CMAKE_BINARY_DIR}/schwarz-lib/include
   ${CMAKE_SOURCE_DIR}/schwarz-lib/include)
 
 
 if(SCHWARZ_BUILD_DEALII)
-  set(BENCH_TARGET "dealii_ex_6;dealii_ex_9")
+  set(BENCH_TARGET "dealii_ex_6;dealii_ex_9;dealii_ex_17")
   FOREACH(_file ${BENCH_TARGET})
     MESSAGE(STATUS "Adding executable for ${_file}")
     add_executable(${_file} ${_file}.cpp)
+    target_link_libraries(${_file} schwz_dealii)
     DEAL_II_SETUP_TARGET(${_file})
-    target_link_libraries(${_file} schwz)
   ENDFOREACH()
 else()
   set(BENCH_TARGET "bench_ras")

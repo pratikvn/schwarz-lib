@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <restricted_schwarz.hpp>
 #include <utils.hpp>
 
+#define CHECK_HERE std::cout << "Here " << __LINE__ << std::endl;
 
 namespace schwz {
 

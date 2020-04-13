@@ -40,6 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <schwarz_base.hpp>
 #include <utils.hpp>
 
+#define CHECK_HERE                                                   \
+    std::cout << "Here " << __LINE__ << " rank " << metadata.my_rank \
+              << std::endl;
 
 namespace schwz {
 
@@ -134,7 +137,6 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     using vec_vecshared = gko::Array<IndexType *>;
     // Setup the global matrix
     // if explicit_laplacian has been enabled or an external matrix has been
-    // provided.
     if (settings.explicit_laplacian || settings.matrix_filename != "null") {
 #if !SCHW_HAVE_DEALII
         Initialize<ValueType, IndexType>::setup_global_matrix(
@@ -309,9 +311,11 @@ void SchwarzBase<ValueType, IndexType>::run(
     std::shared_ptr<gko::matrix::Dense<ValueType>> &solution)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
-
-    solution = vec_vtype::create(settings.executor->get_master(),
-                                 gko::dim<2>(this->metadata.global_size, 1));
+    if (!solution.get()) {
+        solution =
+            vec_vtype::create(settings.executor->get_master(),
+                              gko::dim<2>(this->metadata.global_size, 1));
+    }
     // The main solution vector
     std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));

@@ -236,6 +236,10 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     this->setup_local_matrices(this->settings, this->metadata,
                                this->partition_indices, this->global_matrix,
                                this->local_matrix, this->interface_matrix);
+    std::cout << "Subdomain " << this->metadata.my_rank
+              << " has local problem size " << this->local_matrix->get_size()[0]
+              << " with " << this->local_matrix->get_num_stored_elements()
+              << " non-zeros " << std::endl;
     // Debug to print matrices.
     if (settings.print_matrices && settings.executor_string != "cuda") {
         Utils<ValueType, IndexType>::print_matrix(

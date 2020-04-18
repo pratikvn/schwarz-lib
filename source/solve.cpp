@@ -461,6 +461,9 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         } else {
             l_max_iters = metadata.local_max_iters;
         }
+        if (metadata.my_rank == 0) {
+            std::cout << " Local max iters " << l_max_iters << std::endl;
+        }
         this->iteration_criterion = gko::stop::Iteration::build()
                                         .with_max_iters(l_max_iters)
                                         .on(settings.executor);
@@ -514,6 +517,30 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         .on(exec);
                 auto ilu_preconditioner =
                     ilu_pre_factory->generate(gko::share(par_ilu));
+                this->solver =
+                    solver::build()
+                        .with_criteria(iteration_criterion, residual_criterion)
+                        .with_generated_preconditioner(
+                            gko::share(ilu_preconditioner))
+                        .on(settings.executor)
+                        ->generate(local_matrix);
+            } else if (metadata.local_precond == "isai") {
+                if (metadata.my_rank == 0) {
+                    std::cout
+                        << " Local Ginkgo iterative solve(GMRES) with ISAI"
+                           "preconditioning "
+                        << std::endl;
+                }
+                auto exec = settings.executor;
+                using LowerIsai =
+                    gko::preconditioner::LowerIsai<ValueType, IndexType>;
+                using UpperIsai =
+                    gko::preconditioner::UpperIsai<ValueType, IndexType>;
+                auto ilu_pre_factory =
+                    gko::preconditioner::Ilu<LowerIsai, UpperIsai>::build().on(
+                        exec);
+                auto ilu_preconditioner =
+                    ilu_pre_factory->generate(gko::share(local_matrix));
                 this->solver =
                     solver::build()
                         .with_criteria(iteration_criterion, residual_criterion)
@@ -575,6 +602,30 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         .on(exec);
                 auto ilu_preconditioner =
                     ilu_pre_factory->generate(gko::share(par_ilu));
+                this->solver =
+                    solver::build()
+                        .with_criteria(iteration_criterion, residual_criterion)
+                        .with_generated_preconditioner(
+                            gko::share(ilu_preconditioner))
+                        .on(settings.executor)
+                        ->generate(local_matrix);
+            } else if (metadata.local_precond == "isai") {
+                if (metadata.my_rank == 0) {
+                    std::cout << " Local Ginkgo iterative solve(CG) with ISAI"
+                                 "preconditioning "
+                              << std::endl;
+                }
+                auto exec = settings.executor;
+                using LowerIsai =
+                    gko::preconditioner::LowerIsai<ValueType, IndexType>;
+                using UpperIsai =
+                    gko::preconditioner::UpperIsai<ValueType, IndexType>;
+                auto ilu_pre_factory =
+                    gko::preconditioner::Ilu<LowerIsai, UpperIsai, false,
+                                             IndexType>::build()
+                        .on(exec);
+                auto ilu_preconditioner =
+                    ilu_pre_factory->generate(gko::share(local_matrix));
                 this->solver =
                     solver::build()
                         .with_criteria(iteration_criterion, residual_criterion)

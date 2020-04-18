@@ -125,7 +125,7 @@ DEFINE_bool(factor_ordering_natural, false,
 DEFINE_int32(local_max_iters, -1,
              "Number of maximum iterations for the local iterative solver");
 DEFINE_string(local_precond, "null",
-              "Choices are ilu, parilu and block-jacobi for the local "
+              "Choices are ilu, isai and block-jacobi for the local "
               "iterative solver. ");
 DEFINE_uint32(precond_max_block_size, 16,
               "Maximum size of the blocks for the block jacobi preconditioner");

@@ -47,6 +47,7 @@ DEFINE_uint32(
 DEFINE_uint32(init_refine_level, 4,
               "Initial level for the refinement of the mesh.");
 DEFINE_bool(dealii_orig, false, "Solve with dealii iterative CG");
+DEFINE_bool(vis_sol, false, "Print the solution for visualization");
 
 #define CHECK_HERE std::cout << "Here " << __LINE__ << std::endl;
 
@@ -279,7 +280,9 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
         std::cout << " Running on the " << FLAGS_executor << " executor on "
                   << metadata.num_subdomains << " ranks with "
                   << FLAGS_num_threads << " threads" << std::endl;
-        std::cout << " Problem Size: " << metadata.global_size << std::endl;
+        std::cout << " Problem Size: " << metadata.global_size
+                  << " Number of non-zeros: "
+                  << system_matrix.n_nonzero_elements() << std::endl;
         gsize = metadata.global_size;
     }
     MPI_Bcast(&gsize, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -387,7 +390,9 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::run()
                   << std::endl;
         assemble_system();
         this->solve();
-        output_results(cycle);
+        if (FLAGS_vis_sol) {
+            output_results(cycle);
+        }
     }
 }
 
@@ -418,7 +423,9 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::run(
         }
         this->solve(MPI_COMM_WORLD);
         if (mpi_rank == 0) {
-            output_results(cycle);
+            if (FLAGS_vis_sol) {
+                output_results(cycle);
+            }
         }
     }
 }

@@ -497,6 +497,12 @@ void SolverBase<ValueType, IndexType>::run(
 
     }
 
+    //adding 1 to include the 0-th iteration
+    metadata.iter_count = metadata.iter_count + 1;
+
+    //number of messages a PE would send out without event-based
+    int noevent_msg_count = metadata.iter_count * num_neighbors_out;
+
     //CHANGED
     //Closing file
     fps.close();
@@ -537,12 +543,11 @@ void SolverBase<ValueType, IndexType>::run(
     // clang-format on
    
     //CHANGED
-    std::cout << "Local relative residual norm in PE " << metadata.my_rank << " - "
-              << (local_residual_norm / local_residual_norm0) << std::endl;
+    //std::cout << "Local relative residual norm in PE " << metadata.my_rank << " - "
+    //          << (local_residual_norm / local_residual_norm0) << std::endl;
     //END CHANGED
 
     int total_events = 0;
-    int total_msg = 0;
 
     //Printing msg count
     for (int k = 0; k < num_neighbors_out; k++)
@@ -555,14 +560,14 @@ void SolverBase<ValueType, IndexType>::run(
 
     //Total no of messages in all PEs
     MPI_Allreduce(MPI_IN_PLACE, &total_events, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-    MPI_Allreduce(&metadata.iter_count, &total_msg, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, &noevent_msg_count, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
     if (metadata.my_rank == 0) 
     {
         solution->copy_from(solution_vector.get());
-
+        
         std::cout << "Total number of events - " << total_events << std::endl;
-        std::cout << "Total number of iters (subtract last rank once) - " << total_msg * 2 - metadata.iter_count << std::endl;
+        std::cout << "Total number of msgs without event - " << noevent_msg_count << std::endl;
     }
 }
 
@@ -1011,9 +1016,14 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
                 settings.executor->get_master(), gko::dim<2>(num_recv, 1));
             this->comm_struct.sec_last_recv_bdy = vec_vtype::create(
                 settings.executor->get_master(), gko::dim<2>(num_recv, 1));
+            this->comm_struct.third_last_recv_bdy = vec_vtype::create(
+                settings.executor->get_master(), gko::dim<2>(num_recv, 1));
+
             this->comm_struct.last_recv_iter = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(), this->comm_struct.num_neighbors_in), std::default_delete<vec_itype>());
             this->comm_struct.sec_last_recv_iter = std::shared_ptr<vec_itype>(
+                new vec_itype(settings.executor->get_master(), this->comm_struct.num_neighbors_in), std::default_delete<vec_itype>());
+            this->comm_struct.third_last_recv_iter = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(), this->comm_struct.num_neighbors_in), std::default_delete<vec_itype>());
             
             this->comm_struct.curr_recv_avg = vec_vtype::create(
@@ -1027,12 +1037,15 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
             {
                 this->comm_struct.last_recv_bdy->get_values()[i] = 0.0;
                 this->comm_struct.sec_last_recv_bdy->get_values()[i] = 0.0;
+                this->comm_struct.third_last_recv_bdy->get_values()[i] = 0.0;
             }
 
             for (int i = 0; i < this->comm_struct.num_neighbors_in; i++)
             {
                 this->comm_struct.last_recv_iter->get_data()[i] = 0;
                 this->comm_struct.sec_last_recv_iter->get_data()[i] = 0;
+                this->comm_struct.third_last_recv_iter->get_data()[i] = 0;
+
                 this->comm_struct.curr_recv_avg->get_values()[i] = 0.0;
                 this->comm_struct.last_recv_avg->get_values()[i] = 0.0;
             }
@@ -1465,14 +1478,18 @@ void exchange_boundary_onesided(
                             //fpr << "Msg received from PE " << neighbors_in[p] << " at iter " << metadata.iter_count << std::endl;
                             fpr << "1, ";
  
-                            //update avg and last recv iter 
-                            comm_struct.last_recv_avg->get_values()[p] = comm_struct.curr_recv_avg->get_values()[p];  
+                            //update avg
+                            comm_struct.last_recv_avg->get_values()[p] = comm_struct.curr_recv_avg->get_values()[p];
+  
+                            //update last recvd iter
+                            comm_struct.third_last_recv_iter->get_data()[p] = comm_struct.sec_last_recv_iter->get_data()[p];
                             comm_struct.sec_last_recv_iter->get_data()[p] = comm_struct.last_recv_iter->get_data()[p];
                             comm_struct.last_recv_iter->get_data()[p] = metadata.iter_count;                     
                         
                             for (auto i = 1; i <= (global_get[p])[0]; i++)
                             {
                                 //update history of values
+                                comm_struct.third_last_recv_bdy->get_values()[num_get + i - 1] = comm_struct.sec_last_recv_bdy->get_values()[num_get + i - 1];
                                 comm_struct.sec_last_recv_bdy->get_values()[num_get + i - 1] = comm_struct.last_recv_bdy->get_values()[num_get + i - 1];
                                 comm_struct.last_recv_bdy->get_values()[num_get + i - 1] = comm_struct.recv_buffer->get_values()[num_get + i - 1];
 
@@ -1497,7 +1514,14 @@ void exchange_boundary_onesided(
                                  //Print stats
                                  //fpr << "Last recv bdy - " << comm_struct.last_recv_bdy->get_values()[num_get + i - 1]
                                  //   << ", Sec last recv bdy - " << comm_struct.sec_last_recv_bdy->get_values()[num_get + i - 1] << std::endl;
-                                 
+                               
+                                 float last_slope = 0.0;
+                                 auto last_iter_diff = (comm_struct.sec_last_recv_iter->get_data()[p]
+                                                 - comm_struct.third_last_recv_iter->get_data()[p]);                          
+                                 if(last_iter_diff != 0)
+                                    last_slope = (comm_struct.sec_last_recv_bdy->get_values()[num_get + i - 1]
+                                                      - comm_struct.third_last_recv_bdy->get_values()[num_get + i - 1]) / last_iter_diff;
+       
                                  float slope = 0.0;
                                  auto iter_diff = (comm_struct.last_recv_iter->get_data()[p]
                                                  - comm_struct.sec_last_recv_iter->get_data()[p]);
@@ -1506,7 +1530,7 @@ void exchange_boundary_onesided(
                                                  - comm_struct.sec_last_recv_bdy->get_values()[num_get + i - 1]) / iter_diff;
 
                                  local_solution->get_values()[(local_get[p])[i]] = comm_struct.last_recv_bdy->get_values()[num_get + i - 1]
-                                                               + (slope/4) * (metadata.iter_count - comm_struct.last_recv_iter->get_data()[p]);
+                                                               + ((slope + last_slope)/2) * (metadata.iter_count - comm_struct.last_recv_iter->get_data()[p]);
                                  
                                  //local_solution->get_values()[(local_get[p])[i]] *= 1.05;
                                  //fpr << local_solution->get_values()[(local_get[p])[i]] << ", "; 
@@ -1518,6 +1542,7 @@ void exchange_boundary_onesided(
                          for (auto i = 1; i <= (global_get[p])[0]; i++)
                          {
                              local_avg += local_solution->get_values()[(local_get[p])[i]];
+                             //fpr << local_solution->get_values()[(local_get[p])[i]] << ", ";
                          }
                          local_avg = local_avg / (global_get[p])[0];
                          fpr << local_avg << ", ";

@@ -170,6 +170,11 @@ public:
         std::shared_ptr<gko::matrix::Dense<ValueType>> sec_last_recv_bdy;
 
         /**
+         * The second last received boundary values for each of the in neighbors for extrapolation
+        */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> third_last_recv_bdy;
+
+        /**
          * Average of values in the send buffer for each of the out neighbors
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> curr_send_avg;
@@ -203,6 +208,11 @@ public:
          * Iteration stamp of second last received values
          */
         std::shared_ptr<gko::Array<IndexType>> sec_last_recv_iter;
+
+        /**
+         * Iteration stamp of third last received values
+         */
+        std::shared_ptr<gko::Array<IndexType>> third_last_recv_iter; 
 
         //END CHANGED
 

@@ -49,9 +49,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <settings.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
+/**
+ * The utilities class which provides some checks and basic utilities.
+ *
+ * @tparam ValueType  The type of the floating point values.
+ * @tparam IndexType  The type of the index type values.
+ *
+ * @ref utils
+ * @ingroup utils
+ */
 template <typename ValueType = gko::default_precision,
           typename IndexType = gko::int32>
 struct Utils {
@@ -61,16 +70,27 @@ struct Utils {
 
     static int get_local_num_procs(MPI_Comm mpi_communicator);
 
+    static bool check_subd_locality(MPI_Comm mpi_communicator,
+                                    int neighbor_rank, int my_rank);
+
     static void print_matrix(
         const gko::matrix::Csr<ValueType, IndexType> *matrix, int rank,
         std::string name);
 
     static void print_vector(const gko::matrix::Dense<ValueType> *vector,
                              int rank, std::string name);
+
+    static int find_duplicates(IndexType val, std::size_t index,
+                               const IndexType *data, std::size_t length);
+
+    static bool assert_correct_permutation(
+        const gko::matrix::Permutation<IndexType> *input_perm);
+
+    static bool assert_correct_cuda_devices(int num_devices, int my_rank);
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // utils.hpp

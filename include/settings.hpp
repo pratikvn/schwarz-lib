@@ -53,15 +53,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <gather_scatter.hpp>
 
 
+#if SCHW_HAVE_METIS
+#include <metis.h>
+#define metis_indextype idx_t
+#else
+#define metis_indextype gko::int32
+#endif
+
+
 #define MINIMAL_OVERLAP 2
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
- * The struct that contains the solver settings and the parameters to be set by
- * the user.
+ * @brief The struct that contains the solver settings and the parameters to be
+ * set by the user.
+ *
+ * @ref settings
+ * @ingroup init
  */
 struct Settings {
     /**
@@ -97,7 +108,12 @@ struct Settings {
     gko::int32 overlap = MINIMAL_OVERLAP;
 
     /**
-     * Flag if the laplcian matrix should be generated within the library. If
+     * The string that contains the matrix file name to read from .
+     */
+    std::string matrix_filename = "null";
+
+    /**
+     * Flag if the laplacian matrix should be generated within the library. If
      * false, an external matrix and rhs needs to be provided
      */
     bool explicit_laplacian = true;
@@ -113,10 +129,16 @@ struct Settings {
     bool print_matrices = false;
 
     /**
+     * Flag to enable some debug printing.
+     */
+    bool debug_print = false;
+
+    /**
      * The local solver algorithm for the local subdomain solves.
      */
     enum local_solver_settings {
         direct_solver_cholmod = 0x0,
+        direct_solver_umfpack = 0x5,
         direct_solver_ginkgo = 0x1,
         iterative_solver_ginkgo = 0x2,
         iterative_solver_dealii = 0x3,
@@ -124,6 +146,8 @@ struct Settings {
     };
     local_solver_settings local_solver =
         local_solver_settings::iterative_solver_ginkgo;
+
+    bool non_symmetric_matrix = false;
 
     /**
      * Disables the re-ordering of the matrix before computing the triangular
@@ -149,6 +173,21 @@ struct Settings {
     bool write_debug_out = false;
 
     /**
+     * Enable writing the iters and residuals to a file.
+     */
+    bool write_iters_and_residuals = false;
+
+    /**
+     * Enable the local permutations from CHOLMOD to a file.
+     */
+    bool write_perm_data = false;
+
+    /**
+     * Iteration shift for node local communication.
+     */
+    int shifted_iter = 1;
+
+    /**
      * The settings for the various available communication paradigms.
      */
     struct comm_settings {
@@ -163,14 +202,19 @@ struct Settings {
         bool enable_overlap = false;
 
         /**
-         * Push the data to the window to use MPI_Put rather than get.
+         * Put the data to the window using MPI_Put rather than get.
          */
-        bool enable_push = true;
+        bool enable_put = false;
 
         /**
-         * Push each element separately.
+         * Get the data to the window using MPI_Get rather than put.
          */
-        bool enable_push_one_by_one = false;
+        bool enable_get = true;
+
+        /**
+         * Push each element separately directly into the buffer.
+         */
+        bool enable_one_by_one = false;
 
         /**
          * Use local flush.
@@ -181,6 +225,16 @@ struct Settings {
          * Use flush all.
          */
         bool enable_flush_all = true;
+
+        /**
+         * Use local locks.
+         */
+        bool enable_lock_local = false;
+
+        /**
+         * Use lock all.
+         */
+        bool enable_lock_all = true;
     };
     comm_settings comm_settings;
 
@@ -206,6 +260,15 @@ struct Settings {
     };
     convergence_settings convergence_settings;
 
+    /**
+     * The factorization for the local direct solver.
+     */
+    std::string factorization = "cholmod";
+
+    /**
+     * The reordering for the local solve.
+     */
+    std::string reorder;
 
     Settings(std::string executor_string = "reference")
         : executor_string(executor_string)
@@ -218,6 +281,10 @@ struct Settings {
  *
  * @tparam ValueType  The type of the floating point values.
  * @tparam IndexType  The type of the index type values.
+ *
+ * @ingroup init
+ * @ingroup comm
+ * @ingroup solve
  */
 template <typename ValueType, typename IndexType>
 struct Metadata {
@@ -262,9 +329,19 @@ struct Metadata {
     gko::size_type num_subdomains = 1;
 
     /**
-     * The local rank of the subdomain.
+     * The rank of the subdomain.
      */
     int my_rank;
+
+    /**
+     * The local rank of the subdomain.
+     */
+    int my_local_rank;
+
+    /**
+     * The local number of procs in the subdomain.
+     */
+    int local_num_procs;
 
     /**
      * The number of subdomains used within the solver, size of the
@@ -295,9 +372,19 @@ struct Metadata {
     ValueType local_solver_tolerance;
 
     /**
-     * The maximum iteration count of the solver.
+     * The maximum iteration count of the Schwarz solver.
      */
     IndexType max_iters;
+
+    /**
+     * The maximum iteration count of the local iterative solver.
+     */
+    IndexType local_max_iters;
+
+    /**
+     * Local preconditioner.
+     */
+    std::string local_precond;
 
     /**
      * The maximum block size for the preconditioner.
@@ -328,6 +415,18 @@ struct Metadata {
     std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
                            std::vector<std::tuple<int, int>>, int, int>>
         comm_data_struct;
+
+    /**
+     * The struct used for storing data for post-processing.
+     *
+     */
+    struct post_process_data {
+        std::vector<std::vector<ValueType>> global_residual_vector_out;
+        std::vector<ValueType> local_residual_vector_out;
+        std::vector<ValueType> local_converged_iter_count;
+        std::vector<ValueType> local_converged_resnorm;
+    };
+    post_process_data post_process_data;
 
     /**
      * The mapping containing the global to local indices.
@@ -394,14 +493,14 @@ struct Metadata {
     template _macro(float, gko::int64);                   \
     template _macro(double, gko::int64);
 
-// explicit instantiations for SchwarzWrappers
+// explicit instantiations for schwz
 #define DECLARE_METADATA(ValueType, IndexType) \
     struct Metadata<ValueType, IndexType>
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_METADATA);
 #undef DECLARE_METADATA
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // settings.hpp

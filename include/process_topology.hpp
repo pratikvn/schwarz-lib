@@ -55,12 +55,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "device_guard.hpp"
 
 
+/**
+ * @brief The ProcessTopology namespace .
+ * @ref proc_topo
+ * @ingroup init
+ * @ingroup comm
+ */
 namespace ProcessTopology {
 
 
-
-void bind_gpus_to_process(
-    std::shared_ptr<SchwarzWrappers::device_guard> &dev_guard, int &local_rank,
+static void bind_gpus_to_process(
+    std::shared_ptr<schwz::device_guard> &dev_guard, int &local_rank,
     int &local_num_procs, int &num_threads)
 {
     // SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaSetDevice(local_rank));

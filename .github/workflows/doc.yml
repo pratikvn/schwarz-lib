@@ -1,0 +1,72 @@
+name: Build-doc
+
+on: [push]
+
+jobs:
+  build:
+
+    name: Doxygen build
+    runs-on: [ubuntu-latest]
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: install-doxygen
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install mpich texlive texlive-generic-recommended texlive-latex-extra doxygen graphviz ghostscript libboost-dev
+    - name: info
+      run: |
+        doxygen -v
+        cmake --version
+    - name: install-ginkgo
+      run: |
+        pushd .
+        cd ${HOME}
+        mkdir install
+        git clone https://github.com/ginkgo-project/ginkgo.git
+        cd ginkgo
+        git checkout expt-develop
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=${HOME}/install -DGINKGO_BUILD_BENCHMARKS=off -DGINKGO_BUILD_EXAMPLES=off -DGINKGO_BUILD_TESTS=off -DGINKGO_BUILD_OMP=off -DGINKGO_BUILD_REFERENCE=off -DGINKGO_BUILD_CUDA=off ..
+        make -j10
+        make install
+        export Ginkgo_DIR=${HOME}/install
+        echo $Ginkgo_DIR
+        popd
+    - name: build-doc 
+      run: |
+        mkdir -p build-doc && pushd build-doc
+        export CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+        cmake -DCMAKE_PREFIX_PATH=${HOME}/install -DSCHWARZ_BUILD_CHOLMOD=off -DSCHWARZ_BUILD_UMFPACK=off -DSCHWARZ_BUILD_METIS=off -DSCHWARZ_WITH_HWLOC=off -DSCHWARZ_BUILD_CUDA=off -DSCHWARZ_BUILD_BENCHMARKING=off -DSCHWARZ_DEVEL_TOOLS=off -DSCHWARZ_BUILD_DOC=on -DSCHWARZ_DOC_GENERATE_PDF=on ..
+        make usr
+        make pdf
+        popd
+        # publish it
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        mkdir action-docs && cd action-docs
+        git init
+        git remote add github "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+        git pull github gh-pages --ff-only 
+        git checkout gh-pages
+        rm -rf doc/${CURRENT_BRANCH}
+        mkdir -p doc
+        mkdir -p doc/pdf
+        cp -r ../build-doc/doc/usr doc/${CURRENT_BRANCH}
+        cp ../build-doc/doc/pdf.pdf doc/pdf/${CURRENT_BRANCH}.pdf
+        export CURRENT_SHA="$(git rev-parse --short HEAD)"
+        echo $CURRENT_SHA
+        git add -A
+        git commit -m "Update documentation from ${CURRENT_SHA}"
+        git status
+        git branch --set-upstream-to=github/gh-pages gh-pages
+    - uses: pratikvn/github-push-action@master
+      with:
+        directory: action-docs
+        branch: gh-pages
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/upload-artifact@v1.0.0
+      with:
+        name: pdf-doc 
+        path: build-doc/doc/pdf.pdf 

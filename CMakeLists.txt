@@ -1,4 +1,4 @@
-SET(TARGET "schwarz")
+SET(TARGET "schwz")
 CMAKE_MINIMUM_REQUIRED(VERSION 3.8)
 
 PROJECT(${TARGET} LANGUAGES C CXX)
@@ -8,21 +8,26 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(SCHWARZ_BUILD_BENCHMARKING "Build an example to benchmark the library" ON)
 option(SCHWARZ_BUILD_METIS "Use the METIS partition library" ON)
 option(SCHWARZ_BUILD_CHOLMOD "Use the CHOLMOD direct solver" ON)
+option(SCHWARZ_BUILD_UMFPACK "Use the UMFPACK direct solver" ON)
 option(SCHWARZ_BUILD_CUDA "Build the CUDA kernels" ON)
 option(SCHWARZ_WITH_HWLOC "Build with hwloc support" ON)
 option(SCHWARZ_BUILD_DEALII "Build with deal.ii support" OFF)
 option(SCHWARZ_BUILD_CLANG_TIDY "Use clang-tidy for static checks of code." OFF)
 option(SCHWARZ_DEVEL_TOOLS "Switch on some developer tools" ON)
+option(SCHWARZ_BUILD_DOC "Build the doxygen documentation" OFF)
 
 # Optional packages
 include(cmake/package_helpers.cmake)
 ginkgo_find_package(gflags gflags FALSE 2.2.2)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
+set(Schwarz_SOURCE_DIR "${CMAKE_SOURCE_DIR}")
+set(Schwarz_BINARY_DIR "${CMAKE_BINARY_DIR}")
+
 set(SCHWARZ_HAVE_CHOLMOD 0)
 if(SCHWARZ_BUILD_CHOLMOD)
   if(NOT DEFINED ENV{CHOLMOD_DIR})
-    message(FATAL_ERROR "Please specify where CHOLMOD has been installed.")
+    message(FATAL_ERROR "Please specify where CHOLMOD has been installed in CHOLMOD_DIR.")
   endif()
   set(CHOLMOD_INCLUDE_DIR $ENV{CHOLMOD_DIR}/include)
   set(CHOLMOD_LIBRARY_DIR $ENV{CHOLMOD_DIR}/lib)
@@ -31,13 +36,28 @@ if(SCHWARZ_BUILD_CHOLMOD)
   set(SCHWARZ_HAVE_CHOLMOD 1)
 endif()
 
+set(SCHWARZ_HAVE_UMFPACK 0)
+if(SCHWARZ_BUILD_UMFPACK)
+  if(NOT DEFINED ENV{UMFPACK_DIR})
+    message(FATAL_ERROR "Please specify where UMFPACK has been installed in UMFPACK_DIR.")
+  endif()
+  set(UMFPACK_INCLUDE_DIR $ENV{UMFPACK_DIR}/include)
+  set(UMFPACK_LIBRARY_DIR $ENV{UMFPACK_DIR}/lib)
+  include_directories(${UMFPACK_INCLUDE_DIR})
+  link_directories(${UMFPACK_LIBRARY_DIR})
+  set(SCHWARZ_HAVE_UMFPACK 1)
+endif()
+
 set(SCHWARZ_HAVE_METIS 0)
 if(SCHWARZ_BUILD_METIS)
-  if(NOT DEFINED ENV{METIS_DIR})
-    message(FATAL_ERROR "Please specify where METIS has been installed.")
+  find_package(METIS)
+  if(NOT METIS_FOUND AND NOT DEFINED ENV{METIS_DIR})
+    message(FATAL_ERROR "Please specify where METIS has been installed in METIS_DIR.")
   endif()
-  set(METIS_INCLUDE_DIR $ENV{METIS_DIR}/include)
-  set(METIS_LIBRARY_DIR $ENV{METIS_DIR}/lib)
+  if(NOT METIS_FOUND)
+    set(METIS_INCLUDE_DIR $ENV{METIS_DIR}/include)
+    set(METIS_LIBRARY_DIR $ENV{METIS_DIR}/lib)
+  endif()
   include_directories(${METIS_INCLUDE_DIR})
   link_directories(${METIS_LIBRARY_DIR})
   set(SCHWARZ_HAVE_METIS 1)
@@ -56,6 +76,10 @@ if(SCHWARZ_WITH_HWLOC)
   find_package(HWLOC)
   set(SCHWARZ_HAVE_HWLOC 1)
 endif()
+
+# Add some matrices for configuration.
+add_subdirectory(matrices)
+
 
 set(SCHWARZ_HAVE_CUDA 0)
 if(SCHWARZ_BUILD_CUDA)
@@ -76,7 +100,8 @@ endif()
 
 # Required packages
 
-find_package(Ginkgo REQUIRED)
+find_package(Ginkgo REQUIRED
+  HINTS ${Ginkgo_DIR} $ENV{Ginkgo_DIR})
 
 find_package(MPI REQUIRED)
 include_directories(SYSTEM ${MPI_C_INCLUDE_PATH} ${MPI_CXX_INCLUDE_PATH})
@@ -96,9 +121,11 @@ TARGET_SOURCES(${TARGET} PRIVATE
   source/communicate.cpp
   source/utils.cpp
   source/solve.cpp
-  source/schwarz_solver.cpp
+  source/schwarz_base.cpp
+  source/restricted_schwarz.cpp
   source/exception.cpp
   )
+
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.hpp.in
     ${CMAKE_CURRENT_BINARY_DIR}/include/schwarz/config.hpp @ONLY)
@@ -110,6 +137,14 @@ else()
   target_sources(${TARGET} PRIVATE
     source/cuda_dummy_gather.cpp)
 endif()
+
+include(cmake/information_helpers.cmake)
+schwarz_git_information()
+
+if(SCHWARZ_BUILD_DOC)
+  add_subdirectory(doc)
+endif()
+
 
 if(SCHWARZ_BUILD_CLANG_TIDY)
   find_program(
@@ -151,6 +186,10 @@ if(SCHWARZ_BUILD_CHOLMOD)
   TARGET_LINK_LIBRARIES(${TARGET} cholmod)
 endif()
 
+if(SCHWARZ_BUILD_UMFPACK)
+  TARGET_LINK_LIBRARIES(${TARGET} umfpack)
+endif()
+
 if(SCHWARZ_WITH_HWLOC)
   if(HWLOC_FOUND)
     TARGET_INCLUDE_DIRECTORIES(${TARGET} PRIVATE ${HWLOC_INCLUDE_DIRS})
@@ -164,9 +203,10 @@ endif()
 
 if(SCHWARZ_BUILD_CUDA)
   TARGET_INCLUDE_DIRECTORIES(${TARGET}
-    SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
+    SYSTEM PUBLIC ${CUDA_INCLUDE_DIRS})
   TARGET_LINK_LIBRARIES(${TARGET} ${CUDA_RUNTIME_LIBS} ${CUBLAS} ${CUSPARSE})
 endif()
+
 
 # Link the required packages
 TARGET_LINK_LIBRARIES(${TARGET} Ginkgo::ginkgo)

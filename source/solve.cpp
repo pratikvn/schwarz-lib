@@ -461,6 +461,9 @@ void Solve<ValueType, IndexType>::setup_local_solver(
         } else {
             l_max_iters = metadata.local_max_iters;
         }
+        if (metadata.my_rank == 0) {
+            std::cout << " Local max iters " << l_max_iters << std::endl;
+        }
         this->iteration_criterion = gko::stop::Iteration::build()
                                         .with_max_iters(l_max_iters)
                                         .on(settings.executor);
@@ -480,7 +483,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             // Setup the Ginkgo iterative GMRES solver.
             if (metadata.local_precond == "block-jacobi") {
                 if (metadata.my_rank == 0) {
-                    std::cout << " Local Ginkgo iterative solve with "
+                    std::cout << " Local Ginkgo iterative solve(GMRES) with "
                                  "Block-Jacobi preconditioning "
                               << std::endl;
                 }
@@ -496,9 +499,10 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         ->generate(local_matrix);
             } else if (metadata.local_precond == "ilu") {
                 if (metadata.my_rank == 0) {
-                    std::cout << " Local Ginkgo iterative solve with ParILU "
-                                 "preconditioning "
-                              << std::endl;
+                    std::cout
+                        << " Local Ginkgo iterative solve(GMRES) with ParILU "
+                           "preconditioning "
+                        << std::endl;
                 }
                 auto exec = settings.executor;
                 auto par_ilu_fact =
@@ -520,9 +524,33 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                             gko::share(ilu_preconditioner))
                         .on(settings.executor)
                         ->generate(local_matrix);
+            } else if (metadata.local_precond == "isai") {
+                if (metadata.my_rank == 0) {
+                    std::cout
+                        << " Local Ginkgo iterative solve(GMRES) with ISAI"
+                           "preconditioning "
+                        << std::endl;
+                }
+                auto exec = settings.executor;
+                using LowerIsai =
+                    gko::preconditioner::LowerIsai<ValueType, IndexType>;
+                using UpperIsai =
+                    gko::preconditioner::UpperIsai<ValueType, IndexType>;
+                auto ilu_pre_factory =
+                    gko::preconditioner::Ilu<LowerIsai, UpperIsai>::build().on(
+                        exec);
+                auto ilu_preconditioner =
+                    ilu_pre_factory->generate(gko::share(local_matrix));
+                this->solver =
+                    solver::build()
+                        .with_criteria(iteration_criterion, residual_criterion)
+                        .with_generated_preconditioner(
+                            gko::share(ilu_preconditioner))
+                        .on(settings.executor)
+                        ->generate(local_matrix);
             } else if (metadata.local_precond == "null") {
                 if (metadata.my_rank == 0) {
-                    std::cout << " Local Ginkgo iterative solve with no "
+                    std::cout << " Local Ginkgo iterative solve(GMRES) with no "
                                  "preconditioning "
                               << std::endl;
                 }
@@ -540,7 +568,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             // Setup the Ginkgo iterative CG solver.
             if (metadata.local_precond == "block-jacobi") {
                 if (metadata.my_rank == 0) {
-                    std::cout << " Local Ginkgo iterative solve with "
+                    std::cout << " Local Ginkgo iterative solve(CG) with "
                                  "Block-Jacobi preconditioning "
                               << std::endl;
                 }
@@ -556,9 +584,10 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         ->generate(local_matrix);
             } else if (metadata.local_precond == "ilu") {
                 if (metadata.my_rank == 0) {
-                    std::cout << " Local Ginkgo iterative solve with ParILU "
-                                 "preconditioning "
-                              << std::endl;
+                    std::cout
+                        << " Local Ginkgo iterative solve(CG) with ParILU "
+                           "preconditioning "
+                        << std::endl;
                 }
                 auto exec = settings.executor;
                 auto par_ilu_fact =
@@ -580,9 +609,33 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                             gko::share(ilu_preconditioner))
                         .on(settings.executor)
                         ->generate(local_matrix);
+            } else if (metadata.local_precond == "isai") {
+                if (metadata.my_rank == 0) {
+                    std::cout << " Local Ginkgo iterative solve(CG) with ISAI"
+                                 "preconditioning "
+                              << std::endl;
+                }
+                auto exec = settings.executor;
+                using LowerIsai =
+                    gko::preconditioner::LowerIsai<ValueType, IndexType>;
+                using UpperIsai =
+                    gko::preconditioner::UpperIsai<ValueType, IndexType>;
+                auto ilu_pre_factory =
+                    gko::preconditioner::Ilu<LowerIsai, UpperIsai, false,
+                                             IndexType>::build()
+                        .on(exec);
+                auto ilu_preconditioner =
+                    ilu_pre_factory->generate(gko::share(local_matrix));
+                this->solver =
+                    solver::build()
+                        .with_criteria(iteration_criterion, residual_criterion)
+                        .with_generated_preconditioner(
+                            gko::share(ilu_preconditioner))
+                        .on(settings.executor)
+                        ->generate(local_matrix);
             } else if (metadata.local_precond == "null") {
                 if (metadata.my_rank == 0) {
-                    std::cout << " Local Ginkgo iterative solve with no "
+                    std::cout << " Local Ginkgo iterative solve(CG) with no "
                                  "preconditioning "
                               << std::endl;
                 }

@@ -166,6 +166,7 @@ bool Utils<ValueType, IndexType>::assert_correct_cuda_devices(int num_devices,
                   << std::endl;
         std::exit(-1);
     }
+    return true;
 }
 
 

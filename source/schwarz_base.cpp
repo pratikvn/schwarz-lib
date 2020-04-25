@@ -40,6 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <schwarz_base.hpp>
 #include <utils.hpp>
 
+#define CHECK_HERE                                                   \
+    std::cout << "Here " << __LINE__ << " rank " << metadata.my_rank \
+              << std::endl;
 
 namespace schwz {
 
@@ -124,7 +127,7 @@ template <typename ValueType, typename IndexType>
 void SchwarzBase<ValueType, IndexType>::initialize(
 #if SCHW_HAVE_DEALII
     const dealii::SparseMatrix<ValueType> &matrix,
-    const dealii::Vector<ValueType> &system_rhs
+    const dealii::Vector<ValueType> &system_rhs)
 #else
 )
 #endif
@@ -134,16 +137,18 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     using vec_vecshared = gko::Array<IndexType *>;
     // Setup the global matrix
     // if explicit_laplacian has been enabled or an external matrix has been
-    // provided.
     if (settings.explicit_laplacian || settings.matrix_filename != "null") {
+#if !SCHW_HAVE_DEALII
         Initialize<ValueType, IndexType>::setup_global_matrix(
             settings.matrix_filename, metadata.oned_laplacian_size,
             this->global_matrix);
+#endif
     } else {
         // If not, then check if deal.ii has been enabled for matrix generation.
 #if SCHW_HAVE_DEALII
         Initialize<ValueType, IndexType>::setup_global_matrix(
-            matrix, this->global_matrix);
+            settings.matrix_filename, metadata.oned_laplacian_size, matrix,
+            this->global_matrix);
 #else
         std::cerr << " Explicit laplacian needs to be enabled with the "
                      "--explicit_laplacian flag or deal.ii support needs to be "
@@ -231,6 +236,10 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     this->setup_local_matrices(this->settings, this->metadata,
                                this->partition_indices, this->global_matrix,
                                this->local_matrix, this->interface_matrix);
+    std::cout << "Subdomain " << this->metadata.my_rank
+              << " has local problem size " << this->local_matrix->get_size()[0]
+              << " with " << this->local_matrix->get_num_stored_elements()
+              << " non-zeros " << std::endl;
     // Debug to print matrices.
     if (settings.print_matrices && settings.executor_string != "cuda") {
         Utils<ValueType, IndexType>::print_matrix(
@@ -306,9 +315,11 @@ void SchwarzBase<ValueType, IndexType>::run(
     std::shared_ptr<gko::matrix::Dense<ValueType>> &solution)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
-
-    solution = vec_vtype::create(settings.executor->get_master(),
-                                 gko::dim<2>(this->metadata.global_size, 1));
+    if (!solution.get()) {
+        solution =
+            vec_vtype::create(settings.executor->get_master(),
+                              gko::dim<2>(this->metadata.global_size, 1));
+    }
     // The main solution vector
     std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));

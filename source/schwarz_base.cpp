@@ -251,7 +251,7 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     // Setup the local vectors on each of the subddomains.
     Initialize<ValueType, IndexType>::setup_vectors(
         this->settings, this->metadata, rhs, this->local_rhs, this->global_rhs,
-        this->local_solution, this->global_solution);
+        this->local_solution);
 
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(

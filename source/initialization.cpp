@@ -335,8 +335,7 @@ void Initialize<ValueType, IndexType>::setup_vectors(
     std::vector<ValueType> &rhs,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_rhs,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;
     auto my_rank = metadata.my_rank;
@@ -347,8 +346,6 @@ void Initialize<ValueType, IndexType>::setup_vectors(
                                    rhs.end()};
     global_rhs = vec::create(settings.executor,
                              gko::dim<2>{metadata.global_size, 1}, temp_rhs, 1);
-    global_solution = vec::create(settings.executor->get_master(),
-                                  gko::dim<2>(metadata.global_size, 1));
 
     local_rhs =
         vec::create(settings.executor, gko::dim<2>(metadata.local_size_x, 1));

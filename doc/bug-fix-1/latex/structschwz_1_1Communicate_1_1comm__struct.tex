@@ -1,0 +1,217 @@
+\hypertarget{structschwz_1_1Communicate_1_1comm__struct}{}\section{schwz\+:\+:Communicate$<$ Value\+Type, Index\+Type $>$\+:\+:comm\+\_\+struct Struct Reference}
+\label{structschwz_1_1Communicate_1_1comm__struct}\index{schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct@{schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct}}
+
+
+The communication struct used to store the communication data.  
+
+
+
+
+{\ttfamily \#include $<$communicate.\+hpp$>$}
+
+
+
+Collaboration diagram for schwz\+:\+:Communicate$<$ Value\+Type, Index\+Type $>$\+:\+:comm\+\_\+struct\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{structschwz_1_1Communicate_1_1comm__struct__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a67323ca81cff7f4b7567616133475d84}\label{structschwz_1_1Communicate_1_1comm__struct_a67323ca81cff7f4b7567616133475d84}} 
+int \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a67323ca81cff7f4b7567616133475d84}{num\+\_\+neighbors\+\_\+in}
+\begin{DoxyCompactList}\small\item\em The number of neighbors this subdomain has to receive data from. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_abc044f2335e50d56d367b37432aa6042}\label{structschwz_1_1Communicate_1_1comm__struct_abc044f2335e50d56d367b37432aa6042}} 
+int \hyperlink{structschwz_1_1Communicate_1_1comm__struct_abc044f2335e50d56d367b37432aa6042}{num\+\_\+neighbors\+\_\+out}
+\begin{DoxyCompactList}\small\item\em The number of neighbors this subdomain has to send data to. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a4751a74b08aa00a5c1badb6c996c98e5}\label{structschwz_1_1Communicate_1_1comm__struct_a4751a74b08aa00a5c1badb6c996c98e5}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a4751a74b08aa00a5c1badb6c996c98e5}{neighbors\+\_\+in}
+\begin{DoxyCompactList}\small\item\em The neighbors this subdomain has to receive data from. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_acd95752d7818e28dd3e6c5e3f5c64ce4}\label{structschwz_1_1Communicate_1_1comm__struct_acd95752d7818e28dd3e6c5e3f5c64ce4}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_acd95752d7818e28dd3e6c5e3f5c64ce4}{neighbors\+\_\+out}
+\begin{DoxyCompactList}\small\item\em The neighbors this subdomain has to send data to. \end{DoxyCompactList}\item 
+std\+::vector$<$ bool $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a66536e858c43c5ebbba8bd3fb4b5e888}{is\+\_\+local\+\_\+neighbor}
+\begin{DoxyCompactList}\small\item\em The bool vector which is true if the neighbors of a subdomain are in one node. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_ae3c247c1209882303d447ad19e3e7357}\label{structschwz_1_1Communicate_1_1comm__struct_ae3c247c1209882303d447ad19e3e7357}} 
+int \hyperlink{structschwz_1_1Communicate_1_1comm__struct_ae3c247c1209882303d447ad19e3e7357}{local\+\_\+num\+\_\+neighbors\+\_\+in}
+\begin{DoxyCompactList}\small\item\em The number of neighbors this subdomain has to receive data from. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a78c48f1aa2e1bf2d74851478388d262f}\label{structschwz_1_1Communicate_1_1comm__struct_a78c48f1aa2e1bf2d74851478388d262f}} 
+int \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a78c48f1aa2e1bf2d74851478388d262f}{local\+\_\+num\+\_\+neighbors\+\_\+out}
+\begin{DoxyCompactList}\small\item\em The number of neighbors this subdomain has to send data to. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a42105f0e1d5d3787cf49eeacba5fd2ed}\label{structschwz_1_1Communicate_1_1comm__struct_a42105f0e1d5d3787cf49eeacba5fd2ed}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a42105f0e1d5d3787cf49eeacba5fd2ed}{local\+\_\+neighbors\+\_\+in}
+\begin{DoxyCompactList}\small\item\em The neighbors this subdomain has to receive data from. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_ad0f64a50ac0d8a56121dcdcbbd92035a}\label{structschwz_1_1Communicate_1_1comm__struct_ad0f64a50ac0d8a56121dcdcbbd92035a}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_ad0f64a50ac0d8a56121dcdcbbd92035a}{local\+\_\+neighbors\+\_\+out}
+\begin{DoxyCompactList}\small\item\em The neighbors this subdomain has to send data to. \end{DoxyCompactList}\item 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $\ast$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a2fb26c3f0a44cf875080a8d36b082150}{global\+\_\+put}
+\begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain sends from the other. \end{DoxyCompactList}\item 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $\ast$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a62a9e5c1988b1bf948148ff2f137a900}{local\+\_\+put}
+\begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain sends from the other. \end{DoxyCompactList}\item 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $\ast$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a977cf8a2800021a50e59ee5cefb2a0ca}{remote\+\_\+put}
+\begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain sends from the other. \end{DoxyCompactList}\item 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $\ast$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a4df6a8d7932d277cfd4d8e8ec3ab7096}{global\+\_\+get}
+\begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain gets from the other. \end{DoxyCompactList}\item 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $\ast$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a924b4a6e72c9e9b973c90f9753bc070b}{local\+\_\+get}
+\begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain gets from the other. \end{DoxyCompactList}\item 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $\ast$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a39335cd2ee211817d66189fa6bff7d04}{remote\+\_\+get}
+\begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain gets from the other. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a3e6a4293edc659411abf7e50b67da0c5}\label{structschwz_1_1Communicate_1_1comm__struct_a3e6a4293edc659411abf7e50b67da0c5}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a3e6a4293edc659411abf7e50b67da0c5}{window\+\_\+ids}
+\begin{DoxyCompactList}\small\item\em The R\+D\+MA window ids. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a36dc656e4d4373350bde76da1fc15ba8}\label{structschwz_1_1Communicate_1_1comm__struct_a36dc656e4d4373350bde76da1fc15ba8}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a36dc656e4d4373350bde76da1fc15ba8}{windows\+\_\+from}
+\begin{DoxyCompactList}\small\item\em The R\+D\+MA window ids to receive data from. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_ae850f2a5a6e598f7bf9c3dd34a8a6859}\label{structschwz_1_1Communicate_1_1comm__struct_ae850f2a5a6e598f7bf9c3dd34a8a6859}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_ae850f2a5a6e598f7bf9c3dd34a8a6859}{windows\+\_\+to}
+\begin{DoxyCompactList}\small\item\em The R\+D\+MA window ids to send data to. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_aaf43321fe2af314a0257e4eecbf5a42c}\label{structschwz_1_1Communicate_1_1comm__struct_aaf43321fe2af314a0257e4eecbf5a42c}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ M\+P\+I\+\_\+\+Request $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_aaf43321fe2af314a0257e4eecbf5a42c}{put\+\_\+request}
+\begin{DoxyCompactList}\small\item\em The put request array. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a50ab7728b835b599c376a7fe11dbe513}\label{structschwz_1_1Communicate_1_1comm__struct_a50ab7728b835b599c376a7fe11dbe513}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ M\+P\+I\+\_\+\+Request $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a50ab7728b835b599c376a7fe11dbe513}{get\+\_\+request}
+\begin{DoxyCompactList}\small\item\em The get request array. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_aacb91f128f3bb0bf4cd5d43716bbbcee}\label{structschwz_1_1Communicate_1_1comm__struct_aacb91f128f3bb0bf4cd5d43716bbbcee}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_aacb91f128f3bb0bf4cd5d43716bbbcee}{send\+\_\+buffer}
+\begin{DoxyCompactList}\small\item\em The send buffer used for the actual communication for both one-\/sided and two-\/sided. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a78779301f90436a717cc8dcf50a5d717}\label{structschwz_1_1Communicate_1_1comm__struct_a78779301f90436a717cc8dcf50a5d717}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a78779301f90436a717cc8dcf50a5d717}{recv\+\_\+buffer}
+\begin{DoxyCompactList}\small\item\em The recv buffer used for the actual communication for both one-\/sided and two-\/sided. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a8946e6739f13e98a87ac8ef3f0f808d6}\label{structschwz_1_1Communicate_1_1comm__struct_a8946e6739f13e98a87ac8ef3f0f808d6}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a8946e6739f13e98a87ac8ef3f0f808d6}{get\+\_\+displacements}
+\begin{DoxyCompactList}\small\item\em The displacements for the receiving of the buffer. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a2fe947bc26944406e6e86e1fe1cd4da6}\label{structschwz_1_1Communicate_1_1comm__struct_a2fe947bc26944406e6e86e1fe1cd4da6}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a2fe947bc26944406e6e86e1fe1cd4da6}{put\+\_\+displacements}
+\begin{DoxyCompactList}\small\item\em The displacements for the sending of the buffer. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_ac68bd596b6afd0621ae0489f0eeda036}\label{structschwz_1_1Communicate_1_1comm__struct_ac68bd596b6afd0621ae0489f0eeda036}} 
+M\+P\+I\+\_\+\+Win \hyperlink{structschwz_1_1Communicate_1_1comm__struct_ac68bd596b6afd0621ae0489f0eeda036}{window\+\_\+recv\+\_\+buffer}
+\begin{DoxyCompactList}\small\item\em The R\+D\+MA window for the recv buffer. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a7f855fe1b4cb9ceb404b7ca65636aaf3}\label{structschwz_1_1Communicate_1_1comm__struct_a7f855fe1b4cb9ceb404b7ca65636aaf3}} 
+M\+P\+I\+\_\+\+Win \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a7f855fe1b4cb9ceb404b7ca65636aaf3}{window\+\_\+send\+\_\+buffer}
+\begin{DoxyCompactList}\small\item\em The R\+D\+MA window for the send buffer. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_ac5600fbbd9b89f3d496e35ab09f28dd0}\label{structschwz_1_1Communicate_1_1comm__struct_ac5600fbbd9b89f3d496e35ab09f28dd0}} 
+M\+P\+I\+\_\+\+Win \hyperlink{structschwz_1_1Communicate_1_1comm__struct_ac5600fbbd9b89f3d496e35ab09f28dd0}{window\+\_\+x}
+\begin{DoxyCompactList}\small\item\em The R\+D\+MA window for the solution vector. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Value\+Type, typename Index\+Type$>$\newline
+struct schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct}
+
+The communication struct used to store the communication data. 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a4df6a8d7932d277cfd4d8e8ec3ab7096}\label{structschwz_1_1Communicate_1_1comm__struct_a4df6a8d7932d277cfd4d8e8ec3ab7096}} 
+\index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!global\+\_\+get@{global\+\_\+get}}
+\index{global\+\_\+get@{global\+\_\+get}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
+\subsubsection{\texorpdfstring{global\+\_\+get}{global\_get}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+std\+::shared\+\_\+ptr$<$gko\+::\+Array$<$Index\+Type $\ast$$>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::global\+\_\+get}
+
+
+
+The array containing the number of elements that each subdomain gets from the other. 
+
+For example. global\+\_\+get\mbox{[}p\mbox{]}\mbox{[}0\mbox{]} contains the overall number of elements to be received to subdomain p and global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}i\mbox{]} contains the index of the solution vector to be received from subdomain p. 
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize(), schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows().
+
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a2fb26c3f0a44cf875080a8d36b082150}\label{structschwz_1_1Communicate_1_1comm__struct_a2fb26c3f0a44cf875080a8d36b082150}} 
+\index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!global\+\_\+put@{global\+\_\+put}}
+\index{global\+\_\+put@{global\+\_\+put}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
+\subsubsection{\texorpdfstring{global\+\_\+put}{global\_put}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+std\+::shared\+\_\+ptr$<$gko\+::\+Array$<$Index\+Type $\ast$$>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::global\+\_\+put}
+
+
+
+The array containing the number of elements that each subdomain sends from the other. 
+
+For example. global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}0\mbox{]} contains the overall number of elements to be sent to subdomain p and global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}i\mbox{]} contains the index of the solution vector to be sent to subdomain p. 
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize(), schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows().
+
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a66536e858c43c5ebbba8bd3fb4b5e888}\label{structschwz_1_1Communicate_1_1comm__struct_a66536e858c43c5ebbba8bd3fb4b5e888}} 
+\index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!is\+\_\+local\+\_\+neighbor@{is\+\_\+local\+\_\+neighbor}}
+\index{is\+\_\+local\+\_\+neighbor@{is\+\_\+local\+\_\+neighbor}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
+\subsubsection{\texorpdfstring{is\+\_\+local\+\_\+neighbor}{is\_local\_neighbor}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+std\+::vector$<$bool$>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::is\+\_\+local\+\_\+neighbor}
+
+
+
+The bool vector which is true if the neighbors of a subdomain are in one node. 
+
+
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize(), schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows().
+
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a924b4a6e72c9e9b973c90f9753bc070b}\label{structschwz_1_1Communicate_1_1comm__struct_a924b4a6e72c9e9b973c90f9753bc070b}} 
+\index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!local\+\_\+get@{local\+\_\+get}}
+\index{local\+\_\+get@{local\+\_\+get}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
+\subsubsection{\texorpdfstring{local\+\_\+get}{local\_get}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+std\+::shared\+\_\+ptr$<$gko\+::\+Array$<$Index\+Type $\ast$$>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+get}
+
+
+
+The array containing the number of elements that each subdomain gets from the other. 
+
+For example. global\+\_\+get\mbox{[}p\mbox{]}\mbox{[}0\mbox{]} contains the overall number of elements to be received to subdomain p and global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}i\mbox{]} contains the index of the solution vector to be received from subdomain p. 
+
+Referenced by schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows().
+
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a62a9e5c1988b1bf948148ff2f137a900}\label{structschwz_1_1Communicate_1_1comm__struct_a62a9e5c1988b1bf948148ff2f137a900}} 
+\index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!local\+\_\+put@{local\+\_\+put}}
+\index{local\+\_\+put@{local\+\_\+put}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
+\subsubsection{\texorpdfstring{local\+\_\+put}{local\_put}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+std\+::shared\+\_\+ptr$<$gko\+::\+Array$<$Index\+Type $\ast$$>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+put}
+
+
+
+The array containing the number of elements that each subdomain sends from the other. 
+
+For example. global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}0\mbox{]} contains the overall number of elements to be sent to subdomain p and global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}i\mbox{]} contains the index of the solution vector to be sent to subdomain p. 
+
+Referenced by schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows().
+
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a39335cd2ee211817d66189fa6bff7d04}\label{structschwz_1_1Communicate_1_1comm__struct_a39335cd2ee211817d66189fa6bff7d04}} 
+\index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!remote\+\_\+get@{remote\+\_\+get}}
+\index{remote\+\_\+get@{remote\+\_\+get}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
+\subsubsection{\texorpdfstring{remote\+\_\+get}{remote\_get}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+std\+::shared\+\_\+ptr$<$gko\+::\+Array$<$Index\+Type $\ast$$>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::remote\+\_\+get}
+
+
+
+The array containing the number of elements that each subdomain gets from the other. 
+
+For example. global\+\_\+get\mbox{[}p\mbox{]}\mbox{[}0\mbox{]} contains the overall number of elements to be received to subdomain p and global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}i\mbox{]} contains the index of the solution vector to be received from subdomain p. 
+
+Referenced by schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows().
+
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a977cf8a2800021a50e59ee5cefb2a0ca}\label{structschwz_1_1Communicate_1_1comm__struct_a977cf8a2800021a50e59ee5cefb2a0ca}} 
+\index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!remote\+\_\+put@{remote\+\_\+put}}
+\index{remote\+\_\+put@{remote\+\_\+put}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
+\subsubsection{\texorpdfstring{remote\+\_\+put}{remote\_put}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+std\+::shared\+\_\+ptr$<$gko\+::\+Array$<$Index\+Type $\ast$$>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+struct\+::remote\+\_\+put}
+
+
+
+The array containing the number of elements that each subdomain sends from the other. 
+
+For example. global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}0\mbox{]} contains the overall number of elements to be sent to subdomain p and global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}i\mbox{]} contains the index of the solution vector to be sent to subdomain p. 
+
+Referenced by schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows().
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+communicate.\+hpp (200bbde)\end{DoxyCompactItemize}

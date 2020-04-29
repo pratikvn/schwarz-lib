@@ -1,0 +1,39 @@
+\hypertarget{classschwz_1_1device__guard}{}\section{schwz\+:\+:device\+\_\+guard Class Reference}
+\label{classschwz_1_1device__guard}\index{schwz\+::device\+\_\+guard@{schwz\+::device\+\_\+guard}}
+
+
+This class defines a device guard for the cuda functions and the cuda module.  
+
+
+
+
+{\ttfamily \#include $<$device\+\_\+guard.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classschwz_1_1device__guard_a92b10bc6d8ddd6649dda3766e3daf711}\label{classschwz_1_1device__guard_a92b10bc6d8ddd6649dda3766e3daf711}} 
+{\bfseries device\+\_\+guard} (int device\+\_\+id)
+\item 
+\mbox{\Hypertarget{classschwz_1_1device__guard_a2de09b479828241b2c4a3411c958354c}\label{classschwz_1_1device__guard_a2de09b479828241b2c4a3411c958354c}} 
+{\bfseries device\+\_\+guard} (\hyperlink{classschwz_1_1device__guard}{device\+\_\+guard} \&other)=delete
+\item 
+\mbox{\Hypertarget{classschwz_1_1device__guard_abb46749c09498f2904342dd719451c5a}\label{classschwz_1_1device__guard_abb46749c09498f2904342dd719451c5a}} 
+\hyperlink{classschwz_1_1device__guard}{device\+\_\+guard} \& {\bfseries operator=} (const \hyperlink{classschwz_1_1device__guard}{device\+\_\+guard} \&other)=delete
+\item 
+\mbox{\Hypertarget{classschwz_1_1device__guard_a193c151830543321a641a394099d2249}\label{classschwz_1_1device__guard_a193c151830543321a641a394099d2249}} 
+{\bfseries device\+\_\+guard} (\hyperlink{classschwz_1_1device__guard}{device\+\_\+guard} \&\&other)=delete
+\item 
+\mbox{\Hypertarget{classschwz_1_1device__guard_a54b270cdc45097eceedbc022bbbeed1b}\label{classschwz_1_1device__guard_a54b270cdc45097eceedbc022bbbeed1b}} 
+\hyperlink{classschwz_1_1device__guard}{device\+\_\+guard} const  \& {\bfseries operator=} (\hyperlink{classschwz_1_1device__guard}{device\+\_\+guard} \&\&other)=delete
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class defines a device guard for the cuda functions and the cuda module. 
+
+The guard is used to make sure that the device code is run on the correct cuda device, when run with multiple devices. The class records the current device id and uses {\ttfamily cuda\+Set\+Device} to set the device id to the one being passed in. After the scope has been exited, the destructor sets the device\+\_\+id back to the one before entering the scope. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+device\+\_\+guard.\+hpp (200bbde)\end{DoxyCompactItemize}

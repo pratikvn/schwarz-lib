@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 DEFINE_bool(debug, false, "Enable some possibly expensive debug checks");
 DEFINE_bool(non_symmetric_matrix, false, "The matrix is non-symmetric");
+DEFINE_uint32(restart_iter, 1, "Restart iter for the GMRES solver");
 DEFINE_uint32(num_iters, 100, "Number of Schwarz iterations");
 DEFINE_double(set_tol, 1e-6, "Tolerance for the Schwarz solver");
 DEFINE_double(local_tol, 1e-12, "Tolerance for the local solver");

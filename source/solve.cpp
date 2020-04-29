@@ -462,7 +462,9 @@ void Solve<ValueType, IndexType>::setup_local_solver(
             l_max_iters = metadata.local_max_iters;
         }
         if (metadata.my_rank == 0) {
-            std::cout << " Local max iters " << l_max_iters << std::endl;
+            std::cout << " Local max iters " << l_max_iters
+                      << " with restart iter " << settings.restart_iter
+                      << std::endl;
         }
         this->iteration_criterion = gko::stop::Iteration::build()
                                         .with_max_iters(l_max_iters)
@@ -490,6 +492,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                 this->solver =
                     solver::build()
                         .with_criteria(iteration_criterion, residual_criterion)
+                        .with_krylov_dim(settings.restart_iter)
                         .with_preconditioner(
                             bj::build()
                                 .with_max_block_size(
@@ -520,6 +523,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                 this->solver =
                     solver::build()
                         .with_criteria(iteration_criterion, residual_criterion)
+                        .with_krylov_dim(settings.restart_iter)
                         .with_generated_preconditioner(
                             gko::share(ilu_preconditioner))
                         .on(settings.executor)
@@ -544,6 +548,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                 this->solver =
                     solver::build()
                         .with_criteria(iteration_criterion, residual_criterion)
+                        .with_krylov_dim(settings.restart_iter)
                         .with_generated_preconditioner(
                             gko::share(ilu_preconditioner))
                         .on(settings.executor)
@@ -557,6 +562,7 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                 this->solver =
                     solver::build()
                         .with_criteria(iteration_criterion, residual_criterion)
+                        .with_krylov_dim(settings.restart_iter)
                         .on(settings.executor)
                         ->generate(local_matrix);
             } else {

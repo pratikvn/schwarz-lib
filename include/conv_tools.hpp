@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef conv_tools_hpp
 #define conv_tools_hpp
 
+#include <algorithm>
+#include <functional>
 #include <memory>
 
 
@@ -138,7 +140,8 @@ void propagate_all_local_residual_norms(
     }
 }
 
-
+// This implementation is from Yamazaki et.al 2019
+// (https://doi.org/10.1016/j.parco.2019.05.004)
 template <typename ValueType, typename IndexType>
 void global_convergence_check_onesided_tree(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
@@ -222,10 +225,7 @@ void global_convergence_decentralized(
     auto conv_local = convergence_local->get_data();
     auto global_put = comm_s.global_put->get_data();
     auto neighbors_out = comm_s.neighbors_out->get_data();
-    // count how many processes have locally detected the global convergence
     if (settings.convergence_settings.enable_accumulate) {
-        // if this process has detected the global convergence
-        // let everyone know (by incrementing the counter)
         if (converged_all_local == 1) {
             for (auto j = 0; j < num_subdomains; j++) {
                 if (j != my_rank) {
@@ -242,30 +242,20 @@ void global_convergence_decentralized(
                 }
             }
         }
-        // read (from the window) how many processed have locally detected
-        // the global convergence
         num_converged_procs = conv_vector[0];
     } else {
-        // if this process has detected the global convergence
-        // put a check at my slot in the window
         if (converged_all_local == 1) {
             conv_vector[my_rank] = 1;
         }
-        // go through all the slots in the window
-        // and count how many processes have locally detected the global
-        // convergence
         num_converged_procs = 0;
-        for (auto j = 0; j < num_subdomains; j++) {
-            conv_local[j] = conv_vector[j];
-            num_converged_procs += conv_vector[j];
-        }
-        // let the neighbors know who have detected the global convergence
+        std::copy(conv_vector, conv_vector + num_subdomains, conv_local);
+        num_converged_procs =
+            std::accumulate(conv_vector, conv_vector + num_subdomains, 0);
         for (auto i = 0; i < comm_s.num_neighbors_out; i++) {
             if ((global_put[i])[0] > 0) {
                 auto p = neighbors_out[i];
                 int ione = 1;
                 for (auto j = 0; j < num_subdomains; j++) {
-                    // only if not sent, yet
                     if (conv_sent[j] == 0 && conv_local[j] == 1) {
                         MPI_Put(&ione, 1, MPI_INT, p, j, 1, MPI_INT,
                                 window_convergence);
@@ -278,9 +268,7 @@ void global_convergence_decentralized(
                 }
             }
         }
-        for (auto j = 0; j < num_subdomains; j++) {
-            conv_sent[j] = conv_local[j];
-        }
+        std::copy(conv_local, conv_local + num_subdomains, conv_sent);
     }
 }
 

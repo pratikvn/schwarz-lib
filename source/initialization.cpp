@@ -51,8 +51,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <solve.hpp>
 #include <solver_tools.hpp>
 
+#define CHECK_HERE std::cout << "Here " << __LINE__ << std::endl;
 
 namespace schwz {
+
+
+inline gko::size_type linearize_index(const gko::size_type row,
+                                      const gko::size_type col,
+                                      const gko::size_type num_rows)
+{
+    return (row)*num_rows + col;
+}
 
 
 template <typename ValueType, typename IndexType>
@@ -90,6 +99,7 @@ void Initialize<ValueType, IndexType>::generate_rhs(std::vector<ValueType> &rhs)
 #if SCHW_HAVE_DEALII
 template <typename ValueType, typename IndexType>
 void Initialize<ValueType, IndexType>::setup_global_matrix(
+    const std::string &filename, const gko::size_type &oned_laplacian_size,
     const dealii::SparseMatrix<ValueType> &matrix,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix)
 {
@@ -180,16 +190,8 @@ void Initialize<ValueType, IndexType>::setup_global_matrix(
               MPI_COMM_WORLD);
     // global_matrix->copy_from(global_matrix_compute.get());
 }
-#endif
 
-
-inline gko::size_type linearize_index(const gko::size_type row,
-                                      const gko::size_type col,
-                                      const gko::size_type num_rows)
-{
-    return (row)*num_rows + col;
-}
-
+#else
 
 template <typename ValueType, typename IndexType>
 void Initialize<ValueType, IndexType>::setup_global_matrix(
@@ -270,6 +272,9 @@ void Initialize<ValueType, IndexType>::setup_global_matrix(
 }
 
 
+#endif
+
+
 template <typename ValueType, typename IndexType>
 void Initialize<ValueType, IndexType>::partition(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
@@ -330,8 +335,7 @@ void Initialize<ValueType, IndexType>::setup_vectors(
     std::vector<ValueType> &rhs,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_rhs,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;
     auto my_rank = metadata.my_rank;
@@ -342,8 +346,6 @@ void Initialize<ValueType, IndexType>::setup_vectors(
                                    rhs.end()};
     global_rhs = vec::create(settings.executor,
                              gko::dim<2>{metadata.global_size, 1}, temp_rhs, 1);
-    global_solution = vec::create(settings.executor->get_master(),
-                                  gko::dim<2>(metadata.global_size, 1));
 
     local_rhs =
         vec::create(settings.executor, gko::dim<2>(metadata.local_size_x, 1));

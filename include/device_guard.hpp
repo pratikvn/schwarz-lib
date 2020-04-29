@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <exception_helpers.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -58,6 +58,8 @@ namespace SchwarzWrappers {
  * device id and uses `cudaSetDevice` to set the device id to the one being
  * passed in. After the scope has been exited, the destructor sets the device_id
  * back to the one before entering the scope.
+ *
+ * @ingroup init
  */
 class device_guard {
 public:
@@ -96,7 +98,7 @@ private:
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // SCHWARZ_DEVICE_GUARD_HPP_

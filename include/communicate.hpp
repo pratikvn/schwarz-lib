@@ -1,4 +1,4 @@
-/*******************************<SCHWARZ LIB LICENSE>******************************
+/*******************************<SCHWARZ LIB LICENSE>***********************
 Copyright (c) 2019, the SCHWARZ LIB authors
 All rights reserved.
 
@@ -28,7 +28,7 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-******************************<SCHWARZ LIB LICENSE>*******************************/
+******************************<SCHWARZ LIB LICENSE>*************************/
 
 #ifndef communicate_hpp
 #define communicate_hpp
@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "initialization.hpp"
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -52,6 +52,9 @@ namespace SchwarzWrappers {
  *
  * @tparam ValueType  The type of the floating point values.
  * @tparam IndexType  The type of the index type values.
+ *
+ * @ref comm
+ * @ingroup comm
  */
 template <typename ValueType, typename IndexType>
 class Communicate {
@@ -82,6 +85,31 @@ public:
          * The neighbors this subdomain has to send data to.
          */
         std::shared_ptr<gko::Array<IndexType>> neighbors_out;
+
+        /**
+         * The bool vector which is true if the neighbors of a subdomain are in
+         * one node..
+         */
+        std::vector<bool> is_local_neighbor;
+        /**
+         * The number of neighbors this subdomain has to receive data from.
+         */
+        int local_num_neighbors_in;
+
+        /**
+         * The number of neighbors this subdomain has to send data to.
+         */
+        int local_num_neighbors_out;
+
+        /**
+         * The neighbors this subdomain has to receive data from.
+         */
+        std::shared_ptr<gko::Array<IndexType>> local_neighbors_in;
+
+        /**
+         * The neighbors this subdomain has to send data to.
+         */
+        std::shared_ptr<gko::Array<IndexType>> local_neighbors_out;
 
         /**
          * The array containing the number of elements that each subdomain sends
@@ -227,9 +255,14 @@ public:
         std::shared_ptr<gko::Array<IndexType>> put_displacements;
 
         /**
-         * The RDMA window for the buffer.
+         * The RDMA window for the recv buffer.
          */
-        MPI_Win window_buffer;
+        MPI_Win window_recv_buffer;
+
+        /**
+         * The RDMA window for the send buffer.
+         */
+        MPI_Win window_send_buffer;
 
         /**
          * The RDMA window for the solution vector.
@@ -261,14 +294,14 @@ public:
      *
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.
-     * @param solution_vector  The solution vector being exchanged between the
+     * @param global_solution  The solution vector being exchanged between the
      *                     subdomains.
      */
     virtual void exchange_boundary(
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution_vector,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &solution,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution,
         std::ofstream &fps, std::ofstream &fpr) = 0;
 
     /**
@@ -293,7 +326,7 @@ public:
      * @param metadata  The metadata struct.
      * @param local_solution  The local solution vector in the subdomain.
      * @param local_rhs  The local right hand side vector in the subdomain.
-     * @param solution_vector  The workspace solution vector.
+     * @param global_solution  The workspace solution vector.
      * @param global_old_solution  The global solution vector of the previous
      *                             iteration.
      * @param interface_matrix The interface matrix containing the interface and
@@ -305,8 +338,7 @@ public:
         const Metadata<ValueType, IndexType> &metadata,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
         const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
-        const std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &global_old_solution,
+        const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &interface_matrix) = 0;
 
@@ -317,7 +349,7 @@ public:
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // communicate.hpp

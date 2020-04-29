@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <settings.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -63,6 +63,9 @@ namespace SchwarzWrappers {
  *
  * @tparam ValueType  The type of the floating point values.
  * @tparam IndexType  The type of the index type values.
+ *
+ * @ref init
+ * @ingroup init
  */
 template <typename ValueType = gko::default_precision,
           typename IndexType = gko::int32>
@@ -104,21 +107,22 @@ public:
     void generate_sin_rhs(std::vector<ValueType> &rhs); 
 //END CHANGED
 
-#if SCHW_HAVE_DEALII
-    void setup_global_matrix(
-        const dealii::SparseMatrix<ValueType> &matrix,
-        std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix);
-#endif
-
     /**
      * Generates the 2D global laplacian matrix.
      *
      * @param oned_laplacian_size  The size of the one d laplacian grid.
      * @param global_matrix  The global matrix.
      */
-    void setup_global_matrix_laplacian(
-        const gko::size_type &oned_laplacian_size,
+#if SCHW_HAVE_DEALII
+    void setup_global_matrix(
+        const std::string &filename, const gko::size_type &oned_laplacian_size,
+        const dealii::SparseMatrix<ValueType> &matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix);
+#else
+    void setup_global_matrix(
+        const std::string &filename, const gko::size_type &oned_laplacian_size,
+        std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix);
+#endif
 
     /**
      * The partitioning function. Allows the partition of the global matrix
@@ -168,6 +172,7 @@ public:
      * @param interface_matrix The interface matrix containing the interface and
      *                         the overlap data mainly used for exchanging
      *                         values between different sub-domains.
+     * @param local_perm  The local permutation, obtained through RCM or METIS.
      */
     virtual void setup_local_matrices(
         Settings &settings, Metadata<ValueType, IndexType> &metadata,
@@ -183,6 +188,6 @@ private:
     Metadata<ValueType, IndexType> &metadata;
 };
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 #endif  // initialization.hpp

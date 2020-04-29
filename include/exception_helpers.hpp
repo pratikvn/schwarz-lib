@@ -110,4 +110,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     } while (false)
 
 
+/**
+ * Asserts that a Umfpack library call completed without errors.
+ *
+ * @param _umfpack_call  a library call expression
+ */
+#define SCHWARZ_ASSERT_NO_UMFPACK_ERRORS(_umfpack_call)                   \
+    do {                                                                  \
+        auto _errcode = _umfpack_call;                                    \
+        if (_errcode != UMFPACK_OK) {                                     \
+            throw ::UmfpackError(__FILE__, __LINE__, __func__, _errcode); \
+        }                                                                 \
+    } while (false)
+
+
 #endif  // exception_helpers.hpp

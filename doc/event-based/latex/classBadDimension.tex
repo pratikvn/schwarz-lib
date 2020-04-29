@@ -1,0 +1,64 @@
+\hypertarget{classBadDimension}{}\section{Bad\+Dimension Class Reference}
+\label{classBadDimension}\index{Bad\+Dimension@{Bad\+Dimension}}
+
+
+\hyperlink{classBadDimension}{Bad\+Dimension} is thrown if an operation is being applied to a Lin\+Op with bad dimensions.  
+
+
+
+
+{\ttfamily \#include $<$exception.\+hpp$>$}
+
+
+
+Collaboration diagram for Bad\+Dimension\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=160pt]{classBadDimension__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classBadDimension_a4868c7892d3879a155f37daf04b7f8e9}{Bad\+Dimension} (const std\+::string \&file, int line, const std\+::string \&func, const std\+::string \&op\+\_\+name, std\+::size\+\_\+t op\+\_\+num\+\_\+rows, std\+::size\+\_\+t op\+\_\+num\+\_\+cols, const std\+::string \&clarification)
+\begin{DoxyCompactList}\small\item\em Initializes a bad dimension error. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classBadDimension}{Bad\+Dimension} is thrown if an operation is being applied to a Lin\+Op with bad dimensions. 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classBadDimension_a4868c7892d3879a155f37daf04b7f8e9}\label{classBadDimension_a4868c7892d3879a155f37daf04b7f8e9}} 
+\index{Bad\+Dimension@{Bad\+Dimension}!Bad\+Dimension@{Bad\+Dimension}}
+\index{Bad\+Dimension@{Bad\+Dimension}!Bad\+Dimension@{Bad\+Dimension}}
+\subsubsection{\texorpdfstring{Bad\+Dimension()}{BadDimension()}}
+{\footnotesize\ttfamily Bad\+Dimension\+::\+Bad\+Dimension (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{file,  }\item[{int}]{line,  }\item[{const std\+::string \&}]{func,  }\item[{const std\+::string \&}]{op\+\_\+name,  }\item[{std\+::size\+\_\+t}]{op\+\_\+num\+\_\+rows,  }\item[{std\+::size\+\_\+t}]{op\+\_\+num\+\_\+cols,  }\item[{const std\+::string \&}]{clarification }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Initializes a bad dimension error. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file} & The name of the offending source file \\
+\hline
+{\em line} & The source code line number where the error occurred \\
+\hline
+{\em func} & The function name where the error occurred \\
+\hline
+{\em op\+\_\+name} & The name of the operator \\
+\hline
+{\em op\+\_\+num\+\_\+rows} & The row dimension of the operator \\
+\hline
+{\em op\+\_\+num\+\_\+cols} & The column dimension of the operator \\
+\hline
+{\em clarification} & An additional message further describing the error \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+exception.\+hpp (4714335)\end{DoxyCompactItemize}

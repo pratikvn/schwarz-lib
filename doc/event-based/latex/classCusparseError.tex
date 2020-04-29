@@ -1,0 +1,59 @@
+\hypertarget{classCusparseError}{}\section{Cusparse\+Error Class Reference}
+\label{classCusparseError}\index{Cusparse\+Error@{Cusparse\+Error}}
+
+
+\hyperlink{classCusparseError}{Cusparse\+Error} is thrown when a cu\+S\+P\+A\+R\+SE routine throws a non-\/zero error code.  
+
+
+
+
+{\ttfamily \#include $<$exception.\+hpp$>$}
+
+
+
+Collaboration diagram for Cusparse\+Error\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=160pt]{classCusparseError__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCusparseError_a56df91abf5b97f10bdc6540e06d21617}{Cusparse\+Error} (const std\+::string \&file, int line, const std\+::string \&func, int error\+\_\+code)
+\begin{DoxyCompactList}\small\item\em Initializes a cu\+S\+P\+A\+R\+SE error. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classCusparseError}{Cusparse\+Error} is thrown when a cu\+S\+P\+A\+R\+SE routine throws a non-\/zero error code. 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classCusparseError_a56df91abf5b97f10bdc6540e06d21617}\label{classCusparseError_a56df91abf5b97f10bdc6540e06d21617}} 
+\index{Cusparse\+Error@{Cusparse\+Error}!Cusparse\+Error@{Cusparse\+Error}}
+\index{Cusparse\+Error@{Cusparse\+Error}!Cusparse\+Error@{Cusparse\+Error}}
+\subsubsection{\texorpdfstring{Cusparse\+Error()}{CusparseError()}}
+{\footnotesize\ttfamily Cusparse\+Error\+::\+Cusparse\+Error (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{file,  }\item[{int}]{line,  }\item[{const std\+::string \&}]{func,  }\item[{int}]{error\+\_\+code }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Initializes a cu\+S\+P\+A\+R\+SE error. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file} & The name of the offending source file \\
+\hline
+{\em line} & The source code line number where the error occurred \\
+\hline
+{\em func} & The name of the cu\+S\+P\+A\+R\+SE routine that failed \\
+\hline
+{\em error\+\_\+code} & The resulting cu\+S\+P\+A\+R\+SE error code \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+exception.\+hpp (4714335)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/exception.\+cpp (4714335)\end{DoxyCompactItemize}

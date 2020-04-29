@@ -148,7 +148,6 @@ public:
      * @param local_rhs  The local right hand side vector in the subdomain.
      * @param global_rhs  The global right hand side vector.
      * @param local_solution  The local solution vector in the subdomain.
-     * @param global_solution  The global solution vector.
      */
     void setup_vectors(
         const Settings &settings,
@@ -157,8 +156,7 @@ public:
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &global_rhs,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &local_last_solution,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution);
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution);
 
     /**
      * Sets up the local and the interface matrices from the global matrix and

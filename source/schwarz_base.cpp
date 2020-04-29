@@ -137,7 +137,6 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     using vec_vecshared = gko::Array<IndexType *>;
     // Setup the global matrix
     // if explicit_laplacian has been enabled or an external matrix has been
-    // provided.
     if (settings.explicit_laplacian || settings.matrix_filename != "null") {
 #if !SCHW_HAVE_DEALII
         Initialize<ValueType, IndexType>::setup_global_matrix(
@@ -150,7 +149,6 @@ void SchwarzBase<ValueType, IndexType>::initialize(
         Initialize<ValueType, IndexType>::setup_global_matrix(
             settings.matrix_filename, metadata.oned_laplacian_size, matrix,
             this->global_matrix);
-
 #else
         std::cerr << " Explicit laplacian needs to be enabled with the "
                      "--explicit_laplacian flag or deal.ii support needs to be "
@@ -248,6 +246,10 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     this->setup_local_matrices(this->settings, this->metadata,
                                this->partition_indices, this->global_matrix,
                                this->local_matrix, this->interface_matrix);
+    std::cout << "Subdomain " << this->metadata.my_rank
+              << " has local problem size " << this->local_matrix->get_size()[0]
+              << " with " << this->local_matrix->get_num_stored_elements()
+              << " non-zeros " << std::endl;
     // Debug to print matrices.
     if (settings.print_matrices && settings.executor_string != "cuda") {
         Utils<ValueType, IndexType>::print_matrix(
@@ -259,7 +261,7 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     // Setup the local vectors on each of the subddomains.
     Initialize<ValueType, IndexType>::setup_vectors(
         this->settings, this->metadata, rhs, this->local_rhs, this->global_rhs,
-        this->local_solution, this->last_solution, this->global_solution);
+        this->local_solution, this->last_solution);
 
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
@@ -323,10 +325,11 @@ void SchwarzBase<ValueType, IndexType>::run(
     std::shared_ptr<gko::matrix::Dense<ValueType>> &solution)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
-
-    if(!solution.get())
-        solution = vec_vtype::create(settings.executor->get_master(),
-                                 gko::dim<2>(this->metadata.global_size, 1));
+    if (!solution.get()) {
+        solution =
+            vec_vtype::create(settings.executor->get_master(),
+                              gko::dim<2>(this->metadata.global_size, 1));
+    }
     // The main solution vector
     std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));

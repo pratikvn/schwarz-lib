@@ -50,14 +50,13 @@ endif()
 
 set(SCHWARZ_HAVE_METIS 0)
 if(SCHWARZ_BUILD_METIS)
-  find_package(METIS)
-  if(NOT METIS_FOUND AND NOT DEFINED ENV{METIS_DIR})
+  if(NOT DEFINED ENV{METIS_DIR})
     message(FATAL_ERROR "Please specify where METIS has been installed in METIS_DIR.")
   endif()
-#  if(NOT METIS_FOUND)
-    set(METIS_INCLUDE_DIR $ENV{METIS_DIR}/include)
-    set(METIS_LIBRARY_DIR $ENV{METIS_DIR}/lib)
-#  endif()
+  set(METIS_INCLUDE_DIR $ENV{METIS_DIR}/include)
+  set(METIS_LIBRARY_DIR $ENV{METIS_DIR}/lib)
+  message(STATUS "metis inc ${METIS_INCLUDE_DIR}")
+  message(STATUS "metis lib ${METIS_LIBRARY_DIR}")
   include_directories(${METIS_INCLUDE_DIR})
   link_directories(${METIS_LIBRARY_DIR})
   set(SCHWARZ_HAVE_METIS 1)
@@ -70,6 +69,11 @@ if(SCHWARZ_BUILD_DEALII)
   set(SCHWARZ_HAVE_DEALII 1)
   DEAL_II_INITIALIZE_CACHED_VARIABLES()
 endif()
+
+if(SCHWARZ_HAVE_DEALII)
+  set(TARGET "${TARGET}_dealii")
+endif()
+
 
 set(SCHWARZ_HAVE_HWLOC 0)
 if(SCHWARZ_WITH_HWLOC)
@@ -113,7 +117,8 @@ include_directories(${Boost_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/include)
 
-ADD_LIBRARY(${TARGET} SHARED)
+
+ADD_LIBRARY(${TARGET} SHARED )
 
 
 TARGET_SOURCES(${TARGET} PRIVATE

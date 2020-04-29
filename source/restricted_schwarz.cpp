@@ -767,8 +767,7 @@ template <typename ValueType, typename IndexType>
 void exchange_boundary_onesided(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_last_solution,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
     std::ofstream &fps, std::ofstream &fpr)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
@@ -998,23 +997,19 @@ void exchange_boundary_onesided(
     } // end if (enable push)
 
     //Get is not relevant for event-triggered
-    else if (settings.comm_settings.enable_get) 
-    {
-        if (settings.comm_settings.enable_one_by_one) 
-        {
+    else if (settings.comm_settings.enable_get) {
+        if (settings.comm_settings.enable_one_by_one) {
             CommHelpers::transfer_one_by_one(
-                settings, comm_struct, local_solution->get_values(), global_get,
-                num_neighbors_in, neighbors_in);
-        }
-        else
-        {
+                settings, comm_struct, global_solution->get_values(),
+                global_get, num_neighbors_in, neighbors_in);
+        } else {
             // Gather into send buffer so that the procs can Get from it
             int num_put = 0;
             for (auto p = 0; p < num_neighbors_out; p++)
             {
                 if ((global_put[p])[0] > 0) {
                     CommHelpers::pack_buffer(
-                        settings, local_solution->get_values(), send_buffer,
+                        settings, global_solution->get_values(), send_buffer,
                         global_put, num_put, p);
                 }
                 num_put += (global_put[p])[0];
@@ -1028,7 +1023,7 @@ void exchange_boundary_onesided(
                         global_get, num_get, p, neighbors_in,
                         get_displacements);
                     CommHelpers::unpack_buffer(
-                        settings, local_solution->get_values(), recv_buffer,
+                        settings, global_solution->get_values(), recv_buffer,
                         global_get, num_get, p);
                 }
                 num_get += (global_get[p])[0];

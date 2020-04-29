@@ -147,7 +147,15 @@ struct Settings {
     local_solver_settings local_solver =
         local_solver_settings::iterative_solver_ginkgo;
 
+    /**
+     * Is the matrix non-symmetric ? , Use GMRES for local solves.
+     */
     bool non_symmetric_matrix = false;
+
+    /**
+     * The restart iter for the GMRES solver.
+     */
+    unsigned int restart_iter = 1u;
 
     /**
      * Disables the re-ordering of the matrix before computing the triangular

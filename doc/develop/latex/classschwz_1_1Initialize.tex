@@ -31,7 +31,7 @@ void \hyperlink{classschwz_1_1Initialize_af655816bbed181e0a243efa7e35e942f}{setu
 \begin{DoxyCompactList}\small\item\em Generates the 2D global laplacian matrix. \end{DoxyCompactList}\item 
 void \hyperlink{classschwz_1_1Initialize_a23a10058e35a442c564c0748b66dcb08}{partition} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix, std\+::vector$<$ unsigned int $>$ \&\hyperlink{classschwz_1_1Initialize_a007426e21221298b6dca9b7c9fbd1c10}{partition\+\_\+indices})
 \begin{DoxyCompactList}\small\item\em The partitioning function. \end{DoxyCompactList}\item 
-void \hyperlink{classschwz_1_1Initialize_a361211cdb821674a86b95d552591397c}{setup\+\_\+vectors} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::vector$<$ Value\+Type $>$ \&rhs, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+rhs, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+rhs, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+solution, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+solution)
+void \hyperlink{classschwz_1_1Initialize_af8e2c507404900e2507f6b44b16ca4b7}{setup\+\_\+vectors} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::vector$<$ Value\+Type $>$ \&rhs, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+rhs, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+rhs, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+solution)
 \begin{DoxyCompactList}\small\item\em Setup the vectors with default values and allocate mameory if not allocated. \end{DoxyCompactList}\item 
 virtual void \hyperlink{classschwz_1_1Initialize_ad24764a4ded54c2af6a5111ba8c8228f}{setup\+\_\+local\+\_\+matrices} (\hyperlink{structschwz_1_1Settings}{Settings} \&settings, \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::vector$<$ unsigned int $>$ \&\hyperlink{classschwz_1_1Initialize_a007426e21221298b6dca9b7c9fbd1c10}{partition\+\_\+indices}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&local\+\_\+matrix, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&interface\+\_\+matrix)=0
 \begin{DoxyCompactList}\small\item\em Sets up the local and the interface matrices from the global matrix and the partition indices. \end{DoxyCompactList}\end{DoxyCompactItemize}
@@ -177,12 +177,12 @@ Implemented in \hyperlink{classschwz_1_1SolverRAS_aebbdd245b7019af802606ad95a8e3
 
 Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize().
 
-\mbox{\Hypertarget{classschwz_1_1Initialize_a361211cdb821674a86b95d552591397c}\label{classschwz_1_1Initialize_a361211cdb821674a86b95d552591397c}} 
+\mbox{\Hypertarget{classschwz_1_1Initialize_af8e2c507404900e2507f6b44b16ca4b7}\label{classschwz_1_1Initialize_af8e2c507404900e2507f6b44b16ca4b7}} 
 \index{schwz\+::\+Initialize@{schwz\+::\+Initialize}!setup\+\_\+vectors@{setup\+\_\+vectors}}
 \index{setup\+\_\+vectors@{setup\+\_\+vectors}!schwz\+::\+Initialize@{schwz\+::\+Initialize}}
 \subsubsection{\texorpdfstring{setup\+\_\+vectors()}{setup\_vectors()}}
 {\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
-void \hyperlink{classschwz_1_1Initialize}{schwz\+::\+Initialize}$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+vectors (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{std\+::vector$<$ Value\+Type $>$ \&}]{rhs,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{local\+\_\+rhs,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{global\+\_\+rhs,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{local\+\_\+solution,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{global\+\_\+solution }\end{DoxyParamCaption})}
+void \hyperlink{classschwz_1_1Initialize}{schwz\+::\+Initialize}$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+vectors (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{std\+::vector$<$ Value\+Type $>$ \&}]{rhs,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{local\+\_\+rhs,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{global\+\_\+rhs,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{local\+\_\+solution }\end{DoxyParamCaption})}
 
 
 
@@ -200,12 +200,10 @@ Setup the vectors with default values and allocate mameory if not allocated.
 \hline
 {\em local\+\_\+solution} & The local solution vector in the subdomain. \\
 \hline
-{\em global\+\_\+solution} & The global solution vector. \\
-\hline
 \end{DoxyParams}
 
 
-References schwz\+::\+Settings\+::executor, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::first\+\_\+row, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+size, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+size\+\_\+x, and schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::my\+\_\+rank.
+References schwz\+::\+Settings\+::executor, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::first\+\_\+row, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+size\+\_\+x, and schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::my\+\_\+rank.
 
 
 
@@ -215,5 +213,5 @@ Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initia
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-initialization.\+hpp (f9e9a80)\item 
-/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/initialization.\+cpp (f9e9a80)\end{DoxyCompactItemize}
+initialization.\+hpp (bde74e6)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/initialization.\+cpp (bde74e6)\end{DoxyCompactItemize}

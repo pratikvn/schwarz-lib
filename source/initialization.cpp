@@ -399,7 +399,7 @@ void Initialize<ValueType, IndexType>::setup_vectors(
     
     //contains the solution at the last event of communication
     last_solution =
-        vec::create(settings.executor, gko::dim<2>(metadata.local_size_x, 1));
+        vec::create(settings.executor, gko::dim<2>(metadata.global_size, 1));
 }
 
 

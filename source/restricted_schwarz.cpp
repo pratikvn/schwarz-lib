@@ -768,6 +768,7 @@ void exchange_boundary_onesided(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution,
     std::ofstream &fps, std::ofstream &fpr)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;

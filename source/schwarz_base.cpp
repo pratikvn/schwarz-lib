@@ -365,7 +365,6 @@ void SchwarzBase<ValueType, IndexType>::run(
     ValueType local_residual_norm = -1.0, local_residual_norm0 = -1.0,
               global_residual_norm = 0.0, global_residual_norm0 = -1.0;
     metadata.iter_count = 0;
-    auto start_time = std::chrono::steady_clock::now();
     int num_converged_procs = 0;
 
     //CHANGED - file writing
@@ -388,6 +387,7 @@ void SchwarzBase<ValueType, IndexType>::run(
     
     if(metadata.my_rank == 0) std::cout << "Constant - " << metadata.constant << ", Gamma - " << metadata.gamma <<std::endl;
     //END CHANGED
+    auto start_time = std::chrono::steady_clock::now();
 
     for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
         // Exchange the boundary values. The communication part.
@@ -442,6 +442,10 @@ void SchwarzBase<ValueType, IndexType>::run(
         }
     }
 
+    MPI_Barrier(MPI_COMM_WORLD);
+    auto elapsed_time = std::chrono::duration<ValueType>(
+        std::chrono::steady_clock::now() - start_time);
+
     //CHANGED
     //Closing file
     fps.close();
@@ -450,7 +454,7 @@ void SchwarzBase<ValueType, IndexType>::run(
     //adding 1 to include the 0-th iteration
     metadata.iter_count = metadata.iter_count + 1;
 
-    //number of messages a PE would send out without event-based
+    //number of messages a PE would send without event-based
     int noevent_msg_count = metadata.iter_count * num_neighbors_out;
 
     int total_events = 0;
@@ -473,9 +477,6 @@ void SchwarzBase<ValueType, IndexType>::run(
     }
     //END CHANGED
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    auto elapsed_time = std::chrono::duration<ValueType>(
-        std::chrono::steady_clock::now() - start_time);
     std::cout << " Rank " << metadata.my_rank << " converged in "
               << metadata.iter_count << " iters " << std::endl;
     ValueType mat_norm = -1.0, rhs_norm = -1.0, sol_norm = -1.0,

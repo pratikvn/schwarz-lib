@@ -1,0 +1,77 @@
+#!/bin/bash
+
+NUM_NODES=$1
+NUM_PROCS=$2
+COMM_TYPE="$3"
+EXEC="$4"
+PROB_SIZE=$5
+NUM_ITERS=$6
+LOCAL_SOLVE="$7"
+PARTITION="$8"
+CONSTANT=$9
+GAMMA=${10}
+
+NUM_RANKS_PER_PROC=1
+
+PARENT_DIR="$(dirname $PWD)"
+EXEC_DIR=$PWD
+EXEC_TYPE_DIR="${EXEC}"
+
+mkdir -p $EXEC_TYPE_DIR
+
+RESULTS_DIR=${EXEC_DIR}/${EXEC_TYPE_DIR}
+
+cd $RESULTS_DIR
+
+COMM_TYPE_FLAG="--enable_${COMM_TYPE}"
+COMM_TYPE_DIR="${COMM_TYPE}"
+OUT_DIR="${NUM_PROCS}domains"
+PROB_SIZE_DIR="${PROB_SIZE}local"
+LOCAL_SOLVE_DIR="${LOCAL_SOLVE}"
+PARTITION_DIR="${PARTITION}"
+JOB_NAME="${COMM_TYPE}-${NUM_NODES}-${NUM_PROCS}"
+TIME_FILE="subd"
+CONSTANT_DIR="Constant=${CONSTANT}"
+GAMMA_DIR="Gamma=${GAMMA}"
+
+mkdir -p $COMM_TYPE_DIR
+cd $COMM_TYPE_DIR
+
+mkdir -p $OUT_DIR
+cd $OUT_DIR
+
+mkdir -p $LOCAL_SOLVE_DIR
+cd $LOCAL_SOLVE_DIR
+
+mkdir -p $PARTITION_DIR
+cd $PARTITION_DIR
+
+mkdir -p $PROB_SIZE_DIR
+cd $PROB_SIZE_DIR
+
+mkdir -p $CONSTANT_DIR
+cd $CONSTANT_DIR
+
+#if [ $CONSTANT -ne 0 ]
+if (( $(echo "$CONSTANT > 0" |bc -l) ));
+then
+   mkdir -p $GAMMA_DIR
+   cd $GAMMA_DIR
+fi
+
+export run_exec=$PARENT_DIR/build/benchmarking/bench_ras
+export run_flags="--executor=${EXEC} --num_iters=${NUM_ITERS} --explicit_laplacian --set_1d_laplacian_size=${PROB_SIZE} --set_tol=1e-4 --local_tol=1e-8 --partition=${PARTITION} --local_solver=${LOCAL_SOLVE} ${COMM_TYPE_FLAG} --enable_flush=flush-local --write_comm_data --timings_file=subd --enable_global_check --constant=${CONSTANT} --gamma=${GAMMA}"  
+
+NUM_PE_NODES="$((${NUM_NODES}*48))"
+echo "#!/bin/csh" > job_script.sh
+echo "#$ -pe mpi-48 ${NUM_PE_NODES}" >> job_script.sh
+echo "#$ -q hpc" >> job_script.sh
+echo "#$ -N schwarz" >> job_script.sh
+echo "#$ -o info" >> job_script.sh
+
+echo "module use ~/ompi-boost-gcc-8.3.0/" >> job_script.sh
+echo "module load ompi-8.3.0" >> job_script.sh
+echo "module load boost-8.3.0" >> job_script.sh
+echo "mpirun -N 1 $run_exec $run_flags > out.txt" >> job_script.sh
+#echo "mpirun -np $NUM_PROCS $run_exec $run_flags > out.txt" >> job_script.sh
+qsub job_script.sh

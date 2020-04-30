@@ -1,0 +1,21 @@
+#!/bin/bash -l
+
+for num_pe in 16
+do 
+  for comm in "onesided"
+  do 
+    for size in 512
+    do
+      for part in "regular"
+      do 
+        for constant in 1E-3 1E-2 1E-1 1E0 1E1
+        do
+          for gamma in 0.98
+          do
+            ./cpu_batch $num_pe $num_pe $comm reference $size 4000 iterative-ginkgo $part $constant $gamma
+          done   
+        done
+      done 
+    done
+  done
+done

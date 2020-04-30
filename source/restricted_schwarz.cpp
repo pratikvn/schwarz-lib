@@ -812,20 +812,20 @@ void exchange_boundary_onesided(
                     for (auto i = 1; i <= (global_put[p])[0]; i++) //sending all elements in boundary
                                                                    //one by one
                     {
-                        auto curr_value = &local_solution->get_values()[(local_put[p])[i]];
-                        auto last_value = &local_last_solution->get_values()[(local_put[p])[i]];
+                        auto curr_value = &global_solution->get_values()[(local_put[p])[i]];
+                        auto last_value = &last_solution->get_values()[(local_put[p])[i]];
                         //event condition below
                         if(std::fabs(curr_value - last_value) > get_threshold(settings, metadata))
                         {
                             MPI_Win_lock(MPI_LOCK_EXCLUSIVE, neighbors_out[p], 0, comm_struct.window_x);
                             MPI_Put(
-                            &local_solution->get_values()[(local_put[p])[i]], 1,
+                            &global_solution->get_values()[(local_put[p])[i]], 1,
                             mpi_vtype, neighbors_out[p], (remote_put[p])[i], 1,
                             mpi_vtype, comm_struct.window_x);
    
                             //copy current to last communicated 
-                            local_last_solution->get_values()[(local_put[p])[i]] =
-                               local_solution->get_values()[(local_put[p])[i]];
+                            last_solution->get_values()[(local_put[p])[i]] =
+                               global_solution->get_values()[(local_put[p])[i]];
                             
                             //increment counter
                             comm_struct.msg_count->get_data()[p]++;
@@ -857,7 +857,7 @@ void exchange_boundary_onesided(
                 // send
                 if ((global_put[p])[0] > 0) 
                 {
-                    CommHelpers::pack_buffer(settings, local_solution->get_values(), send_buffer, global_put, num_put, p);
+                    CommHelpers::pack_buffer(settings, global_solution->get_values(), send_buffer, global_put, num_put, p);
 
                     float temp_sum = 0.0;
                         
@@ -935,7 +935,7 @@ void exchange_boundary_onesided(
                            comm_struct.sec_last_recv_bdy->get_values()[num_get + i] = comm_struct.last_recv_bdy->get_values()[num_get + i];
                            comm_struct.last_recv_bdy->get_values()[num_get + i] = comm_struct.recv_buffer->get_values()[num_get + i];
 
-                           //fpr << local_solution->get_values()[(local_get[p])[i]] << ", ";
+                           //fpr << global_solution->get_values()[(local_get[p])[i]] << ", ";
                        }
                        //fpr << std::endl;
                        
@@ -985,7 +985,7 @@ void exchange_boundary_onesided(
                       fpr << temp_avg << ", ";
 
                       //Updating local solution
-                      CommHelpers::unpack_buffer(settings, local_solution->get_values(), recv_buffer, global_get, num_get, p);
+                      CommHelpers::unpack_buffer(settings, global_solution->get_values(), recv_buffer, global_get, num_get, p);
 
                       num_get += (global_get[p])[0];
 

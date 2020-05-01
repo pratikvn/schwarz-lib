@@ -403,6 +403,8 @@ void SchwarzBase<ValueType, IndexType>::run(
                                   this->interface_matrix),
             1, metadata.my_rank, boundary_update, metadata.iter_count);
 
+        fps << metadata.iter_count << ", " << local_residual_norm << std::endl;
+
         // Check for the convergence of the solver.
         // num_converged_procs = 0;
         MEASURE_ELAPSED_FUNC_TIME(

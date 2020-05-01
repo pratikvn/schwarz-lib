@@ -737,15 +737,15 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
         // Lock all windows.
         if (settings.comm_settings.enable_get &&
             settings.comm_settings.enable_lock_all) {
-            //MPI_Win_lock_all(0, this->comm_struct.window_send_buffer);
+            MPI_Win_lock_all(0, this->comm_struct.window_send_buffer);
         }
         if (settings.comm_settings.enable_put &&
             settings.comm_settings.enable_lock_all) {
-            //MPI_Win_lock_all(0, this->comm_struct.window_recv_buffer);
+            MPI_Win_lock_all(0, this->comm_struct.window_recv_buffer);
         }
         if (settings.comm_settings.enable_one_by_one &&
             settings.comm_settings.enable_lock_all) {
-            //MPI_Win_lock_all(0, this->comm_struct.window_x);
+            MPI_Win_lock_all(0, this->comm_struct.window_x);
         }
         MPI_Win_lock_all(0, this->window_residual_vector);
         MPI_Win_lock_all(0, this->window_convergence);
@@ -972,7 +972,7 @@ void exchange_boundary_onesided(
                                                  - comm_struct.sec_last_recv_bdy->get_values()[num_get + i]) / iter_diff;
                            
                            //Using recv_buffer as a temporary buffer for storing extrapolation
-                           recv_buffer[num_get + i] = comm_struct.last_recv_bdy->get_values()[num_get + i - 1]
+                           recv_buffer[num_get + i] = comm_struct.last_recv_bdy->get_values()[num_get + i]
                                                          + ((slope + last_slope)/2) * (metadata.iter_count - comm_struct.last_recv_iter->get_data()[p]);
                         
                            temp_avg += recv_buffer[num_get + i];         

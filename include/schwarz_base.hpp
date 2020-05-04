@@ -176,6 +176,16 @@ public:
     std::shared_ptr<gko::matrix::Dense<ValueType>> global_rhs;
 
     /**
+     * A work vector on the device.
+     */
+    std::shared_ptr<gko::matrix::Dense<ValueType>> work_vector;
+
+    /**
+     * The work vector on the CPU.
+     */
+    std::shared_ptr<gko::matrix::Dense<ValueType>> cpu_work_vector;
+
+    /**
      * The local solution vector.
      */
     std::shared_ptr<gko::matrix::Dense<ValueType>> local_solution;

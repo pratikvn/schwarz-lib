@@ -323,9 +323,12 @@ void SchwarzBase<ValueType, IndexType>::run(
     // The main solution vector
     std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
-    // A work vector.
-    std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
+    // Work vectors.
+    this->work_vector = vec_vtype::create(
         settings.executor, gko::dim<2>(2 * this->metadata.local_size_x, 1));
+    this->cpu_work_vector =
+        vec_vtype::create(settings.executor->get_master(),
+                          gko::dim<2>(2 * this->metadata.local_size_x, 1));
     // An initial guess.
     std::shared_ptr<vec_vtype> init_guess = vec_vtype::create(
         settings.executor, gko::dim<2>(this->metadata.local_size_x, 1));

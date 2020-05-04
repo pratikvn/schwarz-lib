@@ -612,6 +612,8 @@ template <typename ValueType, typename IndexType>
 void exchange_boundary_onesided(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &work_vector,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &cpu_work_vector,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
@@ -620,31 +622,32 @@ void exchange_boundary_onesided(
 
     auto num_neighbors_out = comm_struct.num_neighbors_out;
     auto local_num_neighbors_out = comm_struct.local_num_neighbors_out;
-    auto neighbors_out = comm_struct.neighbors_out->get_data();
-    auto local_neighbors_out = comm_struct.local_neighbors_out->get_data();
+    auto neighbors_out = comm_struct.neighbors_out->get_const_data();
+    auto local_neighbors_out =
+        comm_struct.local_neighbors_out->get_const_data();
     auto global_put = comm_struct.global_put->get_data();
     auto local_put = comm_struct.local_put->get_data();
     auto remote_put = comm_struct.remote_put->get_data();
-    auto put_displacements = comm_struct.put_displacements->get_data();
+    auto put_displacements = comm_struct.put_displacements->get_const_data();
     auto send_buffer = comm_struct.send_buffer->get_values();
 
     auto num_neighbors_in = comm_struct.num_neighbors_in;
     auto local_num_neighbors_in = comm_struct.local_num_neighbors_in;
-    auto neighbors_in = comm_struct.neighbors_in->get_data();
-    auto local_neighbors_in = comm_struct.local_neighbors_in->get_data();
+    auto neighbors_in = comm_struct.neighbors_in->get_const_data();
+    auto local_neighbors_in = comm_struct.local_neighbors_in->get_const_data();
     auto global_get = comm_struct.global_get->get_data();
     auto local_get = comm_struct.local_get->get_data();
     auto remote_get = comm_struct.remote_get->get_data();
-    auto get_displacements = comm_struct.get_displacements->get_data();
+    auto get_displacements = comm_struct.get_displacements->get_const_data();
     auto recv_buffer = comm_struct.recv_buffer->get_values();
-    auto is_local_neighbor = comm_struct.is_local_neighbor;
+    // bool* is_local_neighbor = comm_struct.is_local_neighbor.data();
 
     ValueType dummy = 1.0;
     auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
     if (settings.comm_settings.enable_put) {
         if (settings.comm_settings.enable_one_by_one) {
             CommHelpers::transfer_one_by_one(
-                settings, comm_struct, global_solution->get_values(),
+                settings, comm_struct.window_x, global_solution->get_values(),
                 global_put, num_neighbors_out, neighbors_out);
         } else {
             int num_put = 0;
@@ -653,11 +656,12 @@ void exchange_boundary_onesided(
                 if ((global_put[p])[0] > 0) {
                     CommHelpers::pack_buffer(
                         settings, global_solution->get_values(), send_buffer,
-                        global_put, num_put, p);
+                        work_vector->get_values(), global_put, num_put, p,
+                        comm_struct.is_local_neighbor);
                     CommHelpers::transfer_buffer(
                         settings, comm_struct.window_recv_buffer, send_buffer,
                         global_put, num_put, p, neighbors_out,
-                        put_displacements);
+                        put_displacements, comm_struct.is_local_neighbor);
                     num_put += (global_put[p])[0];
                 }
             }
@@ -666,16 +670,17 @@ void exchange_boundary_onesided(
         int num_get = 0;
         for (auto p = 0; p < num_neighbors_in; p++) {
             if ((global_get[p])[0] > 0) {
-                CommHelpers::unpack_buffer(settings,
-                                           global_solution->get_values(),
-                                           recv_buffer, global_get, num_get, p);
+                CommHelpers::unpack_buffer(
+                    settings, global_solution->get_values(), recv_buffer,
+                    work_vector->get_values(), global_get, num_get, p,
+                    comm_struct.is_local_neighbor);
                 num_get += (global_get[p])[0];
             }
         }
     } else if (settings.comm_settings.enable_get) {
         if (settings.comm_settings.enable_one_by_one) {
             CommHelpers::transfer_one_by_one(
-                settings, comm_struct, global_solution->get_values(),
+                settings, comm_struct.window_x, global_solution->get_values(),
                 global_get, num_neighbors_in, neighbors_in);
         } else {
             // Gather into send buffer so that the procs can Get from it
@@ -684,20 +689,22 @@ void exchange_boundary_onesided(
                 if ((global_put[p])[0] > 0) {
                     CommHelpers::pack_buffer(
                         settings, global_solution->get_values(), send_buffer,
-                        global_put, num_put, p);
+                        work_vector->get_values(), global_put, num_put, p,
+                        comm_struct.is_local_neighbor);
                 }
                 num_put += (global_put[p])[0];
             }
             int num_get = 0;
             for (auto p = 0; p < num_neighbors_in; p++) {
-                if ((global_put[p])[0] > 0) {
+                if ((global_get[p])[0] > 0) {
                     CommHelpers::transfer_buffer(
                         settings, comm_struct.window_send_buffer, recv_buffer,
-                        global_get, num_get, p, neighbors_in,
-                        get_displacements);
+                        global_get, num_get, p, neighbors_in, get_displacements,
+                        comm_struct.is_local_neighbor);
                     CommHelpers::unpack_buffer(
                         settings, global_solution->get_values(), recv_buffer,
-                        global_get, num_get, p);
+                        work_vector->get_values(), global_get, num_get, p,
+                        comm_struct.is_local_neighbor);
                 }
                 num_get += (global_get[p])[0];
             }
@@ -799,7 +806,8 @@ void SolverRAS<ValueType, IndexType>::exchange_boundary(
 {
     if (settings.comm_settings.enable_onesided) {
         exchange_boundary_onesided<ValueType, IndexType>(
-            settings, metadata, this->comm_struct, global_solution);
+            settings, metadata, this->comm_struct, this->work_vector,
+            this->cpu_work_vector, global_solution);
     } else {
         exchange_boundary_twosided<ValueType, IndexType>(
             settings, metadata, this->comm_struct, global_solution);

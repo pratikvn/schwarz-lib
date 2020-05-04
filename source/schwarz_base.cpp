@@ -367,26 +367,28 @@ void SchwarzBase<ValueType, IndexType>::run(
     metadata.iter_count = 0;
     int num_converged_procs = 0;
 
-    //CHANGED - file writing
-    char send_name[30], recv_name[30], pe_str[3];
-    sprintf(pe_str, "%d", metadata.my_rank);
-
-    strcpy(send_name, "send");
-    strcat(send_name, pe_str);
-    strcat(send_name, ".txt");
-
-    strcpy(recv_name, "recv");
-    strcat(recv_name, pe_str);
-    strcat(recv_name, ".txt");
-
     std::ofstream fps; //file for sending log
-    fps.open(send_name);
-
     std::ofstream fpr; //file for receiving log
-    fpr.open(recv_name);
+    if(settings.debug_print)
+    {
+        //Opening files for event logs
+        char send_name[30], recv_name[30], pe_str[3];
+        sprintf(pe_str, "%d", metadata.my_rank);
+
+        strcpy(send_name, "send");
+        strcat(send_name, pe_str);
+        strcat(send_name, ".txt");
+
+        strcpy(recv_name, "recv");
+        strcat(recv_name, pe_str);
+        strcat(recv_name, ".txt");
+
+        fps.open(send_name);
+        fpr.open(recv_name);
+    }
     
     if(metadata.my_rank == 0) std::cout << "Constant - " << metadata.constant << ", Gamma - " << metadata.gamma <<std::endl;
-    //END CHANGED
+    
     auto start_time = std::chrono::steady_clock::now();
 
     for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
@@ -403,7 +405,8 @@ void SchwarzBase<ValueType, IndexType>::run(
                                   this->interface_matrix),
             1, metadata.my_rank, boundary_update, metadata.iter_count);
 
-        fps << metadata.iter_count << ", " << local_residual_norm << std::endl;
+        if(settings.debug_print)
+             fps << metadata.iter_count << ", " << local_residual_norm << std::endl;
 
         // Check for the convergence of the solver.
         // num_converged_procs = 0;
@@ -448,10 +451,12 @@ void SchwarzBase<ValueType, IndexType>::run(
     auto elapsed_time = std::chrono::duration<ValueType>(
         std::chrono::steady_clock::now() - start_time);
 
-    //CHANGED
-    //Closing file
-    fps.close();
-    fpr.close();
+    if(settings.debug_print)
+    {
+       //Closing event log files
+       fps.close();
+       fpr.close();
+    }
    
     //adding 1 to include the 0-th iteration
     metadata.iter_count = metadata.iter_count + 1;
@@ -477,7 +482,6 @@ void SchwarzBase<ValueType, IndexType>::run(
       std::cout << "Total number of events - " << total_events << std::endl;
       std::cout << "Total number of msgs without event - " << noevent_msg_count << std::endl;
     }
-    //END CHANGED
 
     std::cout << " Rank " << metadata.my_rank << " converged in "
               << metadata.iter_count << " iters " << std::endl;

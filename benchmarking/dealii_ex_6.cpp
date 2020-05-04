@@ -187,6 +187,10 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
     metadata.num_threads = FLAGS_num_threads;
     metadata.oned_laplacian_size = FLAGS_set_1d_laplacian_size;
 
+    //Event comm settings
+    metadata.constant = FLAGS_constant;
+    metadata.gamma = FLAGS_gamma;
+
     // Generic settings
     settings.write_debug_out = FLAGS_enable_debug_write;
     settings.write_perm_data = FLAGS_write_perm_data;

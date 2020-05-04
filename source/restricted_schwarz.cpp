@@ -31,8 +31,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************<SCHWARZ LIB LICENSE>*************************/
 
-//This is the branch event-based
-
 #include <schwarz/config.hpp>
 #include <comm_helpers.hpp>
 #include <exception_helpers.hpp>
@@ -485,7 +483,6 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
             this->comm_struct.recv_buffer = 
                  vec_vtype::create(settings.executor, gko::dim<2>(num_recv, 1));
 
-            //CHANGED
             //initializing recv buffer
             for (int i = 0; i < num_recv; i++)
             {
@@ -530,8 +527,6 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
                 this->comm_struct.curr_recv_avg->get_values()[i] = 0.0;
                 this->comm_struct.last_recv_avg->get_values()[i] = 0.0;
             }
-
-            //END CHANGED
 
             MPI_Win_create(this->comm_struct.recv_buffer->get_values(),
                            num_recv * sizeof(ValueType), sizeof(ValueType),
@@ -585,7 +580,6 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
             this->comm_struct.send_buffer = vec_vtype::create(
                 settings.executor, gko::dim<2>(num_send, 1));
            
-            //CHANGED
             this->comm_struct.curr_send_avg = vec_vtype::create(
                 settings.executor, gko::dim<2>(this->comm_struct.num_neighbors_out, 1));
             this->comm_struct.last_send_avg = vec_vtype::create(
@@ -600,7 +594,6 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
             {
                 this->comm_struct.msg_count->get_data()[i] = 0;
             }          
-            //END CHANGED
 
             MPI_Win_create(this->comm_struct.send_buffer->get_values(),
                            num_send * sizeof(ValueType), sizeof(ValueType),
@@ -807,7 +800,6 @@ void exchange_boundary_onesided(
             {
                 if ((global_put[p])[0] > 0) //no of elements in the boundary with p-th neighbor
                 {
-                    //CHANGED
                     // push
                     for (auto i = 1; i <= (global_put[p])[0]; i++) //sending all elements in boundary
                                                                    //one by one
@@ -871,8 +863,9 @@ void exchange_boundary_onesided(
                     auto diff = std::fabs(comm_struct.curr_send_avg->get_values()[p] - comm_struct.last_send_avg->get_values()[p]);
                     auto thres = get_threshold(settings, metadata);
 
-                    fps << "Avg for msg to " << neighbors_out[p] << " at iter " << metadata.iter_count << " - "
-                       << comm_struct.curr_send_avg->get_values()[p] << ", Thres - " << thres << std::endl;
+                    if(settings.debug_print)
+                         fps << "Avg for msg to " << neighbors_out[p] << " at iter " << metadata.iter_count << " - "
+                             << comm_struct.curr_send_avg->get_values()[p] << ", Thres - " << thres << std::endl;
 
                     if(diff >= thres || metadata.iter_count < 30)
                     //if(metadata.iter_count % 4 == 0 || metadata.iter_count < 30)
@@ -886,7 +879,8 @@ void exchange_boundary_onesided(
                          //increment counter
                          comm_struct.msg_count->get_data()[p]++;
              
-                         fps << "Msg sent to " << neighbors_out[p] << " in iter " << metadata.iter_count << std::endl;
+                         if(settings.debug_print)
+                              fps << "Msg sent to " << neighbors_out[p] << " in iter " << metadata.iter_count << std::endl;
 
                          num_put += (global_put[p])[0];
 
@@ -911,14 +905,15 @@ void exchange_boundary_onesided(
                    temp_avg = temp_avg / (global_get[p])[0];
                    comm_struct.curr_recv_avg->get_values()[p] = temp_avg;;
 
-                   //fpr << "Avg of local bdy from PE " << neighbors_in[p] << " at iter " << metadata.iter_count
-                   //                                    << " - " << local_avg << std::endl;
-
                    if(std::fabs(comm_struct.curr_recv_avg->get_values()[p] - comm_struct.last_recv_avg->get_values()[p]) > 0)
                    {
                        //new value received
-                       //fpr << "Msg received from PE " << neighbors_in[p] << " at iter " << metadata.iter_count << std::endl;
-                       fpr << "1, ";
+                       if(settings.debug_print)
+                       {
+                          //fpr << "Msg received from PE " << neighbors_in[p] << " at iter " << metadata.iter_count << std::endl;
+                          //Printing 1 as an indicator that new value is received
+                          fpr << "1, ";
+                       }
  
                        //update avg
                        comm_struct.last_recv_avg->get_values()[p] = comm_struct.curr_recv_avg->get_values()[p];
@@ -935,28 +930,31 @@ void exchange_boundary_onesided(
                            comm_struct.sec_last_recv_bdy->get_values()[num_get + i] = comm_struct.last_recv_bdy->get_values()[num_get + i];
                            comm_struct.last_recv_bdy->get_values()[num_get + i] = comm_struct.recv_buffer->get_values()[num_get + i];
 
-                           //fpr << global_solution->get_values()[(local_get[p])[i]] << ", ";
                        }
-                       //fpr << std::endl;
                        
                     }//end if new value recvd
                           
                     else  // = 0
                     {
                        //no new value received, do extrapolation
-                       //fpr << "Doing extrapolation for PE " << neighbors_in[p] << " at iter " << metadata.iter_count << std::endl;
-                       //fpr << "Last recv iter - " << comm_struct.last_recv_iter->get_data()[p] << ", Sec last recv iter - "
-                       //                          << comm_struct.sec_last_recv_iter->get_data()[p] << std::endl;
-                       fpr << "0, ";
+                       if(settings.debug_print)
+                       {
+                            //fpr << "Doing extrapolation for PE " << neighbors_in[p] << " at iter " << metadata.iter_count << std::endl;
+                            //fpr << "Last recv iter - " << comm_struct.last_recv_iter->get_data()[p] << ", Sec last recv iter - "
+                            //                           << comm_struct.sec_last_recv_iter->get_data()[p] << std::endl;
+                            //Printing 0 to indicate extrapolation
+                            fpr << "0, ";
+                       }
 
                        temp_avg = 0.0; //calculate avg again
                              
                        for (auto i = 0; i < (global_get[p])[0]; i++)
                        {
-                           //Print stats
-                           //fpr << "Last recv bdy - " << comm_struct.last_recv_bdy->get_values()[num_get + i]
-                           //   << ", Sec last recv bdy - " << comm_struct.sec_last_recv_bdy->get_values()[num_get + i] << std::endl;
-                               
+                           if(settings.debug_print)
+                           {
+                              //fpr << "Last recv bdy - " << comm_struct.last_recv_bdy->get_values()[num_get + i]
+                              //   << ", Sec last recv bdy - " << comm_struct.sec_last_recv_bdy->get_values()[num_get + i] << std::endl;
+                           }    
                            float last_slope = 0.0;
                            auto last_iter_diff = (comm_struct.sec_last_recv_iter->get_data()[p]
                                                  - comm_struct.third_last_recv_iter->get_data()[p]);                          
@@ -981,8 +979,11 @@ void exchange_boundary_onesided(
 
                       }//end if extrapolation done
 
-                      //Printing avg of current bdy values (received or extrapolated)
-                      fpr << temp_avg << ", ";
+                      if(settings.debug_print)
+                      {
+                         //Printing avg of current bdy values (received or extrapolated)
+                         fpr << temp_avg << ", ";
+                      }
 
                       //Updating local solution
                       CommHelpers::unpack_buffer(settings, global_solution->get_values(), recv_buffer, global_get, num_get, p);
@@ -997,7 +998,6 @@ void exchange_boundary_onesided(
         } //end else for push one by one
     } // end if (enable push)
 
-    //Get is not relevant for event-triggered
     else if (settings.comm_settings.enable_get) {
         if (settings.comm_settings.enable_one_by_one) {
             CommHelpers::transfer_one_by_one(

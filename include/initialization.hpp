@@ -84,7 +84,6 @@ public:
      */
     std::vector<unsigned int> cell_weights;
 
-//CHANGED
     /**
      * Generates a random right hand side vector
      *
@@ -105,7 +104,6 @@ public:
      * @param rhs The rhs vector.
      */
     void generate_sin_rhs(std::vector<ValueType> &rhs); 
-//END CHANGED
 
     /**
      * Generates the 2D global laplacian matrix.

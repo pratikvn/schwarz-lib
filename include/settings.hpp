@@ -410,7 +410,6 @@ struct Metadata {
      */
     ValueType min_residual_norm = -1.0;
 
-    //CHANGED
     /**
      * Value of constant for event threshold
      */
@@ -420,7 +419,6 @@ struct Metadata {
      * Value of gamma for event threshold
      */
     ValueType gamma = 0.0;
-    //END CHANGED
 
     /**
      * The struct used to measure the timings of each function within the solver

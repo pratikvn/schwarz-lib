@@ -96,7 +96,6 @@ void Initialize<ValueType, IndexType>::generate_random_rhs(std::vector<ValueType
     }
 }
 
-//CHANGED	
 template <typename ValueType, typename IndexType>
 void Initialize<ValueType, IndexType>::generate_dipole_rhs(std::vector<ValueType> &rhs)
 {
@@ -133,7 +132,6 @@ void Initialize<ValueType, IndexType>::generate_sin_rhs(std::vector<ValueType> &
         }
     }
 }
-//END CHANGED 
 
 #if SCHW_HAVE_DEALII
 template <typename ValueType, typename IndexType>

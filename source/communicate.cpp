@@ -98,10 +98,10 @@ void Communicate<ValueType, IndexType>::local_to_global_vector(
 template <typename ValueType, typename IndexType>
 void Communicate<ValueType, IndexType>::clear(Settings &settings)
 {
-    if (settings.comm_settings.enable_onesided) {
-        //MPI_Win_unlock_all(comm_struct.window_recv_buffer);
-        //MPI_Win_unlock_all(comm_struct.window_send_buffer);
-        //MPI_Win_unlock_all(comm_struct.window_x);
+    if (settings.comm_settings.enable_onesided && settings.comm_settings.enable_lock_all) {
+        MPI_Win_unlock_all(comm_struct.window_recv_buffer);
+        MPI_Win_unlock_all(comm_struct.window_send_buffer);
+        MPI_Win_unlock_all(comm_struct.window_x);
 
         // MPI_Win_free(&comm_struct.window_x);
     }

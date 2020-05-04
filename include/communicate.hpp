@@ -185,8 +185,6 @@ public:
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> recv_buffer;
 
-        //CHANGED
-
         /**
          * The last received boundary values for each of the in neighbors for extrapolation
          */
@@ -241,8 +239,6 @@ public:
          * Iteration stamp of third last received values
          */
         std::shared_ptr<gko::Array<IndexType>> third_last_recv_iter; 
-
-        //END CHANGED
 
         /**
          * The displacements for the receiving of the buffer.

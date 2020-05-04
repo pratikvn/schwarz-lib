@@ -147,11 +147,9 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     }
     settings.debug_print = FLAGS_debug;
 
-    //CHANGED 
     //Event settings
     metadata.constant = FLAGS_constant;
     metadata.gamma = FLAGS_gamma;
-    //END CHANGED
 
     // The global solution vector to be passed in to the RAS solver.
     std::shared_ptr<gko::matrix::Dense<ValueType>> explicit_laplacian_solution;
@@ -192,7 +190,6 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
                               filename_recv);
     }
 
-    //CHANGED	
     //Print final solution to file
     
     char name[30];;
@@ -215,7 +212,6 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
        fp.close();
     }
     
-    //END CHANGED   
 }
 
 

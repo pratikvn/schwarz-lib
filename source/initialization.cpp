@@ -84,8 +84,6 @@ void Initialize<ValueType, IndexType>::setup_local_matrices(
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &interface_matrix)
     SCHWARZ_NOT_IMPLEMENTED;
 
-
-//CHANGED NAMING HERE
 template <typename ValueType, typename IndexType>
 void Initialize<ValueType, IndexType>::generate_random_rhs(std::vector<ValueType> &rhs)
 {

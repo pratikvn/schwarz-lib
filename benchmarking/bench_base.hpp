@@ -134,10 +134,8 @@ DEFINE_string(metis_objtype, "null",
               "Defines the objective type for the metis partitioning, options "
               "are edgecut and totalvol ");
 
-//CHANGED
 DEFINE_double(constant, 0.0, "constant for the event threshold");
 DEFINE_double(gamma, 0.0, "gamma for the event threshold");
-//END CHANGED
 
 void initialize_argument_parsing(int *argc, char **argv[])
 {

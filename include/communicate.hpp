@@ -186,6 +186,18 @@ public:
         std::shared_ptr<gko::matrix::Dense<ValueType>> recv_buffer;
 
         /**
+         * The send buffer used for the actual communication for both one-sided
+         * and two-sided.
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> cpu_send_buffer;
+
+        /**
+         * The recv buffer used for the actual communication for both one-sided
+         * and two-sided.
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> cpu_recv_buffer;
+
+        /**
          * The displacements for the receiving of the buffer.
          */
         std::shared_ptr<gko::Array<IndexType>> get_displacements;
@@ -204,6 +216,16 @@ public:
          * The RDMA window for the send buffer.
          */
         MPI_Win window_send_buffer;
+
+        /**
+         * The RDMA window for the recv buffer.
+         */
+        MPI_Win window_cpu_recv_buffer;
+
+        /**
+         * The RDMA window for the send buffer.
+         */
+        MPI_Win window_cpu_send_buffer;
 
         /**
          * The RDMA window for the solution vector.

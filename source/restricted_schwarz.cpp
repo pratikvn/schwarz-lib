@@ -431,6 +431,13 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
                            num_recv * sizeof(ValueType), sizeof(ValueType),
                            MPI_INFO_NULL, MPI_COMM_WORLD,
                            &(this->comm_struct.window_recv_buffer));
+            this->comm_struct.cpu_recv_buffer =
+                vec_vtype::create(settings.executor, gko::dim<2>(num_recv, 1));
+
+            MPI_Win_create(this->comm_struct.cpu_recv_buffer->get_values(),
+                           num_recv * sizeof(ValueType), sizeof(ValueType),
+                           MPI_INFO_NULL, MPI_COMM_WORLD,
+                           &(this->comm_struct.window_cpu_recv_buffer));
             this->comm_struct.windows_from = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
                               this->comm_struct.num_neighbors_in),
@@ -472,6 +479,12 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
                            num_send * sizeof(ValueType), sizeof(ValueType),
                            MPI_INFO_NULL, MPI_COMM_WORLD,
                            &(this->comm_struct.window_send_buffer));
+            this->comm_struct.cpu_send_buffer = vec_vtype::create(
+                settings.executor->get_master(), gko::dim<2>(num_send, 1));
+            MPI_Win_create(this->comm_struct.cpu_send_buffer->get_values(),
+                           num_send * sizeof(ValueType), sizeof(ValueType),
+                           MPI_INFO_NULL, MPI_COMM_WORLD,
+                           &(this->comm_struct.window_cpu_send_buffer));
             this->comm_struct.windows_to = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
                               this->comm_struct.num_neighbors_out),
@@ -593,10 +606,12 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
         if (settings.comm_settings.enable_get &&
             settings.comm_settings.enable_lock_all) {
             MPI_Win_lock_all(0, this->comm_struct.window_send_buffer);
+            MPI_Win_lock_all(0, this->comm_struct.window_cpu_send_buffer);
         }
         if (settings.comm_settings.enable_put &&
             settings.comm_settings.enable_lock_all) {
             MPI_Win_lock_all(0, this->comm_struct.window_recv_buffer);
+            MPI_Win_lock_all(0, this->comm_struct.window_cpu_recv_buffer);
         }
         if (settings.comm_settings.enable_one_by_one &&
             settings.comm_settings.enable_lock_all) {
@@ -630,6 +645,7 @@ void exchange_boundary_onesided(
     auto remote_put = comm_struct.remote_put->get_data();
     auto put_displacements = comm_struct.put_displacements->get_const_data();
     auto send_buffer = comm_struct.send_buffer->get_values();
+    auto cpu_send_buffer = comm_struct.cpu_send_buffer->get_values();
 
     auto num_neighbors_in = comm_struct.num_neighbors_in;
     auto local_num_neighbors_in = comm_struct.local_num_neighbors_in;
@@ -640,7 +656,8 @@ void exchange_boundary_onesided(
     auto remote_get = comm_struct.remote_get->get_data();
     auto get_displacements = comm_struct.get_displacements->get_const_data();
     auto recv_buffer = comm_struct.recv_buffer->get_values();
-    // bool* is_local_neighbor = comm_struct.is_local_neighbor.data();
+    auto cpu_recv_buffer = comm_struct.cpu_recv_buffer->get_values();
+    auto is_local_neighbor = comm_struct.is_local_neighbor;
 
     ValueType dummy = 1.0;
     auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
@@ -658,10 +675,25 @@ void exchange_boundary_onesided(
                         settings, global_solution->get_values(), send_buffer,
                         work_vector->get_values(), global_put, num_put, p,
                         comm_struct.is_local_neighbor);
-                    CommHelpers::transfer_buffer(
-                        settings, comm_struct.window_recv_buffer, send_buffer,
-                        global_put, num_put, p, neighbors_out,
-                        put_displacements, comm_struct.is_local_neighbor);
+                    if (settings.executor_string == "cuda" &&
+                        !is_local_neighbor[neighbors_out[p]]) {
+#if SCHW_HAVE_CUDA
+                        SCHWARZ_ASSERT_NO_CUDA_ERRORS(
+                            cudaMemcpy(&(cpu_send_buffer[num_put]),
+                                       &(send_buffer[num_put]),
+                                       ((global_put)[p])[0] * sizeof(ValueType),
+                                       cudaMemcpyDeviceToHost));
+#endif
+                        CommHelpers::transfer_buffer(
+                            settings, comm_struct.window_cpu_recv_buffer,
+                            cpu_send_buffer, global_put, num_put, p,
+                            neighbors_out, put_displacements);
+                    } else {
+                        CommHelpers::transfer_buffer(
+                            settings, comm_struct.window_recv_buffer,
+                            send_buffer, global_put, num_put, p, neighbors_out,
+                            put_displacements);
+                    }
                     num_put += (global_put[p])[0];
                 }
             }
@@ -670,6 +702,15 @@ void exchange_boundary_onesided(
         int num_get = 0;
         for (auto p = 0; p < num_neighbors_in; p++) {
             if ((global_get[p])[0] > 0) {
+                if (settings.executor_string == "cuda" &&
+                    !is_local_neighbor[neighbors_out[p]]) {
+#if SCHW_HAVE_CUDA
+                    SCHWARZ_ASSERT_NO_CUDA_ERRORS(cudaMemcpy(
+                        &(recv_buffer[num_get]), &(cpu_recv_buffer[num_get]),
+                        ((global_get)[p])[0] * sizeof(ValueType),
+                        cudaMemcpyHostToDevice));
+#endif
+                }
                 CommHelpers::unpack_buffer(
                     settings, global_solution->get_values(), recv_buffer,
                     work_vector->get_values(), global_get, num_get, p,
@@ -691,16 +732,41 @@ void exchange_boundary_onesided(
                         settings, global_solution->get_values(), send_buffer,
                         work_vector->get_values(), global_put, num_put, p,
                         comm_struct.is_local_neighbor);
+                    if (settings.executor_string == "cuda" &&
+                        !is_local_neighbor[neighbors_out[p]]) {
+#if SCHW_HAVE_CUDA
+                        SCHWARZ_ASSERT_NO_CUDA_ERRORS(
+                            cudaMemcpy(&(cpu_send_buffer[num_put]),
+                                       &(send_buffer[num_put]),
+                                       ((global_put)[p])[0] * sizeof(ValueType),
+                                       cudaMemcpyDeviceToHost));
+#endif
+                    }
                 }
                 num_put += (global_put[p])[0];
             }
             int num_get = 0;
             for (auto p = 0; p < num_neighbors_in; p++) {
                 if ((global_get[p])[0] > 0) {
-                    CommHelpers::transfer_buffer(
-                        settings, comm_struct.window_send_buffer, recv_buffer,
-                        global_get, num_get, p, neighbors_in, get_displacements,
-                        comm_struct.is_local_neighbor);
+                    if (settings.executor_string == "cuda" &&
+                        !is_local_neighbor[neighbors_in[p]]) {
+                        CommHelpers::transfer_buffer(
+                            settings, comm_struct.window_cpu_send_buffer,
+                            cpu_recv_buffer, global_get, num_get, p,
+                            neighbors_in, get_displacements);
+#if SCHW_HAVE_CUDA
+                        SCHWARZ_ASSERT_NO_CUDA_ERRORS(
+                            cudaMemcpy(&(recv_buffer[num_get]),
+                                       &(cpu_recv_buffer[num_get]),
+                                       ((global_get)[p])[0] * sizeof(ValueType),
+                                       cudaMemcpyHostToDevice));
+#endif
+                    } else {
+                        CommHelpers::transfer_buffer(
+                            settings, comm_struct.window_send_buffer,
+                            recv_buffer, global_get, num_get, p, neighbors_in,
+                            get_displacements);
+                    }
                     CommHelpers::unpack_buffer(
                         settings, global_solution->get_values(), recv_buffer,
                         work_vector->get_values(), global_get, num_get, p,

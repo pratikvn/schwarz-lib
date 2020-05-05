@@ -122,8 +122,7 @@ template <typename ValueType, typename IndexType>
 void transfer_buffer(const Settings &settings, MPI_Win &window,
                      ValueType *target_buffer, IndexType **num_elems,
                      const int offset, const int target_subd,
-                     const IndexType *neighbors, const IndexType *displacements,
-                     std::vector<bool> &is_local_neighbor)
+                     const IndexType *neighbors, const IndexType *displacements)
 {
     ValueType dummy = 1.0;
     auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);

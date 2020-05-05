@@ -116,7 +116,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     metadata.precond_max_block_size = FLAGS_precond_max_block_size;
     settings.matrix_filename = FLAGS_matrix_filename;
     settings.explicit_laplacian = FLAGS_explicit_laplacian;
-    settings.enable_random_rhs = FLAGS_enable_random_rhs;
+    settings.rhs_type = FLAGS_rhs_type;
     settings.overlap = FLAGS_overlap;
     settings.naturally_ordered_factor = FLAGS_factor_ordering_natural;
     settings.reorder = FLAGS_local_reordering;
@@ -147,7 +147,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     }
     settings.debug_print = FLAGS_debug;
 
-    //Event settings
+    // Event settings
     metadata.constant = FLAGS_constant;
     metadata.gamma = FLAGS_gamma;
 
@@ -190,28 +190,22 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
                               filename_recv);
     }
 
-    //Print final solution to file
-    
-    char name[30];;
-    strcpy(name, "final.txt");
- 
-    std::ofstream fp;
-    if(metadata.my_rank == 0)
-    {
-       fp.open(name);
-       auto num_elem = explicit_laplacian_solution->get_size()[0];
-       auto dim = (int) sqrt(num_elem);
-       
-       //iterating over
-       for (auto i = 0; i < num_elem; i++)
-       {
-           if (i % dim == 0 && i != 0) fp << std::endl;
-           fp << explicit_laplacian_solution->get_values()[i] << "  ";
-       }
-
-       fp.close();
+    if (FLAGS_debug) {
+        // Print final solution to file
+        std::string fname("final_sol.csv");
+        std::ofstream fp;
+        if (metadata.my_rank == 0) {
+            fp.open(fname);
+            auto num_elem = explicit_laplacian_solution->get_size()[0];
+            auto dim = (int)sqrt(num_elem);
+            // iterating over
+            for (auto i = 0; i < num_elem; i++) {
+                if (i % dim == 0 && i != 0) fp << std::endl;
+                fp << explicit_laplacian_solution->get_values()[i] << ",";
+            }
+            fp.close();
+        }
     }
-    
 }
 
 

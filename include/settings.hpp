@@ -121,7 +121,7 @@ struct Settings {
     /**
      * Flag to enable a random rhs.
      */
-    bool enable_random_rhs = false;
+    std::string rhs_type = "ones";
 
     /**
      * Flag to enable printing of matrices.
@@ -243,7 +243,6 @@ struct Settings {
          * Use lock all.
          */
         bool enable_lock_all = true;
-    
     };
     comm_settings comm_settings;
 

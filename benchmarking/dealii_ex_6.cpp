@@ -187,7 +187,7 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
     metadata.num_threads = FLAGS_num_threads;
     metadata.oned_laplacian_size = FLAGS_set_1d_laplacian_size;
 
-    //Event comm settings
+    // Event comm settings
     metadata.constant = FLAGS_constant;
     metadata.gamma = FLAGS_gamma;
 
@@ -249,7 +249,7 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
     metadata.precond_max_block_size = FLAGS_precond_max_block_size;
     settings.matrix_filename = FLAGS_matrix_filename;
     settings.explicit_laplacian = FLAGS_explicit_laplacian;
-    settings.enable_random_rhs = FLAGS_enable_random_rhs;
+    settings.rhs_type = FLAGS_rhs_type;
     settings.overlap = FLAGS_overlap;
     settings.naturally_ordered_factor = FLAGS_factor_ordering_natural;
     settings.reorder = FLAGS_local_reordering;

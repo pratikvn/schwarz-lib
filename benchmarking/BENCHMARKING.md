@@ -32,7 +32,7 @@ Where `[FLAGS]` are the options below with the template [`flag_name [type][defau
 * `global_convergence_type` [std::string][centralized-tree] : Choose the convergence detection algorithm for onesided.
 * `enable_decentralized_accumulate` [bool][false] : Use accumulate strategy for decentralized convergence check..
 * `explicit_laplacian` [bool][false] : Use the explicit laplacian instead of deal.ii's matrix.
-* `enable_random_rhs` [bool][false] : Use a random rhs instead of the default 1.0's .
+* `rhs_type` [bool][false] : Use a random rhs instead of the default 1.0's .
 * `overlap` [uint32][2] : Overlap between the domains.
 * `executor` [std::string][reference] : The executor used to run the solver, one of `reference`, `cuda` or `omp`.
 * `flush_type` [std::string][flush-all] : The window flush strategy. The choices are `flush-local` and `flush-all`.

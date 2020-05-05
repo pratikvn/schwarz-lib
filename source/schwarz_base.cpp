@@ -165,21 +165,21 @@ void SchwarzBase<ValueType, IndexType>::initialize(
 
     // Setup the right hand side vector.
     std::vector<ValueType> rhs(metadata.global_size, 1.0);
-    if (settings.enable_random_rhs && settings.explicit_laplacian) {
-        if (metadata.my_rank == 0) {
+    if (metadata.my_rank == 0 && settings.explicit_laplacian) {
+        if (settings.rhs_type == "random") {
             Initialize<ValueType, IndexType>::generate_random_rhs(rhs);
+            std::cout << "Random rhs." << std::endl;
+        } else if (settings.rhs_type == "sinusoidal") {
+            Initialize<ValueType, IndexType>::generate_sin_rhs(rhs);
+            std::cout << "Sinusoidal rhs." << std::endl;
+        } else if (settings.rhs_type == "dipole") {
+            Initialize<ValueType, IndexType>::generate_dipole_rhs(rhs);
+            std::cout << "Dipole rhs." << std::endl;
+        } else {
+            std::cout << "Default rhs with ones." << std::endl;
         }
     }
 
-    //CHANGED - adding dipole / sinusoidal source    
-    if (!settings.enable_random_rhs && settings.explicit_laplacian){
-        if(metadata.my_rank == 0){
-           Initialize<ValueType, IndexType>::generate_sin_rhs(rhs);
-           //Initialize<ValueType, IndexType>::generate_dipole_rhs(rhs);
-        }
-    }
-    //END CHANGED
- 
 #if SCHW_HAVE_DEALII
     if (metadata.my_rank == 0 && !settings.explicit_laplacian) {
         std::copy(system_rhs.begin(), system_rhs.begin() + metadata.global_size,
@@ -334,14 +334,12 @@ void SchwarzBase<ValueType, IndexType>::run(
     std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
 
-    //CHANGED
     auto num_neighbors_out = this->comm_struct.num_neighbors_out;
     auto neighbors_out = this->comm_struct.neighbors_out->get_data();
 
     // The last communicated solution vector
     std::shared_ptr<vec_vtype> last_solution = vec_vtype::create(
         settings.executor, gko::dim<2>(metadata.global_size, 1));
-    //END CHANGED
 
     // A work vector.
     std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
@@ -367,11 +365,10 @@ void SchwarzBase<ValueType, IndexType>::run(
     metadata.iter_count = 0;
     int num_converged_procs = 0;
 
-    std::ofstream fps; //file for sending log
-    std::ofstream fpr; //file for receiving log
-    if(settings.debug_print)
-    {
-        //Opening files for event logs
+    std::ofstream fps;  // file for sending log
+    std::ofstream fpr;  // file for receiving log
+    if (settings.debug_print) {
+        // Opening files for event logs
         char send_name[30], recv_name[30], pe_str[3];
         sprintf(pe_str, "%d", metadata.my_rank);
 
@@ -386,16 +383,19 @@ void SchwarzBase<ValueType, IndexType>::run(
         fps.open(send_name);
         fpr.open(recv_name);
     }
-    
-    if(metadata.my_rank == 0) std::cout << "Constant - " << metadata.constant << ", Gamma - " << metadata.gamma <<std::endl;
-    
+
+    if (metadata.my_rank == 0)
+        std::cout << "Constant - " << metadata.constant << ", Gamma - "
+                  << metadata.gamma << std::endl;
+
     auto start_time = std::chrono::steady_clock::now();
 
     for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
         // Exchange the boundary values. The communication part.
         MEASURE_ELAPSED_FUNC_TIME(
-            this->exchange_boundary(settings, metadata, global_solution, last_solution, fps, fpr), 0,
-            metadata.my_rank, boundary_exchange, metadata.iter_count);
+            this->exchange_boundary(settings, metadata, global_solution,
+                                    last_solution, fps, fpr),
+            0, metadata.my_rank, boundary_exchange, metadata.iter_count);
 
         // Update the boundary and interior values after the exchanging from
         // other processes.
@@ -405,8 +405,9 @@ void SchwarzBase<ValueType, IndexType>::run(
                                   this->interface_matrix),
             1, metadata.my_rank, boundary_update, metadata.iter_count);
 
-        if(settings.debug_print)
-             fps << metadata.iter_count << ", " << local_residual_norm << std::endl;
+        if (settings.debug_print)
+            fps << metadata.iter_count << ", " << local_residual_norm
+                << std::endl;
 
         // Check for the convergence of the solver.
         // num_converged_procs = 0;
@@ -451,36 +452,38 @@ void SchwarzBase<ValueType, IndexType>::run(
     auto elapsed_time = std::chrono::duration<ValueType>(
         std::chrono::steady_clock::now() - start_time);
 
-    if(settings.debug_print)
-    {
-       //Closing event log files
-       fps.close();
-       fpr.close();
+    if (settings.debug_print) {
+        // Closing event log files
+        fps.close();
+        fpr.close();
     }
-   
-    //adding 1 to include the 0-th iteration
+
+    // adding 1 to include the 0-th iteration
     metadata.iter_count = metadata.iter_count + 1;
 
-    //number of messages a PE would send without event-based
+    // number of messages a PE would send without event-based
     int noevent_msg_count = metadata.iter_count * num_neighbors_out;
 
     int total_events = 0;
 
-    //Printing msg count
+    // Printing msg count
     for (int k = 0; k < num_neighbors_out; k++) {
-	std::cout << " Rank: " << metadata.my_rank << " to "
-	      << neighbors_out[k] << " : " << this->comm_struct.msg_count->get_data()[k];
+        std::cout << " Rank: " << metadata.my_rank << " to " << neighbors_out[k]
+                  << " : " << this->comm_struct.msg_count->get_data()[k];
         total_events += this->comm_struct.msg_count->get_data()[k];
     }
     std::cout << std::endl;
 
-    //Total no of messages in all PEs
-    MPI_Allreduce(MPI_IN_PLACE, &total_events, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-    MPI_Allreduce(MPI_IN_PLACE, &noevent_msg_count, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    // Total no of messages in all PEs
+    MPI_Allreduce(MPI_IN_PLACE, &total_events, 1, MPI_INT, MPI_SUM,
+                  MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, &noevent_msg_count, 1, MPI_INT, MPI_SUM,
+                  MPI_COMM_WORLD);
 
-    if(metadata.my_rank == 0){
-      std::cout << "Total number of events - " << total_events << std::endl;
-      std::cout << "Total number of msgs without event - " << noevent_msg_count << std::endl;
+    if (metadata.my_rank == 0) {
+        std::cout << "Total number of events - " << total_events << std::endl;
+        std::cout << "Total number of msgs without event - "
+                  << noevent_msg_count << std::endl;
     }
 
     std::cout << " Rank " << metadata.my_rank << " converged in "

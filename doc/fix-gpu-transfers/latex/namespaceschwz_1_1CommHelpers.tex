@@ -1,0 +1,28 @@
+\hypertarget{namespaceschwz_1_1CommHelpers}{}\section{schwz\+:\+:Comm\+Helpers Namespace Reference}
+\label{namespaceschwz_1_1CommHelpers}\index{schwz\+::\+Comm\+Helpers@{schwz\+::\+Comm\+Helpers}}
+
+
+The Comm\+Helper namespace .  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1CommHelpers_a2ec36b7c44dc5aa2650fa2aedbfa0f93}\label{namespaceschwz_1_1CommHelpers_a2ec36b7c44dc5aa2650fa2aedbfa0f93}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries transfer\+\_\+one\+\_\+by\+\_\+one} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, M\+P\+I\+\_\+\+Win \&window, Value\+Type $\ast$buffer, Index\+Type $\ast$$\ast$offset, const int num\+\_\+neighbors, const Index\+Type $\ast$neighbors)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1CommHelpers_a4407510891fd56c91940d8ff12e172d9}\label{namespaceschwz_1_1CommHelpers_a4407510891fd56c91940d8ff12e172d9}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries pack\+\_\+buffer} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, Value\+Type $\ast$buffer, Value\+Type $\ast$send\+\_\+buffer, Value\+Type $\ast$work\+\_\+vector, Index\+Type $\ast$$\ast$num\+\_\+send\+\_\+elems, const int offset, const int send\+\_\+subd, std\+::vector$<$ bool $>$ \&is\+\_\+local\+\_\+neighbor)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1CommHelpers_a50ed2dd8908c8d6a42ed4149fcaa0bb0}\label{namespaceschwz_1_1CommHelpers_a50ed2dd8908c8d6a42ed4149fcaa0bb0}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries transfer\+\_\+buffer} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, M\+P\+I\+\_\+\+Win \&window, Value\+Type $\ast$target\+\_\+buffer, Index\+Type $\ast$$\ast$num\+\_\+elems, const int offset, const int target\+\_\+subd, const Index\+Type $\ast$neighbors, const Index\+Type $\ast$displacements)
+\item 
+\mbox{\Hypertarget{namespaceschwz_1_1CommHelpers_ac841a73655ae4b95495192709730563c}\label{namespaceschwz_1_1CommHelpers_ac841a73655ae4b95495192709730563c}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries unpack\+\_\+buffer} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, Value\+Type $\ast$buffer, Value\+Type $\ast$recv\+\_\+buffer, Value\+Type $\ast$work\+\_\+vector, Index\+Type $\ast$$\ast$num\+\_\+recv\+\_\+elems, const int offset, const int recv\+\_\+subd, std\+::vector$<$ bool $>$ \&is\+\_\+local\+\_\+neighbor)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The Comm\+Helper namespace . 
+
+comm\+\_\+helpers 

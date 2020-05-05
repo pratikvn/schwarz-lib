@@ -1,0 +1,195 @@
+\hypertarget{classschwz_1_1SchwarzBase}{}\section{schwz\+:\+:Schwarz\+Base$<$ Value\+Type, Index\+Type $>$ Class Template Reference}
+\label{classschwz_1_1SchwarzBase}\index{schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$@{schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$}}
+
+
+The Base solver class is meant to be the class implementing the common implementations for all the schwarz methods.  
+
+
+
+
+{\ttfamily \#include $<$schwarz\+\_\+base.\+hpp$>$}
+
+
+
+Collaboration diagram for schwz\+:\+:Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classschwz_1_1SchwarzBase__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classschwz_1_1SchwarzBase_ab746eb6bb1c40d110ebd03cef0ddb415}{Schwarz\+Base} (\hyperlink{structschwz_1_1Settings}{Settings} \&settings, \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata)
+\begin{DoxyCompactList}\small\item\em The constructor that takes in the user settings and a metadata struct containing the solver metadata. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_a276660ae87ca01cedce8846954b48d0f}\label{classschwz_1_1SchwarzBase_a276660ae87ca01cedce8846954b48d0f}} 
+void \hyperlink{classschwz_1_1SchwarzBase_a276660ae87ca01cedce8846954b48d0f}{initialize} ()
+\begin{DoxyCompactList}\small\item\em \hyperlink{classschwz_1_1Initialize}{Initialize} the matrix and vectors. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1SchwarzBase_ad4a01651b92f2bf44c4fedf8e1b9b33d}{run} (std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&solution)
+\begin{DoxyCompactList}\small\item\em The function that runs the actual solver and obtains the final solution. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1SchwarzBase_a432e5a033a82c5153dda2170ceb4a199}{print\+\_\+vector} (const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&vector, int subd, std\+::string name)
+\begin{DoxyCompactList}\small\item\em The auxiliary function that prints a passed in vector. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1SchwarzBase_ae671d00ba78877589cb082724c469ff6}{print\+\_\+matrix} (const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&matrix, int rank, std\+::string name)
+\begin{DoxyCompactList}\small\item\em The auxiliary function that prints a passed in C\+SR matrix. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_a64bdd55bbab23c6e21d0621cd84a299b}\label{classschwz_1_1SchwarzBase_a64bdd55bbab23c6e21d0621cd84a299b}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_a64bdd55bbab23c6e21d0621cd84a299b}{local\+\_\+matrix}
+\begin{DoxyCompactList}\small\item\em The local subdomain matrix. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_abd75e7b8624c8a4b6f364f143e9cea17}\label{classschwz_1_1SchwarzBase_abd75e7b8624c8a4b6f364f143e9cea17}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_abd75e7b8624c8a4b6f364f143e9cea17}{local\+\_\+perm}
+\begin{DoxyCompactList}\small\item\em The local subdomain permutation matrix/array. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_af126dde2a173950bfc320ade7e26170b}\label{classschwz_1_1SchwarzBase_af126dde2a173950bfc320ade7e26170b}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Permutation$<$ Index\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_af126dde2a173950bfc320ade7e26170b}{local\+\_\+inv\+\_\+perm}
+\begin{DoxyCompactList}\small\item\em The local subdomain inverse permutation matrix/array. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_ab69b039ef8d83be1c05136ada846a766}\label{classschwz_1_1SchwarzBase_ab69b039ef8d83be1c05136ada846a766}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_ab69b039ef8d83be1c05136ada846a766}{triangular\+\_\+factor\+\_\+l}
+\begin{DoxyCompactList}\small\item\em The local lower triangular factor used for the triangular solves. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_adfb4459647e875717ea8812859f09fea}\label{classschwz_1_1SchwarzBase_adfb4459647e875717ea8812859f09fea}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_adfb4459647e875717ea8812859f09fea}{triangular\+\_\+factor\+\_\+u}
+\begin{DoxyCompactList}\small\item\em The local upper triangular factor used for the triangular solves. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_a1e9742522b50a7bebe936b6540694f72}\label{classschwz_1_1SchwarzBase_a1e9742522b50a7bebe936b6540694f72}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_a1e9742522b50a7bebe936b6540694f72}{interface\+\_\+matrix}
+\begin{DoxyCompactList}\small\item\em The local interface matrix. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_a3539b68fb6ff07a8f58b1f990976dc90}\label{classschwz_1_1SchwarzBase_a3539b68fb6ff07a8f58b1f990976dc90}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_a3539b68fb6ff07a8f58b1f990976dc90}{global\+\_\+matrix}
+\begin{DoxyCompactList}\small\item\em The global matrix. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_ac28b3e811e6016f31836fe366ff56eb7}\label{classschwz_1_1SchwarzBase_ac28b3e811e6016f31836fe366ff56eb7}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_ac28b3e811e6016f31836fe366ff56eb7}{local\+\_\+rhs}
+\begin{DoxyCompactList}\small\item\em The local right hand side. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_a1a6313c3ce53d7868a1b87b807f1a1ce}\label{classschwz_1_1SchwarzBase_a1a6313c3ce53d7868a1b87b807f1a1ce}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_a1a6313c3ce53d7868a1b87b807f1a1ce}{global\+\_\+rhs}
+\begin{DoxyCompactList}\small\item\em The global right hand side. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_a81fafb870fb6ddae350f5e6f25715032}\label{classschwz_1_1SchwarzBase_a81fafb870fb6ddae350f5e6f25715032}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_a81fafb870fb6ddae350f5e6f25715032}{work\+\_\+vector}
+\begin{DoxyCompactList}\small\item\em A work vector on the device. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_a0f822191046b9abfe7433374d50e746a}\label{classschwz_1_1SchwarzBase_a0f822191046b9abfe7433374d50e746a}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_a0f822191046b9abfe7433374d50e746a}{cpu\+\_\+work\+\_\+vector}
+\begin{DoxyCompactList}\small\item\em The work vector on the C\+PU. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_a29ef68da307b6de9b8ae878df8fb19d4}\label{classschwz_1_1SchwarzBase_a29ef68da307b6de9b8ae878df8fb19d4}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_a29ef68da307b6de9b8ae878df8fb19d4}{local\+\_\+solution}
+\begin{DoxyCompactList}\small\item\em The local solution vector. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_a8e6f088b8a7112af2ce27285d8d91bcc}\label{classschwz_1_1SchwarzBase_a8e6f088b8a7112af2ce27285d8d91bcc}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_a8e6f088b8a7112af2ce27285d8d91bcc}{global\+\_\+solution}
+\begin{DoxyCompactList}\small\item\em The global solution vector. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_a1ecd383f150abee6b3076338ecc5e783}\label{classschwz_1_1SchwarzBase_a1ecd383f150abee6b3076338ecc5e783}} 
+std\+::vector$<$ Value\+Type $>$ \hyperlink{classschwz_1_1SchwarzBase_a1ecd383f150abee6b3076338ecc5e783}{local\+\_\+residual\+\_\+vector\+\_\+out}
+\begin{DoxyCompactList}\small\item\em The global residual vector. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_ae060fc8510ce947d893204693755dd97}\label{classschwz_1_1SchwarzBase_ae060fc8510ce947d893204693755dd97}} 
+std\+::vector$<$ std\+::vector$<$ Value\+Type $>$ $>$ \hyperlink{classschwz_1_1SchwarzBase_ae060fc8510ce947d893204693755dd97}{global\+\_\+residual\+\_\+vector\+\_\+out}
+\begin{DoxyCompactList}\small\item\em The local residual vector. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Value\+Type = gko\+::default\+\_\+precision, typename Index\+Type = gko\+::int32$>$\newline
+class schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$}
+
+The Base solver class is meant to be the class implementing the common implementations for all the schwarz methods. 
+
+It derives from the Initialization class, the Communication class and the \hyperlink{classschwz_1_1Solve}{Solve} class all of which are templated.
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Value\+Type} & The type of the floating point values. \\
+\hline
+{\em Index\+Type} & The type of the index type values. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_ab746eb6bb1c40d110ebd03cef0ddb415}\label{classschwz_1_1SchwarzBase_ab746eb6bb1c40d110ebd03cef0ddb415}} 
+\index{schwz\+::\+Schwarz\+Base@{schwz\+::\+Schwarz\+Base}!Schwarz\+Base@{Schwarz\+Base}}
+\index{Schwarz\+Base@{Schwarz\+Base}!schwz\+::\+Schwarz\+Base@{schwz\+::\+Schwarz\+Base}}
+\subsubsection{\texorpdfstring{Schwarz\+Base()}{SchwarzBase()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+\hyperlink{classschwz_1_1SchwarzBase}{schwz\+::\+Schwarz\+Base}$<$ Value\+Type, Index\+Type $>$\+::\hyperlink{classschwz_1_1SchwarzBase}{Schwarz\+Base} (\begin{DoxyParamCaption}\item[{\hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{\hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata }\end{DoxyParamCaption})}
+
+
+
+The constructor that takes in the user settings and a metadata struct containing the solver metadata. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+\end{DoxyParams}
+
+
+References schwz\+::\+Settings\+::cuda\+\_\+device\+\_\+guard, schwz\+::\+Settings\+::executor, schwz\+::\+Settings\+::executor\+\_\+string, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+num\+\_\+procs, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::mpi\+\_\+communicator, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::my\+\_\+local\+\_\+rank, and schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::my\+\_\+rank.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_ae671d00ba78877589cb082724c469ff6}\label{classschwz_1_1SchwarzBase_ae671d00ba78877589cb082724c469ff6}} 
+\index{schwz\+::\+Schwarz\+Base@{schwz\+::\+Schwarz\+Base}!print\+\_\+matrix@{print\+\_\+matrix}}
+\index{print\+\_\+matrix@{print\+\_\+matrix}!schwz\+::\+Schwarz\+Base@{schwz\+::\+Schwarz\+Base}}
+\subsubsection{\texorpdfstring{print\+\_\+matrix()}{print\_matrix()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type  = gko\+::default\+\_\+precision, typename Index\+Type  = gko\+::int32$>$ \\
+void \hyperlink{classschwz_1_1SchwarzBase}{schwz\+::\+Schwarz\+Base}$<$ Value\+Type, Index\+Type $>$\+::print\+\_\+matrix (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{matrix,  }\item[{int}]{rank,  }\item[{std\+::string}]{name }\end{DoxyParamCaption})}
+
+
+
+The auxiliary function that prints a passed in C\+SR matrix. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em matrix} & The matrix to be printed. \\
+\hline
+{\em subd} & The subdomain on which the vector exists. \\
+\hline
+{\em name} & The name of the matrix as a string. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_a432e5a033a82c5153dda2170ceb4a199}\label{classschwz_1_1SchwarzBase_a432e5a033a82c5153dda2170ceb4a199}} 
+\index{schwz\+::\+Schwarz\+Base@{schwz\+::\+Schwarz\+Base}!print\+\_\+vector@{print\+\_\+vector}}
+\index{print\+\_\+vector@{print\+\_\+vector}!schwz\+::\+Schwarz\+Base@{schwz\+::\+Schwarz\+Base}}
+\subsubsection{\texorpdfstring{print\+\_\+vector()}{print\_vector()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type  = gko\+::default\+\_\+precision, typename Index\+Type  = gko\+::int32$>$ \\
+void \hyperlink{classschwz_1_1SchwarzBase}{schwz\+::\+Schwarz\+Base}$<$ Value\+Type, Index\+Type $>$\+::print\+\_\+vector (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{vector,  }\item[{int}]{subd,  }\item[{std\+::string}]{name }\end{DoxyParamCaption})}
+
+
+
+The auxiliary function that prints a passed in vector. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vector} & The vector to be printed. \\
+\hline
+{\em subd} & The subdomain on which the vector exists. \\
+\hline
+{\em name} & The name of the vector as a string. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classschwz_1_1SchwarzBase_ad4a01651b92f2bf44c4fedf8e1b9b33d}\label{classschwz_1_1SchwarzBase_ad4a01651b92f2bf44c4fedf8e1b9b33d}} 
+\index{schwz\+::\+Schwarz\+Base@{schwz\+::\+Schwarz\+Base}!run@{run}}
+\index{run@{run}!schwz\+::\+Schwarz\+Base@{schwz\+::\+Schwarz\+Base}}
+\subsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classschwz_1_1SchwarzBase}{schwz\+::\+Schwarz\+Base}$<$ Value\+Type, Index\+Type $>$\+::run (\begin{DoxyParamCaption}\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{solution }\end{DoxyParamCaption})}
+
+
+
+The function that runs the actual solver and obtains the final solution. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em solution} & The solution vector. \\
+\hline
+\end{DoxyParams}
+
+
+References schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::cpu\+\_\+work\+\_\+vector, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::exchange\+\_\+boundary(), schwz\+::\+Settings\+::executor, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+matrix, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+rhs, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+solution, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::interface\+\_\+matrix, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+inv\+\_\+perm, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+matrix, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+perm, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+rhs, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+solution, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows(), schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::triangular\+\_\+factor\+\_\+l, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::triangular\+\_\+factor\+\_\+u, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type $>$\+::update\+\_\+boundary(), schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::work\+\_\+vector, and schwz\+::\+Settings\+::write\+\_\+iters\+\_\+and\+\_\+residuals.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+schwarz\+\_\+base.\+hpp (394983b)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/schwarz\+\_\+base.\+cpp (394983b)\end{DoxyCompactItemize}

@@ -292,12 +292,12 @@ private:
     /**
      * The local iterative solver residual criterion.
      */
-    std::shared_ptr<ResidualCriterionFactory> residual_criterion;
+    std::shared_ptr<gko::stop::Combined::Factory> combined_criterion;
 
-    /**
-     * The local iterative solver iteration criterion.
-     */
-    std::shared_ptr<IterationCriterionFactory> iteration_criterion;
+    // /**
+    //  * The local iterative solver iteration criterion.
+    //  */
+    // std::shared_ptr<IterationCriterionFactory> iteration_criterion;
 
     /**
      * The local iterative solver iteration criterion.

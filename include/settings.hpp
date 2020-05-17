@@ -186,6 +186,12 @@ struct Settings {
     bool write_iters_and_residuals = false;
 
     /**
+     * Flag to enable logging for local iterative solvers.
+     * Note: Probably will have a significant performance hit.
+     */
+    bool enable_logging = false;
+
+    /**
      * Enable the local permutations from CHOLMOD to a file.
      */
     bool write_perm_data = false;
@@ -388,6 +394,11 @@ struct Metadata {
      * The maximum iteration count of the local iterative solver.
      */
     IndexType local_max_iters;
+
+    /**
+     * The updated maximum iteration count of the local iterative solver.
+     */
+    IndexType updated_max_iters;
 
     /**
      * Local preconditioner.

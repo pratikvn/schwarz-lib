@@ -466,19 +466,23 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                       << " with restart iter " << settings.restart_iter
                       << std::endl;
         }
-        this->iteration_criterion = gko::stop::Iteration::build()
-                                        .with_max_iters(l_max_iters)
-                                        .on(settings.executor);
-        this->residual_criterion =
-            gko::stop::ResidualNormReduction<ValueType>::build()
-                .with_reduction_factor(metadata.local_solver_tolerance)
+        this->combined_criterion =
+            gko::stop::Combined::build()
+                .with_criteria(
+                    gko::stop::Iteration::build()
+                        .with_max_iters(l_max_iters)
+                        .on(settings.executor),
+                    gko::stop::ResidualNormReduction<ValueType>::build()
+                        .with_reduction_factor(metadata.local_solver_tolerance)
+                        .on(settings.executor))
                 .on(settings.executor);
-        this->record_logger = gko::log::Record::create(
-            settings.executor, settings.executor->get_mem_space(),
-            gko::log::Logger::iteration_complete_mask |
-                gko::log::Logger::criterion_check_completed_mask);
-        this->iteration_criterion->add_logger(this->record_logger);
-        this->residual_criterion->add_logger(this->record_logger);
+        if (settings.enable_logging) {
+            this->record_logger = gko::log::Record::create(
+                settings.executor, settings.executor->get_mem_space(),
+                gko::log::Logger::iteration_complete_mask |
+                    gko::log::Logger::criterion_check_completed_mask);
+            this->combined_criterion->add_logger(this->record_logger);
+        }
         if (settings.non_symmetric_matrix) {
             using solver = gko::solver::Gmres<ValueType>;
             using bj = gko::preconditioner::Jacobi<ValueType, IndexType>;
@@ -489,17 +493,16 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                                  "Block-Jacobi preconditioning "
                               << std::endl;
                 }
-                this->solver =
-                    solver::build()
-                        .with_criteria(iteration_criterion, residual_criterion)
-                        .with_krylov_dim(settings.restart_iter)
-                        .with_preconditioner(
-                            bj::build()
-                                .with_max_block_size(
-                                    metadata.precond_max_block_size)
-                                .on(settings.executor))
-                        .on(settings.executor)
-                        ->generate(local_matrix);
+                this->solver = solver::build()
+                                   .with_criteria(this->combined_criterion)
+                                   .with_krylov_dim(settings.restart_iter)
+                                   .with_preconditioner(
+                                       bj::build()
+                                           .with_max_block_size(
+                                               metadata.precond_max_block_size)
+                                           .on(settings.executor))
+                                   .on(settings.executor)
+                                   ->generate(local_matrix);
             } else if (metadata.local_precond == "ilu") {
                 if (metadata.my_rank == 0) {
                     std::cout
@@ -520,14 +523,13 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         .on(exec);
                 auto ilu_preconditioner =
                     ilu_pre_factory->generate(gko::share(par_ilu));
-                this->solver =
-                    solver::build()
-                        .with_criteria(iteration_criterion, residual_criterion)
-                        .with_krylov_dim(settings.restart_iter)
-                        .with_generated_preconditioner(
-                            gko::share(ilu_preconditioner))
-                        .on(settings.executor)
-                        ->generate(local_matrix);
+                this->solver = solver::build()
+                                   .with_criteria(this->combined_criterion)
+                                   .with_krylov_dim(settings.restart_iter)
+                                   .with_generated_preconditioner(
+                                       gko::share(ilu_preconditioner))
+                                   .on(settings.executor)
+                                   ->generate(local_matrix);
             } else if (metadata.local_precond == "isai") {
                 if (metadata.my_rank == 0) {
                     std::cout
@@ -545,26 +547,24 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         exec);
                 auto ilu_preconditioner =
                     ilu_pre_factory->generate(gko::share(local_matrix));
-                this->solver =
-                    solver::build()
-                        .with_criteria(iteration_criterion, residual_criterion)
-                        .with_krylov_dim(settings.restart_iter)
-                        .with_generated_preconditioner(
-                            gko::share(ilu_preconditioner))
-                        .on(settings.executor)
-                        ->generate(local_matrix);
+                this->solver = solver::build()
+                                   .with_criteria(this->combined_criterion)
+                                   .with_krylov_dim(settings.restart_iter)
+                                   .with_generated_preconditioner(
+                                       gko::share(ilu_preconditioner))
+                                   .on(settings.executor)
+                                   ->generate(local_matrix);
             } else if (metadata.local_precond == "null") {
                 if (metadata.my_rank == 0) {
                     std::cout << " Local Ginkgo iterative solve(GMRES) with no "
                                  "preconditioning "
                               << std::endl;
                 }
-                this->solver =
-                    solver::build()
-                        .with_criteria(iteration_criterion, residual_criterion)
-                        .with_krylov_dim(settings.restart_iter)
-                        .on(settings.executor)
-                        ->generate(local_matrix);
+                this->solver = solver::build()
+                                   .with_criteria(this->combined_criterion)
+                                   .with_krylov_dim(settings.restart_iter)
+                                   .on(settings.executor)
+                                   ->generate(local_matrix);
             } else {
                 std::cerr << "Unsupported preconditioner." << std::endl;
             }
@@ -578,16 +578,15 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                                  "Block-Jacobi preconditioning "
                               << std::endl;
                 }
-                this->solver =
-                    solver::build()
-                        .with_criteria(iteration_criterion, residual_criterion)
-                        .with_preconditioner(
-                            bj::build()
-                                .with_max_block_size(
-                                    metadata.precond_max_block_size)
-                                .on(settings.executor))
-                        .on(settings.executor)
-                        ->generate(local_matrix);
+                this->solver = solver::build()
+                                   .with_criteria(this->combined_criterion)
+                                   .with_preconditioner(
+                                       bj::build()
+                                           .with_max_block_size(
+                                               metadata.precond_max_block_size)
+                                           .on(settings.executor))
+                                   .on(settings.executor)
+                                   ->generate(local_matrix);
             } else if (metadata.local_precond == "ilu") {
                 if (metadata.my_rank == 0) {
                     std::cout
@@ -608,13 +607,12 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         .on(exec);
                 auto ilu_preconditioner =
                     ilu_pre_factory->generate(gko::share(par_ilu));
-                this->solver =
-                    solver::build()
-                        .with_criteria(iteration_criterion, residual_criterion)
-                        .with_generated_preconditioner(
-                            gko::share(ilu_preconditioner))
-                        .on(settings.executor)
-                        ->generate(local_matrix);
+                this->solver = solver::build()
+                                   .with_criteria(this->combined_criterion)
+                                   .with_generated_preconditioner(
+                                       gko::share(ilu_preconditioner))
+                                   .on(settings.executor)
+                                   ->generate(local_matrix);
             } else if (metadata.local_precond == "isai") {
                 if (metadata.my_rank == 0) {
                     std::cout << " Local Ginkgo iterative solve(CG) with ISAI"
@@ -632,24 +630,22 @@ void Solve<ValueType, IndexType>::setup_local_solver(
                         .on(exec);
                 auto ilu_preconditioner =
                     ilu_pre_factory->generate(gko::share(local_matrix));
-                this->solver =
-                    solver::build()
-                        .with_criteria(iteration_criterion, residual_criterion)
-                        .with_generated_preconditioner(
-                            gko::share(ilu_preconditioner))
-                        .on(settings.executor)
-                        ->generate(local_matrix);
+                this->solver = solver::build()
+                                   .with_criteria(this->combined_criterion)
+                                   .with_generated_preconditioner(
+                                       gko::share(ilu_preconditioner))
+                                   .on(settings.executor)
+                                   ->generate(local_matrix);
             } else if (metadata.local_precond == "null") {
                 if (metadata.my_rank == 0) {
                     std::cout << " Local Ginkgo iterative solve(CG) with no "
                                  "preconditioning "
                               << std::endl;
                 }
-                this->solver =
-                    solver::build()
-                        .with_criteria(iteration_criterion, residual_criterion)
-                        .on(settings.executor)
-                        ->generate(local_matrix);
+                this->solver = solver::build()
+                                   .with_criteria(this->combined_criterion)
+                                   .on(settings.executor)
+                                   ->generate(local_matrix);
             } else {
                 std::cerr << "Unsupported preconditioner." << std::endl;
             }
@@ -724,24 +720,56 @@ void Solve<ValueType, IndexType>::local_solve(
         local_inv_perm->apply(perm_sol.get(), local_solution.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_ginkgo) {
+        int new_max_iters = 0;
+        if (metadata.updated_max_iters == -1) {
+            new_max_iters = local_matrix->get_size()[0];
+        } else {
+            new_max_iters = metadata.updated_max_iters;
+        }
+        this->combined_criterion =
+            gko::stop::Combined::build()
+                .with_criteria(
+                    gko::stop::Iteration::build()
+                        .with_max_iters(new_max_iters)
+                        .on(settings.executor),
+                    gko::stop::ResidualNormReduction<ValueType>::build()
+                        .with_reduction_factor(metadata.local_solver_tolerance)
+                        .on(settings.executor))
+                .on(settings.executor);
+        if (settings.enable_logging) {
+            this->combined_criterion->add_logger(this->record_logger);
+        }
+        if (settings.non_symmetric_matrix) {
+            gko::as<gko::solver::Gmres<ValueType>>(this->solver.get())
+                ->set_stop_criterion_factory(this->combined_criterion);
+        } else {
+            gko::as<gko::solver::Cg<ValueType>>(this->solver.get())
+                ->set_stop_criterion_factory(this->combined_criterion);
+        }
         SolverTools::solve_iterative_ginkgo(settings, metadata, this->solver,
                                             local_solution, init_guess);
-        auto res_exec = this->record_logger->get()
-                            .criterion_check_completed.back()
-                            ->residual.get();
-        auto res_vec = gko::as<gko::matrix::Dense<ValueType>>(res_exec);
-        auto rnorm_d = vec::create(settings.executor, gko::dim<2>(1, 1));
-        res_vec->compute_norm2(rnorm_d.get());
-        auto rnorm =
-            vec::create(settings.executor->get_master(), gko::dim<2>(1, 1));
-        rnorm->copy_from(rnorm_d.get());
-        auto conv_iter_count = this->record_logger->get()
-                                   .criterion_check_completed.back()
-                                   ->num_iterations;
-        metadata.post_process_data.local_converged_iter_count.push_back(
-            static_cast<IndexType>(conv_iter_count));
-        metadata.post_process_data.local_converged_resnorm.push_back(
-            rnorm->at(0));
+        if (settings.enable_logging) {
+            auto res_exec = this->record_logger->get()
+                                .criterion_check_completed.back()
+                                ->residual.get();
+            auto res_vec = gko::as<gko::matrix::Dense<ValueType>>(res_exec);
+            auto rnorm_d = vec::create(settings.executor, gko::dim<2>(1, 1));
+            res_vec->compute_norm2(rnorm_d.get());
+            auto rnorm =
+                vec::create(settings.executor->get_master(), gko::dim<2>(1, 1));
+            rnorm->copy_from(rnorm_d.get());
+            auto conv_iter_count = this->record_logger->get()
+                                       .criterion_check_completed.back()
+                                       ->num_iterations;
+            metadata.post_process_data.local_converged_iter_count.push_back(
+                static_cast<IndexType>(conv_iter_count));
+            metadata.post_process_data.local_converged_resnorm.push_back(
+                rnorm->at(0));
+        } else {
+            metadata.post_process_data.local_converged_iter_count.push_back(
+                static_cast<IndexType>(0));
+            metadata.post_process_data.local_converged_resnorm.push_back(0.0);
+        }
         local_solution->copy_from(init_guess.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_dealii) {

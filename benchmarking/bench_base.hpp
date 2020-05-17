@@ -109,6 +109,8 @@ DEFINE_bool(print_config, true, "Print the configuration of the run ");
 DEFINE_string(
     partition, "regular",
     "The partitioner used. The choices are metis, regular, regular2d");
+DEFINE_bool(enable_logging, false,
+            "Enable some logs for the local iterative solver. ");
 DEFINE_string(local_solver, "iterative-ginkgo",
               "The local solver used in the local domains. The current choices "
               "include direct-cholmod , direct-ginkgo or iterative-ginkgo");
@@ -125,6 +127,9 @@ DEFINE_bool(factor_ordering_natural, false,
             "ordering. ");
 DEFINE_int32(local_max_iters, -1,
              "Number of maximum iterations for the local iterative solver");
+DEFINE_int32(
+    updated_max_iters, -1,
+    "Number of updated maximum iterations for the local iterative solver");
 DEFINE_string(local_precond, "null",
               "Choices are ilu, isai and block-jacobi for the local "
               "iterative solver. ");

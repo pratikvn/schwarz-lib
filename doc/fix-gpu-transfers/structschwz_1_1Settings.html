@@ -196,6 +196,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a5555cf4340e7918ce22d00b26ccca6a7">write_iters_and_residuals</a> = false</td></tr>
 <tr class="memdesc:a5555cf4340e7918ce22d00b26ccca6a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable writing the iters and residuals to a file. <br /></td></tr>
 <tr class="separator:a5555cf4340e7918ce22d00b26ccca6a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b683340720aadaba85255580483f684"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a2b683340720aadaba85255580483f684">enable_logging</a> = false</td></tr>
+<tr class="memdesc:a2b683340720aadaba85255580483f684"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to enable logging for local iterative solvers.  <a href="#a2b683340720aadaba85255580483f684">More...</a><br /></td></tr>
+<tr class="separator:a2b683340720aadaba85255580483f684"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af692ca8550d16b538dcfddb5208e73f3"><td class="memItemLeft" align="right" valign="top"><a id="af692ca8550d16b538dcfddb5208e73f3"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#af692ca8550d16b538dcfddb5208e73f3">write_perm_data</a> = false</td></tr>
 <tr class="memdesc:af692ca8550d16b538dcfddb5208e73f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the local permutations from CHOLMOD to a file. <br /></td></tr>
@@ -223,6 +226,23 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div class="textblock"><p>The struct that contains the solver settings and the parameters to be set by the user. </p>
 <p>settings </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="a2b683340720aadaba85255580483f684"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b683340720aadaba85255580483f684">&#9670;&nbsp;</a></span>enable_logging</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool schwz::Settings::enable_logging = false</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Flag to enable logging for local iterative solvers. </p>
+<p>Note: Probably will have a significant performance hit. </p>
+
+</div>
+</div>
 <a id="a2af5f07901df047e305c456b2f97e774"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2af5f07901df047e305c456b2f97e774">&#9670;&nbsp;</a></span>explicit_laplacian</h2>
 
@@ -274,7 +294,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li><a class="el" href="settings_8hpp_source.html">settings.hpp (e0c2959)</a></li>
+<li><a class="el" href="settings_8hpp_source.html">settings.hpp (9aef2f5)</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

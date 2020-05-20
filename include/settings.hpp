@@ -158,6 +158,11 @@ struct Settings {
     unsigned int restart_iter = 1u;
 
     /**
+     * The global iter at which to reset the local solver criterion.
+     */
+    int reset_local_crit_iter = -1;
+
+    /**
      * Disables the re-ordering of the matrix before computing the triangular
      * factors during the CHOLMOD factorization
      *

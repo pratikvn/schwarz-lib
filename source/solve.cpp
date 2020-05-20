@@ -726,16 +726,20 @@ void Solve<ValueType, IndexType>::local_solve(
         } else {
             new_max_iters = metadata.updated_max_iters;
         }
-        this->combined_criterion =
-            gko::stop::Combined::build()
-                .with_criteria(
-                    gko::stop::Iteration::build()
-                        .with_max_iters(new_max_iters)
-                        .on(settings.executor),
-                    gko::stop::ResidualNormReduction<ValueType>::build()
-                        .with_reduction_factor(metadata.local_solver_tolerance)
-                        .on(settings.executor))
-                .on(settings.executor);
+        if (settings.reset_local_crit_iter != -1 &&
+            metadata.iter_count > settings.reset_local_crit_iter) {
+            this->combined_criterion =
+                gko::stop::Combined::build()
+                    .with_criteria(
+                        gko::stop::Iteration::build()
+                            .with_max_iters(new_max_iters)
+                            .on(settings.executor),
+                        gko::stop::ResidualNormReduction<ValueType>::build()
+                            .with_reduction_factor(
+                                metadata.local_solver_tolerance)
+                            .on(settings.executor))
+                    .on(settings.executor);
+        }
         if (settings.enable_logging) {
             this->combined_criterion->add_logger(this->record_logger);
         }

@@ -448,6 +448,7 @@ void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
     metadata.updated_max_iters = FLAGS_updated_max_iters;
     settings.non_symmetric_matrix = FLAGS_non_symmetric_matrix;
     settings.restart_iter = FLAGS_restart_iter;
+    settings.reset_local_crit_iter = FLAGS_reset_local_crit_iter;
     settings.enable_logging = FLAGS_enable_logging;
     metadata.precond_max_block_size = FLAGS_precond_max_block_size;
     settings.matrix_filename = FLAGS_matrix_filename;

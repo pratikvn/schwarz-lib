@@ -130,6 +130,8 @@ DEFINE_int32(local_max_iters, -1,
 DEFINE_int32(
     updated_max_iters, -1,
     "Number of updated maximum iterations for the local iterative solver");
+DEFINE_int32(reset_local_crit_iter, -1,
+             "The RAS iter count at which to reset the local iteration.");
 DEFINE_string(local_precond, "null",
               "Choices are ilu, isai and block-jacobi for the local "
               "iterative solver. ");

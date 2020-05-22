@@ -158,6 +158,11 @@ struct Settings {
     unsigned int restart_iter = 1u;
 
     /**
+     * The global iter at which to reset the local solver criterion.
+     */
+    int reset_local_crit_iter = -1;
+
+    /**
      * Disables the re-ordering of the matrix before computing the triangular
      * factors during the CHOLMOD factorization
      *
@@ -184,6 +189,12 @@ struct Settings {
      * Enable writing the iters and residuals to a file.
      */
     bool write_iters_and_residuals = false;
+
+    /**
+     * Flag to enable logging for local iterative solvers.
+     * Note: Probably will have a significant performance hit.
+     */
+    bool enable_logging = false;
 
     /**
      * Enable the local permutations from CHOLMOD to a file.
@@ -388,6 +399,11 @@ struct Metadata {
      * The maximum iteration count of the local iterative solver.
      */
     IndexType local_max_iters;
+
+    /**
+     * The updated maximum iteration count of the local iterative solver.
+     */
+    IndexType updated_max_iters;
 
     /**
      * Local preconditioner.

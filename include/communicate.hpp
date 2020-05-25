@@ -77,6 +77,16 @@ public:
         int num_neighbors_out;
 
         /**
+         * The total number of elements received from all neighbors
+         */
+        int num_recv;
+
+        /**
+         * The total number of elements sent to all neighbors
+         */
+        int num_send; 
+
+        /**
          * The neighbors this subdomain has to receive data from.
          */
         std::shared_ptr<gko::Array<IndexType>> neighbors_in;
@@ -186,19 +196,14 @@ public:
         std::shared_ptr<gko::matrix::Dense<ValueType>> recv_buffer;
 
         /**
+         * The extrapolation buffer used for extrapolation of values at the receiver
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> extra_buffer; 
+
+        /**
          * The last received boundary values for each of the in neighbors for extrapolation
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> last_recv_bdy;
-
-        /**
-         * The second last received boundary values for each of the in neighbors for extrapolation
-         */
-        std::shared_ptr<gko::matrix::Dense<ValueType>> sec_last_recv_bdy;
-
-        /**
-         * The second last received boundary values for each of the in neighbors for extrapolation
-        */
-        std::shared_ptr<gko::matrix::Dense<ValueType>> third_last_recv_bdy;
 
         /**
          * Average of values in the send buffer for each of the out neighbors
@@ -231,14 +236,24 @@ public:
         std::shared_ptr<gko::Array<IndexType>> last_recv_iter;
 
         /**
-         * Iteration stamp of second last received values
+         * Last recv slopes
          */
-        std::shared_ptr<gko::Array<IndexType>> sec_last_recv_iter;
+        std::shared_ptr<gko::matrix::Dense<ValueType>> last_recv_slopes;
 
         /**
-         * Iteration stamp of third last received values
+         * Last sent slopes
          */
-        std::shared_ptr<gko::Array<IndexType>> third_last_recv_iter; 
+        std::shared_ptr<gko::matrix::Dense<ValueType>> last_sent_slopes_avg;
+
+        /**
+         * Iteration stamp of last received values
+         */
+        std::shared_ptr<gko::Array<IndexType>> last_sent_iter;
+
+        /**
+         * Threshold
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> thres; 
 
         /**
          * The displacements for the receiving of the buffer.

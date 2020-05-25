@@ -102,9 +102,12 @@ public:
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &interface_matrix) override;
 
-    void get_threshold(
+    ValueType get_threshold(
          const Settings &settings,
-         const Metadata<ValueType, IndexType> &metadata); //metadata.iter_count is iter count
+         const Metadata<ValueType, IndexType> &metadata);
+
+    ValueType get_threshold(struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+                            IndexType p);
 };
 
 

@@ -124,6 +124,11 @@ struct Settings {
     std::string rhs_type = "ones";
 
     /**
+     * Flag to choose thres type. Choices are "cgammak" or "slope"
+     */
+    std::string thres_type = "cgammak";
+
+    /**
      * Flag to enable printing of matrices.
      */
     bool print_matrices = false;
@@ -418,6 +423,26 @@ struct Metadata {
      * Value of gamma for event threshold
      */
     ValueType gamma = 0.0;
+
+    /**
+     * Value of horizon for the event threshold
+     */
+    ValueType horizon = 0.0;
+
+    /**
+     * Value of history at the sender
+     */
+    IndexType sent_history = 0;
+
+    /**
+     * Value of history at the receiver
+     */
+    IndexType recv_history = 0;
+
+    /**
+     * Number of iterations to communicate before event comm
+     */
+    IndexType comm_start_iters = 0;
 
     /**
      * The struct used to measure the timings of each function within the solver

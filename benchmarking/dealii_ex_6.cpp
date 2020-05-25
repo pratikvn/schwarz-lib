@@ -187,10 +187,6 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
     metadata.num_threads = FLAGS_num_threads;
     metadata.oned_laplacian_size = FLAGS_set_1d_laplacian_size;
 
-    // Event comm settings
-    metadata.constant = FLAGS_constant;
-    metadata.gamma = FLAGS_gamma;
-
     // Generic settings
     settings.write_debug_out = FLAGS_enable_debug_write;
     settings.write_perm_data = FLAGS_write_perm_data;
@@ -279,6 +275,16 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
             schwz::Settings::local_solver_settings::direct_solver_ginkgo;
     }
     settings.debug_print = FLAGS_debug;
+
+    //Event Settings
+    metadata.constant = FLAGS_constant;
+    metadata.gamma = FLAGS_gamma;
+    metadata.horizon = FLAGS_horizon;
+    metadata.sent_history = FLAGS_sent_history;
+    metadata.recv_history = FLAGS_recv_history;
+    metadata.comm_start_iters = FLAGS_comm_start_iters;
+    settings.thres_type = FLAGS_thres_type;
+
     int gsize = 0;
     if (metadata.my_rank == 0) {
         metadata.global_size = system_matrix.m();
@@ -329,7 +335,7 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
                               metadata.comm_data_struct, filename_send,
                               filename_recv);
     }
-
+    
     if (metadata.my_rank == 0) {
         std::copy(solution_vector->get_values(),
                   solution_vector->get_values() + metadata.global_size,

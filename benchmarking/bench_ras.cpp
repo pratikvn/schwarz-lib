@@ -150,6 +150,10 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     // Event settings
     metadata.constant = FLAGS_constant;
     metadata.gamma = FLAGS_gamma;
+    metadata.horizon = FLAGS_horizon;
+    metadata.sent_history = FLAGS_sent_history;
+    metadata.recv_history = FLAGS_recv_history;
+    settings.thres_type = FLAGS_thres_type;
 
     // The global solution vector to be passed in to the RAS solver.
     std::shared_ptr<gko::matrix::Dense<ValueType>> explicit_laplacian_solution;

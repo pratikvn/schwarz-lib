@@ -84,7 +84,7 @@ public:
         /**
          * The total number of elements sent to all neighbors
          */
-        int num_send; 
+        int num_send;
 
         /**
          * The neighbors this subdomain has to receive data from.
@@ -196,12 +196,14 @@ public:
         std::shared_ptr<gko::matrix::Dense<ValueType>> recv_buffer;
 
         /**
-         * The extrapolation buffer used for extrapolation of values at the receiver
+         * The extrapolation buffer used for extrapolation of values at the
+         * receiver
          */
-        std::shared_ptr<gko::matrix::Dense<ValueType>> extra_buffer; 
+        std::shared_ptr<gko::matrix::Dense<ValueType>> extra_buffer;
 
         /**
-         * The last received boundary values for each of the in neighbors for extrapolation
+         * The last received boundary values for each of the in neighbors for
+         * extrapolation
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> last_recv_bdy;
 
@@ -211,7 +213,8 @@ public:
         std::shared_ptr<gko::matrix::Dense<ValueType>> curr_send_avg;
 
         /**
-         * Average of values in the last send buffer for each of the out neighbors
+         * Average of values in the last send buffer for each of the out
+         * neighbors
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> last_send_avg;
 
@@ -221,7 +224,8 @@ public:
         std::shared_ptr<gko::matrix::Dense<ValueType>> curr_recv_avg;
 
         /**
-         * Average of values in the last recv buffer for each of the out neighbors
+         * Average of values in the last recv buffer for each of the out
+         * neighbors
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> last_recv_avg;
 
@@ -253,7 +257,7 @@ public:
         /**
          * Threshold
          */
-        std::shared_ptr<gko::matrix::Dense<ValueType>> thres; 
+        std::shared_ptr<gko::matrix::Dense<ValueType>> thres;
 
         /**
          * The displacements for the receiving of the buffer.

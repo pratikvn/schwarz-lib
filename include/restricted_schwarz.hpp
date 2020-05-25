@@ -87,11 +87,12 @@ public:
         const Metadata<ValueType, IndexType> &metadata,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &main_buffer) override;
 
-    void exchange_boundary(const Settings &settings,
-                           const Metadata<ValueType, IndexType> &metadata,
-                           std::shared_ptr<gko::matrix::Dense<ValueType>> &solution,
-                           std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution,
-                           std::ofstream &fps, std::ofstream &fpr) override;
+    void exchange_boundary(
+        const Settings &settings,
+        const Metadata<ValueType, IndexType> &metadata,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &solution,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution,
+        std::ofstream &fps, std::ofstream &fpr) override;
 
     void update_boundary(
         const Settings &settings,
@@ -102,12 +103,12 @@ public:
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &interface_matrix) override;
 
-    ValueType get_threshold(
-         const Settings &settings,
-         const Metadata<ValueType, IndexType> &metadata);
+    ValueType get_threshold(const Settings &settings,
+                            const Metadata<ValueType, IndexType> &metadata);
 
-    ValueType get_threshold(struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
-                            IndexType p);
+    ValueType get_threshold(
+        struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+        IndexType p);
 };
 
 

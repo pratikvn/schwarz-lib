@@ -367,7 +367,7 @@ void SchwarzBase<ValueType, IndexType>::run(
 
     std::ofstream fps;  // file for sending log
     std::ofstream fpr;  // file for receiving log
-    
+
     if (settings.debug_print) {
         // Opening files for event logs
         char send_name[30], recv_name[30], pe_str[3];
@@ -386,8 +386,8 @@ void SchwarzBase<ValueType, IndexType>::run(
     }
 
     if (metadata.my_rank == 0) {
-        std::cout << "Send history - " << metadata.sent_history << ", Recv history - "
-                  << metadata.recv_history << std::endl;
+        std::cout << "Send history - " << metadata.sent_history
+                  << ", Recv history - " << metadata.recv_history << std::endl;
         std::cout << "Thres type - " << settings.thres_type << std::endl;
         std::cout << "Overlap - " << settings.overlap << std::endl;
     }
@@ -410,7 +410,7 @@ void SchwarzBase<ValueType, IndexType>::run(
             1, metadata.my_rank, boundary_update, metadata.iter_count);
 
         if (settings.debug_print) {
-            //fps << metadata.iter_count << ", " << local_residual_norm
+            // fps << metadata.iter_count << ", " << local_residual_norm
             //    << std::endl;
         }
 
@@ -490,7 +490,7 @@ void SchwarzBase<ValueType, IndexType>::run(
         std::cout << "Total number of msgs without event - "
                   << noevent_msg_count << std::endl;
     }
-   
+
     std::cout << " Rank " << metadata.my_rank << " converged in "
               << metadata.iter_count << " iters " << std::endl;
     ValueType mat_norm = -1.0, rhs_norm = -1.0, sol_norm = -1.0,

@@ -82,6 +82,8 @@ bool \hyperlink{structschwz_1_1Settings_a2af5f07901df047e305c456b2f97e774}{expli
 \mbox{\Hypertarget{structschwz_1_1Settings_aba9fca6688555f4d5eb902ca5f0706f3}\label{structschwz_1_1Settings_aba9fca6688555f4d5eb902ca5f0706f3}} 
 std\+::string \hyperlink{structschwz_1_1Settings_aba9fca6688555f4d5eb902ca5f0706f3}{rhs\+\_\+type} = \char`\"{}ones\char`\"{}
 \begin{DoxyCompactList}\small\item\em Flag to enable a random rhs. \end{DoxyCompactList}\item 
+std\+::string \hyperlink{structschwz_1_1Settings_a6ca3e3368be250c94af8330e293920db}{thres\+\_\+type} = \char`\"{}cgammak\char`\"{}
+\begin{DoxyCompactList}\small\item\em Flag to choose thres type. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structschwz_1_1Settings_afdf517a873a887a21a03b75c1011f903}\label{structschwz_1_1Settings_afdf517a873a887a21a03b75c1011f903}} 
 bool \hyperlink{structschwz_1_1Settings_afdf517a873a887a21a03b75c1011f903}{print\+\_\+matrices} = false
 \begin{DoxyCompactList}\small\item\em Flag to enable printing of matrices. \end{DoxyCompactList}\item 
@@ -174,8 +176,22 @@ Disables the re-\/ordering of the matrix before computing the triangular factors
 \begin{DoxyNote}{Note}
 This is mainly to allow compatibility with G\+PU solution. 
 \end{DoxyNote}
+\mbox{\Hypertarget{structschwz_1_1Settings_a6ca3e3368be250c94af8330e293920db}\label{structschwz_1_1Settings_a6ca3e3368be250c94af8330e293920db}} 
+\index{schwz\+::\+Settings@{schwz\+::\+Settings}!thres\+\_\+type@{thres\+\_\+type}}
+\index{thres\+\_\+type@{thres\+\_\+type}!schwz\+::\+Settings@{schwz\+::\+Settings}}
+\subsubsection{\texorpdfstring{thres\+\_\+type}{thres\_type}}
+{\footnotesize\ttfamily std\+::string schwz\+::\+Settings\+::thres\+\_\+type = \char`\"{}cgammak\char`\"{}}
+
+
+
+Flag to choose thres type. 
+
+Choices are \char`\"{}cgammak\char`\"{} or \char`\"{}slope\char`\"{} 
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::run(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type $>$\+::setup\+\_\+windows().
+
 
 
 The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-settings.\+hpp (912c1bd)\end{DoxyCompactItemize}
+settings.\+hpp (321b91c)\end{DoxyCompactItemize}

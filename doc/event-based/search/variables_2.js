@@ -11,5 +11,6 @@ var searchData=
   ['enable_5fput',['enable_put',['../structschwz_1_1Settings_1_1comm__settings.html#ad9b64e9c41ab52a3f58de7e190aabee0',1,'schwz::Settings::comm_settings']]],
   ['executor',['executor',['../structschwz_1_1Settings.html#a6920db9b39120b83399743083f17691f',1,'schwz::Settings']]],
   ['executor_5fstring',['executor_string',['../structschwz_1_1Settings.html#a088ed3524456a1fd40e76b0e2d624c79',1,'schwz::Settings']]],
-  ['explicit_5flaplacian',['explicit_laplacian',['../structschwz_1_1Settings.html#a2af5f07901df047e305c456b2f97e774',1,'schwz::Settings']]]
+  ['explicit_5flaplacian',['explicit_laplacian',['../structschwz_1_1Settings.html#a2af5f07901df047e305c456b2f97e774',1,'schwz::Settings']]],
+  ['extra_5fbuffer',['extra_buffer',['../structschwz_1_1Communicate_1_1comm__struct.html#a7d15316ac86bf03080faeb5dfbeec672',1,'schwz::Communicate::comm_struct']]]
 ];

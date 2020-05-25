@@ -82,6 +82,9 @@ $(function() {
 <li>comm_size
 : <a class="el" href="structschwz_1_1Metadata.html#aae2c0f118e53c26239ada9c3f71b0eae">schwz::Metadata&lt; ValueType, IndexType &gt;</a>
 </li>
+<li>comm_start_iters
+: <a class="el" href="structschwz_1_1Metadata.html#a716f809953505b19e0f1d9398c167bd4">schwz::Metadata&lt; ValueType, IndexType &gt;</a>
+</li>
 <li>constant
 : <a class="el" href="structschwz_1_1Metadata.html#aed13edafeb7b695ab134a594957b08da">schwz::Metadata&lt; ValueType, IndexType &gt;</a>
 </li>
@@ -157,6 +160,9 @@ $(function() {
 <li>explicit_laplacian
 : <a class="el" href="structschwz_1_1Settings.html#a2af5f07901df047e305c456b2f97e774">schwz::Settings</a>
 </li>
+<li>extra_buffer
+: <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a7d15316ac86bf03080faeb5dfbeec672">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
+</li>
 </ul>
 
 
@@ -216,6 +222,13 @@ $(function() {
 </ul>
 
 
+<h3><a id="index_h"></a>- h -</h3><ul>
+<li>horizon
+: <a class="el" href="structschwz_1_1Metadata.html#a9c12719250c5c44ca3096af308d93e4c">schwz::Metadata&lt; ValueType, IndexType &gt;</a>
+</li>
+</ul>
+
+
 <h3><a id="index_i"></a>- i -</h3><ul>
 <li>i_permutation
 : <a class="el" href="structschwz_1_1Metadata.html#a9ede19ac4f54b4161bed0a39bf7f5767">schwz::Metadata&lt; ValueType, IndexType &gt;</a>
@@ -245,8 +258,17 @@ $(function() {
 <li>last_recv_iter
 : <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#ad5e8ca98e2d75d3cd6193743ce61c2ea">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
 </li>
+<li>last_recv_slopes
+: <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#af946715f1db06364a11585db8b95d9c9">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
+</li>
 <li>last_send_avg
 : <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a1711878fc6041fd6be94d452907268ca">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
+</li>
+<li>last_sent_iter
+: <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#ae26de37aa77fceb895c49c734bbefd3b">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
+</li>
+<li>last_sent_slopes_avg
+: <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a32a942220dbd02a009bbecdc7ff92b27">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
 </li>
 <li>last_solution
 : <a class="el" href="classschwz_1_1SchwarzBase.html#a937e97d9de072f3058b57806b4b88b11">schwz::SchwarzBase&lt; ValueType, IndexType &gt;</a>
@@ -376,6 +398,12 @@ $(function() {
 <li>num_neighbors_out
 : <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#abc044f2335e50d56d367b37432aa6042">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
 </li>
+<li>num_recv
+: <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a9110aa5a3bff096b496b59a1b3283822">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
+</li>
+<li>num_send
+: <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#ac664bdbbf3b1373bfc09490567d76e6c">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
+</li>
 <li>num_subdomains
 : <a class="el" href="structschwz_1_1Metadata.html#aaba09003a5ffa4e8770d5f9f76d69d6b">schwz::Metadata&lt; ValueType, IndexType &gt;</a>
 </li>
@@ -439,6 +467,9 @@ $(function() {
 <li>recv_buffer
 : <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a78779301f90436a717cc8dcf50a5d717">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
 </li>
+<li>recv_history
+: <a class="el" href="structschwz_1_1Metadata.html#aa03846a987e8d185f1b35ce3a8155422">schwz::Metadata&lt; ValueType, IndexType &gt;</a>
+</li>
 <li>remote_get
 : <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a39335cd2ee211817d66189fa6bff7d04">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
 </li>
@@ -464,14 +495,11 @@ $(function() {
 <li>SchwarzBase()
 : <a class="el" href="classschwz_1_1SchwarzBase.html#ab746eb6bb1c40d110ebd03cef0ddb415">schwz::SchwarzBase&lt; ValueType, IndexType &gt;</a>
 </li>
-<li>sec_last_recv_bdy
-: <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a990b6fc845b61bd70bdf49583d48a231">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
-</li>
-<li>sec_last_recv_iter
-: <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a3425c5c8ba13672ac505000dc3088a65">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
-</li>
 <li>send_buffer
 : <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#aacb91f128f3bb0bf4cd5d43716bbbcee">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
+</li>
+<li>sent_history
+: <a class="el" href="structschwz_1_1Metadata.html#a2b400902089b06b47f230306b51252d5">schwz::Metadata&lt; ValueType, IndexType &gt;</a>
 </li>
 <li>setup_comm_buffers()
 : <a class="el" href="classschwz_1_1Communicate.html#ad77bbc19111a7b6ff79962d3a659a2cc">schwz::Communicate&lt; ValueType, IndexType &gt;</a>
@@ -501,11 +529,11 @@ $(function() {
 
 
 <h3><a id="index_t"></a>- t -</h3><ul>
-<li>third_last_recv_bdy
-: <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#afebb324417245d6dc62775fcf88ed921">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
+<li>thres
+: <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#add5822fd33a7a28050d54bcc59d8838d">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
 </li>
-<li>third_last_recv_iter
-: <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#ae4e2be3c4b7c1076ef26b769b8c742a0">schwz::Communicate&lt; ValueType, IndexType &gt;::comm_struct</a>
+<li>thres_type
+: <a class="el" href="structschwz_1_1Settings.html#a6ca3e3368be250c94af8330e293920db">schwz::Settings</a>
 </li>
 <li>time_struct
 : <a class="el" href="structschwz_1_1Metadata.html#a50bb2b3dc28c0eabbd423a069e560951">schwz::Metadata&lt; ValueType, IndexType &gt;</a>

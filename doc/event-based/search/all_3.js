@@ -13,5 +13,6 @@ var searchData=
   ['exchange_5fboundary',['exchange_boundary',['../classschwz_1_1Communicate.html#a40f61bcdae9d4d6a12091929944635a4',1,'schwz::Communicate::exchange_boundary()'],['../classschwz_1_1SolverRAS.html#a45aa596a569e246b5781af2dec84e9e7',1,'schwz::SolverRAS::exchange_boundary()']]],
   ['executor',['executor',['../structschwz_1_1Settings.html#a6920db9b39120b83399743083f17691f',1,'schwz::Settings']]],
   ['executor_5fstring',['executor_string',['../structschwz_1_1Settings.html#a088ed3524456a1fd40e76b0e2d624c79',1,'schwz::Settings']]],
-  ['explicit_5flaplacian',['explicit_laplacian',['../structschwz_1_1Settings.html#a2af5f07901df047e305c456b2f97e774',1,'schwz::Settings']]]
+  ['explicit_5flaplacian',['explicit_laplacian',['../structschwz_1_1Settings.html#a2af5f07901df047e305c456b2f97e774',1,'schwz::Settings']]],
+  ['extra_5fbuffer',['extra_buffer',['../structschwz_1_1Communicate_1_1comm__struct.html#a7d15316ac86bf03080faeb5dfbeec672',1,'schwz::Communicate::comm_struct']]]
 ];

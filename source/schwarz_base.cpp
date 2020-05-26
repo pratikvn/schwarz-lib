@@ -52,16 +52,18 @@ void write_iters_and_residuals(
     int num_subd, int my_rank, int iter_count,
     std::vector<ValueType> &local_res_vec_out,
     std::vector<IndexType> &local_converged_iter_count,
-    std::vector<ValueType> &local_converged_resnorm, std::string filename)
+    std::vector<ValueType> &local_converged_resnorm,
+    std::vector<ValueType> &local_timestamp, std::string filename)
 {
     {
         std::ofstream file;
         file.open(filename);
-        file << "iter,resnorm,localiter,localresnorm\n";
+        file << "iter,resnorm,localiter,localresnorm,timestamp\n";
         for (auto i = 0; i < iter_count; ++i) {
             file << i << "," << local_res_vec_out[i] << ","
                  << local_converged_iter_count[i] << ","
-                 << local_converged_resnorm[i] << "\n";
+                 << local_converged_resnorm[i] << "," << local_timestamp[i]
+                 << "\n";
         }
         file.close();
     }
@@ -423,7 +425,8 @@ void SchwarzBase<ValueType, IndexType>::run(
             metadata.post_process_data.local_residual_vector_out.size(),
             metadata.post_process_data.local_residual_vector_out,
             metadata.post_process_data.local_converged_iter_count,
-            metadata.post_process_data.local_converged_resnorm, filename);
+            metadata.post_process_data.local_converged_resnorm,
+            metadata.post_process_data.local_timestamp, filename);
     }
 
     // Compute the final residual norm. Also gathers the solution from all

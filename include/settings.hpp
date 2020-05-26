@@ -449,9 +449,11 @@ struct Metadata {
         std::vector<ValueType> local_residual_vector_out;
         std::vector<ValueType> local_converged_iter_count;
         std::vector<ValueType> local_converged_resnorm;
+        std::vector<ValueType> local_timestamp;
     };
     post_process_data post_process_data;
 
+    double init_mpi_wtime = 0.0;
     /**
      * The mapping containing the global to local indices.
      */

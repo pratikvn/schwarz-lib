@@ -774,6 +774,8 @@ void Solve<ValueType, IndexType>::local_solve(
                 static_cast<IndexType>(0));
             metadata.post_process_data.local_converged_resnorm.push_back(0.0);
         }
+        metadata.post_process_data.local_timestamp.push_back(
+            MPI_Wtime() - metadata.init_mpi_wtime);
         local_solution->copy_from(init_guess.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_dealii) {

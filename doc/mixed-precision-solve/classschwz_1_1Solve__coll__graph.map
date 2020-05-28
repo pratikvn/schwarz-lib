@@ -1,4 +1,4 @@
-<map id="schwz::Solve&lt; ValueType, IndexType &gt;" name="schwz::Solve&lt; ValueType, IndexType &gt;">
+<map id="schwz::Solve&lt; ValueType, IndexType, MixedValueType &gt;" name="schwz::Solve&lt; ValueType, IndexType, MixedValueType &gt;">
 <area shape="rect" id="node2" href="$structschwz_1_1Settings.html" title="The struct that contains the solver settings and the parameters to be set by the user. " alt="" coords="171,363,287,389"/>
 <area shape="rect" id="node3" href="$structschwz_1_1Settings_1_1comm__settings.html" title="The settings for the various available communication paradigms. " alt="" coords="5,200,165,241"/>
 <area shape="rect" id="node4" title="STL class. " alt="" coords="189,207,269,234"/>

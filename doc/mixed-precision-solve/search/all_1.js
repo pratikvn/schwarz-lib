@@ -1,7 +1,7 @@
 var searchData=
 [
   ['cell_5fweights',['cell_weights',['../classschwz_1_1Initialize.html#a715b9e3a552f77277492d1c86c600681',1,'schwz::Initialize']]],
-  ['clear',['clear',['../classschwz_1_1Communicate.html#a50833af98dd50e2c05029f16ab97479f',1,'schwz::Communicate']]],
+  ['clear',['clear',['../classschwz_1_1Communicate.html#ac01c45763b2945b0c361b49c7305b142',1,'schwz::Communicate']]],
   ['communicate',['Communicate',['../group__comm.html',1,'']]],
   ['comm_5fdata_5fstruct',['comm_data_struct',['../structschwz_1_1Metadata.html#a54f774e70eb42b84f63f702262b99fa6',1,'schwz::Metadata']]],
   ['comm_5fsettings',['comm_settings',['../structschwz_1_1Settings_1_1comm__settings.html',1,'schwz::Settings']]],

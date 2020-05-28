@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>schwz: schwz::Communicate&lt; ValueType, IndexType &gt; Class Template Reference</title>
+<title>schwz: schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -71,7 +71,7 @@ $(function() {
 <a href="#friends">Friends</a> &#124;
 <a href="classschwz_1_1Communicate-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">schwz::Communicate&lt; ValueType, IndexType &gt; Class Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group__comm.html">Communicate</a></div></div>  </div>
+<div class="title">schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt; Class Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group__comm.html">Communicate</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -80,9 +80,9 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp</a>&gt;</code></p>
 <div class="dynheader">
-Collaboration diagram for schwz::Communicate&lt; ValueType, IndexType &gt;:</div>
+Collaboration diagram for schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt;:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classschwz_1_1Communicate__coll__graph.svg" width="206" height="350"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classschwz_1_1Communicate__coll__graph.svg" width="206" height="379"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -94,32 +94,32 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad77bbc19111a7b6ff79962d3a659a2cc"><td class="memItemLeft" align="right" valign="top"><a id="ad77bbc19111a7b6ff79962d3a659a2cc"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#ad77bbc19111a7b6ff79962d3a659a2cc">setup_comm_buffers</a> ()=0</td></tr>
-<tr class="memdesc:ad77bbc19111a7b6ff79962d3a659a2cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the communication buffers needed for the boundary exchange. <br /></td></tr>
-<tr class="separator:ad77bbc19111a7b6ff79962d3a659a2cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab41e8e19e90ce2d53234cbec2cdb3b38"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#ab41e8e19e90ce2d53234cbec2cdb3b38">setup_windows</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;main_buffer)=0</td></tr>
-<tr class="memdesc:ab41e8e19e90ce2d53234cbec2cdb3b38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the windows needed for the asynchronous communication.  <a href="#ab41e8e19e90ce2d53234cbec2cdb3b38">More...</a><br /></td></tr>
-<tr class="separator:ab41e8e19e90ce2d53234cbec2cdb3b38"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f305bc37b86b1cf9369acdf6fe32f7d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#a9f305bc37b86b1cf9369acdf6fe32f7d">exchange_boundary</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution)=0</td></tr>
-<tr class="memdesc:a9f305bc37b86b1cf9369acdf6fe32f7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exchanges the elements of the solution vector.  <a href="#a9f305bc37b86b1cf9369acdf6fe32f7d">More...</a><br /></td></tr>
-<tr class="separator:a9f305bc37b86b1cf9369acdf6fe32f7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af951ced18d73fb0a8c81713fd87422fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#af951ced18d73fb0a8c81713fd87422fe">local_to_global_vector</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;local_vector, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_vector)</td></tr>
-<tr class="memdesc:af951ced18d73fb0a8c81713fd87422fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms data from a local vector to a global vector.  <a href="#af951ced18d73fb0a8c81713fd87422fe">More...</a><br /></td></tr>
-<tr class="separator:af951ced18d73fb0a8c81713fd87422fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1332376dfc67f5384527be90df7cbea"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#aa1332376dfc67f5384527be90df7cbea">update_boundary</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;local_solution, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;local_rhs, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution, const std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;interface_matrix)=0</td></tr>
-<tr class="memdesc:aa1332376dfc67f5384527be90df7cbea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the values into local vector from obtained from the neighboring sub-domains using the interface matrix.  <a href="#aa1332376dfc67f5384527be90df7cbea">More...</a><br /></td></tr>
-<tr class="separator:aa1332376dfc67f5384527be90df7cbea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50833af98dd50e2c05029f16ab97479f"><td class="memItemLeft" align="right" valign="top"><a id="a50833af98dd50e2c05029f16ab97479f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#a50833af98dd50e2c05029f16ab97479f">clear</a> (<a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings)</td></tr>
-<tr class="memdesc:a50833af98dd50e2c05029f16ab97479f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the data. <br /></td></tr>
-<tr class="separator:a50833af98dd50e2c05029f16ab97479f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76b0d6b0571107ab2cd58e309902a666"><td class="memItemLeft" align="right" valign="top"><a id="a76b0d6b0571107ab2cd58e309902a666"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#a76b0d6b0571107ab2cd58e309902a666">setup_comm_buffers</a> ()=0</td></tr>
+<tr class="memdesc:a76b0d6b0571107ab2cd58e309902a666"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the communication buffers needed for the boundary exchange. <br /></td></tr>
+<tr class="separator:a76b0d6b0571107ab2cd58e309902a666"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13190372f3a6193f92226d08e822fde7"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#a13190372f3a6193f92226d08e822fde7">setup_windows</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;main_buffer)=0</td></tr>
+<tr class="memdesc:a13190372f3a6193f92226d08e822fde7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the windows needed for the asynchronous communication.  <a href="#a13190372f3a6193f92226d08e822fde7">More...</a><br /></td></tr>
+<tr class="separator:a13190372f3a6193f92226d08e822fde7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41794ecd95f7f7e590ae27bb6ca6e6e1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#a41794ecd95f7f7e590ae27bb6ca6e6e1">exchange_boundary</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution)=0</td></tr>
+<tr class="memdesc:a41794ecd95f7f7e590ae27bb6ca6e6e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exchanges the elements of the solution vector.  <a href="#a41794ecd95f7f7e590ae27bb6ca6e6e1">More...</a><br /></td></tr>
+<tr class="separator:a41794ecd95f7f7e590ae27bb6ca6e6e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c1ed0c5f86c458038b4062f57337d44"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#a8c1ed0c5f86c458038b4062f57337d44">local_to_global_vector</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;local_vector, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_vector)</td></tr>
+<tr class="memdesc:a8c1ed0c5f86c458038b4062f57337d44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms data from a local vector to a global vector.  <a href="#a8c1ed0c5f86c458038b4062f57337d44">More...</a><br /></td></tr>
+<tr class="separator:a8c1ed0c5f86c458038b4062f57337d44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a371fb6c61c0bd9b619bbe7e154d18696"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#a371fb6c61c0bd9b619bbe7e154d18696">update_boundary</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;local_solution, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;local_rhs, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution, const std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;interface_matrix)=0</td></tr>
+<tr class="memdesc:a371fb6c61c0bd9b619bbe7e154d18696"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the values into local vector from obtained from the neighboring sub-domains using the interface matrix.  <a href="#a371fb6c61c0bd9b619bbe7e154d18696">More...</a><br /></td></tr>
+<tr class="separator:a371fb6c61c0bd9b619bbe7e154d18696"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac01c45763b2945b0c361b49c7305b142"><td class="memItemLeft" align="right" valign="top"><a id="ac01c45763b2945b0c361b49c7305b142"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#ac01c45763b2945b0c361b49c7305b142">clear</a> (<a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings)</td></tr>
+<tr class="memdesc:ac01c45763b2945b0c361b49c7305b142"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the data. <br /></td></tr>
+<tr class="separator:ac01c45763b2945b0c361b49c7305b142"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a67f6d576d2bd14434247f8a9a9c99927"><td class="memItemLeft" align="right" valign="top"><a id="a67f6d576d2bd14434247f8a9a9c99927"></a>
+<tr class="memitem:ab9c6c68bfa363819322189192ca014aa"><td class="memItemLeft" align="right" valign="top"><a id="ab9c6c68bfa363819322189192ca014aa"></a>
 <a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html">comm_struct</a>&#160;</td><td class="memItemRight" valign="bottom"><b>comm_struct</b></td></tr>
-<tr class="separator:a67f6d576d2bd14434247f8a9a9c99927"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ab9c6c68bfa363819322189192ca014aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -128,8 +128,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Initialize&lt; Value
 <tr class="separator:a7044b349fe5363eeace2d1a56b38f650"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename ValueType, typename IndexType&gt;<br />
-class schwz::Communicate&lt; ValueType, IndexType &gt;</h3>
+<div class="textblock"><h3>template&lt;typename ValueType, typename IndexType, typename MixedValueType&gt;<br />
+class schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt;</h3>
 
 <p>The communication class that provides the methods for the communication between the subdomains. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -141,19 +141,19 @@ class schwz::Communicate&lt; ValueType, IndexType &gt;</h3>
 </dl>
 <p><a class="el" href="group__comm.html">Communicate</a> </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a9f305bc37b86b1cf9369acdf6fe32f7d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f305bc37b86b1cf9369acdf6fe32f7d">&#9670;&nbsp;</a></span>exchange_boundary()</h2>
+<a id="a41794ecd95f7f7e590ae27bb6ca6e6e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41794ecd95f7f7e590ae27bb6ca6e6e1">&#9670;&nbsp;</a></span>exchange_boundary()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType , typename IndexType &gt; </div>
+template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType &gt;::exchange_boundary </td>
+          <td class="memname">void <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::exchange_boundary </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;&#160;</td>
           <td class="paramname"><em>settings</em>, </td>
@@ -193,22 +193,22 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classschwz_1_1SolverRAS.html#a30a7b9e8ae4852fce06e407ea620ddbb">schwz::SolverRAS&lt; ValueType, IndexType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classschwz_1_1SolverRAS.html#ab8983c89cdc7b45d15f9f4bf276e9753">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="classschwz_1_1SchwarzBase.html#ad4a01651b92f2bf44c4fedf8e1b9b33d">schwz::SchwarzBase&lt; ValueType, IndexType &gt;::run()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="classschwz_1_1SchwarzBase.html#aed3ccf8d66549af755b39da5e26f79f3">schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;::run()</a>.</p>
 
 </div>
 </div>
-<a id="af951ced18d73fb0a8c81713fd87422fe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af951ced18d73fb0a8c81713fd87422fe">&#9670;&nbsp;</a></span>local_to_global_vector()</h2>
+<a id="a8c1ed0c5f86c458038b4062f57337d44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c1ed0c5f86c458038b4062f57337d44">&#9670;&nbsp;</a></span>local_to_global_vector()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType , typename IndexType &gt; </div>
+template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType &gt;::local_to_global_vector </td>
+          <td class="memname">void <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::local_to_global_vector </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;&#160;</td>
           <td class="paramname"><em>settings</em>, </td>
@@ -250,21 +250,23 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
   </dd>
 </dl>
 
+<p class="reference">Referenced by <a class="el" href="classschwz_1_1SchwarzBase.html#aed3ccf8d66549af755b39da5e26f79f3">schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;::run()</a>.</p>
+
 </div>
 </div>
-<a id="ab41e8e19e90ce2d53234cbec2cdb3b38"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab41e8e19e90ce2d53234cbec2cdb3b38">&#9670;&nbsp;</a></span>setup_windows()</h2>
+<a id="a13190372f3a6193f92226d08e822fde7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13190372f3a6193f92226d08e822fde7">&#9670;&nbsp;</a></span>setup_windows()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType , typename IndexType &gt; </div>
+template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType &gt;::setup_windows </td>
+          <td class="memname">void <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::setup_windows </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;&#160;</td>
           <td class="paramname"><em>settings</em>, </td>
@@ -304,25 +306,25 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classschwz_1_1SolverRAS.html#a8cd640aa073c0890d6121dc3afb3eaac">schwz::SolverRAS&lt; ValueType, IndexType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classschwz_1_1SolverRAS.html#adc313354f7ae256d375316516d0f655e">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="classschwz_1_1SchwarzBase.html#ad4a01651b92f2bf44c4fedf8e1b9b33d">schwz::SchwarzBase&lt; ValueType, IndexType &gt;::run()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="classschwz_1_1SchwarzBase.html#aed3ccf8d66549af755b39da5e26f79f3">schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;::run()</a>.</p>
 
 </div>
 </div>
-<a id="aa1332376dfc67f5384527be90df7cbea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa1332376dfc67f5384527be90df7cbea">&#9670;&nbsp;</a></span>update_boundary()</h2>
+<a id="a371fb6c61c0bd9b619bbe7e154d18696"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a371fb6c61c0bd9b619bbe7e154d18696">&#9670;&nbsp;</a></span>update_boundary()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType , typename IndexType &gt; </div>
+template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType &gt;::update_boundary </td>
+          <td class="memname">void <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::update_boundary </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;&#160;</td>
           <td class="paramname"><em>settings</em>, </td>
@@ -384,15 +386,15 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classschwz_1_1SolverRAS.html#a974f6e6be558338a37bdc65f34afdb26">schwz::SolverRAS&lt; ValueType, IndexType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classschwz_1_1SolverRAS.html#ae0d9bc193a40fb1f27738a2436a3fa36">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="classschwz_1_1SchwarzBase.html#ad4a01651b92f2bf44c4fedf8e1b9b33d">schwz::SchwarzBase&lt; ValueType, IndexType &gt;::run()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="classschwz_1_1SchwarzBase.html#aed3ccf8d66549af755b39da5e26f79f3">schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;::run()</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li><a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp (c223caa)</a></li>
-<li>/home/runner/work/schwarz-lib/schwarz-lib/source/communicate.cpp (c223caa)</li>
+<li><a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp (ca00a18)</a></li>
+<li>/home/runner/work/schwarz-lib/schwarz-lib/source/communicate.cpp (ca00a18)</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

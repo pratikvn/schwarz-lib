@@ -1,4 +1,4 @@
-<map id="schwz::Communicate&lt; ValueType, IndexType &gt;" name="schwz::Communicate&lt; ValueType, IndexType &gt;">
-<area shape="rect" id="node2" href="$structschwz_1_1Communicate_1_1comm__struct.html" title="The communication struct used to store the communication data. " alt="" coords="11,184,177,240"/>
-<area shape="rect" id="node4" title="STL class. " alt="" coords="36,5,152,32"/>
+<map id="schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt;" name="schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt;">
+<area shape="rect" id="node2" href="$structschwz_1_1Communicate_1_1comm__struct.html" title="The communication struct used to store the communication data. " alt="" coords="5,184,184,255"/>
+<area shape="rect" id="node4" title="STL class. " alt="" coords="37,5,153,32"/>
 </map>

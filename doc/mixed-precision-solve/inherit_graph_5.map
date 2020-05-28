@@ -1,9 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classschwz_1_1Communicate.html" title="The communication class that provides the methods for the communication between the subdomains..." alt="" coords="254,5,431,47"/>
-<area shape="rect" id="node2" href="$classschwz_1_1SchwarzBase.html" title="The Base solver class is meant to be the class implementing the common implementations for all the sc..." alt="" coords="480,71,657,112"/>
-<area shape="rect" id="node3" href="$classschwz_1_1SolverRAS.html" title="An implementation of the solver interface using the RAS solver. " alt="" coords="705,71,916,112"/>
-<area shape="rect" id="node4" href="$structschwz_1_1Metadata.html" title="The solver metadata struct. " alt="" coords="5,71,205,112"/>
-<area shape="rect" id="node5" href="$classschwz_1_1Initialize.html" title="The initialization class that provides methods for initialization of the solver. " alt="" coords="258,71,427,112"/>
-<area shape="rect" id="node6" href="$structschwz_1_1Settings.html" title="The struct that contains the solver settings and the parameters to be set by the user. " alt="" coords="47,139,163,166"/>
-<area shape="rect" id="node7" href="$classschwz_1_1Solve.html" title="The Solver class the provides the solver and the convergence checking methods. " alt="" coords="253,136,432,177"/>
+<area shape="rect" id="node1" href="$classschwz_1_1Communicate.html" title="The communication class that provides the methods for the communication between the subdomains..." alt="" coords="271,5,440,61"/>
+<area shape="rect" id="node2" href="$classschwz_1_1SchwarzBase.html" title="The Base solver class is meant to be the class implementing the common implementations for all the sc..." alt="" coords="505,79,675,135"/>
+<area shape="rect" id="node3" href="$classschwz_1_1SolverRAS.html" title="An implementation of the solver interface using the RAS solver. " alt="" coords="723,86,933,127"/>
+<area shape="rect" id="node4" href="$structschwz_1_1Metadata.html" title="The solver metadata struct. " alt="" coords="5,86,205,127"/>
+<area shape="rect" id="node5" href="$classschwz_1_1Initialize.html" title="The initialization class that provides methods for initialization of the solver. " alt="" coords="271,86,440,127"/>
+<area shape="rect" id="node6" href="$structschwz_1_1Settings.html" title="The struct that contains the solver settings and the parameters to be set by the user. " alt="" coords="47,155,163,181"/>
+<area shape="rect" id="node7" href="$classschwz_1_1Solve.html" title="The Solver class the provides the solver and the convergence checking methods. " alt="" coords="253,151,457,193"/>
 </map>

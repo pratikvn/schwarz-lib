@@ -71,10 +71,11 @@ namespace schwz {
  * @ingroup schwarz_class
  */
 template <typename ValueType = gko::default_precision,
-          typename IndexType = gko::int32>
+          typename IndexType = gko::int32,
+          typename MixedValueType = gko::default_precision>
 class SchwarzBase : public Initialize<ValueType, IndexType>,
-                    public Communicate<ValueType, IndexType>,
-                    public Solve<ValueType, IndexType> {
+                    public Communicate<ValueType, IndexType, MixedValueType>,
+                    public Solve<ValueType, IndexType, MixedValueType> {
 public:
     /**
      * The constructor that takes in the user settings and a metadata struct
@@ -211,7 +212,8 @@ protected:
      * The communication struct used to store the metadata and arrays needed for
      * the communication bewtween subdomains.
      */
-    struct Communicate<ValueType, IndexType>::comm_struct comm_struct;
+    struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+        comm_struct;
 };
 
 

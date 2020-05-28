@@ -124,11 +124,11 @@ ADD_LIBRARY(${TARGET} SHARED )
 TARGET_SOURCES(${TARGET} PRIVATE
   source/initialization.cpp
   source/communicate.cpp
+  source/exception.cpp
   source/utils.cpp
   source/solve.cpp
   source/schwarz_base.cpp
   source/restricted_schwarz.cpp
-  source/exception.cpp
   )
 
 

@@ -82,10 +82,11 @@ void put_all_local_residual_norms(
 }
 
 
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename IndexType, typename MixedValueType>
 void propagate_all_local_residual_norms(
     const Settings &settings, Metadata<ValueType, IndexType> &metadata,
-    struct Communicate<ValueType, IndexType>::comm_struct &comm_s,
+    struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+        &comm_s,
     ValueType &local_resnorm,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_residual_vector,
     MPI_Win &window_residual_vector)
@@ -208,10 +209,11 @@ void global_convergence_check_onesided_tree(
 }
 
 
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename IndexType, typename MixedValueType>
 void global_convergence_decentralized(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
-    struct Communicate<ValueType, IndexType>::comm_struct &comm_s,
+    struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+        &comm_s,
     std::shared_ptr<gko::Array<IndexType>> &convergence_vector,
     std::shared_ptr<gko::Array<IndexType>> &convergence_sent,
     std::shared_ptr<gko::Array<IndexType>> &convergence_local,
@@ -272,6 +274,43 @@ void global_convergence_decentralized(
     }
 }
 
+/*
+// Explicit Instantiations
+#define DECLARE_FUNCTION(ValueType, IndexType)                           \
+    void put_all_local_residual_norms(                                   \
+        const Settings &, Metadata<ValueType, IndexType> &, ValueType &, \
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &, MPI_Win &);
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION);
+#undef DECLARE_FUNCTION
+
+#define DECLARE_FUNCTION2(ValueType, IndexType, MixedValueType)               \
+    void propagate_all_local_residual_norms(                                  \
+        const Settings &, Metadata<ValueType, IndexType> &,                   \
+        struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct \
+            &,                                                                \
+        ValueType &, std::shared_ptr<gko::matrix::Dense<ValueType>> &,        \
+        MPI_Win &);
+INSTANTIATE_FOR_EACH_VALUE_MIXEDVALUE_AND_INDEX_TYPE(DECLARE_FUNCTION2);
+#undef DECLARE_FUNCTION2
+
+#define DECLARE_FUNCTION3(ValueType, IndexType)                   \
+    void global_convergence_check_onesided_tree(                  \
+        const Settings &, const Metadata<ValueType, IndexType> &, \
+        std::shared_ptr<gko::Array<IndexType>> &, int &, int &, MPI_Win &);
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_FUNCTION3);
+#undef DECLARE_FUNCTION3
+
+#define DECLARE_FUNCTION4(ValueType, IndexType, MixedValueType)               \
+    void global_convergence_decentralized(                                    \
+        const Settings &, const Metadata<ValueType, IndexType> &,             \
+        struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct \
+            &,                                                                \
+        std::shared_ptr<gko::Array<IndexType>> &,                             \
+        std::shared_ptr<gko::Array<IndexType>> &,                             \
+        std::shared_ptr<gko::Array<IndexType>> &, int &, int &, MPI_Win &);
+INSTANTIATE_FOR_EACH_VALUE_MIXEDVALUE_AND_INDEX_TYPE(DECLARE_FUNCTION4);
+#undef DECLARE_FUNCTION4
+*/
 
 }  // namespace conv_tools
 }  // namespace schwz

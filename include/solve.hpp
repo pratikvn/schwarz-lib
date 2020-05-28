@@ -38,9 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 
+#include <settings.hpp>
+
 #include <communicate.hpp>
 #include <conv_tools.hpp>
-#include <settings.hpp>
 #include <solver_tools.hpp>
 
 
@@ -58,7 +59,8 @@ namespace schwz {
  * @ingroup solve
  */
 template <typename ValueType = gko::default_precision,
-          typename IndexType = gko::int32>
+          typename IndexType = gko::int32,
+          typename MixedValueType = gko::default_precision>
 class Solve : public Settings {
 public:
     using ResidualCriterionFactory =
@@ -178,7 +180,8 @@ protected:
      */
     void check_convergence(
         const Settings &settings, Metadata<ValueType, IndexType> &metadata,
-        struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+        struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+            &comm_struct,
         std::shared_ptr<gko::Array<IndexType>> &convergence_vector,
         const std::shared_ptr<gko::matrix::Dense<ValueType>>
             &global_old_solution,
@@ -207,7 +210,8 @@ protected:
      */
     void check_global_convergence(
         const Settings &settings, Metadata<ValueType, IndexType> &metadata,
-        struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+        struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+            &comm_struct,
         std::shared_ptr<gko::Array<IndexType>> &convergence_vector,
         ValueType &local_resnorm, ValueType &local_resnorm0,
         ValueType &global_resnorm, ValueType &global_resnorm0,

@@ -53,10 +53,11 @@ namespace schwz {
 namespace CommHelpers {
 
 
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename IndexType, typename MixedValueType>
 void transfer_one_by_one(
     const Settings &settings,
-    struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+    struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+        &comm_struct,
     ValueType *buffer, IndexType **offset, int num_neighbors,
     IndexType *neighbors)
 {

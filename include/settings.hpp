@@ -119,6 +119,12 @@ struct Settings {
     bool explicit_laplacian = true;
 
     /**
+     * Flag if the laplacian matrix should be generated within the library. If
+     * false, an external matrix and rhs needs to be provided
+     */
+    bool use_mixed_precision = false;
+
+    /**
      * Flag to enable a random rhs.
      */
     bool enable_random_rhs = false;
@@ -518,6 +524,15 @@ struct Metadata {
     template _macro(double, gko::int32);                  \
     template _macro(float, gko::int64);                   \
     template _macro(double, gko::int64);
+
+
+#define INSTANTIATE_FOR_EACH_VALUE_MIXEDVALUE_AND_INDEX_TYPE(_macro) \
+    template _macro(float, gko::int32, float);                       \
+    template _macro(double, gko::int32, float);                      \
+    template _macro(double, gko::int32, double);                     \
+    template _macro(float, gko::int64, float);                       \
+    template _macro(double, gko::int64, float);                      \
+    template _macro(double, gko::int64, double);
 
 // explicit instantiations for schwz
 #define DECLARE_METADATA(ValueType, IndexType) \

@@ -56,7 +56,7 @@ namespace schwz {
  * @ref comm
  * @ingroup comm
  */
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename IndexType, typename MixedValueType>
 class Communicate {
 public:
     friend class Initialize<ValueType, IndexType>;

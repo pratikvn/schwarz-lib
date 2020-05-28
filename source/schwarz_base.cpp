@@ -70,8 +70,8 @@ void write_iters_and_residuals(
 }
 
 
-template <typename ValueType, typename IndexType>
-SchwarzBase<ValueType, IndexType>::SchwarzBase(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+SchwarzBase<ValueType, IndexType, MixedValueType>::SchwarzBase(
     Settings &settings, Metadata<ValueType, IndexType> &metadata)
     : Initialize<ValueType, IndexType>(settings, metadata),
       settings(settings),
@@ -125,8 +125,8 @@ SchwarzBase<ValueType, IndexType>::SchwarzBase(
 }
 
 
-template <typename ValueType, typename IndexType>
-void SchwarzBase<ValueType, IndexType>::initialize(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
 #if SCHW_HAVE_DEALII
     const dealii::SparseMatrix<ValueType> &matrix,
     const dealii::Vector<ValueType> &system_rhs)
@@ -256,7 +256,7 @@ void SchwarzBase<ValueType, IndexType>::initialize(
         this->local_solution);
 
     // Setup the local solver on each of the subddomains.
-    Solve<ValueType, IndexType>::setup_local_solver(
+    Solve<ValueType, IndexType, MixedValueType>::setup_local_solver(
         this->settings, metadata, this->local_matrix, this->triangular_factor_l,
         this->triangular_factor_u, this->local_perm, this->local_inv_perm,
         this->local_rhs);
@@ -265,10 +265,11 @@ void SchwarzBase<ValueType, IndexType>::initialize(
 }
 
 
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename IndexType, typename MixedValueType>
 void gather_comm_data(
     int num_subdomains,
-    struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+    struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+        &comm_struct,
     std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
                            std::vector<std::tuple<int, int>>, int, int>>
         &comm_data_struct)
@@ -312,8 +313,8 @@ void gather_comm_data(
 }
 
 
-template <typename ValueType, typename IndexType>
-void SchwarzBase<ValueType, IndexType>::run(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     std::shared_ptr<gko::matrix::Dense<ValueType>> &solution)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
@@ -369,7 +370,7 @@ void SchwarzBase<ValueType, IndexType>::run(
         // Check for the convergence of the solver.
         // num_converged_procs = 0;
         MEASURE_ELAPSED_FUNC_TIME(
-            (Solve<ValueType, IndexType>::check_convergence(
+            (Solve<ValueType, IndexType, MixedValueType>::check_convergence(
                 settings, metadata, this->comm_struct, this->convergence_vector,
                 global_solution, this->local_solution, this->local_matrix,
                 work_vector, local_residual_norm, local_residual_norm0,
@@ -390,7 +391,7 @@ void SchwarzBase<ValueType, IndexType>::run(
             break;
         } else {
             MEASURE_ELAPSED_FUNC_TIME(
-                (Solve<ValueType, IndexType>::local_solve(
+                (Solve<ValueType, IndexType, MixedValueType>::local_solve(
                     settings, metadata, this->local_matrix,
                     this->triangular_factor_l, this->triangular_factor_u,
                     this->local_perm, this->local_inv_perm, work_vector,
@@ -399,8 +400,10 @@ void SchwarzBase<ValueType, IndexType>::run(
             // Gather the local vector into the locally global vector for
             // communication.
             MEASURE_ELAPSED_FUNC_TIME(
-                (Communicate<ValueType, IndexType>::local_to_global_vector(
-                    settings, metadata, this->local_solution, global_solution)),
+                (Communicate<ValueType, IndexType, MixedValueType>::
+                     local_to_global_vector(settings, metadata,
+                                            this->local_solution,
+                                            global_solution)),
                 4, metadata.my_rank, expand_local_vec, metadata.iter_count);
         }
     }
@@ -431,10 +434,10 @@ void SchwarzBase<ValueType, IndexType>::run(
 
     // Compute the final residual norm. Also gathers the solution from all
     // subdomains.
-    Solve<ValueType, IndexType>::compute_residual_norm(
+    Solve<ValueType, IndexType, MixedValueType>::compute_residual_norm(
         settings, metadata, global_matrix, global_rhs, global_solution,
         mat_norm, rhs_norm, sol_norm, residual_norm);
-    gather_comm_data<ValueType, IndexType>(
+    gather_comm_data<ValueType, IndexType, MixedValueType>(
         metadata.num_subdomains, this->comm_struct, metadata.comm_data_struct);
     // clang-format off
     if (metadata.my_rank == 0)
@@ -459,9 +462,9 @@ void SchwarzBase<ValueType, IndexType>::run(
     // Communicate<ValueType, IndexType>::clear(settings);
 }
 
-#define DECLARE_SCHWARZ_BASE(ValueType, IndexType) \
-    class SchwarzBase<ValueType, IndexType>
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCHWARZ_BASE);
+#define DECLARE_SCHWARZ_BASE(ValueType, IndexType, MixedValueType) \
+    class SchwarzBase<ValueType, IndexType, MixedValueType>
+INSTANTIATE_FOR_EACH_VALUE_MIXEDVALUE_AND_INDEX_TYPE(DECLARE_SCHWARZ_BASE);
 #undef DECLARE_SCHWARZ_BASE
 
 

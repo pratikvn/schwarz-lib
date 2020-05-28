@@ -45,15 +45,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace schwz {
 
-template <typename ValueType, typename IndexType>
-SolverRAS<ValueType, IndexType>::SolverRAS(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+SolverRAS<ValueType, IndexType, MixedValueType>::SolverRAS(
     Settings &settings, Metadata<ValueType, IndexType> &metadata)
-    : SchwarzBase<ValueType, IndexType>(settings, metadata)
+    : SchwarzBase<ValueType, IndexType, MixedValueType>(settings, metadata)
 {}
 
 
-template <typename ValueType, typename IndexType>
-void SolverRAS<ValueType, IndexType>::setup_local_matrices(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void SolverRAS<ValueType, IndexType, MixedValueType>::setup_local_matrices(
     Settings &settings, Metadata<ValueType, IndexType> &metadata,
     std::vector<unsigned int> &partition_indices,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix,
@@ -304,11 +304,12 @@ void SolverRAS<ValueType, IndexType>::setup_local_matrices(
 }
 
 
-template <typename ValueType, typename IndexType>
-void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
 {
     using vec_itype = gko::Array<IndexType>;
     using vec_vtype = gko::matrix::Dense<ValueType>;
+    using vec_mixedtype = gko::matrix::Dense<MixedValueType>;
     using vec_request = gko::Array<MPI_Request>;
     using vec_vecshared = gko::Array<IndexType *>;
     auto metadata = this->metadata;
@@ -424,13 +425,23 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
     // one-sided
     if (settings.comm_settings.enable_onesided) {
         if (num_recv > 0) {
-            this->comm_struct.recv_buffer =
-                vec_vtype::create(settings.executor, gko::dim<2>(num_recv, 1));
+            if (settings.use_mixed_precision) {
+                // this->comm_struct.recv_buffer = vec_mixedtype::create(
+                //     settings.executor, gko::dim<2>(num_recv, 1));
+                // MPI_Win_create(this->comm_struct.recv_buffer->get_values(),
+                //                num_recv * sizeof(ValueType),
+                //                sizeof(ValueType), MPI_INFO_NULL,
+                //                MPI_COMM_WORLD,
+                //                &(this->comm_struct.window_recv_buffer));
+            } else {
+                this->comm_struct.recv_buffer = vec_vtype::create(
+                    settings.executor, gko::dim<2>(num_recv, 1));
+                MPI_Win_create(this->comm_struct.recv_buffer->get_values(),
+                               num_recv * sizeof(ValueType), sizeof(ValueType),
+                               MPI_INFO_NULL, MPI_COMM_WORLD,
+                               &(this->comm_struct.window_recv_buffer));
+            }
 
-            MPI_Win_create(this->comm_struct.recv_buffer->get_values(),
-                           num_recv * sizeof(ValueType), sizeof(ValueType),
-                           MPI_INFO_NULL, MPI_COMM_WORLD,
-                           &(this->comm_struct.window_recv_buffer));
             this->comm_struct.windows_from = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
                               this->comm_struct.num_neighbors_in),
@@ -501,8 +512,8 @@ void SolverRAS<ValueType, IndexType>::setup_comm_buffers()
 }
 
 
-template <typename ValueType, typename IndexType>
-void SolverRAS<ValueType, IndexType>::setup_windows(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &main_buffer)
 {
@@ -608,10 +619,11 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
 }
 
 
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename IndexType, typename MixedValueType>
 void exchange_boundary_onesided(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
-    struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+    struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+        &comm_struct,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
@@ -643,7 +655,8 @@ void exchange_boundary_onesided(
     auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
     if (settings.comm_settings.enable_put) {
         if (settings.comm_settings.enable_one_by_one) {
-            CommHelpers::transfer_one_by_one(
+            CommHelpers::transfer_one_by_one<ValueType, IndexType,
+                                             MixedValueType>(
                 settings, comm_struct, global_solution->get_values(),
                 global_put, num_neighbors_out, neighbors_out);
         } else {
@@ -674,7 +687,8 @@ void exchange_boundary_onesided(
         }
     } else if (settings.comm_settings.enable_get) {
         if (settings.comm_settings.enable_one_by_one) {
-            CommHelpers::transfer_one_by_one(
+            CommHelpers::transfer_one_by_one<ValueType, IndexType,
+                                             MixedValueType>(
                 settings, comm_struct, global_solution->get_values(),
                 global_get, num_neighbors_in, neighbors_in);
         } else {
@@ -706,10 +720,11 @@ void exchange_boundary_onesided(
 }
 
 
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename IndexType, typename MixedValueType>
 void exchange_boundary_twosided(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
-    struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+    struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+        &comm_struct,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;
@@ -792,23 +807,23 @@ void exchange_boundary_twosided(
 }
 
 
-template <typename ValueType, typename IndexType>
-void SolverRAS<ValueType, IndexType>::exchange_boundary(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void SolverRAS<ValueType, IndexType, MixedValueType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     if (settings.comm_settings.enable_onesided) {
-        exchange_boundary_onesided<ValueType, IndexType>(
+        exchange_boundary_onesided<ValueType, IndexType, MixedValueType>(
             settings, metadata, this->comm_struct, global_solution);
     } else {
-        exchange_boundary_twosided<ValueType, IndexType>(
+        exchange_boundary_twosided<ValueType, IndexType, MixedValueType>(
             settings, metadata, this->comm_struct, global_solution);
     }
 }
 
 
-template <typename ValueType, typename IndexType>
-void SolverRAS<ValueType, IndexType>::update_boundary(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void SolverRAS<ValueType, IndexType, MixedValueType>::update_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
@@ -836,9 +851,9 @@ void SolverRAS<ValueType, IndexType>::update_boundary(
 }
 
 
-#define DECLARE_SOLVER_RAS(ValueType, IndexType) \
-    class SolverRAS<ValueType, IndexType>
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_RAS);
+#define DECLARE_SOLVER_RAS(ValueType, IndexType, MixedValueType) \
+    class SolverRAS<ValueType, IndexType, MixedValueType>
+INSTANTIATE_FOR_EACH_VALUE_MIXEDVALUE_AND_INDEX_TYPE(DECLARE_SOLVER_RAS);
 #undef DECLARE_SOLVER_RAS
 
 

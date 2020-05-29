@@ -61,8 +61,7 @@ void transfer_one_by_one(
     ValueType *buffer, IndexType **offset, int num_neighbors,
     IndexType *neighbors)
 {
-    ValueType dummy = 1.0;
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
+    auto mpi_vtype = boost::mpi::get_mpi_datatype(buffer[0]);
     for (auto p = 0; p < num_neighbors; p++) {
         if ((offset[p])[0] > 0) {
             if (settings.comm_settings.enable_put) {

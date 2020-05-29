@@ -651,8 +651,6 @@ void exchange_boundary_onesided(
     auto recv_buffer = comm_struct.recv_buffer->get_values();
     auto is_local_neighbor = comm_struct.is_local_neighbor;
 
-    ValueType dummy = 1.0;
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
     if (settings.comm_settings.enable_put) {
         if (settings.comm_settings.enable_one_by_one) {
             CommHelpers::transfer_one_by_one<ValueType, IndexType,
@@ -735,66 +733,71 @@ void exchange_boundary_twosided(
     auto local_put = comm_struct.local_put->get_data();
     auto put_request = comm_struct.put_request->get_data();
     int num_put = 0;
-    ValueType dummy = 0.0;
-    for (auto p = 0; p < num_neighbors_out; p++) {
-        // send
-        if ((global_put[p])[0] > 0) {
-            if (settings.comm_settings.enable_overlap &&
-                metadata.iter_count > 1) {
-                // wait for the previous send
-                auto p_r = put_request[p];
-                MPI_Wait(&p_r, &status);
-            }
-            auto send_buffer = comm_struct.send_buffer->get_values();
-            auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
-            settings.executor->run(GatherScatter<ValueType, IndexType>(
-                true, (global_put[p])[0], &((local_put[p])[1]),
-                global_solution->get_values(), &send_buffer[num_put]));
+    auto send_buffer = comm_struct.send_buffer->get_values();
+    {
+        auto mpi_vtype = boost::mpi::get_mpi_datatype(send_buffer[0]);
+        for (auto p = 0; p < num_neighbors_out; p++) {
+            // send
+            if ((global_put[p])[0] > 0) {
+                if (settings.comm_settings.enable_overlap &&
+                    metadata.iter_count > 1) {
+                    // wait for the previous send
+                    auto p_r = put_request[p];
+                    MPI_Wait(&p_r, &status);
+                }
+                settings.executor->run(GatherScatter<ValueType, IndexType>(
+                    true, (global_put[p])[0], &((local_put[p])[1]),
+                    global_solution->get_values(), &send_buffer[num_put]));
 
-            MPI_Isend(&send_buffer[num_put], (global_put[p])[0], mpi_vtype,
-                      neighbors_out[p], 0, MPI_COMM_WORLD, &put_request[p]);
-            num_put += (global_put[p])[0];
+                MPI_Isend(&send_buffer[num_put], (global_put[p])[0], mpi_vtype,
+                          neighbors_out[p], 0, MPI_COMM_WORLD, &put_request[p]);
+                num_put += (global_put[p])[0];
+            }
         }
     }
-
     int num_get = 0;
     auto get_request = comm_struct.get_request->get_data();
     auto num_neighbors_in = comm_struct.num_neighbors_in;
     auto neighbors_in = comm_struct.neighbors_in->get_data();
     auto global_get = comm_struct.global_get->get_data();
     auto local_get = comm_struct.local_get->get_data();
-    if (!settings.comm_settings.enable_overlap || metadata.iter_count == 0) {
+    auto recv_buffer = comm_struct.recv_buffer->get_values();
+    {
+        auto mpi_vtype = boost::mpi::get_mpi_datatype(recv_buffer[0]);
+        if (!settings.comm_settings.enable_overlap ||
+            metadata.iter_count == 0) {
+            for (auto p = 0; p < num_neighbors_in; p++) {
+                // receive
+                if ((global_get[p])[0] > 0) {
+                    MPI_Irecv(&recv_buffer[num_get], (global_get[p])[0],
+                              mpi_vtype, neighbors_in[p], 0, MPI_COMM_WORLD,
+                              &get_request[p]);
+                    num_get += (global_get[p])[0];
+                }
+            }
+        }
+    }
+    num_get = 0;
+    // wait for receive
+    // auto recv_buffer = comm_struct.recv_buffer->get_values();
+    {
+        auto mpi_vtype = boost::mpi::get_mpi_datatype(recv_buffer[0]);
         for (auto p = 0; p < num_neighbors_in; p++) {
-            // receive
             if ((global_get[p])[0] > 0) {
-                auto recv_buffer = comm_struct.recv_buffer->get_values();
-                auto mpi_vtype = boost::mpi::get_mpi_datatype(recv_buffer[0]);
-                MPI_Irecv(&recv_buffer[num_get], (global_get[p])[0], mpi_vtype,
-                          neighbors_in[p], 0, MPI_COMM_WORLD, &get_request[p]);
+                settings.executor->run(GatherScatter<ValueType, IndexType>(
+                    false, (global_get[p])[0], &((local_get[p])[1]),
+                    &recv_buffer[num_get], global_solution->get_values()));
+
+                if (settings.comm_settings.enable_overlap) {
+                    // start the next receive
+                    MPI_Irecv(&recv_buffer[num_get], (global_get[p])[0],
+                              mpi_vtype, neighbors_in[p], 0, MPI_COMM_WORLD,
+                              &get_request[p]);
+                }
                 num_get += (global_get[p])[0];
             }
         }
     }
-
-    num_get = 0;
-    // wait for receive
-    for (auto p = 0; p < num_neighbors_in; p++) {
-        if ((global_get[p])[0] > 0) {
-            auto recv_buffer = comm_struct.recv_buffer->get_values();
-            auto mpi_vtype = boost::mpi::get_mpi_datatype(recv_buffer[0]);
-            settings.executor->run(GatherScatter<ValueType, IndexType>(
-                false, (global_get[p])[0], &((local_get[p])[1]),
-                &recv_buffer[num_get], global_solution->get_values()));
-
-            if (settings.comm_settings.enable_overlap) {
-                // start the next receive
-                MPI_Irecv(&recv_buffer[num_get], (global_get[p])[0], mpi_vtype,
-                          neighbors_in[p], 0, MPI_COMM_WORLD, &get_request[p]);
-            }
-            num_get += (global_get[p])[0];
-        }
-    }
-
     // wait for send
     if (!settings.comm_settings.enable_overlap) {
         for (auto p = 0; p < num_neighbors_out; p++) {

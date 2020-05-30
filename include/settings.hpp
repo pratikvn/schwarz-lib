@@ -119,8 +119,7 @@ struct Settings {
     bool explicit_laplacian = true;
 
     /**
-     * Flag if the laplacian matrix should be generated within the library. If
-     * false, an external matrix and rhs needs to be provided
+     * Flag if mixed precision should be used.
      */
     bool use_mixed_precision = false;
 

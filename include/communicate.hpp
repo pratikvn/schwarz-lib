@@ -180,10 +180,22 @@ public:
         std::shared_ptr<gko::matrix::Dense<ValueType>> send_buffer;
 
         /**
+         * The mixed send buffer used for the actual communication for both
+         * one-sided and two-sided.
+         */
+        std::shared_ptr<gko::matrix::Dense<MixedValueType>> mixedt_send_buffer;
+
+        /**
          * The recv buffer used for the actual communication for both one-sided
          * and two-sided.
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> recv_buffer;
+
+        /**
+         * The mixed precision recv buffer used for the actual communication for
+         * both one-sided and two-sided.
+         */
+        std::shared_ptr<gko::matrix::Dense<MixedValueType>> mixedt_recv_buffer;
 
         /**
          * The displacements for the receiving of the buffer.

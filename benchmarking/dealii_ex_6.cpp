@@ -53,7 +53,8 @@ DEFINE_bool(vis_sol, false, "Print the solution for visualization");
 
 
 using namespace dealii;
-template <int dim, typename ValueType = double, typename IndexType = int>
+template <int dim, typename ValueType = double, typename IndexType = int,
+          typename MixedValueType = double>
 class BenchDealiiLaplace : public BenchBase<ValueType, IndexType> {
 public:
     BenchDealiiLaplace();
@@ -89,14 +90,18 @@ double coefficient(const Point<dim> &p)
 }
 
 
-template <int dim, typename ValueType, typename IndexType>
-BenchDealiiLaplace<dim, ValueType, IndexType>::BenchDealiiLaplace()
+template <int dim, typename ValueType, typename IndexType,
+          typename MixedValueType>
+BenchDealiiLaplace<dim, ValueType, IndexType,
+                   MixedValueType>::BenchDealiiLaplace()
     : fe(2), dof_handler(triangulation)
 {}
 
 
-template <int dim, typename ValueType, typename IndexType>
-void BenchDealiiLaplace<dim, ValueType, IndexType>::setup_system()
+template <int dim, typename ValueType, typename IndexType,
+          typename MixedValueType>
+void BenchDealiiLaplace<dim, ValueType, IndexType,
+                        MixedValueType>::setup_system()
 {
     dof_handler.distribute_dofs(fe);
     solution.reinit(dof_handler.n_dofs());
@@ -114,8 +119,10 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::setup_system()
 }
 
 
-template <int dim, typename ValueType, typename IndexType>
-void BenchDealiiLaplace<dim, ValueType, IndexType>::assemble_system()
+template <int dim, typename ValueType, typename IndexType,
+          typename MixedValueType>
+void BenchDealiiLaplace<dim, ValueType, IndexType,
+                        MixedValueType>::assemble_system()
 {
     const QGauss<dim> quadrature_formula(fe.degree + 1);
     FEValues<dim> fe_values(fe, quadrature_formula,
@@ -154,8 +161,9 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::assemble_system()
 }
 
 
-template <int dim, typename ValueType, typename IndexType>
-void BenchDealiiLaplace<dim, ValueType, IndexType>::solve()
+template <int dim, typename ValueType, typename IndexType,
+          typename MixedValueType>
+void BenchDealiiLaplace<dim, ValueType, IndexType, MixedValueType>::solve()
 {
     SolverControl solver_control(1000, 1e-12);
     SolverCG<> solver(solver_control);
@@ -170,8 +178,9 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve()
 }
 
 
-template <int dim, typename ValueType, typename IndexType>
-void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
+template <int dim, typename ValueType, typename IndexType,
+          typename MixedValueType>
+void BenchDealiiLaplace<dim, ValueType, IndexType, MixedValueType>::solve(
     MPI_Comm mpi_communicator)
 {
     schwz::Metadata<ValueType, IndexType> metadata;
@@ -247,6 +256,7 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
     settings.matrix_filename = FLAGS_matrix_filename;
     settings.explicit_laplacian = FLAGS_explicit_laplacian;
     settings.enable_random_rhs = FLAGS_enable_random_rhs;
+    settings.use_mixed_precision = FLAGS_use_mixed_precision;
     settings.overlap = FLAGS_overlap;
     settings.naturally_ordered_factor = FLAGS_factor_ordering_natural;
     settings.reorder = FLAGS_local_reordering;
@@ -296,7 +306,8 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
     }
     using vec_vtype = gko::matrix::Dense<ValueType>;
     std::shared_ptr<vec_vtype> solution_vector;
-    schwz::SolverRAS<ValueType, IndexType> solver(settings, metadata);
+    schwz::SolverRAS<ValueType, IndexType, MixedValueType> solver(settings,
+                                                                  metadata);
     solver.initialize(system_matrix, system_rhs);
     auto start_time = std::chrono::steady_clock::now();
     solver.run(solution_vector);
@@ -336,8 +347,10 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
 }
 
 
-template <int dim, typename ValueType, typename IndexType>
-void BenchDealiiLaplace<dim, ValueType, IndexType>::refine_grid()
+template <int dim, typename ValueType, typename IndexType,
+          typename MixedValueType>
+void BenchDealiiLaplace<dim, ValueType, IndexType,
+                        MixedValueType>::refine_grid()
 {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate(
@@ -350,9 +363,10 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::refine_grid()
 }
 
 
-template <int dim, typename ValueType, typename IndexType>
-void BenchDealiiLaplace<dim, ValueType, IndexType>::output_results(
-    const unsigned int cycle) const
+template <int dim, typename ValueType, typename IndexType,
+          typename MixedValueType>
+void BenchDealiiLaplace<dim, ValueType, IndexType, MixedValueType>::
+    output_results(const unsigned int cycle) const
 {
     {
         GridOut grid_out;
@@ -372,8 +386,9 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::output_results(
     }
 }
 
-template <int dim, typename ValueType, typename IndexType>
-void BenchDealiiLaplace<dim, ValueType, IndexType>::run()
+template <int dim, typename ValueType, typename IndexType,
+          typename MixedValueType>
+void BenchDealiiLaplace<dim, ValueType, IndexType, MixedValueType>::run()
 {
     int num_cycles = FLAGS_num_refine_cycles;
 
@@ -398,8 +413,9 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::run()
     }
 }
 
-template <int dim, typename ValueType, typename IndexType>
-void BenchDealiiLaplace<dim, ValueType, IndexType>::run(
+template <int dim, typename ValueType, typename IndexType,
+          typename MixedValueType>
+void BenchDealiiLaplace<dim, ValueType, IndexType, MixedValueType>::run(
     MPI_Comm mpi_communicator)
 {
     int num_cycles = FLAGS_num_refine_cycles;
@@ -437,7 +453,7 @@ int main(int argc, char **argv)
 {
     try {
         initialize_argument_parsing(&argc, &argv);
-        BenchDealiiLaplace<3, double, int> laplace_problem;
+        BenchDealiiLaplace<3, double, int, double> laplace_problem;
         if (FLAGS_num_threads > 1) {
             int req_thread_support = MPI_THREAD_MULTIPLE;
             int prov_thread_support = MPI_THREAD_MULTIPLE;

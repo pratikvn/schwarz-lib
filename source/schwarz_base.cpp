@@ -368,7 +368,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
             1, metadata.my_rank, boundary_update, metadata.iter_count);
 
         // Check for the convergence of the solver.
-        num_converged_procs = 0;
+        // num_converged_procs = 0;
         MEASURE_ELAPSED_FUNC_TIME(
             (Solve<ValueType, IndexType, MixedValueType>::check_convergence(
                 settings, metadata, this->comm_struct, this->convergence_vector,

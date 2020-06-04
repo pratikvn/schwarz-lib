@@ -454,6 +454,7 @@ void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
     settings.matrix_filename = FLAGS_matrix_filename;
     settings.explicit_laplacian = FLAGS_explicit_laplacian;
     settings.enable_random_rhs = FLAGS_enable_random_rhs;
+    settings.use_mixed_precision = FLAGS_use_mixed_precision;
     settings.overlap = FLAGS_overlap;
     settings.naturally_ordered_factor = FLAGS_factor_ordering_natural;
     settings.reorder = FLAGS_local_reordering;

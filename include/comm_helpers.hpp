@@ -126,8 +126,7 @@ void transfer_buffer(const Settings &settings, MPI_Win &window,
                      int offset, int target_subd, IndexType *neighbors,
                      IndexType *displacements)
 {
-    ValueType dummy = 1.0;
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
+    auto mpi_vtype = boost::mpi::get_mpi_datatype(target_buffer[0]);
     if (settings.comm_settings.enable_lock_local) {
         MPI_Win_lock(MPI_LOCK_SHARED, neighbors[target_subd], 0, window);
     }

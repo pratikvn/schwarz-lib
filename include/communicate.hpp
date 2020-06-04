@@ -175,7 +175,7 @@ public:
 
         /**
          * The send buffer used for the actual communication for both one-sided
-         * and two-sided.
+         * and two-sided (always allocated).
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> send_buffer;
 
@@ -187,7 +187,7 @@ public:
 
         /**
          * The recv buffer used for the actual communication for both one-sided
-         * and two-sided.
+         * and two-sided (always allocated).
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> recv_buffer;
 

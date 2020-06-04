@@ -533,6 +533,7 @@ struct Metadata {
     template _macro(double, gko::int64, float);                      \
     template _macro(double, gko::int64, double);
 
+
 // explicit instantiations for schwz
 #define DECLARE_METADATA(ValueType, IndexType) \
     struct Metadata<ValueType, IndexType>

@@ -426,6 +426,8 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
     if (settings.comm_settings.enable_onesided) {
         if (num_recv > 0) {
             if (settings.use_mixed_precision) {
+                this->comm_struct.recv_buffer = vec_vtype::create(
+                    settings.executor, gko::dim<2>(num_recv, 1));
                 this->comm_struct.mixedt_recv_buffer = vec_mixedtype::create(
                     settings.executor, gko::dim<2>(num_recv, 1));
                 MPI_Win_create(
@@ -452,6 +454,8 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
             }
         } else {
             if (settings.use_mixed_precision) {
+                this->comm_struct.recv_buffer =
+                    vec_vtype::create(settings.executor, gko::dim<2>(1, 1));
                 this->comm_struct.mixedt_recv_buffer =
                     vec_mixedtype::create(settings.executor, gko::dim<2>(1, 1));
             } else {
@@ -464,6 +468,8 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
     else {
         if (num_recv > 0) {
             if (settings.use_mixed_precision) {
+                this->comm_struct.recv_buffer = vec_vtype::create(
+                    settings.executor, gko::dim<2>(num_recv, 1));
                 this->comm_struct.mixedt_recv_buffer = vec_mixedtype::create(
                     settings.executor, gko::dim<2>(num_recv, 1));
             } else {
@@ -488,6 +494,8 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
     if (settings.comm_settings.enable_onesided) {
         if (num_send > 0) {
             if (settings.use_mixed_precision) {
+                this->comm_struct.send_buffer = vec_vtype::create(
+                    settings.executor, gko::dim<2>(num_send, 1));
                 this->comm_struct.mixedt_send_buffer = vec_mixedtype::create(
                     settings.executor, gko::dim<2>(num_send, 1));
                 MPI_Win_create(
@@ -512,6 +520,8 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
             }
         } else {
             if (settings.use_mixed_precision) {
+                this->comm_struct.send_buffer =
+                    vec_vtype::create(settings.executor, gko::dim<2>(1, 1));
                 this->comm_struct.mixedt_send_buffer =
                     vec_mixedtype::create(settings.executor, gko::dim<2>(1, 1));
             } else {
@@ -524,6 +534,8 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
     else {
         if (num_send > 0) {
             if (settings.use_mixed_precision) {
+                this->comm_struct.send_buffer = vec_vtype::create(
+                    settings.executor, gko::dim<2>(num_send, 1));
                 this->comm_struct.mixedt_send_buffer = vec_mixedtype::create(
                     settings.executor, gko::dim<2>(num_send, 1));
             } else {
@@ -667,7 +679,8 @@ void exchange_boundary_onesided(
     auto local_put = comm_struct.local_put->get_data();
     auto remote_put = comm_struct.remote_put->get_data();
     auto put_displacements = comm_struct.put_displacements->get_data();
-    auto send_buffer = comm_struct.send_buffer->get_values();
+    auto send_buffer = comm_struct.send_buffer;
+    auto mixedt_send_buffer = comm_struct.mixedt_send_buffer;
 
     auto num_neighbors_in = comm_struct.num_neighbors_in;
     auto local_num_neighbors_in = comm_struct.local_num_neighbors_in;
@@ -677,7 +690,8 @@ void exchange_boundary_onesided(
     auto local_get = comm_struct.local_get->get_data();
     auto remote_get = comm_struct.remote_get->get_data();
     auto get_displacements = comm_struct.get_displacements->get_data();
-    auto recv_buffer = comm_struct.recv_buffer->get_values();
+    auto recv_buffer = comm_struct.recv_buffer;
+    auto mixedt_recv_buffer = comm_struct.mixedt_recv_buffer;
     auto is_local_neighbor = comm_struct.is_local_neighbor;
 
     if (settings.comm_settings.enable_put) {
@@ -692,23 +706,36 @@ void exchange_boundary_onesided(
                 // send
                 if ((global_put[p])[0] > 0) {
                     CommHelpers::pack_buffer(
-                        settings, global_solution->get_values(), send_buffer,
-                        global_put, num_put, p);
-                    CommHelpers::transfer_buffer(
-                        settings, comm_struct.window_recv_buffer, send_buffer,
-                        global_put, num_put, p, neighbors_out,
-                        put_displacements);
+                        settings, global_solution->get_values(),
+                        send_buffer->get_values(), global_put, num_put, p);
+                    if (settings.use_mixed_precision) {
+                        send_buffer->convert_to(gko::lend(mixedt_send_buffer));
+                        // mixedt_send_buffer->copy_from(gko::lend(send_buffer));
+                        CommHelpers::transfer_buffer(
+                            settings, comm_struct.window_recv_buffer,
+                            mixedt_send_buffer->get_values(), global_put,
+                            num_put, p, neighbors_out, put_displacements);
+                    } else {
+                        CommHelpers::transfer_buffer(
+                            settings, comm_struct.window_recv_buffer,
+                            send_buffer->get_values(), global_put, num_put, p,
+                            neighbors_out, put_displacements);
+                    }
                     num_put += (global_put[p])[0];
                 }
             }
+        }
+        if (settings.use_mixed_precision) {
+            mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
+            // recv_buffer->copy_from(gko::lend(mixedt_recv_buffer));
         }
         // unpack receive buffer
         int num_get = 0;
         for (auto p = 0; p < num_neighbors_in; p++) {
             if ((global_get[p])[0] > 0) {
-                CommHelpers::unpack_buffer(settings,
-                                           global_solution->get_values(),
-                                           recv_buffer, global_get, num_get, p);
+                CommHelpers::unpack_buffer(
+                    settings, global_solution->get_values(),
+                    recv_buffer->get_values(), global_get, num_get, p);
                 num_get += (global_get[p])[0];
             }
         }
@@ -724,21 +751,37 @@ void exchange_boundary_onesided(
             for (auto p = 0; p < num_neighbors_out; p++) {
                 if ((global_put[p])[0] > 0) {
                     CommHelpers::pack_buffer(
-                        settings, global_solution->get_values(), send_buffer,
-                        global_put, num_put, p);
+                        settings, global_solution->get_values(),
+                        send_buffer->get_values(), global_put, num_put, p);
                 }
                 num_put += (global_put[p])[0];
+            }
+            if (settings.use_mixed_precision) {
+                send_buffer->convert_to(gko::lend(mixedt_send_buffer));
+                // mixedt_send_buffer->copy_from(gko::lend(send_buffer));
             }
             int num_get = 0;
             for (auto p = 0; p < num_neighbors_in; p++) {
                 if ((global_put[p])[0] > 0) {
-                    CommHelpers::transfer_buffer(
-                        settings, comm_struct.window_send_buffer, recv_buffer,
-                        global_get, num_get, p, neighbors_in,
-                        get_displacements);
-                    CommHelpers::unpack_buffer(
-                        settings, global_solution->get_values(), recv_buffer,
-                        global_get, num_get, p);
+                    if (settings.use_mixed_precision) {
+                        CommHelpers::transfer_buffer(
+                            settings, comm_struct.window_send_buffer,
+                            mixedt_recv_buffer->get_values(), global_get,
+                            num_get, p, neighbors_in, get_displacements);
+                        mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
+                        // recv_buffer->copy_from(gko::lend(mixedt_recv_buffer));
+                        CommHelpers::unpack_buffer(
+                            settings, global_solution->get_values(),
+                            recv_buffer->get_values(), global_get, num_get, p);
+                    } else {
+                        CommHelpers::transfer_buffer(
+                            settings, comm_struct.window_send_buffer,
+                            recv_buffer->get_values(), global_get, num_get, p,
+                            neighbors_in, get_displacements);
+                        CommHelpers::unpack_buffer(
+                            settings, global_solution->get_values(),
+                            recv_buffer->get_values(), global_get, num_get, p);
+                    }
                 }
                 num_get += (global_get[p])[0];
             }
@@ -762,9 +805,15 @@ void exchange_boundary_twosided(
     auto local_put = comm_struct.local_put->get_data();
     auto put_request = comm_struct.put_request->get_data();
     int num_put = 0;
-    auto send_buffer = comm_struct.send_buffer->get_values();
+    auto send_buffer = comm_struct.send_buffer;
+    auto mixedt_send_buffer = comm_struct.mixedt_send_buffer;
+
+    MixedValueType dummy_mixed = 0.0;
+    auto mpi_mixedvtype = boost::mpi::get_mpi_datatype(dummy_mixed);
+
     {
-        auto mpi_vtype = boost::mpi::get_mpi_datatype(send_buffer[0]);
+        auto mpi_vtype =
+            boost::mpi::get_mpi_datatype(send_buffer->get_values()[0]);
         for (auto p = 0; p < num_neighbors_out; p++) {
             // send
             if ((global_put[p])[0] > 0) {
@@ -776,10 +825,20 @@ void exchange_boundary_twosided(
                 }
                 settings.executor->run(GatherScatter<ValueType, IndexType>(
                     true, (global_put[p])[0], &((local_put[p])[1]),
-                    global_solution->get_values(), &send_buffer[num_put]));
-
-                MPI_Isend(&send_buffer[num_put], (global_put[p])[0], mpi_vtype,
-                          neighbors_out[p], 0, MPI_COMM_WORLD, &put_request[p]);
+                    global_solution->get_values(),
+                    &(send_buffer->get_values()[num_put])));
+                if (settings.use_mixed_precision) {
+                    send_buffer->convert_to(gko::lend(mixedt_send_buffer));
+                    // mixedt_send_buffer->copy_from(gko::lend(send_buffer));
+                    MPI_Isend(&(mixedt_send_buffer->get_values()[num_put]),
+                              (global_put[p])[0], mpi_mixedvtype,
+                              neighbors_out[p], 0, MPI_COMM_WORLD,
+                              &put_request[p]);
+                } else {
+                    MPI_Isend(&(send_buffer->get_values()[num_put]),
+                              (global_put[p])[0], mpi_vtype, neighbors_out[p],
+                              0, MPI_COMM_WORLD, &put_request[p]);
+                }
                 num_put += (global_put[p])[0];
             }
         }
@@ -790,17 +849,27 @@ void exchange_boundary_twosided(
     auto neighbors_in = comm_struct.neighbors_in->get_data();
     auto global_get = comm_struct.global_get->get_data();
     auto local_get = comm_struct.local_get->get_data();
-    auto recv_buffer = comm_struct.recv_buffer->get_values();
+    auto recv_buffer = comm_struct.recv_buffer;
+    auto mixedt_recv_buffer = comm_struct.mixedt_recv_buffer;
     {
-        auto mpi_vtype = boost::mpi::get_mpi_datatype(recv_buffer[0]);
+        auto mpi_vtype =
+            boost::mpi::get_mpi_datatype(recv_buffer->get_values()[0]);
         if (!settings.comm_settings.enable_overlap ||
             metadata.iter_count == 0) {
             for (auto p = 0; p < num_neighbors_in; p++) {
                 // receive
                 if ((global_get[p])[0] > 0) {
-                    MPI_Irecv(&recv_buffer[num_get], (global_get[p])[0],
-                              mpi_vtype, neighbors_in[p], 0, MPI_COMM_WORLD,
-                              &get_request[p]);
+                    if (settings.use_mixed_precision) {
+                        MPI_Irecv(&(mixedt_recv_buffer->get_values()[num_get]),
+                                  (global_get[p])[0], mpi_mixedvtype,
+                                  neighbors_in[p], 0, MPI_COMM_WORLD,
+                                  &get_request[p]);
+                    } else {
+                        MPI_Irecv(&(recv_buffer->get_values()[num_get]),
+                                  (global_get[p])[0], mpi_vtype,
+                                  neighbors_in[p], 0, MPI_COMM_WORLD,
+                                  &get_request[p]);
+                    }
                     num_get += (global_get[p])[0];
                 }
             }
@@ -808,20 +877,35 @@ void exchange_boundary_twosided(
     }
     num_get = 0;
     // wait for receive
-    // auto recv_buffer = comm_struct.recv_buffer->get_values();
     {
-        auto mpi_vtype = boost::mpi::get_mpi_datatype(recv_buffer[0]);
+        auto mpi_vtype =
+            boost::mpi::get_mpi_datatype(recv_buffer->get_values()[0]);
         for (auto p = 0; p < num_neighbors_in; p++) {
             if ((global_get[p])[0] > 0) {
+                if (settings.use_mixed_precision) {
+                    mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
+                    // recv_buffer->copy_from(gko::lend(mixedt_recv_buffer));
+                }
                 settings.executor->run(GatherScatter<ValueType, IndexType>(
                     false, (global_get[p])[0], &((local_get[p])[1]),
-                    &recv_buffer[num_get], global_solution->get_values()));
-
-                if (settings.comm_settings.enable_overlap) {
-                    // start the next receive
-                    MPI_Irecv(&recv_buffer[num_get], (global_get[p])[0],
-                              mpi_vtype, neighbors_in[p], 0, MPI_COMM_WORLD,
-                              &get_request[p]);
+                    &(recv_buffer->get_values()[num_get]),
+                    global_solution->get_values()));
+                if (settings.use_mixed_precision) {
+                    if (settings.comm_settings.enable_overlap) {
+                        // start the next receive
+                        MPI_Irecv(&(mixedt_recv_buffer->get_values()[num_get]),
+                                  (global_get[p])[0], mpi_mixedvtype,
+                                  neighbors_in[p], 0, MPI_COMM_WORLD,
+                                  &get_request[p]);
+                    }
+                } else {
+                    if (settings.comm_settings.enable_overlap) {
+                        // start the next receive
+                        MPI_Irecv(&(recv_buffer->get_values()[num_get]),
+                                  (global_get[p])[0], mpi_vtype,
+                                  neighbors_in[p], 0, MPI_COMM_WORLD,
+                                  &get_request[p]);
+                    }
                 }
                 num_get += (global_get[p])[0];
             }

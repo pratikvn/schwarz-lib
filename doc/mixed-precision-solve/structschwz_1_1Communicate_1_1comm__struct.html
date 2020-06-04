@@ -160,7 +160,7 @@ std::shared_ptr&lt; gko::Array&lt; MPI_Request &gt; &gt;&#160;</td><td class="me
 <tr class="separator:a91cc6e7d906fbb693e4dff2dee609c94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc441e718856c45bd3cc462780886ca8"><td class="memItemLeft" align="right" valign="top"><a id="afc441e718856c45bd3cc462780886ca8"></a>
 std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#afc441e718856c45bd3cc462780886ca8">send_buffer</a></td></tr>
-<tr class="memdesc:afc441e718856c45bd3cc462780886ca8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The send buffer used for the actual communication for both one-sided and two-sided. <br /></td></tr>
+<tr class="memdesc:afc441e718856c45bd3cc462780886ca8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The send buffer used for the actual communication for both one-sided and two-sided (always allocated). <br /></td></tr>
 <tr class="separator:afc441e718856c45bd3cc462780886ca8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a357d96eeeb734a275f78782e7e6542a8"><td class="memItemLeft" align="right" valign="top"><a id="a357d96eeeb734a275f78782e7e6542a8"></a>
 std::shared_ptr&lt; gko::matrix::Dense&lt; MixedValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a357d96eeeb734a275f78782e7e6542a8">mixedt_send_buffer</a></td></tr>
@@ -168,7 +168,7 @@ std::shared_ptr&lt; gko::matrix::Dense&lt; MixedValueType &gt; &gt;&#160;</td><t
 <tr class="separator:a357d96eeeb734a275f78782e7e6542a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b02126d598b9054b9adf0ebc9b3138c"><td class="memItemLeft" align="right" valign="top"><a id="a7b02126d598b9054b9adf0ebc9b3138c"></a>
 std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a7b02126d598b9054b9adf0ebc9b3138c">recv_buffer</a></td></tr>
-<tr class="memdesc:a7b02126d598b9054b9adf0ebc9b3138c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The recv buffer used for the actual communication for both one-sided and two-sided. <br /></td></tr>
+<tr class="memdesc:a7b02126d598b9054b9adf0ebc9b3138c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The recv buffer used for the actual communication for both one-sided and two-sided (always allocated). <br /></td></tr>
 <tr class="separator:a7b02126d598b9054b9adf0ebc9b3138c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93ca78673122ad09e24bebd0b1ec9750"><td class="memItemLeft" align="right" valign="top"><a id="a93ca78673122ad09e24bebd0b1ec9750"></a>
 std::shared_ptr&lt; gko::matrix::Dense&lt; MixedValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a93ca78673122ad09e24bebd0b1ec9750">mixedt_recv_buffer</a></td></tr>
@@ -348,7 +348,7 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li><a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp (ebc6847)</a></li>
+<li><a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp (b5ec69e)</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

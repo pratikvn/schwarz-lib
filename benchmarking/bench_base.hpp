@@ -109,6 +109,8 @@ DEFINE_bool(print_config, true, "Print the configuration of the run ");
 DEFINE_string(
     partition, "regular",
     "The partitioner used. The choices are metis, regular, regular2d");
+DEFINE_bool(enable_logging, false,
+            "Enable some logs for the local iterative solver. ");
 DEFINE_string(local_solver, "iterative-ginkgo",
               "The local solver used in the local domains. The current choices "
               "include direct-cholmod , direct-ginkgo or iterative-ginkgo");
@@ -137,9 +139,14 @@ DEFINE_string(metis_objtype, "null",
 DEFINE_double(constant, 0.0, "constant for the event threshold");
 DEFINE_double(gamma, 0.0, "gamma for the event threshold");
 DEFINE_double(horizon, 0.0, "horizon for the event threshold");
-DEFINE_uint32(sent_history, 2, "number of previous slopes used at sender for calculating threshold");
-DEFINE_uint32(recv_history, 2, "number of previous slopes used at receiver for extrapolation");
-DEFINE_uint32(comm_start_iters, 5, "number of iters to communicate before starting event-based comm");
+DEFINE_uint32(
+    sent_history, 2,
+    "number of previous slopes used at sender for calculating threshold");
+DEFINE_uint32(recv_history, 2,
+              "number of previous slopes used at receiver for extrapolation");
+DEFINE_uint32(
+    comm_start_iters, 5,
+    "number of iters to communicate before starting event-based comm");
 DEFINE_string(thres_type, "cgammak",
               "The rhs type: choices are: cgammak or slope ");
 

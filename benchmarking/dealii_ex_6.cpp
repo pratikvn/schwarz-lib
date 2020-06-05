@@ -241,7 +241,7 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
     metadata.local_max_iters = FLAGS_local_max_iters;
     settings.non_symmetric_matrix = FLAGS_non_symmetric_matrix;
     settings.restart_iter = FLAGS_restart_iter;
-    metadata.precond_max_block_size = FLAGS_precond_max_block_size;
+    settings.enable_logging = FLAGS_enable_logging;
     metadata.precond_max_block_size = FLAGS_precond_max_block_size;
     settings.matrix_filename = FLAGS_matrix_filename;
     settings.explicit_laplacian = FLAGS_explicit_laplacian;
@@ -276,7 +276,7 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
     }
     settings.debug_print = FLAGS_debug;
 
-    //Event Settings
+    // Event Settings
     metadata.constant = FLAGS_constant;
     metadata.gamma = FLAGS_gamma;
     metadata.horizon = FLAGS_horizon;
@@ -335,7 +335,7 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
                               metadata.comm_data_struct, filename_send,
                               filename_recv);
     }
-    
+
     if (metadata.my_rank == 0) {
         std::copy(solution_vector->get_values(),
                   solution_vector->get_values() + metadata.global_size,

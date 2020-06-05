@@ -481,6 +481,16 @@ void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
             schwz::Settings::local_solver_settings::direct_solver_ginkgo;
     }
     settings.debug_print = FLAGS_debug;
+
+    // Event Settings
+    metadata.constant = FLAGS_constant;
+    metadata.gamma = FLAGS_gamma;
+    metadata.horizon = FLAGS_horizon;
+    metadata.sent_history = FLAGS_sent_history;
+    metadata.recv_history = FLAGS_recv_history;
+    metadata.comm_start_iters = FLAGS_comm_start_iters;
+    settings.thres_type = FLAGS_thres_type;
+
     int gsize = 0;
     if (metadata.my_rank == 0) {
         metadata.global_size = system_matrix.m();

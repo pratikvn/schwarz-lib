@@ -3,6 +3,7 @@ var searchData=
   ['commhelpers',['CommHelpers',['../namespaceschwz_1_1CommHelpers.html',1,'schwz']]],
   ['conv_5ftools',['conv_tools',['../namespaceschwz_1_1conv__tools.html',1,'schwz']]],
   ['partitiontools',['PartitionTools',['../namespaceschwz_1_1PartitionTools.html',1,'schwz']]],
+  ['scatter',['Scatter',['../structschwz_1_1Scatter.html',1,'schwz']]],
   ['schwarz_20class',['Schwarz Class',['../group__schwarz__class.html',1,'']]],
   ['schwarzbase',['SchwarzBase',['../classschwz_1_1SchwarzBase.html',1,'schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;'],['../classschwz_1_1SchwarzBase.html#adf9cd07681409095deecfb3bf63f1bf8',1,'schwz::SchwarzBase::SchwarzBase()']]],
   ['schwz',['schwz',['../namespaceschwz.html',1,'']]],

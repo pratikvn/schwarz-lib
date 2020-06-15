@@ -95,11 +95,15 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1device__guard.html">device_guard</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class defines a device guard for the cuda functions and the cuda module.  <a href="classschwz_1_1device__guard.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Gather.html">Gather</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Initialize.html">Initialize</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The initialization class that provides methods for initialization of the solver.  <a href="classschwz_1_1Initialize.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html">Metadata</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The solver metadata struct.  <a href="structschwz_1_1Metadata.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Scatter.html">Scatter</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1SchwarzBase.html">SchwarzBase</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Base solver class is meant to be the class implementing the common implementations for all the schwarz methods.  <a href="classschwz_1_1SchwarzBase.html#details">More...</a><br /></td></tr>
@@ -119,6 +123,42 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ac0d7361baa5ceaa2596da4586960cafc"><td class="memTemplParams" colspan="2"><a id="ac0d7361baa5ceaa2596da4586960cafc"></a>
+template&lt;typename ValueType , typename IndexType &gt; </td></tr>
+<tr class="memitem:ac0d7361baa5ceaa2596da4586960cafc"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>gather_values</b> (const IndexType num_elems, const IndexType *indices, const ValueType *from_array, ValueType *into_array)</td></tr>
+<tr class="separator:ac0d7361baa5ceaa2596da4586960cafc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e9cee5617c5c8270b831925ea4e6575"><td class="memTemplParams" colspan="2"><a id="a8e9cee5617c5c8270b831925ea4e6575"></a>
+template&lt;typename ValueType , typename IndexType &gt; </td></tr>
+<tr class="memitem:a8e9cee5617c5c8270b831925ea4e6575"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>scatter_values</b> (const IndexType num_elems, const IndexType *indices, const ValueType *from_array, ValueType *into_array)</td></tr>
+<tr class="separator:a8e9cee5617c5c8270b831925ea4e6575"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e68ca208e6176c2ba8f7da99786bd75"><td class="memTemplParams" colspan="2"><a id="a5e68ca208e6176c2ba8f7da99786bd75"></a>
+template&lt;typename ValueType , typename IndexType , typename AdditionalOperation &gt; </td></tr>
+<tr class="memitem:a5e68ca208e6176c2ba8f7da99786bd75"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>gather_kernel</b> (const IndexType num_elems, const IndexType *indices, const ValueType *gather_from, ValueType *gather_into, AdditionalOperation op)</td></tr>
+<tr class="separator:a5e68ca208e6176c2ba8f7da99786bd75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ab38225d7d861d19a8832cfffb7efe5"><td class="memItemLeft" align="right" valign="top"><a id="a7ab38225d7d861d19a8832cfffb7efe5"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_values</b> (const int, const int *, const float *, float *)</td></tr>
+<tr class="separator:a7ab38225d7d861d19a8832cfffb7efe5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6c2935754fee8a672b1ead7a7ca0fe3"><td class="memItemLeft" align="right" valign="top"><a id="aa6c2935754fee8a672b1ead7a7ca0fe3"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_values</b> (const int, const int *, const double *, double *)</td></tr>
+<tr class="separator:aa6c2935754fee8a672b1ead7a7ca0fe3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bed0b908c287eb731936d0fcece6c6e"><td class="memItemLeft" align="right" valign="top"><a id="a4bed0b908c287eb731936d0fcece6c6e"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_values</b> (const int, const int *, const int *, int *)</td></tr>
+<tr class="separator:a4bed0b908c287eb731936d0fcece6c6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab13b4ded1cd7a8c5bd9e738035c36e6"><td class="memItemLeft" align="right" valign="top"><a id="aab13b4ded1cd7a8c5bd9e738035c36e6"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_values</b> (const int, const int *, const long int *, long int *)</td></tr>
+<tr class="separator:aab13b4ded1cd7a8c5bd9e738035c36e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a758923b00d860044630d1b5cd4c4235a"><td class="memItemLeft" align="right" valign="top"><a id="a758923b00d860044630d1b5cd4c4235a"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_values</b> (const long int, const long int *, const float *, float *)</td></tr>
+<tr class="separator:a758923b00d860044630d1b5cd4c4235a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71821c9bb49d9dc02bcdad25f414bf35"><td class="memItemLeft" align="right" valign="top"><a id="a71821c9bb49d9dc02bcdad25f414bf35"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_values</b> (const long int, const long int *, const double *, double *)</td></tr>
+<tr class="separator:a71821c9bb49d9dc02bcdad25f414bf35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d12e403a66aba1b9d5b5a08d8e3013b"><td class="memItemLeft" align="right" valign="top"><a id="a3d12e403a66aba1b9d5b5a08d8e3013b"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_values</b> (const long int, const long int *, const int *, int *)</td></tr>
+<tr class="separator:a3d12e403a66aba1b9d5b5a08d8e3013b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d79bead3c437129ee3f0e4fb9539a2e"><td class="memItemLeft" align="right" valign="top"><a id="a3d79bead3c437129ee3f0e4fb9539a2e"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_values</b> (const long int, const long int *, const long int *, long int *)</td></tr>
+<tr class="separator:a3d79bead3c437129ee3f0e4fb9539a2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a443a272fc6c66825dc7a958e824e32e3"><td class="memItemLeft" align="right" valign="top"><a id="a443a272fc6c66825dc7a958e824e32e3"></a>
 gko::size_type&#160;</td><td class="memItemRight" valign="bottom"><b>linearize_index</b> (const gko::size_type row, const gko::size_type col, const gko::size_type num_rows)</td></tr>
 <tr class="separator:a443a272fc6c66825dc7a958e824e32e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -130,6 +170,34 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </td></tr>
 <tr class="memitem:a5c58f9da7e21d6671295b7b62f45b33f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>exchange_boundary_twosided</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, struct <a class="el" href="classschwz_1_1Communicate.html">Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct &amp;comm_struct, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution)</td></tr>
 <tr class="separator:a5c58f9da7e21d6671295b7b62f45b33f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1149b1cad510b1ae7285480c970fd2b3"><td class="memTemplParams" colspan="2"><a id="a1149b1cad510b1ae7285480c970fd2b3"></a>
+template&lt;typename ValueType , typename IndexType , typename AdditionalOperation &gt; </td></tr>
+<tr class="memitem:a1149b1cad510b1ae7285480c970fd2b3"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>scatter_kernel</b> (const IndexType num_elems, const IndexType *indices, const ValueType *scatter_from, ValueType *scatter_into, AdditionalOperation op)</td></tr>
+<tr class="separator:a1149b1cad510b1ae7285480c970fd2b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2581a54865ba2cf58b58dfd35725798"><td class="memItemLeft" align="right" valign="top"><a id="af2581a54865ba2cf58b58dfd35725798"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_values</b> (const int, const int *, const float *, float *)</td></tr>
+<tr class="separator:af2581a54865ba2cf58b58dfd35725798"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a936497bda52c4576c12e53e253cceab2"><td class="memItemLeft" align="right" valign="top"><a id="a936497bda52c4576c12e53e253cceab2"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_values</b> (const int, const int *, const double *, double *)</td></tr>
+<tr class="separator:a936497bda52c4576c12e53e253cceab2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a166460cb963d5ee838ced61ad3d382f6"><td class="memItemLeft" align="right" valign="top"><a id="a166460cb963d5ee838ced61ad3d382f6"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_values</b> (const int, const int *, const int *, int *)</td></tr>
+<tr class="separator:a166460cb963d5ee838ced61ad3d382f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8f9c56f2d0a9aaf5509c3bc86c8155e"><td class="memItemLeft" align="right" valign="top"><a id="aa8f9c56f2d0a9aaf5509c3bc86c8155e"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_values</b> (const int, const int *, const long int *, long int *)</td></tr>
+<tr class="separator:aa8f9c56f2d0a9aaf5509c3bc86c8155e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fec6640931ec9c0e528e90d27d0951d"><td class="memItemLeft" align="right" valign="top"><a id="a3fec6640931ec9c0e528e90d27d0951d"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_values</b> (const long int, const long int *, const float *, float *)</td></tr>
+<tr class="separator:a3fec6640931ec9c0e528e90d27d0951d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30054ec4df2645e3b13bc3df228d1273"><td class="memItemLeft" align="right" valign="top"><a id="a30054ec4df2645e3b13bc3df228d1273"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_values</b> (const long int, const long int *, const double *, double *)</td></tr>
+<tr class="separator:a30054ec4df2645e3b13bc3df228d1273"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24803b7dd7b84c7c8054e11d6a9194fb"><td class="memItemLeft" align="right" valign="top"><a id="a24803b7dd7b84c7c8054e11d6a9194fb"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_values</b> (const long int, const long int *, const int *, int *)</td></tr>
+<tr class="separator:a24803b7dd7b84c7c8054e11d6a9194fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9136fe3be2935ea9e1baf81e3e190635"><td class="memItemLeft" align="right" valign="top"><a id="a9136fe3be2935ea9e1baf81e3e190635"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_values</b> (const long int, const long int *, const long int *, long int *)</td></tr>
+<tr class="separator:a9136fe3be2935ea9e1baf81e3e190635"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5437b273e3d364a2b3fa80929aeded9"><td class="memTemplParams" colspan="2"><a id="af5437b273e3d364a2b3fa80929aeded9"></a>
 template&lt;typename ValueType , typename IndexType &gt; </td></tr>
 <tr class="memitem:af5437b273e3d364a2b3fa80929aeded9"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>write_iters_and_residuals</b> (int num_subd, int my_rank, int iter_count, std::vector&lt; ValueType &gt; &amp;local_res_vec_out, std::vector&lt; IndexType &gt; &amp;local_converged_iter_count, std::vector&lt; ValueType &gt; &amp;local_converged_resnorm, std::vector&lt; ValueType &gt; &amp;local_timestamp, std::string filename)</td></tr>

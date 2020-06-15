@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['gatherscatter',['GatherScatter',['../structGatherScatter.html',1,'']]],
+  ['gather',['Gather',['../structschwz_1_1Gather.html',1,'schwz']]],
   ['generate_5frhs',['generate_rhs',['../classschwz_1_1Initialize.html#a9dee6b55c599df30410cdf45819b3e28',1,'schwz::Initialize']]],
   ['get_5fdisplacements',['get_displacements',['../structschwz_1_1Communicate_1_1comm__struct.html#aa9d510fb291e896fa14fe3e0f00f0454',1,'schwz::Communicate::comm_struct']]],
   ['get_5frequest',['get_request',['../structschwz_1_1Communicate_1_1comm__struct.html#a91cc6e7d906fbb693e4dff2dee609c94',1,'schwz::Communicate::comm_struct']]],

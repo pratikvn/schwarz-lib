@@ -38,9 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 
+#include <schwarz/config.hpp>
 
 #include <communicate.hpp>
-#include <schwarz/config.hpp>
+#include <gather.hpp>
+#include <scatter.hpp>
 #include <settings.hpp>
 
 
@@ -102,8 +104,8 @@ void pack_buffer(const Settings &settings, ValueType *buffer,
                              arr::view(settings.executor->get_master(),
                                        ((num_send_elems)[send_subd])[0],
                                        &((num_send_elems[send_subd])[1])));
-        settings.executor->run(GatherScatter<ValueType, IndexType>(
-            true, (num_send_elems[send_subd])[0], tmp_idx_s.get_data(), buffer,
+        settings.executor->run(Gather<ValueType, IndexType>(
+            (num_send_elems[send_subd])[0], tmp_idx_s.get_data(), buffer,
             tmp_send_buf->get_values()));
 #if SCHW_HAVE_CUDA
         SCHWARZ_ASSERT_NO_CUDA_ERRORS(
@@ -171,8 +173,8 @@ void unpack_buffer(const Settings &settings, ValueType *buffer,
                              arr::view(settings.executor->get_master(),
                                        ((num_recv_elems)[recv_subd])[0],
                                        &((num_recv_elems[recv_subd])[1])));
-        settings.executor->run(GatherScatter<ValueType, IndexType>(
-            false, (num_recv_elems[recv_subd])[0], tmp_idx_r.get_data(),
+        settings.executor->run(Scatter<ValueType, IndexType>(
+            (num_recv_elems[recv_subd])[0], tmp_idx_r.get_data(),
             tmp_recv_buf->get_values(), buffer));
     } else {
         for (auto i = 0; i < (num_recv_elems[recv_subd])[0]; i++) {

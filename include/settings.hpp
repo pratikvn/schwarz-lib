@@ -50,7 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <device_guard.hpp>
 #include <exception_helpers.hpp>
-#include <gather_scatter.hpp>
+#include <gather.hpp>
+#include <scatter.hpp>
 
 
 #if SCHW_HAVE_METIS

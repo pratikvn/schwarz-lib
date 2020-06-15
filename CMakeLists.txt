@@ -133,11 +133,15 @@ TARGET_SOURCES(${TARGET} PRIVATE
 
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.hpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/include/schwarz/config.hpp @ONLY)
+  ${CMAKE_CURRENT_BINARY_DIR}/include/schwarz/config.hpp @ONLY)
 
 if(SCHWARZ_BUILD_CUDA)
   target_sources(${TARGET} PRIVATE
-    source/cuda_gather.cu)
+    source/gather_kernel.cu
+    source/scatter_kernel.cu)
+  target_compile_options(${TARGET}
+    PRIVATE
+    $<$<COMPILE_LANGUAGE:CUDA>:--expt-extended-lambda>)
 else()
   target_sources(${TARGET} PRIVATE
     source/cuda_dummy_gather.cpp)
@@ -179,7 +183,7 @@ if(CLANG_TIDY_EXE)
   SET_TARGET_PROPERTIES(
     ${TARGET} PROPERTIES
     CXX_CLANG_TIDY "${DO_CLANG_TIDY}"
-  )
+    )
 endif()
 
 # Link optional packages

@@ -108,8 +108,8 @@ void extract_local_vector(const Settings &settings,
     sub_vector->get_executor()->get_mem_space()->copy_from(
         settings.executor->get_mem_space().get(), metadata.local_size,
         vector->get_const_values() + vec_index, sub_vector->get_values());
-    settings.executor->run(GatherScatter<ValueType, IndexType>(
-        true, metadata.overlap_size, metadata.overlap_row->get_data(),
+    settings.executor->run(Gather<ValueType, IndexType>(
+        metadata.overlap_size, metadata.overlap_row->get_data(),
         vector->get_const_values(),
         &(sub_vector->get_values()[metadata.local_size])));
 }

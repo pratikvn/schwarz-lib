@@ -775,7 +775,6 @@ void Solve<ValueType, IndexType, MixedValueType>::local_solve(
         } else {
             metadata.post_process_data.local_converged_iter_count.push_back(
                 static_cast<IndexType>(0));
-            metadata.post_process_data.local_converged_resnorm.push_back(0.0);
         }
         metadata.post_process_data.local_timestamp.push_back(
             MPI_Wtime() - metadata.init_mpi_wtime);
@@ -795,7 +794,7 @@ void Solve<ValueType, IndexType, MixedValueType>::local_solve(
 
 template <typename ValueType, typename IndexType, typename MixedValueType>
 bool Solve<ValueType, IndexType, MixedValueType>::check_local_convergence(
-    const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
+    const Settings &settings, Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
@@ -850,6 +849,14 @@ bool Solve<ValueType, IndexType, MixedValueType>::check_local_convergence(
                                 (local_resnorm0 * local_resnorm0) <
                             (tolerance * tolerance);
     }
+    if (!settings.enable_logging) {
+        metadata.post_process_data.local_converged_resnorm.push_back(
+            local_resnorm / local_resnorm0);
+    }
+    // std::cout << "Here: " << __LINE__ << " rank " << metadata.my_rank
+    //           << " iter " << metadata.iter_count << " l res norm /l norm 0 "
+    //           << local_resnorm / local_resnorm0 << " tol " << tolerance
+    //           << " locally_converged " << locally_converged << std::endl;
     return locally_converged;
 }
 
@@ -976,6 +983,9 @@ void Solve<ValueType, IndexType, MixedValueType>::check_convergence(
         num_converged_p = 1;
     } else {
         num_converged_p = 0;
+    }
+    if (std::isnan(local_residual_norm)) {
+        std::exit(-1);
     }
     metadata.post_process_data.local_residual_vector_out.push_back(
         local_residual_norm);

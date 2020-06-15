@@ -232,8 +232,7 @@ protected:
      * @return local_convergence  If the local subdomain has converged.
      */
     bool check_local_convergence(
-        const Settings &settings,
-        const Metadata<ValueType, IndexType> &metadata,
+        const Settings &settings, Metadata<ValueType, IndexType> &metadata,
         const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
         const std::shared_ptr<gko::matrix::Dense<ValueType>>
             &global_old_solution,

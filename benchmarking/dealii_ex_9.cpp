@@ -112,7 +112,7 @@ double RightHandSide<dim>::value(const Point<dim> &p,
     const double diameter = 0.1;
     return ((p - center_point).norm_square() < diameter * diameter
                 ? 0.1 / std::pow(diameter, dim)
-                : 0.0);
+                : 0.1);
 }
 
 

@@ -286,12 +286,14 @@ void BenchDealiiLaplace<dim, ValueType, IndexType, MixedValueType>::solve(
             schwz::Settings::local_solver_settings::direct_solver_ginkgo;
     }
     settings.debug_print = FLAGS_debug;
+    MixedValueType dummy = 0.0;
     int gsize = 0;
     if (metadata.my_rank == 0) {
         metadata.global_size = system_matrix.m();
         std::cout << " Running on the " << FLAGS_executor << " executor on "
                   << metadata.num_subdomains << " ranks with "
                   << FLAGS_num_threads << " threads" << std::endl;
+        std::cout << " MixedValueType: " << typeid(dummy).name() << std::endl;
         std::cout << " Problem Size: " << metadata.global_size
                   << " Number of non-zeros: "
                   << system_matrix.n_nonzero_elements() << std::endl;
@@ -453,7 +455,7 @@ int main(int argc, char **argv)
 {
     try {
         initialize_argument_parsing(&argc, &argv);
-        BenchDealiiLaplace<3, double, int, double> laplace_problem;
+        BenchDealiiLaplace<3, double, int, float> laplace_problem;
         if (FLAGS_num_threads > 1) {
             int req_thread_support = MPI_THREAD_MULTIPLE;
             int prov_thread_support = MPI_THREAD_MULTIPLE;

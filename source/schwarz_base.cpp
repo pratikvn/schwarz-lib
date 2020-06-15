@@ -323,6 +323,13 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
             vec_vtype::create(settings.executor->get_master(),
                               gko::dim<2>(this->metadata.global_size, 1));
     }
+    MixedValueType dummy1 = 0.0;
+    ValueType dummy2 = 1.0;
+
+    if (metadata.my_rank == 0) {
+        std::cout << " MixedValueType: " << typeid(dummy1).name()
+                  << " ValueType: " << typeid(dummy2).name() << std::endl;
+    }
     // The main solution vector
     std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
@@ -332,7 +339,15 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     // An initial guess.
     std::shared_ptr<vec_vtype> init_guess = vec_vtype::create(
         settings.executor, gko::dim<2>(this->metadata.local_size_x, 1));
-    init_guess->copy_from(local_rhs.get());
+    // init_guess->copy_from(local_rhs.get());
+
+    if (settings.executor_string == "omp") {
+        ValueType sum_rhs = std::accumulate(
+            local_rhs->get_values(),
+            local_rhs->get_values() + local_rhs->get_size()[0], 0.0);
+        std::cout << " Rank " << this->metadata.my_rank << " sum local rhs "
+                  << sum_rhs << std::endl;
+    }
 
     // std::vector<IndexType> local_converged_iter_count;
 
@@ -410,10 +425,6 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     MPI_Barrier(MPI_COMM_WORLD);
     auto elapsed_time = std::chrono::duration<ValueType>(
         std::chrono::steady_clock::now() - start_time);
-    std::cout << " Rank " << metadata.my_rank << " converged in "
-              << metadata.iter_count << " iters " << std::endl;
-    ValueType mat_norm = -1.0, rhs_norm = -1.0, sol_norm = -1.0,
-              residual_norm = -1.0;
     // Write the residuals and iterations to files
     if (settings.write_iters_and_residuals &&
         solver_settings ==
@@ -431,30 +442,34 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
             metadata.post_process_data.local_converged_resnorm,
             metadata.post_process_data.local_timestamp, filename);
     }
+    if (num_converged_procs < metadata.num_subdomains) {
+        std::cout << "Rank " << metadata.my_rank << " did not converge in "
+                  << metadata.iter_count << " iterations." << std::endl;
+    } else {
+        std::cout << " Rank " << metadata.my_rank << " converged in "
+                  << metadata.iter_count << " iterations " << std::endl;
+        ValueType mat_norm = -1.0, rhs_norm = -1.0, sol_norm = -1.0,
+                  residual_norm = -1.0;
 
-    // Compute the final residual norm. Also gathers the solution from all
-    // subdomains.
-    Solve<ValueType, IndexType, MixedValueType>::compute_residual_norm(
-        settings, metadata, global_matrix, global_rhs, global_solution,
-        mat_norm, rhs_norm, sol_norm, residual_norm);
-    gather_comm_data<ValueType, IndexType, MixedValueType>(
-        metadata.num_subdomains, this->comm_struct, metadata.comm_data_struct);
-    // clang-format off
-    if (metadata.my_rank == 0)
-      {
-        std::cout
+        // Compute the final residual norm. Also gathers the solution from all
+        // subdomains.
+        Solve<ValueType, IndexType, MixedValueType>::compute_residual_norm(
+            settings, metadata, global_matrix, global_rhs, global_solution,
+            mat_norm, rhs_norm, sol_norm, residual_norm);
+        gather_comm_data<ValueType, IndexType, MixedValueType>(
+            metadata.num_subdomains, this->comm_struct,
+            metadata.comm_data_struct);
+        // clang-format off
+        if (metadata.my_rank == 0)
+          {
+            std::cout
               << " residual norm " << residual_norm << "\n"
               << " relative residual norm of solution " << residual_norm/rhs_norm << "\n"
               << " Time taken for solve " << elapsed_time.count()
               << std::endl;
-        if (num_converged_procs < metadata.num_subdomains)
-          {
-            std::cout << " Did not converge in " << metadata.iter_count
-                      << " iterations."
-                      << std::endl;
           }
-      }
-    // clang-format on
+        // clang-format on
+    }
     if (metadata.my_rank == 0) {
         solution->copy_from(global_solution.get());
     }

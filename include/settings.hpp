@@ -526,12 +526,18 @@ struct Metadata {
 
 
 #define INSTANTIATE_FOR_EACH_VALUE_MIXEDVALUE_AND_INDEX_TYPE(_macro) \
-    template _macro(float, gko::int32, float);                       \
     template _macro(double, gko::int32, float);                      \
     template _macro(double, gko::int32, double);                     \
-    template _macro(float, gko::int64, float);                       \
     template _macro(double, gko::int64, float);                      \
     template _macro(double, gko::int64, double);
+
+// #define INSTANTIATE_FOR_EACH_VALUE_MIXEDVALUE_AND_INDEX_TYPE(_macro)  \
+//   template _macro(float, gko::int32, float);                          \
+//   template _macro(double, gko::int32, float);                         \
+//   template _macro(double, gko::int32, double);                        \
+//   template _macro(float, gko::int64, float);                          \
+//   template _macro(double, gko::int64, float);                         \
+//   template _macro(double, gko::int64, double);
 
 
 // explicit instantiations for schwz

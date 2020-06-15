@@ -88,7 +88,7 @@ void solve_direct_ginkgo(
 
 
 template <typename ValueType, typename IndexType>
-void solve_iterative_ginkgo(
+inline void solve_iterative_ginkgo(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::LinOp> &solver,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,

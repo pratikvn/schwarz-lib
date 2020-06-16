@@ -39,9 +39,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <omp.h>
 #include <ginkgo/ginkgo.hpp>
 
+#include <collective_common.hpp>
 
 namespace schwz {
 
+
+template <typename ValueType, typename IndexType>
+extern void scatter_add_values(const IndexType num_elems,
+                               const IndexType *indices,
+                               const ValueType *from_array,
+                               ValueType *into_array);
+
+template <typename ValueType, typename IndexType>
+extern void scatter_diff_values(const IndexType num_elems,
+                                const IndexType *indices,
+                                const ValueType *from_array,
+                                ValueType *into_array);
 
 template <typename ValueType, typename IndexType>
 extern void scatter_values(const IndexType num_elems, const IndexType *indices,
@@ -51,32 +64,66 @@ extern void scatter_values(const IndexType num_elems, const IndexType *indices,
 template <typename ValueType, typename IndexType>
 struct Scatter : public gko::Operation {
     Scatter(const IndexType num_elems, const IndexType *indices,
-            const ValueType *from_array, ValueType *into_array)
+            const ValueType *from_array, ValueType *into_array,
+            OperationType optype)
         : num_elems{num_elems},
           indices{indices},
           from_array{from_array},
-          into_array{into_array}
+          into_array{into_array},
+          optype{optype}
     {}
 
     void run(std::shared_ptr<const gko::OmpExecutor>) const override
     {
-        auto op = [] __device__(const ValueType &x, const ValueType &y) {
-            return y;
-        };
+        switch (optype) {
+        case copy:
 #pragma omp parallel for
-        for (auto i = 0; i < num_elems; ++i) {
-            into_array[indices[i]] = op(into_array[indices[i]], from_array[i]);
+            for (auto i = 0; i < num_elems; ++i) {
+                into_array[indices[i]] = from_array[i];
+            }
+            break;
+
+        case add:
+#pragma omp parallel for
+            for (auto i = 0; i < num_elems; ++i) {
+                into_array[indices[i]] = from_array[i] + into_array[indices[i]];
+            }
+            break;
+
+        case diff:
+#pragma omp parallel for
+            for (auto i = 0; i < num_elems; ++i) {
+                into_array[indices[i]] = from_array[i] - into_array[indices[i]];
+            }
+            break;
+        default:
+            std::cout << "Undefined gather operation" << std::endl;
+            std::exit(-1);
         }
     }
 
     void run(std::shared_ptr<const gko::CudaExecutor>) const override
     {
-        scatter_values(num_elems, indices, from_array, into_array);
+        switch (optype) {
+        case copy:
+            scatter_values(num_elems, indices, from_array, into_array);
+            break;
+        case add:
+            scatter_add_values(num_elems, indices, from_array, into_array);
+            break;
+        case diff:
+            scatter_diff_values(num_elems, indices, from_array, into_array);
+            break;
+        default:
+            std::cout << "Undefined gather operation" << std::endl;
+            std::exit(-1);
+        }
     }
     const IndexType num_elems;
     const IndexType *indices;
     const ValueType *from_array;
     ValueType *into_array;
+    OperationType optype;
 };
 
 #define INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \

@@ -106,7 +106,7 @@ void pack_buffer(const Settings &settings, ValueType *buffer,
                                        &((num_send_elems[send_subd])[1])));
         settings.executor->run(Gather<ValueType, IndexType>(
             (num_send_elems[send_subd])[0], tmp_idx_s.get_data(), buffer,
-            tmp_send_buf->get_values()));
+            tmp_send_buf->get_values(), diff));
 #if SCHW_HAVE_CUDA
         SCHWARZ_ASSERT_NO_CUDA_ERRORS(
             cudaMemcpy(&(send_buffer[offset]), tmp_send_buf->get_values(),
@@ -116,7 +116,8 @@ void pack_buffer(const Settings &settings, ValueType *buffer,
     } else {
         for (auto i = 0; i < (num_send_elems[send_subd])[0]; i++) {
             send_buffer[offset + i] =
-                buffer[(num_send_elems[send_subd])[i + 1]];
+                buffer[(num_send_elems[send_subd])[i + 1]] -
+                send_buffer[offset + i];
         }
     }
 }
@@ -175,14 +176,16 @@ void unpack_buffer(const Settings &settings, ValueType *buffer,
                                        &((num_recv_elems[recv_subd])[1])));
         settings.executor->run(Scatter<ValueType, IndexType>(
             (num_recv_elems[recv_subd])[0], tmp_idx_r.get_data(),
-            tmp_recv_buf->get_values(), buffer));
+            tmp_recv_buf->get_values(), buffer, add));
     } else {
         for (auto i = 0; i < (num_recv_elems[recv_subd])[0]; i++) {
             buffer[(num_recv_elems[recv_subd])[i + 1]] =
+                buffer[(num_recv_elems[recv_subd])[i + 1]] +
                 recv_buffer[offset + i];
         }
     }
 }
+
 
 }  // namespace CommHelpers
 }  // namespace schwz

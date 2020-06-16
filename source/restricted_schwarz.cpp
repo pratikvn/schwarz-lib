@@ -757,8 +757,8 @@ void exchange_boundary_onesided(
                 num_put += (global_put[p])[0];
             }
             if (settings.use_mixed_precision) {
-                // send_buffer->convert_to(gko::lend(mixedt_send_buffer));
-                mixedt_send_buffer->copy_from(gko::lend(send_buffer));
+                send_buffer->convert_to(gko::lend(mixedt_send_buffer));
+                // mixedt_send_buffer->copy_from(gko::lend(send_buffer));
             }
             int num_get = 0;
             for (auto p = 0; p < num_neighbors_in; p++) {
@@ -768,8 +768,8 @@ void exchange_boundary_onesided(
                             settings, comm_struct.window_send_buffer,
                             mixedt_recv_buffer->get_values(), global_get,
                             num_get, p, neighbors_in, get_displacements);
-                        // mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
-                        recv_buffer->copy_from(gko::lend(mixedt_recv_buffer));
+                        mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
+                        // recv_buffer->copy_from(gko::lend(mixedt_recv_buffer));
                         CommHelpers::unpack_buffer(
                             settings, global_solution->get_values(),
                             recv_buffer->get_values(), global_get, num_get, p);
@@ -826,7 +826,7 @@ void exchange_boundary_twosided(
                 settings.executor->run(Gather<ValueType, IndexType>(
                     (global_put[p])[0], &((local_put[p])[1]),
                     global_solution->get_values(),
-                    &(send_buffer->get_values()[num_put])));
+                    &(send_buffer->get_values()[num_put]), copy));
                 if (settings.use_mixed_precision) {
                     send_buffer->convert_to(gko::lend(mixedt_send_buffer));
                     // mixedt_send_buffer->copy_from(gko::lend(send_buffer));
@@ -889,7 +889,7 @@ void exchange_boundary_twosided(
                 settings.executor->run(Scatter<ValueType, IndexType>(
                     (global_get[p])[0], &((local_get[p])[1]),
                     &(recv_buffer->get_values()[num_get]),
-                    global_solution->get_values()));
+                    global_solution->get_values(), copy));
                 if (settings.use_mixed_precision) {
                     if (settings.comm_settings.enable_overlap) {
                         // start the next receive

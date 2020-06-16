@@ -111,7 +111,7 @@ void extract_local_vector(const Settings &settings,
     settings.executor->run(Gather<ValueType, IndexType>(
         metadata.overlap_size, metadata.overlap_row->get_data(),
         vector->get_const_values(),
-        &(sub_vector->get_values()[metadata.local_size])));
+        &(sub_vector->get_values()[metadata.local_size]), copy));
 }
 
 

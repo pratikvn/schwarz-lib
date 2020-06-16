@@ -68,6 +68,32 @@ void scatter_values(const IndexType num_elems, const IndexType *indices,
                                                scatter_into, op);
 }
 
+template <typename ValueType, typename IndexType>
+void scatter_add_values(const IndexType num_elems, const IndexType *indices,
+                        const ValueType *scatter_from, ValueType *scatter_into)
+{
+    dim3 grid((num_elems + BLOCK_SIZE - 1) / BLOCK_SIZE, 1, 1);
+
+    auto op = [] __device__(const ValueType &x, const ValueType &y) {
+        return y + x;
+    };
+    scatter_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(num_elems, indices, scatter_from,
+                                               scatter_into, op);
+}
+
+template <typename ValueType, typename IndexType>
+void scatter_diff_values(const IndexType num_elems, const IndexType *indices,
+                         const ValueType *scatter_from, ValueType *scatter_into)
+{
+    dim3 grid((num_elems + BLOCK_SIZE - 1) / BLOCK_SIZE, 1, 1);
+
+    auto op = [] __device__(const ValueType &x, const ValueType &y) {
+        return y - x;
+    };
+    scatter_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(num_elems, indices, scatter_from,
+                                               scatter_into, op);
+}
+
 #define INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
     template _macro(float, int);                          \
     template _macro(double, int);                         \
@@ -84,5 +110,17 @@ void scatter_values(const IndexType num_elems, const IndexType *indices,
                         ValueType *)
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER);
 #undef DECLARE_SCATTER
+
+#define DECLARE_SCATTER_ADD(ValueType, IndexType)               \
+    void scatter_add_values(const IndexType, const IndexType *, \
+                            const ValueType *, ValueType *)
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER_ADD);
+#undef DECLARE_SCATTER_ADD
+
+#define DECLARE_SCATTER_DIFF(ValueType, IndexType)               \
+    void scatter_diff_values(const IndexType, const IndexType *, \
+                             const ValueType *, ValueType *)
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER_DIFF);
+#undef DECLARE_SCATTER_DIFF
 
 }  // namespace schwz

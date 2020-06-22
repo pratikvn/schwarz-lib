@@ -131,6 +131,10 @@ template&lt;typename ValueType , typename IndexType &gt; </td></tr>
 template&lt;typename ValueType , typename IndexType &gt; </td></tr>
 <tr class="memitem:a61c3a595834b5807415d04042ce74715"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>gather_diff_values</b> (const IndexType num_elems, const IndexType *indices, const ValueType *from_array, ValueType *into_array)</td></tr>
 <tr class="separator:a61c3a595834b5807415d04042ce74715"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a896f3d4b86393dc8ce73982e23073d9a"><td class="memTemplParams" colspan="2"><a id="a896f3d4b86393dc8ce73982e23073d9a"></a>
+template&lt;typename ValueType , typename IndexType &gt; </td></tr>
+<tr class="memitem:a896f3d4b86393dc8ce73982e23073d9a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>gather_avg_values</b> (const IndexType num_elems, const IndexType *indices, const ValueType *from_array, ValueType *into_array)</td></tr>
+<tr class="separator:a896f3d4b86393dc8ce73982e23073d9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0d7361baa5ceaa2596da4586960cafc"><td class="memTemplParams" colspan="2"><a id="ac0d7361baa5ceaa2596da4586960cafc"></a>
 template&lt;typename ValueType , typename IndexType &gt; </td></tr>
 <tr class="memitem:ac0d7361baa5ceaa2596da4586960cafc"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>gather_values</b> (const IndexType num_elems, const IndexType *indices, const ValueType *from_array, ValueType *into_array)</td></tr>
@@ -143,6 +147,10 @@ template&lt;typename ValueType , typename IndexType &gt; </td></tr>
 template&lt;typename ValueType , typename IndexType &gt; </td></tr>
 <tr class="memitem:adbc33f65188d6040744e0e022bc99d62"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>scatter_diff_values</b> (const IndexType num_elems, const IndexType *indices, const ValueType *from_array, ValueType *into_array)</td></tr>
 <tr class="separator:adbc33f65188d6040744e0e022bc99d62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07d5a0ad6fe3b1c9692a933ccf402ab4"><td class="memTemplParams" colspan="2"><a id="a07d5a0ad6fe3b1c9692a933ccf402ab4"></a>
+template&lt;typename ValueType , typename IndexType &gt; </td></tr>
+<tr class="memitem:a07d5a0ad6fe3b1c9692a933ccf402ab4"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>scatter_avg_values</b> (const IndexType num_elems, const IndexType *indices, const ValueType *from_array, ValueType *into_array)</td></tr>
+<tr class="separator:a07d5a0ad6fe3b1c9692a933ccf402ab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e9cee5617c5c8270b831925ea4e6575"><td class="memTemplParams" colspan="2"><a id="a8e9cee5617c5c8270b831925ea4e6575"></a>
 template&lt;typename ValueType , typename IndexType &gt; </td></tr>
 <tr class="memitem:a8e9cee5617c5c8270b831925ea4e6575"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>scatter_values</b> (const IndexType num_elems, const IndexType *indices, const ValueType *from_array, ValueType *into_array)</td></tr>
@@ -223,17 +231,41 @@ template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_diff_
 <tr class="memitem:a6b906ed90cfe429146cb1e253fe06116"><td class="memItemLeft" align="right" valign="top"><a id="a6b906ed90cfe429146cb1e253fe06116"></a>
 template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_diff_values</b> (const long int, const long int *, const long int *, long int *)</td></tr>
 <tr class="separator:a6b906ed90cfe429146cb1e253fe06116"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa5bc78e39b6982bf8f9b3d0687647c0"><td class="memItemLeft" align="right" valign="top"><a id="afa5bc78e39b6982bf8f9b3d0687647c0"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_avg_values</b> (const int, const int *, const float *, float *)</td></tr>
+<tr class="separator:afa5bc78e39b6982bf8f9b3d0687647c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a966e8da22076968cde59487e74e248"><td class="memItemLeft" align="right" valign="top"><a id="a4a966e8da22076968cde59487e74e248"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_avg_values</b> (const int, const int *, const double *, double *)</td></tr>
+<tr class="separator:a4a966e8da22076968cde59487e74e248"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ad25532a91580ee41f3f21a9ef6e1e6"><td class="memItemLeft" align="right" valign="top"><a id="a9ad25532a91580ee41f3f21a9ef6e1e6"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_avg_values</b> (const int, const int *, const int *, int *)</td></tr>
+<tr class="separator:a9ad25532a91580ee41f3f21a9ef6e1e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a598e57814eb4b4266415619c6e01ea8a"><td class="memItemLeft" align="right" valign="top"><a id="a598e57814eb4b4266415619c6e01ea8a"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_avg_values</b> (const int, const int *, const long int *, long int *)</td></tr>
+<tr class="separator:a598e57814eb4b4266415619c6e01ea8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c9e5b9195d16742a8e09ae8eb1b948d"><td class="memItemLeft" align="right" valign="top"><a id="a4c9e5b9195d16742a8e09ae8eb1b948d"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_avg_values</b> (const long int, const long int *, const float *, float *)</td></tr>
+<tr class="separator:a4c9e5b9195d16742a8e09ae8eb1b948d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad44f654032dc8868eeb4000d8953d87c"><td class="memItemLeft" align="right" valign="top"><a id="ad44f654032dc8868eeb4000d8953d87c"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_avg_values</b> (const long int, const long int *, const double *, double *)</td></tr>
+<tr class="separator:ad44f654032dc8868eeb4000d8953d87c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9209d8313c0da94428a5ebd8ab6d955f"><td class="memItemLeft" align="right" valign="top"><a id="a9209d8313c0da94428a5ebd8ab6d955f"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_avg_values</b> (const long int, const long int *, const int *, int *)</td></tr>
+<tr class="separator:a9209d8313c0da94428a5ebd8ab6d955f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab80e27a06c01f85e821b1fd0b20342b5"><td class="memItemLeft" align="right" valign="top"><a id="ab80e27a06c01f85e821b1fd0b20342b5"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>gather_avg_values</b> (const long int, const long int *, const long int *, long int *)</td></tr>
+<tr class="separator:ab80e27a06c01f85e821b1fd0b20342b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a443a272fc6c66825dc7a958e824e32e3"><td class="memItemLeft" align="right" valign="top"><a id="a443a272fc6c66825dc7a958e824e32e3"></a>
 gko::size_type&#160;</td><td class="memItemRight" valign="bottom"><b>linearize_index</b> (const gko::size_type row, const gko::size_type col, const gko::size_type num_rows)</td></tr>
 <tr class="separator:a443a272fc6c66825dc7a958e824e32e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c99059ae93f77311f4a14d28774c0d3"><td class="memTemplParams" colspan="2"><a id="a4c99059ae93f77311f4a14d28774c0d3"></a>
+<tr class="memitem:a3ca248698ba2885cac5b477083f44505"><td class="memTemplParams" colspan="2"><a id="a3ca248698ba2885cac5b477083f44505"></a>
 template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </td></tr>
-<tr class="memitem:a4c99059ae93f77311f4a14d28774c0d3"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>exchange_boundary_onesided</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, struct <a class="el" href="classschwz_1_1Communicate.html">Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct &amp;comm_struct, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution)</td></tr>
-<tr class="separator:a4c99059ae93f77311f4a14d28774c0d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c58f9da7e21d6671295b7b62f45b33f"><td class="memTemplParams" colspan="2"><a id="a5c58f9da7e21d6671295b7b62f45b33f"></a>
+<tr class="memitem:a3ca248698ba2885cac5b477083f44505"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>exchange_boundary_onesided</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, struct <a class="el" href="classschwz_1_1Communicate.html">Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct &amp;comm_struct, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;prev_global_solution, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution)</td></tr>
+<tr class="separator:a3ca248698ba2885cac5b477083f44505"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f69ce81eaf85081073d0f45e11ce149"><td class="memTemplParams" colspan="2"><a id="a1f69ce81eaf85081073d0f45e11ce149"></a>
 template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </td></tr>
-<tr class="memitem:a5c58f9da7e21d6671295b7b62f45b33f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>exchange_boundary_twosided</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, struct <a class="el" href="classschwz_1_1Communicate.html">Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct &amp;comm_struct, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution)</td></tr>
-<tr class="separator:a5c58f9da7e21d6671295b7b62f45b33f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f69ce81eaf85081073d0f45e11ce149"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>exchange_boundary_twosided</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, struct <a class="el" href="classschwz_1_1Communicate.html">Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct &amp;comm_struct, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;prev_global_solution, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution)</td></tr>
+<tr class="separator:a1f69ce81eaf85081073d0f45e11ce149"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1149b1cad510b1ae7285480c970fd2b3"><td class="memTemplParams" colspan="2"><a id="a1149b1cad510b1ae7285480c970fd2b3"></a>
 template&lt;typename ValueType , typename IndexType , typename AdditionalOperation &gt; </td></tr>
 <tr class="memitem:a1149b1cad510b1ae7285480c970fd2b3"><td class="memTemplItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>scatter_kernel</b> (const IndexType num_elems, const IndexType *indices, const ValueType *scatter_from, ValueType *scatter_into, AdditionalOperation op)</td></tr>
@@ -310,6 +342,30 @@ template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_diff
 <tr class="memitem:a7ac82936a1eec570aac68dc6042f4823"><td class="memItemLeft" align="right" valign="top"><a id="a7ac82936a1eec570aac68dc6042f4823"></a>
 template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_diff_values</b> (const long int, const long int *, const long int *, long int *)</td></tr>
 <tr class="separator:a7ac82936a1eec570aac68dc6042f4823"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88529ad74a3f7548c85f26f636e24212"><td class="memItemLeft" align="right" valign="top"><a id="a88529ad74a3f7548c85f26f636e24212"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_avg_values</b> (const int, const int *, const float *, float *)</td></tr>
+<tr class="separator:a88529ad74a3f7548c85f26f636e24212"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adeb6898dd28ee5b0345a973d17106372"><td class="memItemLeft" align="right" valign="top"><a id="adeb6898dd28ee5b0345a973d17106372"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_avg_values</b> (const int, const int *, const double *, double *)</td></tr>
+<tr class="separator:adeb6898dd28ee5b0345a973d17106372"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac473f48d68800895d95bb377496827a8"><td class="memItemLeft" align="right" valign="top"><a id="ac473f48d68800895d95bb377496827a8"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_avg_values</b> (const int, const int *, const int *, int *)</td></tr>
+<tr class="separator:ac473f48d68800895d95bb377496827a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26eb04ab096688b4ad522fef0eab204e"><td class="memItemLeft" align="right" valign="top"><a id="a26eb04ab096688b4ad522fef0eab204e"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_avg_values</b> (const int, const int *, const long int *, long int *)</td></tr>
+<tr class="separator:a26eb04ab096688b4ad522fef0eab204e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac104918c72369958d827881200e6b0f2"><td class="memItemLeft" align="right" valign="top"><a id="ac104918c72369958d827881200e6b0f2"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_avg_values</b> (const long int, const long int *, const float *, float *)</td></tr>
+<tr class="separator:ac104918c72369958d827881200e6b0f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7857bd3c6d5819613725a25e46c8fb2c"><td class="memItemLeft" align="right" valign="top"><a id="a7857bd3c6d5819613725a25e46c8fb2c"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_avg_values</b> (const long int, const long int *, const double *, double *)</td></tr>
+<tr class="separator:a7857bd3c6d5819613725a25e46c8fb2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c7a01a33460207f5c3d063ef9eb015a"><td class="memItemLeft" align="right" valign="top"><a id="a0c7a01a33460207f5c3d063ef9eb015a"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_avg_values</b> (const long int, const long int *, const int *, int *)</td></tr>
+<tr class="separator:a0c7a01a33460207f5c3d063ef9eb015a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba9e74f2b7d99cfe0e27bb1577e61331"><td class="memItemLeft" align="right" valign="top"><a id="aba9e74f2b7d99cfe0e27bb1577e61331"></a>
+template void&#160;</td><td class="memItemRight" valign="bottom"><b>scatter_avg_values</b> (const long int, const long int *, const long int *, long int *)</td></tr>
+<tr class="separator:aba9e74f2b7d99cfe0e27bb1577e61331"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5437b273e3d364a2b3fa80929aeded9"><td class="memTemplParams" colspan="2"><a id="af5437b273e3d364a2b3fa80929aeded9"></a>
 template&lt;typename ValueType , typename IndexType &gt; </td></tr>
 <tr class="memitem:af5437b273e3d364a2b3fa80929aeded9"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>write_iters_and_residuals</b> (int num_subd, int my_rank, int iter_count, std::vector&lt; ValueType &gt; &amp;local_res_vec_out, std::vector&lt; IndexType &gt; &amp;local_converged_iter_count, std::vector&lt; ValueType &gt; &amp;local_converged_resnorm, std::vector&lt; ValueType &gt; &amp;local_timestamp, std::string filename)</td></tr>

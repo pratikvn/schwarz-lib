@@ -98,9 +98,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:adc313354f7ae256d375316516d0f655e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1SolverRAS.html#adc313354f7ae256d375316516d0f655e">setup_windows</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;main_buffer) override</td></tr>
 <tr class="memdesc:adc313354f7ae256d375316516d0f655e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the windows needed for the asynchronous communication.  <a href="#adc313354f7ae256d375316516d0f655e">More...</a><br /></td></tr>
 <tr class="separator:adc313354f7ae256d375316516d0f655e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8983c89cdc7b45d15f9f4bf276e9753"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1SolverRAS.html#ab8983c89cdc7b45d15f9f4bf276e9753">exchange_boundary</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;<a class="el" href="classschwz_1_1SchwarzBase.html#a8b1916399b8d0272cfd95dac495f0c92">global_solution</a>) override</td></tr>
-<tr class="memdesc:ab8983c89cdc7b45d15f9f4bf276e9753"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exchanges the elements of the solution vector.  <a href="#ab8983c89cdc7b45d15f9f4bf276e9753">More...</a><br /></td></tr>
-<tr class="separator:ab8983c89cdc7b45d15f9f4bf276e9753"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af33d7cc7aec6bb8bf26864f576ded42d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1SolverRAS.html#af33d7cc7aec6bb8bf26864f576ded42d">exchange_boundary</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;prev_global_solution, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;<a class="el" href="classschwz_1_1SchwarzBase.html#a8b1916399b8d0272cfd95dac495f0c92">global_solution</a>) override</td></tr>
+<tr class="memdesc:af33d7cc7aec6bb8bf26864f576ded42d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exchanges the elements of the solution vector.  <a href="#af33d7cc7aec6bb8bf26864f576ded42d">More...</a><br /></td></tr>
+<tr class="separator:af33d7cc7aec6bb8bf26864f576ded42d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0d9bc193a40fb1f27738a2436a3fa36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1SolverRAS.html#ae0d9bc193a40fb1f27738a2436a3fa36">update_boundary</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;<a class="el" href="classschwz_1_1SchwarzBase.html#a50b156f241360f12dd025b790203c58a">local_solution</a>, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;<a class="el" href="classschwz_1_1SchwarzBase.html#a186d54605688f53f50bb6305efe9c5fd">local_rhs</a>, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;<a class="el" href="classschwz_1_1SchwarzBase.html#a8b1916399b8d0272cfd95dac495f0c92">global_solution</a>, const std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;<a class="el" href="classschwz_1_1SchwarzBase.html#afeb8f503b58440a45ec901cae4708f29">interface_matrix</a>) override</td></tr>
 <tr class="memdesc:ae0d9bc193a40fb1f27738a2436a3fa36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the values into local vector from obtained from the neighboring sub-domains using the interface matrix.  <a href="#ae0d9bc193a40fb1f27738a2436a3fa36">More...</a><br /></td></tr>
 <tr class="separator:ae0d9bc193a40fb1f27738a2436a3fa36"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -538,8 +538,8 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ab8983c89cdc7b45d15f9f4bf276e9753"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab8983c89cdc7b45d15f9f4bf276e9753">&#9670;&nbsp;</a></span>exchange_boundary()</h2>
+<a id="af33d7cc7aec6bb8bf26864f576ded42d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af33d7cc7aec6bb8bf26864f576ded42d">&#9670;&nbsp;</a></span>exchange_boundary()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -560,6 +560,12 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
           <td></td>
           <td class="paramtype">const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;&#160;</td>
           <td class="paramname"><em>metadata</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;&#160;</td>
+          <td class="paramname"><em>prev_global_solution</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -590,7 +596,7 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classschwz_1_1Communicate.html#a41794ecd95f7f7e590ae27bb6ca6e6e1">schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt;</a>.</p>
+<p>Implements <a class="el" href="classschwz_1_1Communicate.html#a78864f8bdc7feb992c740b49d80b8d53">schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt;</a>.</p>
 
 <p class="reference">References <a class="el" href="structschwz_1_1Settings_1_1comm__settings.html#ad4273bd93cf3ee223c6c099a5fe9d02c">schwz::Settings::comm_settings::enable_onesided</a>, and <a class="el" href="classschwz_1_1SchwarzBase.html#a8b1916399b8d0272cfd95dac495f0c92">schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;::global_solution</a>.</p>
 
@@ -815,8 +821,8 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li><a class="el" href="restricted__schwarz_8hpp_source.html">restricted_schwarz.hpp (9d4939f)</a></li>
-<li>/home/runner/work/schwarz-lib/schwarz-lib/source/restricted_schwarz.cpp (9d4939f)</li>
+<li><a class="el" href="restricted__schwarz_8hpp_source.html">restricted_schwarz.hpp (7c9a9f7)</a></li>
+<li>/home/runner/work/schwarz-lib/schwarz-lib/source/restricted_schwarz.cpp (7c9a9f7)</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

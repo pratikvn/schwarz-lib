@@ -12,7 +12,7 @@ var searchData=
   ['enable_5fput',['enable_put',['../structschwz_1_1Settings_1_1comm__settings.html#ad9b64e9c41ab52a3f58de7e190aabee0',1,'schwz::Settings::comm_settings']]],
   ['enable_5frandom_5frhs',['enable_random_rhs',['../structschwz_1_1Settings.html#a04760b39513414af70498808c0a6b317',1,'schwz::Settings']]],
   ['error',['Error',['../classError.html',1,'Error'],['../classError.html#a146e7d37cbd73162b88a91ffa7fa776a',1,'Error::Error()']]],
-  ['exchange_5fboundary',['exchange_boundary',['../classschwz_1_1Communicate.html#a41794ecd95f7f7e590ae27bb6ca6e6e1',1,'schwz::Communicate::exchange_boundary()'],['../classschwz_1_1SolverRAS.html#ab8983c89cdc7b45d15f9f4bf276e9753',1,'schwz::SolverRAS::exchange_boundary()']]],
+  ['exchange_5fboundary',['exchange_boundary',['../classschwz_1_1Communicate.html#a78864f8bdc7feb992c740b49d80b8d53',1,'schwz::Communicate::exchange_boundary()'],['../classschwz_1_1SolverRAS.html#af33d7cc7aec6bb8bf26864f576ded42d',1,'schwz::SolverRAS::exchange_boundary()']]],
   ['executor',['executor',['../structschwz_1_1Settings.html#a6920db9b39120b83399743083f17691f',1,'schwz::Settings']]],
   ['executor_5fstring',['executor_string',['../structschwz_1_1Settings.html#a088ed3524456a1fd40e76b0e2d624c79',1,'schwz::Settings']]],
   ['explicit_5flaplacian',['explicit_laplacian',['../structschwz_1_1Settings.html#a2af5f07901df047e305c456b2f97e774',1,'schwz::Settings']]]

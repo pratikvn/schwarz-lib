@@ -57,6 +57,12 @@ extern void scatter_diff_values(const IndexType num_elems,
                                 ValueType *into_array);
 
 template <typename ValueType, typename IndexType>
+extern void scatter_avg_values(const IndexType num_elems,
+                               const IndexType *indices,
+                               const ValueType *from_array,
+                               ValueType *into_array);
+
+template <typename ValueType, typename IndexType>
 extern void scatter_values(const IndexType num_elems, const IndexType *indices,
                            const ValueType *from_array, ValueType *into_array);
 
@@ -82,23 +88,29 @@ struct Scatter : public gko::Operation {
                 into_array[indices[i]] = from_array[i];
             }
             break;
-
         case add:
 #pragma omp parallel for
             for (auto i = 0; i < num_elems; ++i) {
                 into_array[indices[i]] = from_array[i] + into_array[indices[i]];
             }
             break;
-
         case diff:
 #pragma omp parallel for
             for (auto i = 0; i < num_elems; ++i) {
                 into_array[indices[i]] = from_array[i] - into_array[indices[i]];
             }
             break;
-        default:
+        case avg:
+#pragma omp parallel for
+            for (auto i = 0; i < num_elems; ++i) {
+                into_array[indices[i]] =
+                    (from_array[i] + into_array[indices[i]]) / 2;
+            }
+            break;
+        default: {
             std::cout << "Undefined gather operation" << std::endl;
-            std::exit(-1);
+            break;
+        }
         }
     }
 
@@ -114,9 +126,13 @@ struct Scatter : public gko::Operation {
         case diff:
             scatter_diff_values(num_elems, indices, from_array, into_array);
             break;
-        default:
+        case avg:
+            scatter_avg_values(num_elems, indices, from_array, into_array);
+            break;
+        default: {
             std::cout << "Undefined gather operation" << std::endl;
-            std::exit(-1);
+            break;
+        }
         }
     }
     const IndexType num_elems;

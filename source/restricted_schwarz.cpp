@@ -665,11 +665,14 @@ void exchange_boundary_onesided(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
         &comm_struct,
+    const std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_global_solution,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using arr = gko::Array<IndexType>;
     using varr = gko::Array<ValueType>;
+
+    if (metadata.iter_count == 0) return;
 
     auto num_neighbors_out = comm_struct.num_neighbors_out;
     auto local_num_neighbors_out = comm_struct.local_num_neighbors_out;
@@ -694,6 +697,7 @@ void exchange_boundary_onesided(
     auto mixedt_recv_buffer = comm_struct.mixedt_recv_buffer;
     auto is_local_neighbor = comm_struct.is_local_neighbor;
 
+
     if (settings.comm_settings.enable_put) {
         if (settings.comm_settings.enable_one_by_one) {
             CommHelpers::transfer_one_by_one<ValueType, IndexType,
@@ -706,7 +710,8 @@ void exchange_boundary_onesided(
                 // send
                 if ((global_put[p])[0] > 0) {
                     CommHelpers::pack_buffer(
-                        settings, global_solution->get_values(),
+                        settings, prev_global_solution->get_values(),
+                        global_solution->get_values(),
                         send_buffer->get_values(), global_put, num_put, p);
                     if (settings.use_mixed_precision) {
                         send_buffer->convert_to(gko::lend(mixedt_send_buffer));
@@ -734,8 +739,9 @@ void exchange_boundary_onesided(
         for (auto p = 0; p < num_neighbors_in; p++) {
             if ((global_get[p])[0] > 0) {
                 CommHelpers::unpack_buffer(
-                    settings, global_solution->get_values(),
-                    recv_buffer->get_values(), global_get, num_get, p);
+                    settings, prev_global_solution->get_values(),
+                    global_solution->get_values(), recv_buffer->get_values(),
+                    global_get, num_get, p);
                 num_get += (global_get[p])[0];
             }
         }
@@ -751,7 +757,8 @@ void exchange_boundary_onesided(
             for (auto p = 0; p < num_neighbors_out; p++) {
                 if ((global_put[p])[0] > 0) {
                     CommHelpers::pack_buffer(
-                        settings, global_solution->get_values(),
+                        settings, prev_global_solution->get_values(),
+                        global_solution->get_values(),
                         send_buffer->get_values(), global_put, num_put, p);
                 }
                 num_put += (global_put[p])[0];
@@ -771,7 +778,8 @@ void exchange_boundary_onesided(
                         mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
                         // recv_buffer->copy_from(gko::lend(mixedt_recv_buffer));
                         CommHelpers::unpack_buffer(
-                            settings, global_solution->get_values(),
+                            settings, prev_global_solution->get_values(),
+                            global_solution->get_values(),
                             recv_buffer->get_values(), global_get, num_get, p);
                     } else {
                         CommHelpers::transfer_buffer(
@@ -779,7 +787,8 @@ void exchange_boundary_onesided(
                             recv_buffer->get_values(), global_get, num_get, p,
                             neighbors_in, get_displacements);
                         CommHelpers::unpack_buffer(
-                            settings, global_solution->get_values(),
+                            settings, prev_global_solution->get_values(),
+                            global_solution->get_values(),
                             recv_buffer->get_values(), global_get, num_get, p);
                     }
                 }
@@ -795,9 +804,11 @@ void exchange_boundary_twosided(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
         &comm_struct,
+    const std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_global_solution,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;
+    using vec_vtype = gko::matrix::Dense<ValueType>;
     MPI_Status status;
     auto num_neighbors_out = comm_struct.num_neighbors_out;
     auto neighbors_out = comm_struct.neighbors_out->get_data();
@@ -810,6 +821,19 @@ void exchange_boundary_twosided(
 
     MixedValueType dummy_mixed = 0.0;
     auto mpi_mixedvtype = boost::mpi::get_mpi_datatype(dummy_mixed);
+    // auto diff_buf =
+    //     vec_vtype::create(settings.executor,
+    //     prev_global_solution->get_size());
+    // if (settings.executor_string == "omp") {
+    //     // for (auto q = 0; q < diff_buf->get_size()[0]; ++q) {
+    //     //     diff_buf->get_values()[q] = global_solution->get_values()[q] -
+    //     // prev_global_solution->get_values()[q];
+    //     // }
+    //     diff_buf->copy_from(gko::lend(global_solution));
+    // } else {
+    //     diff_buf->copy_from(gko::lend(global_solution));
+    // }
+
 
     {
         auto mpi_vtype =
@@ -823,6 +847,7 @@ void exchange_boundary_twosided(
                     auto p_r = put_request[p];
                     MPI_Wait(&p_r, &status);
                 }
+
                 settings.executor->run(Gather<ValueType, IndexType>(
                     (global_put[p])[0], &((local_put[p])[1]),
                     global_solution->get_values(),
@@ -889,7 +914,7 @@ void exchange_boundary_twosided(
                 settings.executor->run(Scatter<ValueType, IndexType>(
                     (global_get[p])[0], &((local_get[p])[1]),
                     &(recv_buffer->get_values()[num_get]),
-                    global_solution->get_values(), copy));
+                    global_solution->get_values(), avg));
                 if (settings.use_mixed_precision) {
                     if (settings.comm_settings.enable_overlap) {
                         // start the next receive
@@ -911,6 +936,17 @@ void exchange_boundary_twosided(
             }
         }
     }
+    // if (settings.executor_string == "omp") {
+    //     for (auto q = 0; q < diff_buf->get_size()[0]; ++q) {
+    //         global_solution->get_values()[q] =
+    //             (global_solution->get_values()[q] +
+    //             diff_buf->get_values()[q]) / 2;
+    //         // prev_global_solution->get_values()[q];
+    //     }
+    //     // global_solution->copy_from(gko::lend(diff_buf));
+    // } else {
+    //     global_solution->copy_from(gko::lend(diff_buf));
+    // }
     // wait for send
     if (!settings.comm_settings.enable_overlap) {
         for (auto p = 0; p < num_neighbors_out; p++) {
@@ -926,14 +962,17 @@ void exchange_boundary_twosided(
 template <typename ValueType, typename IndexType, typename MixedValueType>
 void SolverRAS<ValueType, IndexType, MixedValueType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
+    const std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_global_solution,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     if (settings.comm_settings.enable_onesided) {
         exchange_boundary_onesided<ValueType, IndexType, MixedValueType>(
-            settings, metadata, this->comm_struct, global_solution);
+            settings, metadata, this->comm_struct, prev_global_solution,
+            global_solution);
     } else {
         exchange_boundary_twosided<ValueType, IndexType, MixedValueType>(
-            settings, metadata, this->comm_struct, global_solution);
+            settings, metadata, this->comm_struct, prev_global_solution,
+            global_solution);
     }
 }
 

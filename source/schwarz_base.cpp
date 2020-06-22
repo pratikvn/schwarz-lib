@@ -333,6 +333,9 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     // The main solution vector
     std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
+    // The previous iteration solution vector
+    std::shared_ptr<vec_vtype> prev_global_solution = vec_vtype::create(
+        this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
     // A work vector.
     std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
         settings.executor, gko::dim<2>(2 * this->metadata.local_size_x, 1));
@@ -361,6 +364,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
          Settings::local_solver_settings::iterative_solver_dealii |
          Settings::local_solver_settings::iterative_solver_ginkgo) &
         settings.local_solver;
+    prev_global_solution->copy_from(gko::lend(global_solution));
 
     ValueType local_residual_norm = -1.0, local_residual_norm0 = -1.0,
               global_residual_norm = 0.0, global_residual_norm0 = -1.0;
@@ -371,8 +375,10 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
         // Exchange the boundary values. The communication part.
         MEASURE_ELAPSED_FUNC_TIME(
-            this->exchange_boundary(settings, metadata, global_solution), 0,
-            metadata.my_rank, boundary_exchange, metadata.iter_count);
+            this->exchange_boundary(settings, metadata, prev_global_solution,
+                                    global_solution),
+            0, metadata.my_rank, boundary_exchange, metadata.iter_count);
+        prev_global_solution->copy_from(gko::lend(global_solution));
 
         // Update the boundary and interior values after the exchanging from
         // other processes.
@@ -412,6 +418,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
                     this->local_perm, this->local_inv_perm, work_vector,
                     init_guess, this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
+
             // Gather the local vector into the locally global vector for
             // communication.
             MEASURE_ELAPSED_FUNC_TIME(

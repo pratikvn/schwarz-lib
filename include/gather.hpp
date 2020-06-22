@@ -57,6 +57,12 @@ extern void gather_diff_values(const IndexType num_elems,
                                ValueType *into_array);
 
 template <typename ValueType, typename IndexType>
+extern void gather_avg_values(const IndexType num_elems,
+                              const IndexType *indices,
+                              const ValueType *from_array,
+                              ValueType *into_array);
+
+template <typename ValueType, typename IndexType>
 extern void gather_values(const IndexType num_elems, const IndexType *indices,
                           const ValueType *from_array, ValueType *into_array);
 
@@ -94,9 +100,16 @@ struct Gather : public gko::Operation {
                 into_array[i] = from_array[indices[i]] - into_array[i];
             }
             break;
-        default:
+        case avg:
+#pragma omp parallel for
+            for (auto i = 0; i < num_elems; ++i) {
+                into_array[i] = (from_array[indices[i]] + into_array[i]) / 2;
+            }
+            break;
+        default: {
             std::cout << "Undefined gather operation" << std::endl;
-            std::exit(-1);
+            break;
+        }
         }
     }
 
@@ -112,9 +125,13 @@ struct Gather : public gko::Operation {
         case diff:
             gather_diff_values(num_elems, indices, from_array, into_array);
             break;
-        default:
+        case avg:
+            gather_avg_values(num_elems, indices, from_array, into_array);
+            break;
+        default: {
             std::cout << "Undefined gather operation" << std::endl;
-            std::exit(-1);
+            break;
+        }
         }
     }
     const IndexType num_elems;

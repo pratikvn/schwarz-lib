@@ -45,7 +45,6 @@ __global__ void scatter_kernel(const IndexType num_elems,
                                const IndexType *indices,
                                const ValueType *scatter_from,
                                ValueType *scatter_into, AdditionalOperation op)
-// std::function<ValueType(ValueType &, ValueType &)> op)
 {
     int row = blockDim.x * blockIdx.x + threadIdx.x;
     if (row < num_elems) {
@@ -94,6 +93,19 @@ void scatter_diff_values(const IndexType num_elems, const IndexType *indices,
                                                scatter_into, op);
 }
 
+template <typename ValueType, typename IndexType>
+void scatter_avg_values(const IndexType num_elems, const IndexType *indices,
+                        const ValueType *scatter_from, ValueType *scatter_into)
+{
+    dim3 grid((num_elems + BLOCK_SIZE - 1) / BLOCK_SIZE, 1, 1);
+
+    auto op = [] __device__(const ValueType &x, const ValueType &y) {
+        return (y + 4 * x) / 5;
+    };
+    scatter_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(num_elems, indices, scatter_from,
+                                               scatter_into, op);
+}
+
 #define INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
     template _macro(float, int);                          \
     template _macro(double, int);                         \
@@ -122,5 +134,11 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER_ADD);
                              const ValueType *, ValueType *)
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER_DIFF);
 #undef DECLARE_SCATTER_DIFF
+
+#define DECLARE_SCATTER_AVG(ValueType, IndexType)               \
+    void scatter_avg_values(const IndexType, const IndexType *, \
+                            const ValueType *, ValueType *)
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER_AVG);
+#undef DECLARE_SCATTER_AVG
 
 }  // namespace schwz

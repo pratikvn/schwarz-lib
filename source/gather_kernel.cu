@@ -89,6 +89,18 @@ void gather_diff_values(const IndexType num_elems, const IndexType *indices,
                                               gather_into, op);
 }
 
+template <typename ValueType, typename IndexType>
+void gather_avg_values(const IndexType num_elems, const IndexType *indices,
+                       const ValueType *gather_from, ValueType *gather_into)
+{
+    dim3 grid((num_elems + BLOCK_SIZE - 1) / BLOCK_SIZE, 1, 1);
+    auto op = [] __device__(const ValueType &x, const ValueType &y) {
+        return (y + x) / 2;
+    };
+    gather_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(num_elems, indices, gather_from,
+                                              gather_into, op);
+}
+
 #define INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
     template _macro(float, int);                          \
     template _macro(double, int);                         \
@@ -118,5 +130,11 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER_ADD);
                             const ValueType *, ValueType *)
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER_DIFF);
 #undef DECLARE_GATHER_DIFF
+
+#define DECLARE_GATHER_AVG(ValueType, IndexType)               \
+    void gather_avg_values(const IndexType, const IndexType *, \
+                           const ValueType *, ValueType *)
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER_AVG);
+#undef DECLARE_GATHER_AVG
 
 }  // namespace schwz

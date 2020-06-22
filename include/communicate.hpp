@@ -253,6 +253,8 @@ public:
     virtual void exchange_boundary(
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
+        const std::shared_ptr<gko::matrix::Dense<ValueType>>
+            &prev_global_solution,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution) = 0;
 
     /**

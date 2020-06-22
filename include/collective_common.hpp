@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef collective_common_hpp
 #define collective_common_hpp
 
-enum OperationType { add = 0, copy = 1, diff = 2 };
+enum OperationType { add = 0, copy = 1, diff = 2, avg = 3 };
 
 
 #endif  // collective_common.hpp

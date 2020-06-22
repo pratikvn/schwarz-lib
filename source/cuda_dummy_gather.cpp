@@ -40,11 +40,30 @@ void gather_values(const IndexType num_elems, const IndexType *indices,
                    const ValueType *gather_from,
                    ValueType *gather_into) SCHWARZ_NOT_IMPLEMENTED;
 
+template <typename ValueType, typename IndexType>
+void gather_add_values(const IndexType num_elems, const IndexType *indices,
+                       const ValueType *gather_from,
+                       ValueType *gather_into) SCHWARZ_NOT_IMPLEMENTED;
+
+template <typename ValueType, typename IndexType>
+void gather_diff_values(const IndexType num_elems, const IndexType *indices,
+                        const ValueType *gather_from,
+                        ValueType *gather_into) SCHWARZ_NOT_IMPLEMENTED;
 
 template <typename ValueType, typename IndexType>
 void scatter_values(const IndexType num_elems, const IndexType *indices,
                     const ValueType *scatter_from,
                     ValueType *scatter_into) SCHWARZ_NOT_IMPLEMENTED;
+
+template <typename ValueType, typename IndexType>
+void scatter_add_values(const IndexType num_elems, const IndexType *indices,
+                        const ValueType *scatter_from,
+                        ValueType *scatter_into) SCHWARZ_NOT_IMPLEMENTED;
+
+template <typename ValueType, typename IndexType>
+void scatter_diff_values(const IndexType num_elems, const IndexType *indices,
+                         const ValueType *scatter_from,
+                         ValueType *scatter_into) SCHWARZ_NOT_IMPLEMENTED;
 
 
 #define INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
@@ -64,9 +83,33 @@ void scatter_values(const IndexType num_elems, const IndexType *indices,
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER);
 #undef DECLARE_GATHER
 
+#define DECLARE_GATHER(ValueType, IndexType)                   \
+    void gather_add_values(const IndexType, const IndexType *, \
+                           const ValueType *, ValueType *)
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER);
+#undef DECLARE_GATHER
+
+#define DECLARE_GATHER(ValueType, IndexType)                    \
+    void gather_diff_values(const IndexType, const IndexType *, \
+                            const ValueType *, ValueType *)
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER);
+#undef DECLARE_GATHER
+
 
 #define DECLARE_SCATTER(ValueType, IndexType)                                  \
     void scatter_values(const IndexType, const IndexType *, const ValueType *, \
                         ValueType *)
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER);
+#undef DECLARE_SCATTER
+
+#define DECLARE_SCATTER(ValueType, IndexType)                   \
+    void scatter_add_values(const IndexType, const IndexType *, \
+                            const ValueType *, ValueType *)
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER);
+#undef DECLARE_SCATTER
+
+#define DECLARE_SCATTER(ValueType, IndexType)                    \
+    void scatter_diff_values(const IndexType, const IndexType *, \
+                             const ValueType *, ValueType *)
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER);
 #undef DECLARE_SCATTER

@@ -4,6 +4,7 @@ var searchData=
   ['neighbors_5fin',['neighbors_in',['../structschwz_1_1Communicate_1_1comm__struct.html#a4751a74b08aa00a5c1badb6c996c98e5',1,'schwz::Communicate::comm_struct']]],
   ['neighbors_5fout',['neighbors_out',['../structschwz_1_1Communicate_1_1comm__struct.html#acd95752d7818e28dd3e6c5e3f5c64ce4',1,'schwz::Communicate::comm_struct']]],
   ['non_5fsymmetric_5fmatrix',['non_symmetric_matrix',['../structschwz_1_1Settings.html#a5f110676f929eebeb357cb07398e2048',1,'schwz::Settings']]],
+  ['norm_5ftype',['norm_type',['../structschwz_1_1Settings.html#a0aa45e3ca102e6a985f25b6c5467088a',1,'schwz::Settings']]],
   ['notimplemented',['NotImplemented',['../classNotImplemented.html',1,'NotImplemented'],['../classNotImplemented.html#a744fb791ca16c8d500eaae24ec113aec',1,'NotImplemented::NotImplemented()']]],
   ['num_5fneighbors_5fin',['num_neighbors_in',['../structschwz_1_1Communicate_1_1comm__struct.html#a67323ca81cff7f4b7567616133475d84',1,'schwz::Communicate::comm_struct']]],
   ['num_5fneighbors_5fout',['num_neighbors_out',['../structschwz_1_1Communicate_1_1comm__struct.html#abc044f2335e50d56d367b37432aa6042',1,'schwz::Communicate::comm_struct']]],

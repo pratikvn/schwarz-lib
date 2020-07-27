@@ -5,6 +5,7 @@ var searchData=
   ['enable_5fget',['enable_get',['../structschwz_1_1Settings_1_1comm__settings.html#ab14aa253c21562ebe91bf52f42731c19',1,'schwz::Settings::comm_settings']]],
   ['enable_5flock_5fall',['enable_lock_all',['../structschwz_1_1Settings_1_1comm__settings.html#a39a59cea325ea1b57aba12e9ada4b91b',1,'schwz::Settings::comm_settings']]],
   ['enable_5flock_5flocal',['enable_lock_local',['../structschwz_1_1Settings_1_1comm__settings.html#abc715396bf51f36307caf88db02c819c',1,'schwz::Settings::comm_settings']]],
+  ['enable_5flogging',['enable_logging',['../structschwz_1_1Settings.html#a2b683340720aadaba85255580483f684',1,'schwz::Settings']]],
   ['enable_5fone_5fby_5fone',['enable_one_by_one',['../structschwz_1_1Settings_1_1comm__settings.html#aae063b9fcf2bc8e49e960286e4c0939f',1,'schwz::Settings::comm_settings']]],
   ['enable_5fonesided',['enable_onesided',['../structschwz_1_1Settings_1_1comm__settings.html#ad4273bd93cf3ee223c6c099a5fe9d02c',1,'schwz::Settings::comm_settings']]],
   ['enable_5foverlap',['enable_overlap',['../structschwz_1_1Settings_1_1comm__settings.html#a6ddd499f563bc4463e117b4e4ad495e6',1,'schwz::Settings::comm_settings']]],

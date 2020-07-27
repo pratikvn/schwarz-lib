@@ -82,7 +82,7 @@ $(function() {
 <div class="dynheader">
 Collaboration diagram for schwz::Settings:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structschwz_1_1Settings__coll__graph.svg" width="519" height="424"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="structschwz_1_1Settings__coll__graph.svg" width="522" height="439"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -162,6 +162,9 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:a6ca3e3368be250c94af8330e293920db"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a6ca3e3368be250c94af8330e293920db">thres_type</a> = &quot;cgammak&quot;</td></tr>
 <tr class="memdesc:a6ca3e3368be250c94af8330e293920db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to choose thres type.  <a href="#a6ca3e3368be250c94af8330e293920db">More...</a><br /></td></tr>
 <tr class="separator:a6ca3e3368be250c94af8330e293920db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0aa45e3ca102e6a985f25b6c5467088a"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a0aa45e3ca102e6a985f25b6c5467088a">norm_type</a> = &quot;L1&quot;</td></tr>
+<tr class="memdesc:a0aa45e3ca102e6a985f25b6c5467088a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to choose norm type.  <a href="#a0aa45e3ca102e6a985f25b6c5467088a">More...</a><br /></td></tr>
+<tr class="separator:a0aa45e3ca102e6a985f25b6c5467088a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afdf517a873a887a21a03b75c1011f903"><td class="memItemLeft" align="right" valign="top"><a id="afdf517a873a887a21a03b75c1011f903"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#afdf517a873a887a21a03b75c1011f903">print_matrices</a> = false</td></tr>
 <tr class="memdesc:afdf517a873a887a21a03b75c1011f903"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to enable printing of matrices. <br /></td></tr>
@@ -176,10 +179,14 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a5f110676f929eebeb357cb07398e2048">non_symmetric_matrix</a> = false</td></tr>
 <tr class="memdesc:a5f110676f929eebeb357cb07398e2048"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the matrix non-symmetric ? , Use GMRES for local solves. <br /></td></tr>
 <tr class="separator:a5f110676f929eebeb357cb07398e2048"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d26302ccb58fd96c795046ecc577694"><td class="memItemLeft" align="right" valign="top"><a id="a7d26302ccb58fd96c795046ecc577694"></a>
-unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a7d26302ccb58fd96c795046ecc577694">restart_iter</a> = 1u</td></tr>
-<tr class="memdesc:a7d26302ccb58fd96c795046ecc577694"><td class="mdescLeft">&#160;</td><td class="mdescRight">The restart iter for the GMRES solver. <br /></td></tr>
-<tr class="separator:a7d26302ccb58fd96c795046ecc577694"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a443c7d58eb0df515d1c863640cffb654"><td class="memItemLeft" align="right" valign="top"><a id="a443c7d58eb0df515d1c863640cffb654"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a443c7d58eb0df515d1c863640cffb654">restart_iter</a> = 1</td></tr>
+<tr class="memdesc:a443c7d58eb0df515d1c863640cffb654"><td class="mdescLeft">&#160;</td><td class="mdescRight">The restart iter for the GMRES solver. <br /></td></tr>
+<tr class="separator:a443c7d58eb0df515d1c863640cffb654"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af257396850c46e4d3217b4bb1a858114"><td class="memItemLeft" align="right" valign="top"><a id="af257396850c46e4d3217b4bb1a858114"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#af257396850c46e4d3217b4bb1a858114">reset_local_crit_iter</a> = -1</td></tr>
+<tr class="memdesc:af257396850c46e4d3217b4bb1a858114"><td class="mdescLeft">&#160;</td><td class="mdescRight">The global iter at which to reset the local solver criterion. <br /></td></tr>
+<tr class="separator:af257396850c46e4d3217b4bb1a858114"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75a2ff3778c7334382a6c74553dbd5b4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a75a2ff3778c7334382a6c74553dbd5b4">naturally_ordered_factor</a> = false</td></tr>
 <tr class="memdesc:a75a2ff3778c7334382a6c74553dbd5b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disables the re-ordering of the matrix before computing the triangular factors during the CHOLMOD factorization.  <a href="#a75a2ff3778c7334382a6c74553dbd5b4">More...</a><br /></td></tr>
 <tr class="separator:a75a2ff3778c7334382a6c74553dbd5b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -199,6 +206,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a5555cf4340e7918ce22d00b26ccca6a7">write_iters_and_residuals</a> = false</td></tr>
 <tr class="memdesc:a5555cf4340e7918ce22d00b26ccca6a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable writing the iters and residuals to a file. <br /></td></tr>
 <tr class="separator:a5555cf4340e7918ce22d00b26ccca6a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b683340720aadaba85255580483f684"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a2b683340720aadaba85255580483f684">enable_logging</a> = false</td></tr>
+<tr class="memdesc:a2b683340720aadaba85255580483f684"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to enable logging for local iterative solvers.  <a href="#a2b683340720aadaba85255580483f684">More...</a><br /></td></tr>
+<tr class="separator:a2b683340720aadaba85255580483f684"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af692ca8550d16b538dcfddb5208e73f3"><td class="memItemLeft" align="right" valign="top"><a id="af692ca8550d16b538dcfddb5208e73f3"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#af692ca8550d16b538dcfddb5208e73f3">write_perm_data</a> = false</td></tr>
 <tr class="memdesc:af692ca8550d16b538dcfddb5208e73f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the local permutations from CHOLMOD to a file. <br /></td></tr>
@@ -226,6 +236,23 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div class="textblock"><p>The struct that contains the solver settings and the parameters to be set by the user. </p>
 <p>settings </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="a2b683340720aadaba85255580483f684"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b683340720aadaba85255580483f684">&#9670;&nbsp;</a></span>enable_logging</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool schwz::Settings::enable_logging = false</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Flag to enable logging for local iterative solvers. </p>
+<p>Note: Probably will have a significant performance hit. </p>
+
+</div>
+</div>
 <a id="a2af5f07901df047e305c456b2f97e774"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2af5f07901df047e305c456b2f97e774">&#9670;&nbsp;</a></span>explicit_laplacian</h2>
 
@@ -276,6 +303,25 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 </div>
 </div>
+<a id="a0aa45e3ca102e6a985f25b6c5467088a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0aa45e3ca102e6a985f25b6c5467088a">&#9670;&nbsp;</a></span>norm_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string schwz::Settings::norm_type = &quot;L1&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Flag to choose norm type. </p>
+<p>Choices are "L1" or "L2" </p>
+
+<p class="reference">Referenced by <a class="el" href="classschwz_1_1SolverRAS.html#a8cd640aa073c0890d6121dc3afb3eaac">schwz::SolverRAS&lt; ValueType, IndexType &gt;::setup_windows()</a>.</p>
+
+</div>
+</div>
 <a id="a6ca3e3368be250c94af8330e293920db"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6ca3e3368be250c94af8330e293920db">&#9670;&nbsp;</a></span>thres_type</h2>
 
@@ -296,7 +342,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li><a class="el" href="settings_8hpp_source.html">settings.hpp (a335fe5)</a></li>
+<li><a class="el" href="settings_8hpp_source.html">settings.hpp (4967b92)</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

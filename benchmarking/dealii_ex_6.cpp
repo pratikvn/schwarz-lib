@@ -284,6 +284,7 @@ void BenchDealiiLaplace<dim, ValueType, IndexType>::solve(
     metadata.recv_history = FLAGS_recv_history;
     metadata.comm_start_iters = FLAGS_comm_start_iters;
     settings.thres_type = FLAGS_thres_type;
+    settings.norm_type = FLAGS_norm_type;
 
     int gsize = 0;
     if (metadata.my_rank == 0) {

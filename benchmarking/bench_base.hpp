@@ -127,6 +127,11 @@ DEFINE_bool(factor_ordering_natural, false,
             "ordering. ");
 DEFINE_int32(local_max_iters, -1,
              "Number of maximum iterations for the local iterative solver");
+DEFINE_int32(
+    updated_max_iters, -1,
+    "Number of updated maximum iterations for the local iterative solver");
+DEFINE_int32(reset_local_crit_iter, -1,
+             "The RAS iter count at which to reset the local iteration.");
 DEFINE_string(local_precond, "null",
               "Choices are ilu, isai and block-jacobi for the local "
               "iterative solver. ");
@@ -149,7 +154,9 @@ DEFINE_uint32(
     "number of iters to communicate before starting event-based comm");
 DEFINE_string(thres_type, "cgammak",
               "The rhs type: choices are: cgammak or slope ");
-
+DEFINE_string(norm_type, "L1",
+              "The norm type to evaluate at a boundary for triggering events; "
+              "choices are L1 or L2");
 
 void initialize_argument_parsing(int *argc, char **argv[])
 {

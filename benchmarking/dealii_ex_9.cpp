@@ -112,7 +112,7 @@ double RightHandSide<dim>::value(const Point<dim> &p,
     const double diameter = 0.1;
     return ((p - center_point).norm_square() < diameter * diameter
                 ? 0.1 / std::pow(diameter, dim)
-                : 0.0);
+                : 0.1);  // CHANGED THIS VALUE FROM ORIGINAL TEST CASE
 }
 
 
@@ -447,7 +447,8 @@ void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
     metadata.local_max_iters = FLAGS_local_max_iters;
     settings.non_symmetric_matrix = FLAGS_non_symmetric_matrix;
     settings.restart_iter = FLAGS_restart_iter;
-    metadata.precond_max_block_size = FLAGS_precond_max_block_size;
+    settings.reset_local_crit_iter = FLAGS_reset_local_crit_iter;
+    settings.enable_logging = FLAGS_enable_logging;
     metadata.precond_max_block_size = FLAGS_precond_max_block_size;
     settings.matrix_filename = FLAGS_matrix_filename;
     settings.explicit_laplacian = FLAGS_explicit_laplacian;
@@ -490,6 +491,7 @@ void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
     metadata.recv_history = FLAGS_recv_history;
     metadata.comm_start_iters = FLAGS_comm_start_iters;
     settings.thres_type = FLAGS_thres_type;
+    settings.norm_type = FLAGS_norm_type;
 
     int gsize = 0;
     if (metadata.my_rank == 0) {

@@ -103,7 +103,7 @@ public:
      *
      * @param rhs The rhs vector.
      */
-    void generate_sin_rhs(std::vector<ValueType> &rhs); 
+    void generate_sin_rhs(std::vector<ValueType> &rhs);
 
     /**
      * Generates the 2D global laplacian matrix.
@@ -153,8 +153,7 @@ public:
         std::vector<ValueType> &rhs,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &global_rhs,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution);
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution);
 
     /**
      * Sets up the local and the interface matrices from the global matrix and

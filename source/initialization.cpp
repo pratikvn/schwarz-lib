@@ -85,7 +85,8 @@ void Initialize<ValueType, IndexType>::setup_local_matrices(
     SCHWARZ_NOT_IMPLEMENTED;
 
 template <typename ValueType, typename IndexType>
-void Initialize<ValueType, IndexType>::generate_random_rhs(std::vector<ValueType> &rhs)
+void Initialize<ValueType, IndexType>::generate_random_rhs(
+    std::vector<ValueType> &rhs)
 {
     std::uniform_real_distribution<double> unif(0.0, 1.0);
     std::default_random_engine engine;
@@ -95,38 +96,38 @@ void Initialize<ValueType, IndexType>::generate_random_rhs(std::vector<ValueType
 }
 
 template <typename ValueType, typename IndexType>
-void Initialize<ValueType, IndexType>::generate_dipole_rhs(std::vector<ValueType> &rhs)
+void Initialize<ValueType, IndexType>::generate_dipole_rhs(
+    std::vector<ValueType> &rhs)
 {
     auto oned_laplacian_size = metadata.oned_laplacian_size;
 
-    //Placing dipole at 1/4 and 3/4 of Y-dim at the middle of X-dim
-    for (int i = 0; i < oned_laplacian_size; i++)
-    {
-        for (int j = 0; j < oned_laplacian_size; j++)
-        {
+    // Placing dipole at 1/4 and 3/4 of Y-dim at the middle of X-dim
+    for (int i = 0; i < oned_laplacian_size; i++) {
+        for (int j = 0; j < oned_laplacian_size; j++) {
             if (i == oned_laplacian_size / 4 && j == oned_laplacian_size / 2)
-               rhs[i * oned_laplacian_size + j] = 100.0;
-            else if (i == 3 * oned_laplacian_size / 4 && j == oned_laplacian_size / 2)
-               rhs[i * oned_laplacian_size + j] = -100.0;
+                rhs[i * oned_laplacian_size + j] = 100.0;
+            else if (i == 3 * oned_laplacian_size / 4 &&
+                     j == oned_laplacian_size / 2)
+                rhs[i * oned_laplacian_size + j] = -100.0;
             else
-               rhs[i * oned_laplacian_size + j] = 0.0;
+                rhs[i * oned_laplacian_size + j] = 0.0;
         }
     }
 }
 
 template <typename ValueType, typename IndexType>
-void Initialize<ValueType, IndexType>::generate_sin_rhs(std::vector<ValueType> &rhs)
+void Initialize<ValueType, IndexType>::generate_sin_rhs(
+    std::vector<ValueType> &rhs)
 {
-    auto PI = (ValueType) (atan(1.0) * 4);
+    auto PI = (ValueType)(atan(1.0) * 4);
     auto oned_laplacian_size = metadata.oned_laplacian_size;
 
-    //Source = sin(x)sin(y)
-    for (int i = 0; i < oned_laplacian_size; i++)
-    {
-        for (int j = 0; j < oned_laplacian_size; j++)
-        {
-            rhs[i * oned_laplacian_size + j] = sin(2 * PI * i / oned_laplacian_size) *
-                                               sin(2 * PI * j / oned_laplacian_size);
+    // Source = sin(x)sin(y)
+    for (int i = 0; i < oned_laplacian_size; i++) {
+        for (int j = 0; j < oned_laplacian_size; j++) {
+            rhs[i * oned_laplacian_size + j] =
+                sin(2 * PI * i / oned_laplacian_size) *
+                sin(2 * PI * j / oned_laplacian_size);
         }
     }
 }
@@ -370,8 +371,7 @@ void Initialize<ValueType, IndexType>::setup_vectors(
     std::vector<ValueType> &rhs,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_rhs,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;
     auto my_rank = metadata.my_rank;
@@ -391,10 +391,6 @@ void Initialize<ValueType, IndexType>::setup_vectors(
                                       global_rhs.get(), first_row);
 
     local_solution =
-        vec::create(settings.executor, gko::dim<2>(metadata.local_size_x, 1));
-    
-    //contains the solution at the last event of communication
-    last_solution =
         vec::create(settings.executor, gko::dim<2>(metadata.local_size_x, 1));
 }
 

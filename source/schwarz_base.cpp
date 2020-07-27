@@ -261,13 +261,13 @@ void SchwarzBase<ValueType, IndexType>::initialize(
     // Setup the local vectors on each of the subddomains.
     Initialize<ValueType, IndexType>::setup_vectors(
         this->settings, this->metadata, rhs, this->local_rhs, this->global_rhs,
-        this->local_solution, this->last_solution);
+        this->local_solution);
 
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType>::setup_local_solver(
-        this->settings, metadata, this->local_matrix, this->triangular_factor_l,
-        this->triangular_factor_u, this->local_perm, this->local_inv_perm,
-        this->local_rhs);
+        this->settings, this->metadata, this->local_matrix,
+        this->triangular_factor_l, this->triangular_factor_u, this->local_perm,
+        this->local_inv_perm, this->local_rhs);
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
@@ -342,12 +342,40 @@ void SchwarzBase<ValueType, IndexType>::run(
         settings.executor, gko::dim<2>(metadata.global_size, 1));
 
     // A work vector.
-    std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
-        settings.executor, gko::dim<2>(2 * this->metadata.local_size_x, 1));
+    std::shared_ptr<vec_vtype> work_vector =
+        vec_vtype::create(this->settings.executor,
+                          gko::dim<2>(2 * this->metadata.local_size_x, 1));
     // An initial guess.
     std::shared_ptr<vec_vtype> init_guess = vec_vtype::create(
-        settings.executor, gko::dim<2>(this->metadata.local_size_x, 1));
-    init_guess->copy_from(local_rhs.get());
+        this->settings.executor, gko::dim<2>(this->metadata.local_size_x, 1));
+
+    ValueType temp_sum = 0.0;
+    for (int i = 0; i < this->metadata.local_size_x; i++)
+        temp_sum += this->local_rhs->get_values()[i];
+
+    std::cout << "Sum of local rhs in " << metadata.my_rank << " - " << temp_sum
+              << std::endl;
+
+    init_guess->copy_from(this->local_rhs.get());
+
+    // Initializing all vectors
+    for (int i = 0; i < this->metadata.global_size; i++) {
+        solution->get_values()[i] = 0.0;
+        global_solution->get_values()[i] = 0.0;
+        last_solution->get_values()[i] = 0.0;
+    }
+
+    /*
+    for (int i = 0; i < 2 * this->metadata.local_size_x; i++) {
+        work_vector->get_values()[i] = 0.0;
+    }
+    */
+
+    /*
+    for (int i = 0; i < this->metadata.local_size_x; i++) {
+        this->local_solution->get_values()[i] = 0.0;
+    }
+    */
 
     // Setup the windows for the onesided communication.
     this->setup_windows(this->settings, this->metadata, global_solution);
@@ -409,10 +437,11 @@ void SchwarzBase<ValueType, IndexType>::run(
                                   this->interface_matrix),
             1, metadata.my_rank, boundary_update, metadata.iter_count);
 
+        /*
         if (settings.debug_print) {
-            // fps << metadata.iter_count << ", " << local_residual_norm
-            //    << std::endl;
-        }
+             fps << metadata.iter_count << ", " << local_residual_norm
+              << std::endl;
+        }*/
 
         // Check for the convergence of the solver.
         // num_converged_procs = 0;
@@ -424,6 +453,7 @@ void SchwarzBase<ValueType, IndexType>::run(
                 global_residual_norm, global_residual_norm0,
                 num_converged_procs)),
             2, metadata.my_rank, convergence_check, metadata.iter_count);
+
 
         // break if the solution diverges.
         if (std::isnan(global_residual_norm) || global_residual_norm > 1e12) {
@@ -535,6 +565,7 @@ void SchwarzBase<ValueType, IndexType>::run(
                       << " iterations."
                       << std::endl;
           }
+        std::cout << "Num converged - " << num_converged_procs << std::endl;
       }
 
     // clang-format on

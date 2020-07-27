@@ -290,17 +290,12 @@ private:
     std::shared_ptr<gko::LinOp> solver;
 
     /**
-     * The local iterative solver residual criterion.
+     * The local iterative solver combined residual and iteration criterion.
      */
-    std::shared_ptr<ResidualCriterionFactory> residual_criterion;
+    std::shared_ptr<gko::stop::Combined::Factory> combined_criterion;
 
     /**
-     * The local iterative solver iteration criterion.
-     */
-    std::shared_ptr<IterationCriterionFactory> iteration_criterion;
-
-    /**
-     * The local iterative solver iteration criterion.
+     * The record logger
      */
     std::shared_ptr<gko::log::Record> record_logger;
 

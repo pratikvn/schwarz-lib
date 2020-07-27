@@ -659,6 +659,11 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
     // setup windows
     if (settings.comm_settings.enable_onesided) {
         // Onesided
+
+        for (int i = 0; i < main_buffer->get_size()[0]; i++) {
+            main_buffer->get_values()[i] = 0.0;
+        }
+
         MPI_Win_create(main_buffer->get_values(),
                        main_buffer->get_size()[0] * sizeof(ValueType),
                        sizeof(ValueType), MPI_INFO_NULL, MPI_COMM_WORLD,
@@ -667,6 +672,11 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
 
     if (settings.comm_settings.enable_onesided) {
         // MPI_Alloc_mem ? Custom allocator ?  TODO
+
+        for (int i = 0; i < num_subdomains; i++) {
+            this->local_residual_vector->get_values()[i] = 0.0;
+        }
+
         MPI_Win_create(this->local_residual_vector->get_values(),
                        (num_subdomains) * sizeof(ValueType), sizeof(ValueType),
                        MPI_INFO_NULL, MPI_COMM_WORLD,
@@ -683,6 +693,13 @@ void SolverRAS<ValueType, IndexType>::setup_windows(
         this->convergence_local = std::shared_ptr<vec_itype>(
             new vec_itype(settings.executor->get_master(), num_subdomains),
             std::default_delete<vec_itype>());
+
+        for (int i = 0; i < num_subdomains; i++) {
+            this->convergence_vector->get_data()[i] = 0;
+            this->convergence_sent->get_data()[i] = 0;
+            this->convergence_local->get_data()[i] = 0;
+        }
+
         MPI_Win_create(this->convergence_vector->get_data(),
                        (num_subdomains) * sizeof(IndexType), sizeof(IndexType),
                        MPI_INFO_NULL, MPI_COMM_WORLD,
@@ -838,13 +855,24 @@ void exchange_boundary_onesided(
 
                     ValueType temp_sum = 0.0;
 
-                    // calculating avg of send buffer
-                    for (auto i = 0; i < (global_put[p])[0]; i++) {
-                        temp_sum +=
-                            comm_struct.send_buffer->get_values()[num_put + i];
+                    // calculating avg of send buffer - doing euclidean norm now
+                    if (settings.norm_type == "L2") {
+                        for (auto i = 0; i < (global_put[p])[0]; i++) {
+                            temp_sum +=
+                                std::pow(comm_struct.send_buffer
+                                             ->get_values()[num_put + i],
+                                         2);
+                        }
+                        comm_struct.curr_send_avg->get_values()[p] =
+                            sqrt(temp_sum) / (global_put[p])[0];
+                    } else {  // L1
+                        for (auto i = 0; i < (global_put[p])[0]; i++) {
+                            temp_sum += comm_struct.send_buffer
+                                            ->get_values()[num_put + i];
+                        }
+                        comm_struct.curr_send_avg->get_values()[p] =
+                            temp_sum / (global_put[p])[0];
                     }
-                    comm_struct.curr_send_avg->get_values()[p] =
-                        temp_sum / (global_put[p])[0];
 
                     auto diff =
                         std::fabs(comm_struct.curr_send_avg->get_values()[p] -
@@ -852,9 +880,10 @@ void exchange_boundary_onesided(
                     auto iter_diff = metadata.iter_count -
                                      comm_struct.last_sent_iter->get_data()[p];
 
-                    if (settings.thres_type == "cgammak")
+                    if (settings.thres_type == "cgammak") {
                         comm_struct.thres->get_values()[p] =
                             get_threshold(settings, metadata);
+                    }
 
                     auto thres = comm_struct.thres->get_values()[p] *
                                  std::pow(metadata.horizon, iter_diff);
@@ -862,6 +891,13 @@ void exchange_boundary_onesided(
                     if (settings.debug_print) {
                         fps << comm_struct.curr_send_avg->get_values()[p]
                             << ", " << diff << ", " << thres << ",    ";
+
+                        /*
+                        for (auto i = 0; i < (global_put[p])[0]; i++) {
+                            fps << comm_struct.send_buffer->get_values()[num_put
+                        + i] << ", ";
+                        }
+                        */
                     }
 
                     if (diff >= thres ||
@@ -871,8 +907,9 @@ void exchange_boundary_onesided(
                     // 30)
                     {
                         if (settings.debug_print) {
-                            fps << "1,    ";
+                            fps << "1, ";
                         }
+
 
                         CommHelpers::transfer_buffer(
                             settings, comm_struct.window_recv_buffer,
@@ -924,7 +961,7 @@ void exchange_boundary_onesided(
                     }  // end if (event condition)
                     else {
                         if (settings.debug_print) {
-                            fps << "0,   ";
+                            fps << "0, ";
                         }
                     }
                 }  // end if (global_put[p] > 0)

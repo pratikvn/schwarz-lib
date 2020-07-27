@@ -51,7 +51,7 @@ void Communicate<ValueType, IndexType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &solution,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &last_solution,
-    std::ofstream &fp, std::ofstream &fpr)
+    std::ofstream &fps, std::ofstream &fpr)
     SCHWARZ_NOT_IMPLEMENTED;
 
 template <typename ValueType, typename IndexType>

@@ -6,7 +6,7 @@ Schwarz Library
 
 Performance results
 -------------------
-1. [Preprint Paper on arXiv](https://arxiv.org/abs/2003.05361)
+1. [Paper in IJHPCA](https://journals.sagepub.com/doi/10.1177/1094342020946814); [Alternative arXiv version](https://arxiv.org/abs/2003.05361)
 
 
 ## Required components

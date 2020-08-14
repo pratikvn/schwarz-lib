@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <exception_helpers.hpp>
 
+namespace schwz {
 
 template <typename ValueType, typename IndexType>
 void gather_values(const IndexType num_elems, const IndexType *indices,
@@ -51,6 +52,11 @@ void gather_diff_values(const IndexType num_elems, const IndexType *indices,
                         ValueType *gather_into) SCHWARZ_NOT_IMPLEMENTED;
 
 template <typename ValueType, typename IndexType>
+void gather_avg_values(const IndexType num_elems, const IndexType *indices,
+                       const ValueType *from_array,
+                       ValueType *into_array) SCHWARZ_NOT_IMPLEMENTED;
+
+template <typename ValueType, typename IndexType>
 void scatter_values(const IndexType num_elems, const IndexType *indices,
                     const ValueType *scatter_from,
                     ValueType *scatter_into) SCHWARZ_NOT_IMPLEMENTED;
@@ -64,6 +70,11 @@ template <typename ValueType, typename IndexType>
 void scatter_diff_values(const IndexType num_elems, const IndexType *indices,
                          const ValueType *scatter_from,
                          ValueType *scatter_into) SCHWARZ_NOT_IMPLEMENTED;
+
+template <typename ValueType, typename IndexType>
+void scatter_avg_values(const IndexType num_elems, const IndexType *indices,
+                        const ValueType *from_array,
+                        ValueType *into_array) SCHWARZ_NOT_IMPLEMENTED;
 
 
 #define INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
@@ -83,17 +94,23 @@ void scatter_diff_values(const IndexType num_elems, const IndexType *indices,
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER);
 #undef DECLARE_GATHER
 
-#define DECLARE_GATHER(ValueType, IndexType)                   \
+#define DECLARE_GATHER_ADD(ValueType, IndexType)               \
     void gather_add_values(const IndexType, const IndexType *, \
                            const ValueType *, ValueType *)
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER);
-#undef DECLARE_GATHER
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER_ADD);
+#undef DECLARE_GATHER_ADD
 
-#define DECLARE_GATHER(ValueType, IndexType)                    \
+#define DECLARE_GATHER_DIFF(ValueType, IndexType)               \
     void gather_diff_values(const IndexType, const IndexType *, \
                             const ValueType *, ValueType *)
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER);
-#undef DECLARE_GATHER
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER_DIFF);
+#undef DECLARE_GATHER_DIFF
+
+#define DECLARE_GATHER_AVG(ValueType, IndexType)               \
+    void gather_avg_values(const IndexType, const IndexType *, \
+                           const ValueType *, ValueType *)
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER_AVG);
+#undef DECLARE_GATHER_AVG
 
 
 #define DECLARE_SCATTER(ValueType, IndexType)                                  \
@@ -102,14 +119,23 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER);
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER);
 #undef DECLARE_SCATTER
 
-#define DECLARE_SCATTER(ValueType, IndexType)                   \
+#define DECLARE_SCATTER_ADD(ValueType, IndexType)               \
     void scatter_add_values(const IndexType, const IndexType *, \
                             const ValueType *, ValueType *)
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER);
-#undef DECLARE_SCATTER
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER_ADD);
+#undef DECLARE_SCATTER_ADD
 
-#define DECLARE_SCATTER(ValueType, IndexType)                    \
+#define DECLARE_SCATTER_DIFF(ValueType, IndexType)               \
     void scatter_diff_values(const IndexType, const IndexType *, \
                              const ValueType *, ValueType *)
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER);
-#undef DECLARE_SCATTER
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER_DIFF);
+#undef DECLARE_SCATTER_DIFF
+
+#define DECLARE_SCATTER_AVG(ValueType, IndexType)               \
+    void scatter_avg_values(const IndexType, const IndexType *, \
+                            const ValueType *, ValueType *)
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCATTER_AVG);
+#undef DECLARE_SCATTER_AVG
+
+
+}  // namespace schwz

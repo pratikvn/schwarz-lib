@@ -7,9 +7,9 @@ var searchData=
   ['post_5fprocess_5fdata',['post_process_data',['../structschwz_1_1Metadata_1_1post__process__data.html',1,'schwz::Metadata']]],
   ['precond_5fmax_5fblock_5fsize',['precond_max_block_size',['../structschwz_1_1Metadata.html#a93978e9e4d28fac4ee80fdb5c77a7074',1,'schwz::Metadata']]],
   ['print_5fmatrices',['print_matrices',['../structschwz_1_1Settings.html#afdf517a873a887a21a03b75c1011f903',1,'schwz::Settings']]],
-  ['print_5fmatrix',['print_matrix',['../classschwz_1_1SchwarzBase.html#ae671d00ba78877589cb082724c469ff6',1,'schwz::SchwarzBase']]],
-  ['print_5fvector',['print_vector',['../classschwz_1_1SchwarzBase.html#a432e5a033a82c5153dda2170ceb4a199',1,'schwz::SchwarzBase']]],
+  ['print_5fmatrix',['print_matrix',['../classschwz_1_1SchwarzBase.html#a835d94bb5649850365f6adab8983754e',1,'schwz::SchwarzBase']]],
+  ['print_5fvector',['print_vector',['../classschwz_1_1SchwarzBase.html#a5bdfc70b9c31bb7d25382646f679ebfa',1,'schwz::SchwarzBase']]],
   ['processtopology',['ProcessTopology',['../namespaceProcessTopology.html',1,'']]],
-  ['put_5fdisplacements',['put_displacements',['../structschwz_1_1Communicate_1_1comm__struct.html#a2fe947bc26944406e6e86e1fe1cd4da6',1,'schwz::Communicate::comm_struct']]],
-  ['put_5frequest',['put_request',['../structschwz_1_1Communicate_1_1comm__struct.html#aaf43321fe2af314a0257e4eecbf5a42c',1,'schwz::Communicate::comm_struct']]]
+  ['put_5fdisplacements',['put_displacements',['../structschwz_1_1Communicate_1_1comm__struct.html#abb06062ad6fddb9d0399625f4d799d08',1,'schwz::Communicate::comm_struct']]],
+  ['put_5frequest',['put_request',['../structschwz_1_1Communicate_1_1comm__struct.html#a9f135d4c33838027f8ed64a3ee18d42f',1,'schwz::Communicate::comm_struct']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['initialize',['initialize',['../classschwz_1_1SchwarzBase.html#a276660ae87ca01cedce8846954b48d0f',1,'schwz::SchwarzBase']]]
+  ['initialize',['initialize',['../classschwz_1_1SchwarzBase.html#ac3dbbbe6c63db7d669f9f5de85d9b264',1,'schwz::SchwarzBase']]]
 ];

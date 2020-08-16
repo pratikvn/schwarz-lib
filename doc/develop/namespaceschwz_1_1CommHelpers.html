@@ -76,22 +76,22 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a649cff721443b605791abc1127af8796"><td class="memTemplParams" colspan="2"><a id="a649cff721443b605791abc1127af8796"></a>
+<tr class="memitem:ad55122b484f131b8b63e7d82e8ff6e88"><td class="memTemplParams" colspan="2"><a id="ad55122b484f131b8b63e7d82e8ff6e88"></a>
+template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </td></tr>
+<tr class="memitem:ad55122b484f131b8b63e7d82e8ff6e88"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>transfer_one_by_one</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, struct <a class="el" href="classschwz_1_1Communicate.html">Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct &amp;comm_struct, ValueType *buffer, IndexType **offset, int num_neighbors, IndexType *neighbors)</td></tr>
+<tr class="separator:ad55122b484f131b8b63e7d82e8ff6e88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53666b2d814707ecc77955391bc0d9e6"><td class="memTemplParams" colspan="2"><a id="a53666b2d814707ecc77955391bc0d9e6"></a>
 template&lt;typename ValueType , typename IndexType &gt; </td></tr>
-<tr class="memitem:a649cff721443b605791abc1127af8796"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>transfer_one_by_one</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, struct <a class="el" href="classschwz_1_1Communicate.html">Communicate</a>&lt; ValueType, IndexType &gt;::comm_struct &amp;comm_struct, ValueType *buffer, IndexType **offset, int num_neighbors, IndexType *neighbors)</td></tr>
-<tr class="separator:a649cff721443b605791abc1127af8796"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8b226ff485829069e8769eea1a9c1e7"><td class="memTemplParams" colspan="2"><a id="af8b226ff485829069e8769eea1a9c1e7"></a>
-template&lt;typename ValueType , typename IndexType &gt; </td></tr>
-<tr class="memitem:af8b226ff485829069e8769eea1a9c1e7"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>pack_buffer</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, ValueType *buffer, ValueType *send_buffer, IndexType **num_send_elems, int offset, int send_subd)</td></tr>
-<tr class="separator:af8b226ff485829069e8769eea1a9c1e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53666b2d814707ecc77955391bc0d9e6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>pack_buffer</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const ValueType *prev_buffer, const ValueType *buffer, ValueType *send_buffer, IndexType **num_send_elems, int offset, int send_subd)</td></tr>
+<tr class="separator:a53666b2d814707ecc77955391bc0d9e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05d10520ce2980f012ca6e89916801b4"><td class="memTemplParams" colspan="2"><a id="a05d10520ce2980f012ca6e89916801b4"></a>
 template&lt;typename ValueType , typename IndexType &gt; </td></tr>
 <tr class="memitem:a05d10520ce2980f012ca6e89916801b4"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>transfer_buffer</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, MPI_Win &amp;window, ValueType *target_buffer, IndexType **num_elems, int offset, int target_subd, IndexType *neighbors, IndexType *displacements)</td></tr>
 <tr class="separator:a05d10520ce2980f012ca6e89916801b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa7aa05475e265f8d22c234a50637626"><td class="memTemplParams" colspan="2"><a id="aaa7aa05475e265f8d22c234a50637626"></a>
+<tr class="memitem:a1e05e8df16d3efc3c488835785848f76"><td class="memTemplParams" colspan="2"><a id="a1e05e8df16d3efc3c488835785848f76"></a>
 template&lt;typename ValueType , typename IndexType &gt; </td></tr>
-<tr class="memitem:aaa7aa05475e265f8d22c234a50637626"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>unpack_buffer</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, ValueType *buffer, ValueType *recv_buffer, IndexType **num_recv_elems, int offset, int recv_subd)</td></tr>
-<tr class="separator:aaa7aa05475e265f8d22c234a50637626"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e05e8df16d3efc3c488835785848f76"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>unpack_buffer</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const ValueType *prev_buffer, ValueType *buffer, const ValueType *recv_buffer, IndexType **num_recv_elems, int offset, int recv_subd)</td></tr>
+<tr class="separator:a1e05e8df16d3efc3c488835785848f76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The CommHelper namespace . </p>

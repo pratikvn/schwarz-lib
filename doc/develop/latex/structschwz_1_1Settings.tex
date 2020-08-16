@@ -79,6 +79,9 @@ std\+::string \hyperlink{structschwz_1_1Settings_a30bee3efa70fac8650d1c2837f1ba9
 \begin{DoxyCompactList}\small\item\em The string that contains the matrix file name to read from . \end{DoxyCompactList}\item 
 bool \hyperlink{structschwz_1_1Settings_a2af5f07901df047e305c456b2f97e774}{explicit\+\_\+laplacian} = true
 \begin{DoxyCompactList}\small\item\em Flag if the laplacian matrix should be generated within the library. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Settings_a1bb8b8ee875222bd73899ebf0447fa4e}\label{structschwz_1_1Settings_a1bb8b8ee875222bd73899ebf0447fa4e}} 
+bool \hyperlink{structschwz_1_1Settings_a1bb8b8ee875222bd73899ebf0447fa4e}{use\+\_\+mixed\+\_\+precision} = false
+\begin{DoxyCompactList}\small\item\em Flag if mixed precision should be used. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structschwz_1_1Settings_a04760b39513414af70498808c0a6b317}\label{structschwz_1_1Settings_a04760b39513414af70498808c0a6b317}} 
 bool \hyperlink{structschwz_1_1Settings_a04760b39513414af70498808c0a6b317}{enable\+\_\+random\+\_\+rhs} = false
 \begin{DoxyCompactList}\small\item\em Flag to enable a random rhs. \end{DoxyCompactList}\item 
@@ -96,6 +99,9 @@ bool \hyperlink{structschwz_1_1Settings_a5f110676f929eebeb357cb07398e2048}{non\+
 \mbox{\Hypertarget{structschwz_1_1Settings_a7d26302ccb58fd96c795046ecc577694}\label{structschwz_1_1Settings_a7d26302ccb58fd96c795046ecc577694}} 
 unsigned int \hyperlink{structschwz_1_1Settings_a7d26302ccb58fd96c795046ecc577694}{restart\+\_\+iter} = 1u
 \begin{DoxyCompactList}\small\item\em The restart iter for the G\+M\+R\+ES solver. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Settings_af257396850c46e4d3217b4bb1a858114}\label{structschwz_1_1Settings_af257396850c46e4d3217b4bb1a858114}} 
+int \hyperlink{structschwz_1_1Settings_af257396850c46e4d3217b4bb1a858114}{reset\+\_\+local\+\_\+crit\+\_\+iter} = -\/1
+\begin{DoxyCompactList}\small\item\em The global iter at which to reset the local solver criterion. \end{DoxyCompactList}\item 
 bool \hyperlink{structschwz_1_1Settings_a75a2ff3778c7334382a6c74553dbd5b4}{naturally\+\_\+ordered\+\_\+factor} = false
 \begin{DoxyCompactList}\small\item\em Disables the re-\/ordering of the matrix before computing the triangular factors during the C\+H\+O\+L\+M\+OD factorization. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structschwz_1_1Settings_a8a057e4ac5331c9222ad539ffd1f5c3d}\label{structschwz_1_1Settings_a8a057e4ac5331c9222ad539ffd1f5c3d}} 
@@ -110,6 +116,8 @@ bool \hyperlink{structschwz_1_1Settings_af81ff061a4d7220d380fb7f579d7a6e1}{write
 \mbox{\Hypertarget{structschwz_1_1Settings_a5555cf4340e7918ce22d00b26ccca6a7}\label{structschwz_1_1Settings_a5555cf4340e7918ce22d00b26ccca6a7}} 
 bool \hyperlink{structschwz_1_1Settings_a5555cf4340e7918ce22d00b26ccca6a7}{write\+\_\+iters\+\_\+and\+\_\+residuals} = false
 \begin{DoxyCompactList}\small\item\em Enable writing the iters and residuals to a file. \end{DoxyCompactList}\item 
+bool \hyperlink{structschwz_1_1Settings_a2b683340720aadaba85255580483f684}{enable\+\_\+logging} = false
+\begin{DoxyCompactList}\small\item\em Flag to enable logging for local iterative solvers. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structschwz_1_1Settings_af692ca8550d16b538dcfddb5208e73f3}\label{structschwz_1_1Settings_af692ca8550d16b538dcfddb5208e73f3}} 
 bool \hyperlink{structschwz_1_1Settings_af692ca8550d16b538dcfddb5208e73f3}{write\+\_\+perm\+\_\+data} = false
 \begin{DoxyCompactList}\small\item\em Enable the local permutations from C\+H\+O\+L\+M\+OD to a file. \end{DoxyCompactList}\item 
@@ -136,7 +144,17 @@ The struct that contains the solver settings and the parameters to be set by the
 settings 
 
 \subsection{Member Data Documentation}
-\mbox{\Hypertarget{structschwz_1_1Settings_a2af5f07901df047e305c456b2f97e774}\label{structschwz_1_1Settings_a2af5f07901df047e305c456b2f97e774}} 
+\mbox{\Hypertarget{structschwz_1_1Settings_a2b683340720aadaba85255580483f684}\label{structschwz_1_1Settings_a2b683340720aadaba85255580483f684}} 
+\index{schwz\+::\+Settings@{schwz\+::\+Settings}!enable\+\_\+logging@{enable\+\_\+logging}}
+\index{enable\+\_\+logging@{enable\+\_\+logging}!schwz\+::\+Settings@{schwz\+::\+Settings}}
+\subsubsection{\texorpdfstring{enable\+\_\+logging}{enable\_logging}}
+{\footnotesize\ttfamily bool schwz\+::\+Settings\+::enable\+\_\+logging = false}
+
+
+
+Flag to enable logging for local iterative solvers. 
+
+Note\+: Probably will have a significant performance hit. \mbox{\Hypertarget{structschwz_1_1Settings_a2af5f07901df047e305c456b2f97e774}\label{structschwz_1_1Settings_a2af5f07901df047e305c456b2f97e774}} 
 \index{schwz\+::\+Settings@{schwz\+::\+Settings}!explicit\+\_\+laplacian@{explicit\+\_\+laplacian}}
 \index{explicit\+\_\+laplacian@{explicit\+\_\+laplacian}!schwz\+::\+Settings@{schwz\+::\+Settings}}
 \subsubsection{\texorpdfstring{explicit\+\_\+laplacian}{explicit\_laplacian}}
@@ -148,7 +166,7 @@ Flag if the laplacian matrix should be generated within the library.
 
 If false, an external matrix and rhs needs to be provided 
 
-Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type $>$\+::initialize().
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::initialize().
 
 \mbox{\Hypertarget{structschwz_1_1Settings_a8028fcf029fadc07a7d1b9aa94c83f08}\label{structschwz_1_1Settings_a8028fcf029fadc07a7d1b9aa94c83f08}} 
 \index{schwz\+::\+Settings@{schwz\+::\+Settings}!local\+\_\+solver@{local\+\_\+solver}}
@@ -178,4 +196,4 @@ This is mainly to allow compatibility with G\+PU solution.
 
 The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-settings.\+hpp (bde74e6)\end{DoxyCompactItemize}
+settings.\+hpp (92dbd95)\end{DoxyCompactItemize}

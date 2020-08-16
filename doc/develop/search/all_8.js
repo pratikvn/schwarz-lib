@@ -6,6 +6,8 @@ var searchData=
   ['metis_5fobjtype',['metis_objtype',['../structschwz_1_1Settings.html#a8a057e4ac5331c9222ad539ffd1f5c3d',1,'schwz::Settings']]],
   ['metiserror',['MetisError',['../classMetisError.html',1,'MetisError'],['../classMetisError.html#ac75e70bca56efa9b432897dba8e59fda',1,'MetisError::MetisError()']]],
   ['min_5fresidual_5fnorm',['min_residual_norm',['../structschwz_1_1Metadata.html#a04bd75fb60c4085481a3fc3e96269452',1,'schwz::Metadata']]],
+  ['mixedt_5frecv_5fbuffer',['mixedt_recv_buffer',['../structschwz_1_1Communicate_1_1comm__struct.html#a93ca78673122ad09e24bebd0b1ec9750',1,'schwz::Communicate::comm_struct']]],
+  ['mixedt_5fsend_5fbuffer',['mixedt_send_buffer',['../structschwz_1_1Communicate_1_1comm__struct.html#a357d96eeeb734a275f78782e7e6542a8',1,'schwz::Communicate::comm_struct']]],
   ['modulenotimplemented',['ModuleNotImplemented',['../classModuleNotImplemented.html',1,'ModuleNotImplemented'],['../classModuleNotImplemented.html#adf169bb339dbebbd025eda534d58fd6f',1,'ModuleNotImplemented::ModuleNotImplemented()']]],
   ['mpi_5fcommunicator',['mpi_communicator',['../structschwz_1_1Metadata.html#a84a525a7a5f5282dcc1ef165e93bad35',1,'schwz::Metadata']]],
   ['my_5flocal_5frank',['my_local_rank',['../structschwz_1_1Metadata.html#a8e48fee48d4865f2a23782e2bf3e9f5c',1,'schwz::Metadata']]],

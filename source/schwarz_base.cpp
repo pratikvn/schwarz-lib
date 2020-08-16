@@ -52,24 +52,26 @@ void write_iters_and_residuals(
     int num_subd, int my_rank, int iter_count,
     std::vector<ValueType> &local_res_vec_out,
     std::vector<IndexType> &local_converged_iter_count,
-    std::vector<ValueType> &local_converged_resnorm, std::string filename)
+    std::vector<ValueType> &local_converged_resnorm,
+    std::vector<ValueType> &local_timestamp, std::string filename)
 {
     {
         std::ofstream file;
         file.open(filename);
-        file << "iter,resnorm,localiter,localresnorm\n";
+        file << "iter,resnorm,localiter,localresnorm,timestamp\n";
         for (auto i = 0; i < iter_count; ++i) {
             file << i << "," << local_res_vec_out[i] << ","
                  << local_converged_iter_count[i] << ","
-                 << local_converged_resnorm[i] << "\n";
+                 << local_converged_resnorm[i] << "," << local_timestamp[i]
+                 << "\n";
         }
         file.close();
     }
 }
 
 
-template <typename ValueType, typename IndexType>
-SchwarzBase<ValueType, IndexType>::SchwarzBase(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+SchwarzBase<ValueType, IndexType, MixedValueType>::SchwarzBase(
     Settings &settings, Metadata<ValueType, IndexType> &metadata)
     : Initialize<ValueType, IndexType>(settings, metadata),
       settings(settings),
@@ -123,8 +125,8 @@ SchwarzBase<ValueType, IndexType>::SchwarzBase(
 }
 
 
-template <typename ValueType, typename IndexType>
-void SchwarzBase<ValueType, IndexType>::initialize(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
 #if SCHW_HAVE_DEALII
     const dealii::SparseMatrix<ValueType> &matrix,
     const dealii::Vector<ValueType> &system_rhs)
@@ -176,7 +178,7 @@ void SchwarzBase<ValueType, IndexType>::initialize(
                   rhs.begin());
     }
 #endif
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
+    auto mpi_vtype = schwz::mpi::get_mpi_datatype(*rhs.data());
     MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0, MPI_COMM_WORLD);
 
 
@@ -254,7 +256,7 @@ void SchwarzBase<ValueType, IndexType>::initialize(
         this->local_solution);
 
     // Setup the local solver on each of the subddomains.
-    Solve<ValueType, IndexType>::setup_local_solver(
+    Solve<ValueType, IndexType, MixedValueType>::setup_local_solver(
         this->settings, metadata, this->local_matrix, this->triangular_factor_l,
         this->triangular_factor_u, this->local_perm, this->local_inv_perm,
         this->local_rhs);
@@ -263,10 +265,11 @@ void SchwarzBase<ValueType, IndexType>::initialize(
 }
 
 
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename IndexType, typename MixedValueType>
 void gather_comm_data(
     int num_subdomains,
-    struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+    struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+        &comm_struct,
     std::vector<std::tuple<int, std::vector<std::tuple<int, int>>,
                            std::vector<std::tuple<int, int>>, int, int>>
         &comm_data_struct)
@@ -310,8 +313,8 @@ void gather_comm_data(
 }
 
 
-template <typename ValueType, typename IndexType>
-void SchwarzBase<ValueType, IndexType>::run(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     std::shared_ptr<gko::matrix::Dense<ValueType>> &solution)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
@@ -320,8 +323,18 @@ void SchwarzBase<ValueType, IndexType>::run(
             vec_vtype::create(settings.executor->get_master(),
                               gko::dim<2>(this->metadata.global_size, 1));
     }
+    MixedValueType dummy1 = 0.0;
+    ValueType dummy2 = 1.0;
+
+    if (metadata.my_rank == 0) {
+        std::cout << " MixedValueType: " << typeid(dummy1).name()
+                  << " ValueType: " << typeid(dummy2).name() << std::endl;
+    }
     // The main solution vector
     std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
+        this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
+    // The previous iteration solution vector
+    std::shared_ptr<vec_vtype> prev_global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
     // A work vector.
     std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
@@ -329,7 +342,15 @@ void SchwarzBase<ValueType, IndexType>::run(
     // An initial guess.
     std::shared_ptr<vec_vtype> init_guess = vec_vtype::create(
         settings.executor, gko::dim<2>(this->metadata.local_size_x, 1));
-    init_guess->copy_from(local_rhs.get());
+    // init_guess->copy_from(local_rhs.get());
+
+    if (settings.executor_string == "omp") {
+        ValueType sum_rhs = std::accumulate(
+            local_rhs->get_values(),
+            local_rhs->get_values() + local_rhs->get_size()[0], 0.0);
+        std::cout << " Rank " << this->metadata.my_rank << " sum local rhs "
+                  << sum_rhs << std::endl;
+    }
 
     // std::vector<IndexType> local_converged_iter_count;
 
@@ -343,6 +364,7 @@ void SchwarzBase<ValueType, IndexType>::run(
          Settings::local_solver_settings::iterative_solver_dealii |
          Settings::local_solver_settings::iterative_solver_ginkgo) &
         settings.local_solver;
+    prev_global_solution->copy_from(gko::lend(global_solution));
 
     ValueType local_residual_norm = -1.0, local_residual_norm0 = -1.0,
               global_residual_norm = 0.0, global_residual_norm0 = -1.0;
@@ -353,8 +375,10 @@ void SchwarzBase<ValueType, IndexType>::run(
     for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
         // Exchange the boundary values. The communication part.
         MEASURE_ELAPSED_FUNC_TIME(
-            this->exchange_boundary(settings, metadata, global_solution), 0,
-            metadata.my_rank, boundary_exchange, metadata.iter_count);
+            this->exchange_boundary(settings, metadata, prev_global_solution,
+                                    global_solution),
+            0, metadata.my_rank, boundary_exchange, metadata.iter_count);
+        prev_global_solution->copy_from(gko::lend(global_solution));
 
         // Update the boundary and interior values after the exchanging from
         // other processes.
@@ -367,7 +391,7 @@ void SchwarzBase<ValueType, IndexType>::run(
         // Check for the convergence of the solver.
         // num_converged_procs = 0;
         MEASURE_ELAPSED_FUNC_TIME(
-            (Solve<ValueType, IndexType>::check_convergence(
+            (Solve<ValueType, IndexType, MixedValueType>::check_convergence(
                 settings, metadata, this->comm_struct, this->convergence_vector,
                 global_solution, this->local_solution, this->local_matrix,
                 work_vector, local_residual_norm, local_residual_norm0,
@@ -388,27 +412,26 @@ void SchwarzBase<ValueType, IndexType>::run(
             break;
         } else {
             MEASURE_ELAPSED_FUNC_TIME(
-                (Solve<ValueType, IndexType>::local_solve(
+                (Solve<ValueType, IndexType, MixedValueType>::local_solve(
                     settings, metadata, this->local_matrix,
                     this->triangular_factor_l, this->triangular_factor_u,
                     this->local_perm, this->local_inv_perm, work_vector,
                     init_guess, this->local_solution)),
                 3, metadata.my_rank, local_solve, metadata.iter_count);
+
             // Gather the local vector into the locally global vector for
             // communication.
             MEASURE_ELAPSED_FUNC_TIME(
-                (Communicate<ValueType, IndexType>::local_to_global_vector(
-                    settings, metadata, this->local_solution, global_solution)),
+                (Communicate<ValueType, IndexType, MixedValueType>::
+                     local_to_global_vector(settings, metadata,
+                                            this->local_solution,
+                                            global_solution)),
                 4, metadata.my_rank, expand_local_vec, metadata.iter_count);
         }
     }
     MPI_Barrier(MPI_COMM_WORLD);
     auto elapsed_time = std::chrono::duration<ValueType>(
         std::chrono::steady_clock::now() - start_time);
-    std::cout << " Rank " << metadata.my_rank << " converged in "
-              << metadata.iter_count << " iters " << std::endl;
-    ValueType mat_norm = -1.0, rhs_norm = -1.0, sol_norm = -1.0,
-              residual_norm = -1.0;
     // Write the residuals and iterations to files
     if (settings.write_iters_and_residuals &&
         solver_settings ==
@@ -423,32 +446,37 @@ void SchwarzBase<ValueType, IndexType>::run(
             metadata.post_process_data.local_residual_vector_out.size(),
             metadata.post_process_data.local_residual_vector_out,
             metadata.post_process_data.local_converged_iter_count,
-            metadata.post_process_data.local_converged_resnorm, filename);
+            metadata.post_process_data.local_converged_resnorm,
+            metadata.post_process_data.local_timestamp, filename);
     }
+    if (num_converged_procs < metadata.num_subdomains) {
+        std::cout << "Rank " << metadata.my_rank << " did not converge in "
+                  << metadata.iter_count << " iterations." << std::endl;
+    } else {
+        std::cout << " Rank " << metadata.my_rank << " converged in "
+                  << metadata.iter_count << " iterations " << std::endl;
+        ValueType mat_norm = -1.0, rhs_norm = -1.0, sol_norm = -1.0,
+                  residual_norm = -1.0;
 
-    // Compute the final residual norm. Also gathers the solution from all
-    // subdomains.
-    Solve<ValueType, IndexType>::compute_residual_norm(
-        settings, metadata, global_matrix, global_rhs, global_solution,
-        mat_norm, rhs_norm, sol_norm, residual_norm);
-    gather_comm_data<ValueType, IndexType>(
-        metadata.num_subdomains, this->comm_struct, metadata.comm_data_struct);
-    // clang-format off
-    if (metadata.my_rank == 0)
-      {
-        std::cout
+        // Compute the final residual norm. Also gathers the solution from all
+        // subdomains.
+        Solve<ValueType, IndexType, MixedValueType>::compute_residual_norm(
+            settings, metadata, global_matrix, global_rhs, global_solution,
+            mat_norm, rhs_norm, sol_norm, residual_norm);
+        gather_comm_data<ValueType, IndexType, MixedValueType>(
+            metadata.num_subdomains, this->comm_struct,
+            metadata.comm_data_struct);
+        // clang-format off
+        if (metadata.my_rank == 0)
+          {
+            std::cout
               << " residual norm " << residual_norm << "\n"
               << " relative residual norm of solution " << residual_norm/rhs_norm << "\n"
               << " Time taken for solve " << elapsed_time.count()
               << std::endl;
-        if (num_converged_procs < metadata.num_subdomains)
-          {
-            std::cout << " Did not converge in " << metadata.iter_count
-                      << " iterations."
-                      << std::endl;
           }
-      }
-    // clang-format on
+        // clang-format on
+    }
     if (metadata.my_rank == 0) {
         solution->copy_from(global_solution.get());
     }
@@ -456,9 +484,9 @@ void SchwarzBase<ValueType, IndexType>::run(
     // Communicate<ValueType, IndexType>::clear(settings);
 }
 
-#define DECLARE_SCHWARZ_BASE(ValueType, IndexType) \
-    class SchwarzBase<ValueType, IndexType>
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SCHWARZ_BASE);
+#define DECLARE_SCHWARZ_BASE(ValueType, IndexType, MixedValueType) \
+    class SchwarzBase<ValueType, IndexType, MixedValueType>
+INSTANTIATE_FOR_EACH_VALUE_MIXEDVALUE_AND_INDEX_TYPE(DECLARE_SCHWARZ_BASE);
 #undef DECLARE_SCHWARZ_BASE
 
 

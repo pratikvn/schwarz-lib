@@ -59,8 +59,9 @@ namespace schwz {
  * @ingroup schwarz_class
  */
 template <typename ValueType = gko::default_precision,
-          typename IndexType = gko::int32>
-class SolverRAS : public SchwarzBase<ValueType, IndexType> {
+          typename IndexType = gko::int32,
+          typename MixedValueType = gko::default_precision>
+class SolverRAS : public SchwarzBase<ValueType, IndexType, MixedValueType> {
 public:
     /**
      * The constructor that takes in the user settings and a metadata struct
@@ -89,6 +90,8 @@ public:
 
     void exchange_boundary(const Settings &settings,
                            const Metadata<ValueType, IndexType> &metadata,
+                           const std::shared_ptr<gko::matrix::Dense<ValueType>>
+                               &prev_global_solution,
                            std::shared_ptr<gko::matrix::Dense<ValueType>>
                                &global_solution) override;
 

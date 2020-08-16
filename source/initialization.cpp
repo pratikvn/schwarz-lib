@@ -179,9 +179,9 @@ void Initialize<ValueType, IndexType>::setup_global_matrix(
         }
     }
     auto mpi_itype =
-        boost::mpi::get_mpi_datatype(global_matrix->get_row_ptrs()[0]);
+        schwz::mpi::get_mpi_datatype(global_matrix->get_row_ptrs()[0]);
     auto mpi_vtype =
-        boost::mpi::get_mpi_datatype(global_matrix->get_values()[0]);
+        schwz::mpi::get_mpi_datatype(global_matrix->get_values()[0]);
     MPI_Bcast(global_matrix->get_row_ptrs(), N + 1, mpi_itype, 0,
               MPI_COMM_WORLD);
     MPI_Bcast(global_matrix->get_col_idxs(), numnnz, mpi_itype, 0,

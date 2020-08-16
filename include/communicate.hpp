@@ -56,7 +56,7 @@ namespace schwz {
  * @ref comm
  * @ingroup comm
  */
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename IndexType, typename MixedValueType>
 class Communicate {
 public:
     friend class Initialize<ValueType, IndexType>;
@@ -175,15 +175,27 @@ public:
 
         /**
          * The send buffer used for the actual communication for both one-sided
-         * and two-sided.
+         * and two-sided (always allocated).
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> send_buffer;
 
         /**
+         * The mixed send buffer used for the actual communication for both
+         * one-sided and two-sided.
+         */
+        std::shared_ptr<gko::matrix::Dense<MixedValueType>> mixedt_send_buffer;
+
+        /**
          * The recv buffer used for the actual communication for both one-sided
-         * and two-sided.
+         * and two-sided (always allocated).
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> recv_buffer;
+
+        /**
+         * The mixed precision recv buffer used for the actual communication for
+         * both one-sided and two-sided.
+         */
+        std::shared_ptr<gko::matrix::Dense<MixedValueType>> mixedt_recv_buffer;
 
         /**
          * The displacements for the receiving of the buffer.
@@ -241,6 +253,8 @@ public:
     virtual void exchange_boundary(
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
+        const std::shared_ptr<gko::matrix::Dense<ValueType>>
+            &prev_global_solution,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution) = 0;
 
     /**

@@ -38,9 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 
+#include <schwarz/config.hpp>
 
 #include <communicate.hpp>
-#include <schwarz/config.hpp>
+#include <gather.hpp>
+#include <scatter.hpp>
 #include <settings.hpp>
 
 
@@ -53,15 +55,15 @@ namespace schwz {
 namespace CommHelpers {
 
 
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename IndexType, typename MixedValueType>
 void transfer_one_by_one(
     const Settings &settings,
-    struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+    struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+        &comm_struct,
     ValueType *buffer, IndexType **offset, int num_neighbors,
     IndexType *neighbors)
 {
-    ValueType dummy = 1.0;
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
+    auto mpi_vtype = schwz::mpi::get_mpi_datatype(buffer[0]);
     for (auto p = 0; p < num_neighbors; p++) {
         if ((offset[p])[0] > 0) {
             if (settings.comm_settings.enable_put) {
@@ -88,9 +90,9 @@ void transfer_one_by_one(
 
 
 template <typename ValueType, typename IndexType>
-void pack_buffer(const Settings &settings, ValueType *buffer,
-                 ValueType *send_buffer, IndexType **num_send_elems, int offset,
-                 int send_subd)
+void pack_buffer(const Settings &settings, const ValueType *prev_buffer,
+                 const ValueType *buffer, ValueType *send_buffer,
+                 IndexType **num_send_elems, int offset, int send_subd)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using arr = gko::Array<IndexType>;
@@ -102,15 +104,12 @@ void pack_buffer(const Settings &settings, ValueType *buffer,
                              arr::view(settings.executor->get_master(),
                                        ((num_send_elems)[send_subd])[0],
                                        &((num_send_elems[send_subd])[1])));
-        settings.executor->run(GatherScatter<ValueType, IndexType>(
-            true, (num_send_elems[send_subd])[0], tmp_idx_s.get_data(), buffer,
-            tmp_send_buf->get_values()));
-#if SCHW_HAVE_CUDA
-        SCHWARZ_ASSERT_NO_CUDA_ERRORS(
-            cudaMemcpy(&(send_buffer[offset]), tmp_send_buf->get_values(),
-                       ((num_send_elems)[send_subd])[0] * sizeof(ValueType),
-                       cudaMemcpyDeviceToDevice));
-#endif
+        settings.executor->run(Gather<ValueType, IndexType>(
+            (num_send_elems[send_subd])[0], tmp_idx_s.get_data(), buffer,
+            tmp_send_buf->get_values(), copy));
+        settings.executor->copy(((num_send_elems)[send_subd])[0],
+                                tmp_send_buf->get_values(),
+                                &(send_buffer[offset]));
     } else {
         for (auto i = 0; i < (num_send_elems[send_subd])[0]; i++) {
             send_buffer[offset + i] =
@@ -126,8 +125,7 @@ void transfer_buffer(const Settings &settings, MPI_Win &window,
                      int offset, int target_subd, IndexType *neighbors,
                      IndexType *displacements)
 {
-    ValueType dummy = 1.0;
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(dummy);
+    auto mpi_vtype = schwz::mpi::get_mpi_datatype(target_buffer[0]);
     if (settings.comm_settings.enable_lock_local) {
         MPI_Win_lock(MPI_LOCK_SHARED, neighbors[target_subd], 0, window);
     }
@@ -152,9 +150,9 @@ void transfer_buffer(const Settings &settings, MPI_Win &window,
 
 
 template <typename ValueType, typename IndexType>
-void unpack_buffer(const Settings &settings, ValueType *buffer,
-                   ValueType *recv_buffer, IndexType **num_recv_elems,
-                   int offset, int recv_subd)
+void unpack_buffer(const Settings &settings, const ValueType *prev_buffer,
+                   ValueType *buffer, const ValueType *recv_buffer,
+                   IndexType **num_recv_elems, int offset, int recv_subd)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using arr = gko::Array<IndexType>;
@@ -162,19 +160,16 @@ void unpack_buffer(const Settings &settings, ValueType *buffer,
     if (settings.executor_string == "cuda") {
         auto tmp_recv_buf = vec_vtype::create(
             settings.executor, gko::dim<2>((num_recv_elems[recv_subd])[0], 1));
-#if SCHW_HAVE_CUDA
-        SCHWARZ_ASSERT_NO_CUDA_ERRORS(
-            cudaMemcpy(tmp_recv_buf->get_values(), &(recv_buffer[offset]),
-                       ((num_recv_elems)[recv_subd])[0] * sizeof(ValueType),
-                       cudaMemcpyDeviceToDevice));
-#endif
+        settings.executor->copy(((num_recv_elems)[recv_subd])[0],
+                                &(recv_buffer[offset]),
+                                tmp_recv_buf->get_values());
         auto tmp_idx_r = arr(settings.executor,
                              arr::view(settings.executor->get_master(),
                                        ((num_recv_elems)[recv_subd])[0],
                                        &((num_recv_elems[recv_subd])[1])));
-        settings.executor->run(GatherScatter<ValueType, IndexType>(
-            false, (num_recv_elems[recv_subd])[0], tmp_idx_r.get_data(),
-            tmp_recv_buf->get_values(), buffer));
+        settings.executor->run(Scatter<ValueType, IndexType>(
+            (num_recv_elems[recv_subd])[0], tmp_idx_r.get_data(),
+            tmp_recv_buf->get_values(), buffer, copy));
     } else {
         for (auto i = 0; i < (num_recv_elems[recv_subd])[0]; i++) {
             buffer[(num_recv_elems[recv_subd])[i + 1]] =
@@ -182,6 +177,7 @@ void unpack_buffer(const Settings &settings, ValueType *buffer,
         }
     }
 }
+
 
 }  // namespace CommHelpers
 }  // namespace schwz

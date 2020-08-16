@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(SCHWARZ_BUILD_BENCHMARKING "Build an example to benchmark the library" ON)
 option(SCHWARZ_BUILD_METIS "Use the METIS partition library" ON)
-option(SCHWARZ_BUILD_CHOLMOD "Use the CHOLMOD direct solver" ON)
-option(SCHWARZ_BUILD_UMFPACK "Use the UMFPACK direct solver" ON)
+option(SCHWARZ_BUILD_CHOLMOD "Use the CHOLMOD direct solver" OFF)
+option(SCHWARZ_BUILD_UMFPACK "Use the UMFPACK direct solver" OFF)
 option(SCHWARZ_BUILD_CUDA "Build the CUDA kernels" ON)
 option(SCHWARZ_WITH_HWLOC "Build with hwloc support" ON)
 option(SCHWARZ_BUILD_DEALII "Build with deal.ii support" OFF)
@@ -110,10 +110,6 @@ find_package(Ginkgo REQUIRED
 find_package(MPI REQUIRED)
 include_directories(SYSTEM ${MPI_C_INCLUDE_PATH} ${MPI_CXX_INCLUDE_PATH})
 
-set(BOOST_ROOT $ENV{BOOST_DIR})
-find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-
 INCLUDE_DIRECTORIES(include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/include)
 
@@ -124,20 +120,24 @@ ADD_LIBRARY(${TARGET} SHARED )
 TARGET_SOURCES(${TARGET} PRIVATE
   source/initialization.cpp
   source/communicate.cpp
+  source/exception.cpp
   source/utils.cpp
   source/solve.cpp
   source/schwarz_base.cpp
   source/restricted_schwarz.cpp
-  source/exception.cpp
   )
 
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.hpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/include/schwarz/config.hpp @ONLY)
+  ${CMAKE_CURRENT_BINARY_DIR}/include/schwarz/config.hpp @ONLY)
 
 if(SCHWARZ_BUILD_CUDA)
   target_sources(${TARGET} PRIVATE
-    source/cuda_gather.cu)
+    source/gather_kernel.cu
+    source/scatter_kernel.cu)
+  target_compile_options(${TARGET}
+    PRIVATE
+    $<$<COMPILE_LANGUAGE:CUDA>:--expt-extended-lambda>)
 else()
   target_sources(${TARGET} PRIVATE
     source/cuda_dummy_gather.cpp)
@@ -179,7 +179,7 @@ if(CLANG_TIDY_EXE)
   SET_TARGET_PROPERTIES(
     ${TARGET} PROPERTIES
     CXX_CLANG_TIDY "${DO_CLANG_TIDY}"
-  )
+    )
 endif()
 
 # Link optional packages

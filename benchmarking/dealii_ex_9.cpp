@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2000 - 2018 by the deal.II authors
  *
- * This file is part of the deal.II library.
+ * This file is modification of the version in the deal.II library.
  *
  * The deal.II library is free software; you can use it, redistribute
  * it, and/or modify it under the terms of the GNU Lesser General
@@ -112,7 +112,7 @@ double RightHandSide<dim>::value(const Point<dim> &p,
     const double diameter = 0.1;
     return ((p - center_point).norm_square() < diameter * diameter
                 ? 0.1 / std::pow(diameter, dim)
-                : 0.0);
+                : 0.1);
 }
 
 
@@ -454,6 +454,7 @@ void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
     settings.matrix_filename = FLAGS_matrix_filename;
     settings.explicit_laplacian = FLAGS_explicit_laplacian;
     settings.enable_random_rhs = FLAGS_enable_random_rhs;
+    settings.use_mixed_precision = FLAGS_use_mixed_precision;
     settings.overlap = FLAGS_overlap;
     settings.naturally_ordered_factor = FLAGS_factor_ordering_natural;
     settings.reorder = FLAGS_local_reordering;

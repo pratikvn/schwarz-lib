@@ -71,8 +71,8 @@ double get_relative_error(const gko::matrix::Dense<ValueType> *first,
 }
 
 
-template <typename ValueType, typename IndexType>
-void Solve<ValueType, IndexType>::compute_local_factors(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Solve<ValueType, IndexType, MixedValueType>::compute_local_factors(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix)
 {
@@ -193,8 +193,8 @@ void update_diagonals(
 }
 
 
-template <typename ValueType, typename IndexType>
-void Solve<ValueType, IndexType>::setup_local_solver(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Solve<ValueType, IndexType, MixedValueType>::setup_local_solver(
     const Settings &settings, Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
@@ -663,8 +663,8 @@ void Solve<ValueType, IndexType>::setup_local_solver(
 }
 
 
-template <typename ValueType, typename IndexType>
-void Solve<ValueType, IndexType>::local_solve(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Solve<ValueType, IndexType, MixedValueType>::local_solve(
     const Settings &settings, Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
@@ -769,11 +769,15 @@ void Solve<ValueType, IndexType>::local_solve(
                 static_cast<IndexType>(conv_iter_count));
             metadata.post_process_data.local_converged_resnorm.push_back(
                 rnorm->at(0));
+            metadata.post_process_data.local_timestamp.push_back(
+                MPI_Wtime() - metadata.init_mpi_wtime);
+
         } else {
             metadata.post_process_data.local_converged_iter_count.push_back(
                 static_cast<IndexType>(0));
-            metadata.post_process_data.local_converged_resnorm.push_back(0.0);
         }
+        metadata.post_process_data.local_timestamp.push_back(
+            MPI_Wtime() - metadata.init_mpi_wtime);
         local_solution->copy_from(init_guess.get());
     } else if (solver_settings ==
                Settings::local_solver_settings::iterative_solver_dealii) {
@@ -788,9 +792,9 @@ void Solve<ValueType, IndexType>::local_solve(
 }
 
 
-template <typename ValueType, typename IndexType>
-bool Solve<ValueType, IndexType>::check_local_convergence(
-    const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
+template <typename ValueType, typename IndexType, typename MixedValueType>
+bool Solve<ValueType, IndexType, MixedValueType>::check_local_convergence(
+    const Settings &settings, Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
@@ -840,19 +844,23 @@ bool Solve<ValueType, IndexType>::check_local_convergence(
 
         if (local_resnorm0 < 0.0) local_resnorm0 = local_resnorm;
 
-        // locally_converged = (local_resnorm) / (local_resnorm0) < tolerance;
         locally_converged = (local_resnorm * local_resnorm) /
                                 (local_resnorm0 * local_resnorm0) <
                             (tolerance * tolerance);
+    }
+    if (!settings.enable_logging) {
+        metadata.post_process_data.local_converged_resnorm.push_back(
+            local_resnorm / local_resnorm0);
     }
     return locally_converged;
 }
 
 
-template <typename ValueType, typename IndexType>
-void Solve<ValueType, IndexType>::check_global_convergence(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Solve<ValueType, IndexType, MixedValueType>::check_global_convergence(
     const Settings &settings, Metadata<ValueType, IndexType> &metadata,
-    struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+    struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+        &comm_struct,
     std::shared_ptr<gko::Array<IndexType>> &convergence_vector,
     ValueType &local_resnorm, ValueType &local_resnorm0,
     ValueType &global_resnorm, ValueType &global_resnorm0,
@@ -863,7 +871,7 @@ void Solve<ValueType, IndexType>::check_global_convergence(
     auto iter = metadata.iter_count;
     auto tolerance = metadata.tolerance;
     auto l_res_vec = this->local_residual_vector->get_values();
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(l_res_vec[0]);
+    auto mpi_vtype = schwz::mpi::get_mpi_datatype(l_res_vec[0]);
 
     if (settings.comm_settings.enable_onesided) {
         if (settings.convergence_settings.put_all_local_residual_norms) {
@@ -871,7 +879,8 @@ void Solve<ValueType, IndexType>::check_global_convergence(
                 settings, metadata, local_resnorm, this->local_residual_vector,
                 this->window_residual_vector);
         } else {
-            conv_tools::propagate_all_local_residual_norms(
+            conv_tools::propagate_all_local_residual_norms<ValueType, IndexType,
+                                                           MixedValueType>(
                 settings, metadata, comm_struct, local_resnorm,
                 this->local_residual_vector, this->window_residual_vector);
         }
@@ -922,7 +931,8 @@ void Solve<ValueType, IndexType>::check_global_convergence(
                 num_converged_procs, window_convergence);
         } else if (settings.convergence_settings
                        .enable_decentralized_leader_election) {
-            conv_tools::global_convergence_decentralized(
+            conv_tools::global_convergence_decentralized<ValueType, IndexType,
+                                                         MixedValueType>(
                 settings, metadata, comm_struct, convergence_vector,
                 convergence_sent, convergence_local, converged_all_local,
                 num_converged_procs, window_convergence);
@@ -945,10 +955,11 @@ void Solve<ValueType, IndexType>::check_global_convergence(
 }
 
 
-template <typename ValueType, typename IndexType>
-void Solve<ValueType, IndexType>::check_convergence(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Solve<ValueType, IndexType, MixedValueType>::check_convergence(
     const Settings &settings, Metadata<ValueType, IndexType> &metadata,
-    struct Communicate<ValueType, IndexType>::comm_struct &comm_struct,
+    struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+        &comm_struct,
     std::shared_ptr<gko::Array<IndexType>> &convergence_vector,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
@@ -967,6 +978,9 @@ void Solve<ValueType, IndexType>::check_convergence(
         num_converged_p = 1;
     } else {
         num_converged_p = 0;
+    }
+    if (std::isnan(local_residual_norm)) {
+        std::exit(-1);
     }
     metadata.post_process_data.local_residual_vector_out.push_back(
         local_residual_norm);
@@ -991,8 +1005,8 @@ void Solve<ValueType, IndexType>::check_convergence(
 }
 
 
-template <typename ValueType, typename IndexType>
-void Solve<ValueType, IndexType>::update_residual(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Solve<ValueType, IndexType, MixedValueType>::update_residual(
     const Settings &settings,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
@@ -1007,8 +1021,8 @@ void Solve<ValueType, IndexType>::update_residual(
 }
 
 
-template <typename ValueType, typename IndexType>
-void Solve<ValueType, IndexType>::compute_residual_norm(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Solve<ValueType, IndexType, MixedValueType>::compute_residual_norm(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &global_matrix,
@@ -1040,7 +1054,7 @@ void Solve<ValueType, IndexType>::compute_residual_norm(
                         &global_solution->get_values()[first_row])),
                     1);
     temp_vector->copy_from(temp_vector2.get());
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(local_sol->get_values()[0]);
+    auto mpi_vtype = schwz::mpi::get_mpi_datatype(local_sol->get_values()[0]);
     auto rnorm = gko::initialize<vec>({0.0}, settings.executor);
     auto rhsnorm = gko::initialize<vec>({0.0}, settings.executor);
     auto xnorm = gko::initialize<vec>({0.0}, settings.executor);
@@ -1071,8 +1085,8 @@ void Solve<ValueType, IndexType>::compute_residual_norm(
 }
 
 
-template <typename ValueType, typename IndexType>
-void Solve<ValueType, IndexType>::clear(Settings &settings)
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Solve<ValueType, IndexType, MixedValueType>::clear(Settings &settings)
 {
     if (settings.comm_settings.enable_onesided) {
         MPI_Win_unlock_all(window_convergence);
@@ -1096,8 +1110,9 @@ void Solve<ValueType, IndexType>::clear(Settings &settings)
         INSTANTIATE_FOR_EACH_VALUE_TYPE(DECLARE_FUNCTION);
 #undef DECLARE_FUNCTION
 
-#define DECLARE_SOLVER(ValueType, IndexType) class Solve<ValueType, IndexType>
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER);
+#define DECLARE_SOLVER(ValueType, IndexType, MixedValueType) \
+    class Solve<ValueType, IndexType, MixedValueType>
+INSTANTIATE_FOR_EACH_VALUE_MIXEDVALUE_AND_INDEX_TYPE(DECLARE_SOLVER);
 #undef DECLARE_SOLVER
 
 

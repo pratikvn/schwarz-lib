@@ -6,7 +6,7 @@ Schwarz Library
 
 Performance results
 -------------------
-1. [Preprint Paper on arXiv](https://arxiv.org/abs/2003.05361)
+1. [Paper in IJHPCA](https://journals.sagepub.com/doi/10.1177/1094342020946814); [Alternative arXiv version](https://arxiv.org/abs/2003.05361)
 
 
 ## Required components
@@ -15,8 +15,6 @@ The required components include:
 1. Ginkgo: The Ginkgo library is needed. It needs to be installed and preferably the installation path
    provided as an environment variable in `Ginkgo_DIR` variable.
 2. MPI: As multiple nodes and a domain decomposition is used, an MPI implementation is necessary.
-3. Boost: A Boost library is also required as one of its header files `mpi_datatype.hpp` is used to 
-   detect the `MPI_type` needed at run-time.
 
 ## Quick Install
 

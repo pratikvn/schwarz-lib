@@ -36,24 +36,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <exception_helpers.hpp>
 
 namespace schwz {
-template <typename ValueType, typename IndexType>
-void Communicate<ValueType, IndexType>::setup_comm_buffers()
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Communicate<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
     SCHWARZ_NOT_IMPLEMENTED;
 
-template <typename ValueType, typename IndexType>
-void Communicate<ValueType, IndexType>::setup_windows(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Communicate<ValueType, IndexType, MixedValueType>::setup_windows(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &main_buffer)
     SCHWARZ_NOT_IMPLEMENTED;
 
-template <typename ValueType, typename IndexType>
-void Communicate<ValueType, IndexType>::exchange_boundary(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Communicate<ValueType, IndexType, MixedValueType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
+    const std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_global_solution,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
     SCHWARZ_NOT_IMPLEMENTED;
 
-template <typename ValueType, typename IndexType>
-void Communicate<ValueType, IndexType>::update_boundary(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Communicate<ValueType, IndexType, MixedValueType>::update_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
@@ -61,8 +62,8 @@ void Communicate<ValueType, IndexType>::update_boundary(
     const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
         &interface_matrix) SCHWARZ_NOT_IMPLEMENTED;
 
-template <typename ValueType, typename IndexType>
-void Communicate<ValueType, IndexType>::local_to_global_vector(
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Communicate<ValueType, IndexType, MixedValueType>::local_to_global_vector(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_vector,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_vector)
@@ -93,8 +94,9 @@ void Communicate<ValueType, IndexType>::local_to_global_vector(
     }
 }
 
-template <typename ValueType, typename IndexType>
-void Communicate<ValueType, IndexType>::clear(Settings &settings)
+template <typename ValueType, typename IndexType, typename MixedValueType>
+void Communicate<ValueType, IndexType, MixedValueType>::clear(
+    Settings &settings)
 {
     if (settings.comm_settings.enable_onesided) {
         MPI_Win_unlock_all(comm_struct.window_recv_buffer);
@@ -105,9 +107,9 @@ void Communicate<ValueType, IndexType>::clear(Settings &settings)
     }
 }
 
-#define DECLARE_COMMUNICATE(ValueType, IndexType) \
-    class Communicate<ValueType, IndexType>
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_COMMUNICATE);
+#define DECLARE_COMMUNICATE(ValueType, IndexType, MixedValueType) \
+    class Communicate<ValueType, IndexType, MixedValueType>
+INSTANTIATE_FOR_EACH_VALUE_MIXEDVALUE_AND_INDEX_TYPE(DECLARE_COMMUNICATE);
 #undef DECLARE_COMMUNICATE
 
 }  // namespace schwz

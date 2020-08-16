@@ -6,7 +6,7 @@ include_directories(
 
 
 if(SCHWARZ_BUILD_DEALII)
-  set(BENCH_TARGET "dealii_ex_6;dealii_ex_9;dealii_ex_17")
+  set(BENCH_TARGET "dealii_ex_6;dealii_ex_9")
   FOREACH(_file ${BENCH_TARGET})
     MESSAGE(STATUS "Adding executable for ${_file}")
     add_executable(${_file} ${_file}.cpp)

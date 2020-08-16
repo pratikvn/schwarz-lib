@@ -844,7 +844,6 @@ bool Solve<ValueType, IndexType, MixedValueType>::check_local_convergence(
 
         if (local_resnorm0 < 0.0) local_resnorm0 = local_resnorm;
 
-        // locally_converged = (local_resnorm) / (local_resnorm0) < tolerance;
         locally_converged = (local_resnorm * local_resnorm) /
                                 (local_resnorm0 * local_resnorm0) <
                             (tolerance * tolerance);
@@ -853,10 +852,6 @@ bool Solve<ValueType, IndexType, MixedValueType>::check_local_convergence(
         metadata.post_process_data.local_converged_resnorm.push_back(
             local_resnorm / local_resnorm0);
     }
-    // std::cout << "Here: " << __LINE__ << " rank " << metadata.my_rank
-    //           << " iter " << metadata.iter_count << " l res norm /l norm 0 "
-    //           << local_resnorm / local_resnorm0 << " tol " << tolerance
-    //           << " locally_converged " << locally_converged << std::endl;
     return locally_converged;
 }
 
@@ -876,7 +871,7 @@ void Solve<ValueType, IndexType, MixedValueType>::check_global_convergence(
     auto iter = metadata.iter_count;
     auto tolerance = metadata.tolerance;
     auto l_res_vec = this->local_residual_vector->get_values();
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(l_res_vec[0]);
+    auto mpi_vtype = schwz::mpi::get_mpi_datatype(l_res_vec[0]);
 
     if (settings.comm_settings.enable_onesided) {
         if (settings.convergence_settings.put_all_local_residual_norms) {
@@ -1059,7 +1054,7 @@ void Solve<ValueType, IndexType, MixedValueType>::compute_residual_norm(
                         &global_solution->get_values()[first_row])),
                     1);
     temp_vector->copy_from(temp_vector2.get());
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(local_sol->get_values()[0]);
+    auto mpi_vtype = schwz::mpi::get_mpi_datatype(local_sol->get_values()[0]);
     auto rnorm = gko::initialize<vec>({0.0}, settings.executor);
     auto rhsnorm = gko::initialize<vec>({0.0}, settings.executor);
     auto xnorm = gko::initialize<vec>({0.0}, settings.executor);

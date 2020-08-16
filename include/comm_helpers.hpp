@@ -63,7 +63,7 @@ void transfer_one_by_one(
     ValueType *buffer, IndexType **offset, int num_neighbors,
     IndexType *neighbors)
 {
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(buffer[0]);
+    auto mpi_vtype = schwz::mpi::get_mpi_datatype(buffer[0]);
     for (auto p = 0; p < num_neighbors; p++) {
         if ((offset[p])[0] > 0) {
             if (settings.comm_settings.enable_put) {
@@ -128,7 +128,7 @@ void transfer_buffer(const Settings &settings, MPI_Win &window,
                      int offset, int target_subd, IndexType *neighbors,
                      IndexType *displacements)
 {
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(target_buffer[0]);
+    auto mpi_vtype = schwz::mpi::get_mpi_datatype(target_buffer[0]);
     if (settings.comm_settings.enable_lock_local) {
         MPI_Win_lock(MPI_LOCK_SHARED, neighbors[target_subd], 0, window);
     }

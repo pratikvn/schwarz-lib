@@ -68,7 +68,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_local_matrices(
     auto comm_size = metadata.comm_size;
     auto num_subdomains = metadata.num_subdomains;
     auto global_size = metadata.global_size;
-    auto mpi_itype = boost::mpi::get_mpi_datatype(*partition_indices.data());
+    auto mpi_itype = schwz::mpi::get_mpi_datatype(*partition_indices.data());
 
     MPI_Bcast(partition_indices.data(), global_size, mpi_itype, 0,
               MPI_COMM_WORLD);
@@ -369,7 +369,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
     int pp = 0;
     std::vector<int> send(num_subdomains, 0);
 
-    auto mpi_itype = boost::mpi::get_mpi_datatype(global_get[pp][0]);
+    auto mpi_itype = schwz::mpi::get_mpi_datatype(global_get[pp][0]);
     for (auto p = 0; p < num_subdomains; p++) {
         if (p != my_rank) {
             if (recv[p] != 0) {
@@ -391,7 +391,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
     auto local_neighbors_out =
         this->comm_struct.local_neighbors_out->get_data();
     auto global_put = this->comm_struct.global_put->get_data();
-    mpi_itype = boost::mpi::get_mpi_datatype((global_put[pp])[0]);
+    mpi_itype = schwz::mpi::get_mpi_datatype((global_put[pp])[0]);
     int pflag = 0;
     pp = 0;
     int num_send = 0;
@@ -583,7 +583,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
             tmp_num_comm_elems[j + 1] += tmp_num_comm_elems[j];
         }
 
-        auto mpi_itype = boost::mpi::get_mpi_datatype(tmp_num_comm_elems[0]);
+        auto mpi_itype = schwz::mpi::get_mpi_datatype(tmp_num_comm_elems[0]);
         MPI_Alltoall(tmp_num_comm_elems.data(), 1, mpi_itype, put_displacements,
                      1, mpi_itype, MPI_COMM_WORLD);
     }
@@ -601,7 +601,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
             tmp_num_comm_elems[j + 1] += tmp_num_comm_elems[j];
         }
 
-        auto mpi_itype = boost::mpi::get_mpi_datatype(tmp_num_comm_elems[0]);
+        auto mpi_itype = schwz::mpi::get_mpi_datatype(tmp_num_comm_elems[0]);
         MPI_Alltoall(tmp_num_comm_elems.data(), 1, mpi_itype, get_displacements,
                      1, mpi_itype, MPI_COMM_WORLD);
     }
@@ -820,7 +820,7 @@ void exchange_boundary_twosided(
     auto mixedt_send_buffer = comm_struct.mixedt_send_buffer;
 
     MixedValueType dummy_mixed = 0.0;
-    auto mpi_mixedvtype = boost::mpi::get_mpi_datatype(dummy_mixed);
+    auto mpi_mixedvtype = schwz::mpi::get_mpi_datatype(dummy_mixed);
     // auto diff_buf =
     //     vec_vtype::create(settings.executor,
     //     prev_global_solution->get_size());
@@ -837,7 +837,7 @@ void exchange_boundary_twosided(
 
     {
         auto mpi_vtype =
-            boost::mpi::get_mpi_datatype(send_buffer->get_values()[0]);
+            schwz::mpi::get_mpi_datatype(send_buffer->get_values()[0]);
         for (auto p = 0; p < num_neighbors_out; p++) {
             // send
             if ((global_put[p])[0] > 0) {
@@ -878,7 +878,7 @@ void exchange_boundary_twosided(
     auto mixedt_recv_buffer = comm_struct.mixedt_recv_buffer;
     {
         auto mpi_vtype =
-            boost::mpi::get_mpi_datatype(recv_buffer->get_values()[0]);
+            schwz::mpi::get_mpi_datatype(recv_buffer->get_values()[0]);
         if (!settings.comm_settings.enable_overlap ||
             metadata.iter_count == 0) {
             for (auto p = 0; p < num_neighbors_in; p++) {
@@ -904,7 +904,7 @@ void exchange_boundary_twosided(
     // wait for receive
     {
         auto mpi_vtype =
-            boost::mpi::get_mpi_datatype(recv_buffer->get_values()[0]);
+            schwz::mpi::get_mpi_datatype(recv_buffer->get_values()[0]);
         for (auto p = 0; p < num_neighbors_in; p++) {
             if ((global_get[p])[0] > 0) {
                 if (settings.use_mixed_precision) {

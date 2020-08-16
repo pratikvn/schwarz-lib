@@ -110,10 +110,6 @@ find_package(Ginkgo REQUIRED
 find_package(MPI REQUIRED)
 include_directories(SYSTEM ${MPI_C_INCLUDE_PATH} ${MPI_CXX_INCLUDE_PATH})
 
-set(BOOST_ROOT $ENV{BOOST_DIR})
-find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-
 INCLUDE_DIRECTORIES(include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/include)
 

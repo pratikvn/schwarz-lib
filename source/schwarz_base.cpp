@@ -178,7 +178,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
                   rhs.begin());
     }
 #endif
-    auto mpi_vtype = boost::mpi::get_mpi_datatype(*rhs.data());
+    auto mpi_vtype = schwz::mpi::get_mpi_datatype(*rhs.data());
     MPI_Bcast(rhs.data(), metadata.global_size, mpi_vtype, 0, MPI_COMM_WORLD);
 
 

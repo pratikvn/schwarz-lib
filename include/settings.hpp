@@ -44,13 +44,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <mpi.h>
-#include <boost/mpi/datatype.hpp>
 #include <ginkgo/ginkgo.hpp>
-
 
 #include <device_guard.hpp>
 #include <exception_helpers.hpp>
 #include <gather.hpp>
+#include <mpi_datatype.hpp>
 #include <scatter.hpp>
 
 

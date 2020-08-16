@@ -64,9 +64,9 @@ $(function() {
 <div class="title">Benchmarking. </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1># Benchmark example 1. </h1>
-<h2>## Poisson solver using Restricted Additive Schwarz with overlap. </h2>
-<p>The flag <code>-DSCHWARZ_BUILD_BENCHMARKING</code> (default <code>ON</code>) enables the example and benchmarking snippets. The following command line options are available for this example. This is setup using <code>gflags</code>.</p>
+<div class="textblock"><h1># Generic Benchmark settings. </h1>
+<p>The flag <code>-DSCHWARZ_BUILD_BENCHMARKING</code> (default <code>ON</code>) enables the examples and benchmarking snippets.</p>
+<p>If <code>schwarz-lib</code> has been built with <code>deal.ii</code>, then the <code>deal.ii</code> examples, <code>ex_6</code> and <code>ex_9</code> are also built, else only the <code>bench_ras</code> example is built. The following command line options are available for this example. This is setup using <code>gflags</code>.</p>
 <p>The executable is run in the following fashion:</p>
 <p>```sh [MPI_COMMAND] [MPI_OPTIONS] </p>
 </div></div><!-- contents -->

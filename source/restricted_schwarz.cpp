@@ -715,7 +715,6 @@ void exchange_boundary_onesided(
                         send_buffer->get_values(), global_put, num_put, p);
                     if (settings.use_mixed_precision) {
                         send_buffer->convert_to(gko::lend(mixedt_send_buffer));
-                        // mixedt_send_buffer->copy_from(gko::lend(send_buffer));
                         CommHelpers::transfer_buffer(
                             settings, comm_struct.window_recv_buffer,
                             mixedt_send_buffer->get_values(), global_put,
@@ -732,7 +731,6 @@ void exchange_boundary_onesided(
         }
         if (settings.use_mixed_precision) {
             mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
-            // recv_buffer->copy_from(gko::lend(mixedt_recv_buffer));
         }
         // unpack receive buffer
         int num_get = 0;

@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2000 - 2018 by the deal.II authors
  *
- * This file is part of the deal.II library.
+ * This file is modification of the version in the deal.II library.
  *
  * The deal.II library is free software; you can use it, redistribute
  * it, and/or modify it under the terms of the GNU Lesser General

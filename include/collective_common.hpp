@@ -31,31 +31,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************<SCHWARZ LIB LICENSE>*************************/
 
-#ifndef SCHWARZ_INCLUDE_CONFIG_H
-#define SCHWARZ_INCLUDE_CONFIG_H
+#ifndef collective_common_hpp
+#define collective_common_hpp
 
-// clang-format off
-#define SCHW_HAVE_METIS @SCHWARZ_HAVE_METIS@
-// clang-format on
+enum OperationType { add = 0, copy = 1, diff = 2, avg = 3 };
 
-// clang-format off
-#define SCHW_HAVE_CHOLMOD @SCHWARZ_HAVE_CHOLMOD@
-// clang-format on
 
-// clang-format off
-#define SCHW_HAVE_UMFPACK @SCHWARZ_HAVE_UMFPACK@
-// clang-format on
-
-// clang-format off
-#define SCHW_HAVE_DEALII @SCHWARZ_HAVE_DEALII@
-// clang-format on
-
-// clang-format off
-#define SCHW_HAVE_CUDA @SCHWARZ_HAVE_CUDA@
-// clang-format on
-
-// clang-format off
-#define SCHW_HAVE_HWLOC @SCHWARZ_HAVE_HWLOC@
-// clang-format on
-
-#endif  // SCHWARZ_INCLUDE_CONFIG_H
+#endif  // collective_common.hpp

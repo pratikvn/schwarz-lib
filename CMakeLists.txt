@@ -1,4 +1,4 @@
-SET(TARGET "schwarz-lib")
+SET(TARGET "schwz")
 CMAKE_MINIMUM_REQUIRED(VERSION 3.8)
 
 PROJECT(${TARGET} LANGUAGES C CXX)
@@ -7,7 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(SCHWARZ_BUILD_BENCHMARKING "Build an example to benchmark the library" ON)
 option(SCHWARZ_BUILD_METIS "Use the METIS partition library" ON)
-option(SCHWARZ_BUILD_CHOLMOD "Use the CHOLMOD direct solver" ON)
+option(SCHWARZ_BUILD_CHOLMOD "Use the CHOLMOD direct solver" OFF)
+option(SCHWARZ_BUILD_UMFPACK "Use the UMFPACK direct solver" OFF)
 option(SCHWARZ_BUILD_CUDA "Build the CUDA kernels" ON)
 option(SCHWARZ_WITH_HWLOC "Build with hwloc support" ON)
 option(SCHWARZ_BUILD_DEALII "Build with deal.ii support" OFF)
@@ -21,6 +22,7 @@ ginkgo_find_package(gflags gflags FALSE 2.2.2)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 set(Schwarz_SOURCE_DIR "${CMAKE_SOURCE_DIR}")
+set(Schwarz_BINARY_DIR "${CMAKE_BINARY_DIR}")
 
 set(SCHWARZ_HAVE_CHOLMOD 0)
 if(SCHWARZ_BUILD_CHOLMOD)
@@ -34,16 +36,27 @@ if(SCHWARZ_BUILD_CHOLMOD)
   set(SCHWARZ_HAVE_CHOLMOD 1)
 endif()
 
+set(SCHWARZ_HAVE_UMFPACK 0)
+if(SCHWARZ_BUILD_UMFPACK)
+  if(NOT DEFINED ENV{UMFPACK_DIR})
+    message(FATAL_ERROR "Please specify where UMFPACK has been installed in UMFPACK_DIR.")
+  endif()
+  set(UMFPACK_INCLUDE_DIR $ENV{UMFPACK_DIR}/include)
+  set(UMFPACK_LIBRARY_DIR $ENV{UMFPACK_DIR}/lib)
+  include_directories(${UMFPACK_INCLUDE_DIR})
+  link_directories(${UMFPACK_LIBRARY_DIR})
+  set(SCHWARZ_HAVE_UMFPACK 1)
+endif()
+
 set(SCHWARZ_HAVE_METIS 0)
 if(SCHWARZ_BUILD_METIS)
-  find_package(METIS)
-  if(NOT METIS_FOUND AND NOT DEFINED ENV{METIS_DIR})
+  if(NOT DEFINED ENV{METIS_DIR})
     message(FATAL_ERROR "Please specify where METIS has been installed in METIS_DIR.")
   endif()
-  if(NOT METIS_FOUND)
-    set(METIS_INCLUDE_DIR $ENV{METIS_DIR}/include)
-    set(METIS_LIBRARY_DIR $ENV{METIS_DIR}/lib)
-  endif()
+  set(METIS_INCLUDE_DIR $ENV{METIS_DIR}/include)
+  set(METIS_LIBRARY_DIR $ENV{METIS_DIR}/lib)
+  message(STATUS "metis inc ${METIS_INCLUDE_DIR}")
+  message(STATUS "metis lib ${METIS_LIBRARY_DIR}")
   include_directories(${METIS_INCLUDE_DIR})
   link_directories(${METIS_LIBRARY_DIR})
   set(SCHWARZ_HAVE_METIS 1)
@@ -57,11 +70,20 @@ if(SCHWARZ_BUILD_DEALII)
   DEAL_II_INITIALIZE_CACHED_VARIABLES()
 endif()
 
+if(SCHWARZ_HAVE_DEALII)
+  set(TARGET "${TARGET}_dealii")
+endif()
+
+
 set(SCHWARZ_HAVE_HWLOC 0)
 if(SCHWARZ_WITH_HWLOC)
   find_package(HWLOC)
   set(SCHWARZ_HAVE_HWLOC 1)
 endif()
+
+# Add some matrices for configuration.
+add_subdirectory(matrices)
+
 
 set(SCHWARZ_HAVE_CUDA 0)
 if(SCHWARZ_BUILD_CUDA)
@@ -88,33 +110,34 @@ find_package(Ginkgo REQUIRED
 find_package(MPI REQUIRED)
 include_directories(SYSTEM ${MPI_C_INCLUDE_PATH} ${MPI_CXX_INCLUDE_PATH})
 
-set(BOOST_ROOT $ENV{BOOST_DIR})
-find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-
 INCLUDE_DIRECTORIES(include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/include)
 
-ADD_LIBRARY(${TARGET} SHARED)
+
+ADD_LIBRARY(${TARGET} SHARED )
 
 
 TARGET_SOURCES(${TARGET} PRIVATE
   source/initialization.cpp
   source/communicate.cpp
+  source/exception.cpp
   source/utils.cpp
   source/solve.cpp
   source/schwarz_base.cpp
   source/restricted_schwarz.cpp
-  source/exception.cpp
   )
 
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/config.hpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/include/schwarz/config.hpp @ONLY)
+  ${CMAKE_CURRENT_BINARY_DIR}/include/schwarz/config.hpp @ONLY)
 
 if(SCHWARZ_BUILD_CUDA)
   target_sources(${TARGET} PRIVATE
-    source/cuda_gather.cu)
+    source/gather_kernel.cu
+    source/scatter_kernel.cu)
+  target_compile_options(${TARGET}
+    PRIVATE
+    $<$<COMPILE_LANGUAGE:CUDA>:--expt-extended-lambda>)
 else()
   target_sources(${TARGET} PRIVATE
     source/cuda_dummy_gather.cpp)
@@ -156,7 +179,7 @@ if(CLANG_TIDY_EXE)
   SET_TARGET_PROPERTIES(
     ${TARGET} PROPERTIES
     CXX_CLANG_TIDY "${DO_CLANG_TIDY}"
-  )
+    )
 endif()
 
 # Link optional packages
@@ -166,6 +189,10 @@ endif()
 
 if(SCHWARZ_BUILD_CHOLMOD)
   TARGET_LINK_LIBRARIES(${TARGET} cholmod)
+endif()
+
+if(SCHWARZ_BUILD_UMFPACK)
+  TARGET_LINK_LIBRARIES(${TARGET} umfpack)
 endif()
 
 if(SCHWARZ_WITH_HWLOC)

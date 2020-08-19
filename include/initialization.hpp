@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <settings.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -91,21 +91,22 @@ public:
      */
     void generate_rhs(std::vector<ValueType> &rhs);
 
-#if SCHW_HAVE_DEALII
-    void setup_global_matrix(
-        const dealii::SparseMatrix<ValueType> &matrix,
-        std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix);
-#endif
-
     /**
      * Generates the 2D global laplacian matrix.
      *
      * @param oned_laplacian_size  The size of the one d laplacian grid.
      * @param global_matrix  The global matrix.
      */
-    void setup_global_matrix_laplacian(
-        const gko::size_type &oned_laplacian_size,
+#if SCHW_HAVE_DEALII
+    void setup_global_matrix(
+        const std::string &filename, const gko::size_type &oned_laplacian_size,
+        const dealii::SparseMatrix<ValueType> &matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix);
+#else
+    void setup_global_matrix(
+        const std::string &filename, const gko::size_type &oned_laplacian_size,
+        std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix);
+#endif
 
     /**
      * The partitioning function. Allows the partition of the global matrix
@@ -131,7 +132,6 @@ public:
      * @param local_rhs  The local right hand side vector in the subdomain.
      * @param global_rhs  The global right hand side vector.
      * @param local_solution  The local solution vector in the subdomain.
-     * @param global_solution  The global solution vector.
      */
     void setup_vectors(
         const Settings &settings,
@@ -139,8 +139,7 @@ public:
         std::vector<ValueType> &rhs,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &global_rhs,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution);
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution);
 
     /**
      * Sets up the local and the interface matrices from the global matrix and
@@ -162,10 +161,7 @@ public:
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
-            &interface_matrix,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>>
-            &local_inv_perm) = 0;
+            &interface_matrix) = 0;
 
 private:
     Settings &settings;
@@ -173,6 +169,6 @@ private:
     Metadata<ValueType, IndexType> &metadata;
 };
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 #endif  // initialization.hpp

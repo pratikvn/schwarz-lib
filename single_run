@@ -1,0 +1,180 @@
+#!/bin/bash
+
+NUM_NODES=$1
+NUM_PROCS=$2
+COMM_TYPE="$3"
+EXEC="$4"
+PROB_SIZE=$5
+NUM_ITERS=$6
+LOCAL_SOLVE="$7"
+PARTITION="$8"
+OVERLAP="$9"
+CONV_TYPE="${10}"
+FLUSH_TYPE="${11}"
+LOCK_TYPE="${12}"
+RC_TYPE="${13}"
+ITER_SHIFT="${14}"
+FACT="${15}"
+MAT_F="${16}"
+LSOL_TOL="${17}"
+LOCAL_PRECOND="${18}"
+USE_D2="${19}"
+L_ITER="${20}"
+RESTART_IT="${21}"
+U_ITER="${22}"
+RESET_ITER="${23}"
+EN_LOG="${24}"
+PROP_TYPE="${25}"
+MIXED_PREC="${26}"
+WORK_REPO="${27}"
+
+NUM_RANKS_PER_PROC=1
+
+mkdir -p ${WORK_REPO} 
+cd ${WORK_REPO}
+
+EXEC_DIR=$PWD
+EXEC_TYPE_DIR="${EXEC}"
+
+mkdir -p $EXEC_TYPE_DIR
+
+RESULTS_DIR=${EXEC_DIR}/${EXEC_TYPE_DIR}
+
+cd $RESULTS_DIR
+
+COMM_TYPE_FLAG="--enable_${COMM_TYPE}"
+COMM_TYPE_DIR="${COMM_TYPE}"
+NN_DIR="${NUM_NODES}nodes"
+OUT_DIR="$((${NUM_NODES}*${NUM_PROCS}))domains"
+PROB_SIZE_DIR="${PROB_SIZE}local"
+LOCAL_SOLVE_DIR="${LOCAL_SOLVE}"
+LOCAL_PRECOND_DIR="${LOCAL_PRECOND}precond"
+LSOL_TOL_DIR="${LSOL_TOL}ltol"
+FLUSH_TYPE_DIR="${FLUSH_TYPE}"
+LOCK_TYPE_DIR="${LOCK_TYPE}"
+RC_TYPE_DIR="${RC_TYPE}"
+ITER_SHIFT_DIR="${ITER_SHIFT}shift"
+CONV_TYPE_DIR="${CONV_TYPE}"
+PARTITION_DIR="${PARTITION}"
+OVERLAP_DIR="${OVERLAP}ov"
+JOB_NAME="${COMM_TYPE}-${NUM_NODES}-${NUM_PROCS}"
+TIME_FILE="subd"
+
+if [ "${MAT_F}" == "ex_9" ] 
+then
+MATRIX_DIR="advection"
+NON_SYM="true"
+elif [ "${MAT_F}" == "ex_6" ] || [ "${MAT_F}" == "" ] || [ "${MAT_F}" == "null" ]
+then
+MATRIX_DIR="laplacian"
+NON_SYM="false"
+#else
+#exit 1
+fi
+
+if [ "${L_ITER}" == "def" ] 
+then
+L_ITER_DIR="defaultliter"
+L_ITER_VAL=-1
+else 
+L_ITER_DIR="${L_ITER}liter"
+L_ITER_VAL=${L_ITER}
+fi
+
+if [ "${U_ITER}" == "def" ] 
+then
+U_ITER_DIR="defaultuiter"
+U_ITER_VAL=-1
+else 
+U_ITER_DIR="${U_ITER}uiter"
+U_ITER_VAL=${U_ITER}
+fi
+
+if [ "${RESET_ITER}" == "def" ] 
+then
+RESET_ITER_DIR="defaultresetiter"
+RESET_ITER_VAL=-1
+else 
+RESET_ITER_DIR="${RESET_ITER}resetiter"
+RESET_ITER_VAL=${RESET_ITER}
+fi
+
+mkdir -p $COMM_TYPE_DIR
+cd $COMM_TYPE_DIR
+
+mkdir -p $NN_DIR
+cd $NN_DIR
+
+mkdir -p $OUT_DIR
+cd $OUT_DIR
+
+mkdir -p $LOCAL_SOLVE_DIR
+cd $LOCAL_SOLVE_DIR
+
+mkdir -p $CONV_TYPE_DIR
+cd $CONV_TYPE_DIR
+
+mkdir -p $FLUSH_TYPE_DIR
+cd $FLUSH_TYPE_DIR
+
+mkdir -p $LOCK_TYPE_DIR
+cd $LOCK_TYPE_DIR
+
+mkdir -p $RC_TYPE_DIR
+cd $RC_TYPE_DIR
+
+mkdir -p $PARTITION_DIR
+cd $PARTITION_DIR
+
+mkdir -p $PROB_SIZE_DIR
+cd $PROB_SIZE_DIR
+
+mkdir -p $OVERLAP_DIR
+cd $OVERLAP_DIR
+
+mkdir -p $LOCAL_PRECOND_DIR
+cd $LOCAL_PRECOND_DIR
+
+mkdir -p $LSOL_TOL_DIR
+cd $LSOL_TOL_DIR
+
+mkdir -p $L_ITER_DIR
+cd $L_ITER_DIR
+
+mkdir -p $U_ITER_DIR
+cd $U_ITER_DIR
+
+mkdir -p $RESET_ITER_DIR
+cd $RESET_ITER_DIR
+
+mkdir -p $MATRIX_DIR 
+cd $MATRIX_DIR
+
+export run_exec="${EXEC_DIR}/../benchmarking/dealii_${MAT_F}"
+#export run_flags="--executor=${EXEC} --num_iters=${NUM_ITERS} --timings_file=${TIME_FILE} --init_refine_level=${PROB_SIZE} --partition=${PARTITION} --set_tol=1e-8 ${COMM_TYPE_FLAG} --local_solver=${LOCAL_SOLVE} --overlap=${OVERLAP} --local_tol=${LSOL_TOL} --flush_type=${FLUSH_TYPE} --print_config  --remote_comm_type=${RC_TYPE} --lock_type=${LOCK_TYPE} --shifted_iter=${ITER_SHIFT} --local_factorization=${FACT} --local_precond=${LOCAL_PRECOND} --write_iters_and_residuals --dealii_orig=${USE_D2} --write_comm_data --non_symmetric_matrix=${NON_SYM} --local_max_iters=${L_ITER_VAL} --restart_iter=${RESTART_IT} --updated_max_iters=${U_ITER_VAL} --enable_logging=${EN_LOG} --reset_local_crit_iter=${RESET_ITER_VAL} --use_mixed_precision=${MIXED_PREC} "
+export run_flags="--executor=${EXEC} --num_iters=${NUM_ITERS} --timings_file=${TIME_FILE} --init_refine_level=${PROB_SIZE} --partition=${PARTITION} --set_tol=1e-8 ${COMM_TYPE_FLAG} --local_solver=${LOCAL_SOLVE} --overlap=${OVERLAP} --local_tol=${LSOL_TOL} --global_convergence_type=${CONV_TYPE} --enable_put_all_local_residual_norms=${PROP_TYPE} --enable_global_check --flush_type=${FLUSH_TYPE} --print_config  --remote_comm_type=${RC_TYPE} --lock_type=${LOCK_TYPE} --shifted_iter=${ITER_SHIFT} --local_factorization=${FACT} --local_precond=${LOCAL_PRECOND} --write_iters_and_residuals --dealii_orig=${USE_D2} --write_comm_data --non_symmetric_matrix=${NON_SYM} --local_max_iters=${L_ITER_VAL} --restart_iter=${RESTART_IT} --updated_max_iters=${U_ITER_VAL} --enable_logging=${EN_LOG} --reset_local_crit_iter=${RESET_ITER_VAL} --use_mixed_precision=${MIXED_PREC} "
+#export run_flags="--num_refine_cycles=2"
+
+echo "#!/bin/bash -l" > job_script.sh
+echo "#BSUB -o output-$JOB_NAME" >> job_script.sh
+echo "#BSUB -e error-$JOB_NAME" >> job_script.sh
+echo "#BSUB -J $JOB_NAME" >> job_script.sh
+echo "#BSUB -nnodes $NUM_NODES" >> job_script.sh
+echo "#BSUB -alloc_flags \"smt4\" " >> job_script.sh
+echo "#BSUB -W 00:14" >> job_script.sh
+
+NUM_RES_SETS="$((${NUM_NODES}*1))"
+echo "date" >> job_script.sh
+#echo "export PAMI_DISABLE_IPC=1" >> job_script.sh
+if [ "${NUM_RES_SETS}" -gt 1 ]
+then
+echo "export PAMI_CUDA_AWARE_THRESH=200000000" >> job_script.sh
+fi
+if [ "$EXEC" == "cuda" ]
+then
+	echo "jsrun --smpiargs=\"-gpu \" -n ${NUM_RES_SETS} -a ${NUM_PROCS} -g ${NUM_PROCS} -c ${NUM_PROCS} -r ${NUM_RANKS_PER_PROC} $run_exec $run_flags" >> job_script.sh
+else
+echo "export OMP_NUM_THREADS=4" >> job_script.sh
+	echo "jsrun -n ${NUM_RES_SETS} -a ${NUM_PROCS} -c ${NUM_PROCS} -r ${NUM_RANKS_PER_PROC} $run_exec $run_flags " >> job_script.sh
+fi
+bsub job_script.sh

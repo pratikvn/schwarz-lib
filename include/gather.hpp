@@ -31,13 +31,36 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************<SCHWARZ LIB LICENSE>*************************/
 
-#ifndef gather_scatter_hpp
-#define gather_scatter_hpp
+#ifndef gather_hpp
+#define gather_hpp
 
+#include <functional>
 
 #include <omp.h>
 #include <ginkgo/ginkgo.hpp>
 
+#include <collective_common.hpp>
+
+namespace schwz {
+
+
+template <typename ValueType, typename IndexType>
+extern void gather_add_values(const IndexType num_elems,
+                              const IndexType *indices,
+                              const ValueType *from_array,
+                              ValueType *into_array);
+
+template <typename ValueType, typename IndexType>
+extern void gather_diff_values(const IndexType num_elems,
+                               const IndexType *indices,
+                               const ValueType *from_array,
+                               ValueType *into_array);
+
+template <typename ValueType, typename IndexType>
+extern void gather_avg_values(const IndexType num_elems,
+                              const IndexType *indices,
+                              const ValueType *from_array,
+                              ValueType *into_array);
 
 template <typename ValueType, typename IndexType>
 extern void gather_values(const IndexType num_elems, const IndexType *indices,
@@ -45,52 +68,77 @@ extern void gather_values(const IndexType num_elems, const IndexType *indices,
 
 
 template <typename ValueType, typename IndexType>
-extern void scatter_values(const IndexType num_elems, const IndexType *indices,
-                           const ValueType *from_array, ValueType *into_array);
-
-
-template <typename ValueType, typename IndexType>
-struct GatherScatter : public gko::Operation {
-    GatherScatter(const bool flag, const IndexType num_elems,
-                  const IndexType *indices, const ValueType *from_array,
-                  ValueType *into_array)
-        : flag{flag},
-          num_elems{num_elems},
+struct Gather : public gko::Operation {
+    Gather(const IndexType num_elems, const IndexType *indices,
+           const ValueType *from_array, ValueType *into_array,
+           OperationType optype)
+        : num_elems{num_elems},
           indices{indices},
           from_array{from_array},
-          into_array{into_array}
+          into_array{into_array},
+          optype{optype}
     {}
 
     void run(std::shared_ptr<const gko::OmpExecutor>) const override
     {
-        if (flag)  // gather if true: TODO: improve this
-        {
+        switch (optype) {
+        case copy:
 #pragma omp parallel for
             for (auto i = 0; i < num_elems; ++i) {
                 into_array[i] = from_array[indices[i]];
             }
-        } else  // scatter if false
-        {
+            break;
+        case add:
 #pragma omp parallel for
             for (auto i = 0; i < num_elems; ++i) {
-                into_array[indices[i]] = from_array[i];
+                into_array[i] = from_array[indices[i]] + into_array[i];
             }
+            break;
+        case diff:
+#pragma omp parallel for
+            for (auto i = 0; i < num_elems; ++i) {
+                into_array[i] = from_array[indices[i]] - into_array[i];
+            }
+            break;
+        case avg:
+#pragma omp parallel for
+            for (auto i = 0; i < num_elems; ++i) {
+                into_array[i] = (from_array[indices[i]] + into_array[i]) / 2;
+            }
+            break;
+        default: {
+            std::cout << "Undefined gather operation" << std::endl;
+            break;
+        }
         }
     }
 
     void run(std::shared_ptr<const gko::CudaExecutor>) const override
     {
-        if (flag) {
+        switch (optype) {
+        case copy:
             gather_values(num_elems, indices, from_array, into_array);
-        } else {
-            scatter_values(num_elems, indices, from_array, into_array);
+            break;
+        case add:
+            gather_add_values(num_elems, indices, from_array, into_array);
+            break;
+        case diff:
+            gather_diff_values(num_elems, indices, from_array, into_array);
+            break;
+        case avg:
+            gather_avg_values(num_elems, indices, from_array, into_array);
+            break;
+        default: {
+            std::cout << "Undefined gather operation" << std::endl;
+            break;
+        }
         }
     }
-    const bool flag;
     const IndexType num_elems;
     const IndexType *indices;
     const ValueType *from_array;
     ValueType *into_array;
+    OperationType optype;
 };
 
 
@@ -100,10 +148,11 @@ struct GatherScatter : public gko::Operation {
     template _macro(float, gko::int64);                   \
     template _macro(double, gko::int64);
 
-#define DECLARE_GATHERSCATTER(ValueType, IndexType) \
-    struct GatherScatter<ValueType, IndexType>
-INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHERSCATTER);
-#undef DECLARE_GATHERSCATTER
+#define DECLARE_GATHER(ValueType, IndexType) struct Gather<ValueType, IndexType>
+INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_GATHER);
+#undef DECLARE_GATHER
+
+}  // namespace schwz
 
 
-#endif  // gather_scatter.hpp
+#endif  // gather.hpp

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @ingroup schwarz_wrappers
  */
-namespace SchwarzWrappers {
+namespace schwz {
 
 /**
  * An implementation of the solver interface using the RAS solver.
@@ -59,8 +59,9 @@ namespace SchwarzWrappers {
  * @ingroup schwarz_class
  */
 template <typename ValueType = gko::default_precision,
-          typename IndexType = gko::int32>
-class SolverRAS : public SchwarzBase<ValueType, IndexType> {
+          typename IndexType = gko::int32,
+          typename MixedValueType = gko::default_precision>
+class SolverRAS : public SchwarzBase<ValueType, IndexType, MixedValueType> {
 public:
     /**
      * The constructor that takes in the user settings and a metadata struct
@@ -78,10 +79,7 @@ public:
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &global_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> &local_matrix,
         std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
-            &interface_matrix,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_perm,
-        std::shared_ptr<gko::matrix::Permutation<IndexType>> &local_inv_perm)
-        override;
+            &interface_matrix) override;
 
     void setup_comm_buffers() override;
 
@@ -92,22 +90,23 @@ public:
 
     void exchange_boundary(const Settings &settings,
                            const Metadata<ValueType, IndexType> &metadata,
+                           const std::shared_ptr<gko::matrix::Dense<ValueType>>
+                               &prev_global_solution,
                            std::shared_ptr<gko::matrix::Dense<ValueType>>
-                               &solution_vector) override;
+                               &global_solution) override;
 
     void update_boundary(
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
         const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
-        const std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &global_old_solution,
+        const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &interface_matrix) override;
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // restricted_schwarz.hpp

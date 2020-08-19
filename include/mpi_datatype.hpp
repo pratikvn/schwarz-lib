@@ -31,31 +31,35 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************<SCHWARZ LIB LICENSE>*************************/
 
-#ifndef SCHWARZ_INCLUDE_CONFIG_H
-#define SCHWARZ_INCLUDE_CONFIG_H
+#ifndef mpi_datatype_hpp
+#define mpi_datatype_hpp
 
-// clang-format off
-#define SCHW_HAVE_METIS @SCHWARZ_HAVE_METIS@
-// clang-format on
+namespace schwz {
+namespace mpi {
 
-// clang-format off
-#define SCHW_HAVE_CHOLMOD @SCHWARZ_HAVE_CHOLMOD@
-// clang-format on
+#define SCHWZ_MPI_DATATYPE(BaseType, MPIType)                                  \
+    inline MPI_Datatype get_mpi_datatype(const BaseType &) { return MPIType; } \
+    static_assert(true,                                                        \
+                  "This assert is used to counter the false positive extra "   \
+                  "semi-colon warnings")
 
-// clang-format off
-#define SCHW_HAVE_UMFPACK @SCHWARZ_HAVE_UMFPACK@
-// clang-format on
 
-// clang-format off
-#define SCHW_HAVE_DEALII @SCHWARZ_HAVE_DEALII@
-// clang-format on
+SCHWZ_MPI_DATATYPE(char, MPI_CHAR);
+SCHWZ_MPI_DATATYPE(unsigned char, MPI_UNSIGNED_CHAR);
+SCHWZ_MPI_DATATYPE(unsigned, MPI_UNSIGNED);
+SCHWZ_MPI_DATATYPE(int, MPI_INT);
+SCHWZ_MPI_DATATYPE(unsigned long, MPI_UNSIGNED_LONG);
+SCHWZ_MPI_DATATYPE(unsigned short, MPI_UNSIGNED_SHORT);
+SCHWZ_MPI_DATATYPE(long, MPI_LONG);
+SCHWZ_MPI_DATATYPE(float, MPI_FLOAT);
+SCHWZ_MPI_DATATYPE(double, MPI_DOUBLE);
+SCHWZ_MPI_DATATYPE(long double, MPI_LONG_DOUBLE);
+SCHWZ_MPI_DATATYPE(std::complex<float>, MPI_COMPLEX);
+SCHWZ_MPI_DATATYPE(std::complex<double>, MPI_DOUBLE_COMPLEX);
 
-// clang-format off
-#define SCHW_HAVE_CUDA @SCHWARZ_HAVE_CUDA@
-// clang-format on
 
-// clang-format off
-#define SCHW_HAVE_HWLOC @SCHWARZ_HAVE_HWLOC@
-// clang-format on
+}  // namespace mpi
+}  // namespace schwz
 
-#endif  // SCHWARZ_INCLUDE_CONFIG_H
+
+#endif  // mpi_datatype.hpp

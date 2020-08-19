@@ -31,31 +31,20 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************<SCHWARZ LIB LICENSE>*************************/
 
-#ifndef SCHWARZ_INCLUDE_CONFIG_H
-#define SCHWARZ_INCLUDE_CONFIG_H
+#ifndef SCHW_MATRICES_CONFIG_HPP_
+#define SCHW_MATRICES_CONFIG_HPP_
 
-// clang-format off
-#define SCHW_HAVE_METIS @SCHWARZ_HAVE_METIS@
-// clang-format on
 
-// clang-format off
-#define SCHW_HAVE_CHOLMOD @SCHWARZ_HAVE_CHOLMOD@
-// clang-format on
+namespace schwarz {
+namespace matrices {
 
-// clang-format off
-#define SCHW_HAVE_UMFPACK @SCHWARZ_HAVE_UMFPACK@
-// clang-format on
 
-// clang-format off
-#define SCHW_HAVE_DEALII @SCHWARZ_HAVE_DEALII@
-// clang-format on
+const char *location_ani3_mtx = "@Schwarz_BINARY_DIR@/matrices/ani3_crop.mtx";
+const char *location_ani4_mtx = "@Schwarz_BINARY_DIR@/matrices/ani4_crop.mtx";
 
-// clang-format off
-#define SCHW_HAVE_CUDA @SCHWARZ_HAVE_CUDA@
-// clang-format on
 
-// clang-format off
-#define SCHW_HAVE_HWLOC @SCHWARZ_HAVE_HWLOC@
-// clang-format on
+}  // namespace matrices
+}  // namespace schwarz
 
-#endif  // SCHWARZ_INCLUDE_CONFIG_H
+
+#endif  // SCHW_MATRICES_CONFIG_HPP_

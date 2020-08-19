@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @ingroup schwarz_wrappers
  */
-namespace SchwarzWrappers {
+namespace schwz {
 
 /**
  * The Base solver class is meant to be the class implementing the common
@@ -71,10 +71,11 @@ namespace SchwarzWrappers {
  * @ingroup schwarz_class
  */
 template <typename ValueType = gko::default_precision,
-          typename IndexType = gko::int32>
+          typename IndexType = gko::int32,
+          typename MixedValueType = gko::default_precision>
 class SchwarzBase : public Initialize<ValueType, IndexType>,
-                    public Communicate<ValueType, IndexType>,
-                    public Solve<ValueType, IndexType> {
+                    public Communicate<ValueType, IndexType, MixedValueType>,
+                    public Solve<ValueType, IndexType, MixedValueType> {
 public:
     /**
      * The constructor that takes in the user settings and a metadata struct
@@ -146,9 +147,14 @@ public:
     std::shared_ptr<gko::matrix::Permutation<IndexType>> local_inv_perm;
 
     /**
-     * The local triangular factor used for the triangular solves.
+     * The local lower triangular factor used for the triangular solves.
      */
-    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> triangular_factor;
+    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> triangular_factor_l;
+
+    /**
+     * The local upper triangular factor used for the triangular solves.
+     */
+    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> triangular_factor_u;
 
     /**
      * The local interface matrix.
@@ -180,6 +186,16 @@ public:
      */
     std::shared_ptr<gko::matrix::Dense<ValueType>> global_solution;
 
+    /**
+     * The global residual vector.
+     */
+    std::vector<ValueType> local_residual_vector_out;
+
+    /**
+     * The local residual vector.
+     */
+    std::vector<std::vector<ValueType>> global_residual_vector_out;
+
 protected:
     /**
      * The settings struct used to store the solver and other auxiliary
@@ -196,11 +212,12 @@ protected:
      * The communication struct used to store the metadata and arrays needed for
      * the communication bewtween subdomains.
      */
-    struct Communicate<ValueType, IndexType>::comm_struct comm_struct;
+    struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
+        comm_struct;
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // schwarz_base.hpp

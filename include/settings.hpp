@@ -44,13 +44,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <mpi.h>
-#include <boost/mpi/datatype.hpp>
 #include <ginkgo/ginkgo.hpp>
-
 
 #include <device_guard.hpp>
 #include <exception_helpers.hpp>
-#include <gather_scatter.hpp>
+#include <gather.hpp>
+#include <mpi_datatype.hpp>
+#include <scatter.hpp>
 
 
 #if SCHW_HAVE_METIS
@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MINIMAL_OVERLAP 2
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -108,10 +108,20 @@ struct Settings {
     gko::int32 overlap = MINIMAL_OVERLAP;
 
     /**
-     * Flag if the laplcian matrix should be generated within the library. If
+     * The string that contains the matrix file name to read from .
+     */
+    std::string matrix_filename = "null";
+
+    /**
+     * Flag if the laplacian matrix should be generated within the library. If
      * false, an external matrix and rhs needs to be provided
      */
     bool explicit_laplacian = true;
+
+    /**
+     * Flag if mixed precision should be used.
+     */
+    bool use_mixed_precision = false;
 
     /**
      * Flag to enable a random rhs.
@@ -133,6 +143,7 @@ struct Settings {
      */
     enum local_solver_settings {
         direct_solver_cholmod = 0x0,
+        direct_solver_umfpack = 0x5,
         direct_solver_ginkgo = 0x1,
         iterative_solver_ginkgo = 0x2,
         iterative_solver_dealii = 0x3,
@@ -140,6 +151,21 @@ struct Settings {
     };
     local_solver_settings local_solver =
         local_solver_settings::iterative_solver_ginkgo;
+
+    /**
+     * Is the matrix non-symmetric ? , Use GMRES for local solves.
+     */
+    bool non_symmetric_matrix = false;
+
+    /**
+     * The restart iter for the GMRES solver.
+     */
+    unsigned int restart_iter = 1u;
+
+    /**
+     * The global iter at which to reset the local solver criterion.
+     */
+    int reset_local_crit_iter = -1;
 
     /**
      * Disables the re-ordering of the matrix before computing the triangular
@@ -163,6 +189,17 @@ struct Settings {
      * Enable the writing of debug out to file.
      */
     bool write_debug_out = false;
+
+    /**
+     * Enable writing the iters and residuals to a file.
+     */
+    bool write_iters_and_residuals = false;
+
+    /**
+     * Flag to enable logging for local iterative solvers.
+     * Note: Probably will have a significant performance hit.
+     */
+    bool enable_logging = false;
 
     /**
      * Enable the local permutations from CHOLMOD to a file.
@@ -246,6 +283,11 @@ struct Settings {
             local_convergence_crit::solution_based;
     };
     convergence_settings convergence_settings;
+
+    /**
+     * The factorization for the local direct solver.
+     */
+    std::string factorization = "cholmod";
 
     /**
      * The reordering for the local solve.
@@ -354,9 +396,24 @@ struct Metadata {
     ValueType local_solver_tolerance;
 
     /**
-     * The maximum iteration count of the solver.
+     * The maximum iteration count of the Schwarz solver.
      */
     IndexType max_iters;
+
+    /**
+     * The maximum iteration count of the local iterative solver.
+     */
+    IndexType local_max_iters;
+
+    /**
+     * The updated maximum iteration count of the local iterative solver.
+     */
+    IndexType updated_max_iters;
+
+    /**
+     * Local preconditioner.
+     */
+    std::string local_precond;
 
     /**
      * The maximum block size for the preconditioner.
@@ -388,6 +445,20 @@ struct Metadata {
                            std::vector<std::tuple<int, int>>, int, int>>
         comm_data_struct;
 
+    /**
+     * The struct used for storing data for post-processing.
+     *
+     */
+    struct post_process_data {
+        std::vector<std::vector<ValueType>> global_residual_vector_out;
+        std::vector<ValueType> local_residual_vector_out;
+        std::vector<ValueType> local_converged_iter_count;
+        std::vector<ValueType> local_converged_resnorm;
+        std::vector<ValueType> local_timestamp;
+    };
+    post_process_data post_process_data;
+
+    double init_mpi_wtime = 0.0;
     /**
      * The mapping containing the global to local indices.
      */
@@ -453,14 +524,30 @@ struct Metadata {
     template _macro(float, gko::int64);                   \
     template _macro(double, gko::int64);
 
-// explicit instantiations for SchwarzWrappers
+
+#define INSTANTIATE_FOR_EACH_VALUE_MIXEDVALUE_AND_INDEX_TYPE(_macro) \
+    template _macro(double, gko::int32, float);                      \
+    template _macro(double, gko::int32, double);                     \
+    template _macro(double, gko::int64, float);                      \
+    template _macro(double, gko::int64, double);
+
+// #define INSTANTIATE_FOR_EACH_VALUE_MIXEDVALUE_AND_INDEX_TYPE(_macro)  \
+//   template _macro(float, gko::int32, float);                          \
+//   template _macro(double, gko::int32, float);                         \
+//   template _macro(double, gko::int32, double);                        \
+//   template _macro(float, gko::int64, float);                          \
+//   template _macro(double, gko::int64, float);                         \
+//   template _macro(double, gko::int64, double);
+
+
+// explicit instantiations for schwz
 #define DECLARE_METADATA(ValueType, IndexType) \
     struct Metadata<ValueType, IndexType>
 INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_METADATA);
 #undef DECLARE_METADATA
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // settings.hpp

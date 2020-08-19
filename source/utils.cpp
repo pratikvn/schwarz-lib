@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <utils.hpp>
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 template <typename ValueType, typename IndexType>
 int Utils<ValueType, IndexType>::get_local_rank(MPI_Comm mpi_communicator)
@@ -148,6 +148,25 @@ bool Utils<ValueType, IndexType>::assert_correct_permutation(
             return false;
         }
     }
+    return true;
+}
+
+
+template <typename ValueType, typename IndexType>
+bool Utils<ValueType, IndexType>::assert_correct_cuda_devices(int num_devices,
+                                                              int my_rank)
+{
+    if (num_devices > 0) {
+        if (my_rank == 0) {
+            std::cout << " Number of available devices: " << num_devices
+                      << std::endl;
+        }
+    } else {
+        std::cout << " No CUDA devices available for rank " << my_rank
+                  << std::endl;
+        std::exit(-1);
+    }
+    return true;
 }
 
 
@@ -156,4 +175,4 @@ INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_UTILS);
 #undef DECLARE_UTILS
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz

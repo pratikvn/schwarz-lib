@@ -1,0 +1,76 @@
+#!/bin/bash -l
+
+dir=$1
+log="false"
+
+size=5
+for num_nodes in 1
+do 
+for num_gpus in 4
+do 
+  for comm in "onesided" # "onesided"
+  do 
+  for exec in "omp" # "omp"
+  do 
+	if [[ $exec == "cuda" ]]
+	then
+	comm_type="get"
+	else
+	comm_type="put"
+	fi 
+	for part in "metis"
+        do 
+      	for conv in "decentralized" 
+        do 
+      	for prop_type in "false" 
+        do 
+      	for ov in "8" 
+        do 
+      	for precond in "block-jacobi" # "isai" # "block-jacobi" #"ilu" "null" # "isai" 
+        do 
+      	for prob in "ex_6" 
+        do 
+      	for dealii in "false" # "true" 
+        do 
+      	for ltol in "0.1" 
+        do 
+      	#for liter in "50" # "def"
+      	for liter in "70" # "50" "60"     #"30" "40" "50" "60" "80" "90" "def"
+        do 
+      	for uiter in "def"
+        do 
+      	for riter in "40" 
+        do 
+      	for resetiter in "def" 
+        do 
+      	for mixed_prec in "false" 
+        do 
+      	for lsolve in "iterative-ginkgo" # "direct-ginkgo" # "iterative-ginkgo" 
+        do 
+      	for numiter in "100" 
+        do 
+	echo "./single_run $num_nodes $num_gpus $comm $exec $size $numiter $lsolve $part $ov $conv flush-local lock-all $comm_type 1 cholmod $prob $ltol $precond $dealii $liter $riter $uiter $resetiter $log $prop_type $mixed_prec $dir"
+	date
+	./sc_paper_batch $num_nodes $num_gpus $comm $exec $size $numiter $lsolve $part $ov $conv flush-local lock-all $comm_type 1 umfpack $prob $ltol $precond $dealii $liter $riter $uiter $resetiter $log $prop_type $mixed_prec $dir
+      done
+      done
+    done
+    done
+    done
+    done
+    done
+done
+done
+done
+done
+done
+done
+done
+done
+done
+done
+done
+size=$(echo "$size+1" | bc)
+done
+
+#res_sc_paper/cuda/onesided/1nodes/6domains/iterative-ginkgo/decentralized/flush-local/lock-all/get/metis/6local/8ov/0.3precond/nullltol/falseliter/laplacian/

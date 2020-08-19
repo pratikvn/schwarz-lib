@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "initialization.hpp"
 
 
-namespace SchwarzWrappers {
+namespace schwz {
 
 
 /**
@@ -56,7 +56,7 @@ namespace SchwarzWrappers {
  * @ref comm
  * @ingroup comm
  */
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename IndexType, typename MixedValueType>
 class Communicate {
 public:
     friend class Initialize<ValueType, IndexType>;
@@ -175,15 +175,27 @@ public:
 
         /**
          * The send buffer used for the actual communication for both one-sided
-         * and two-sided.
+         * and two-sided (always allocated).
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> send_buffer;
 
         /**
+         * The mixed send buffer used for the actual communication for both
+         * one-sided and two-sided.
+         */
+        std::shared_ptr<gko::matrix::Dense<MixedValueType>> mixedt_send_buffer;
+
+        /**
          * The recv buffer used for the actual communication for both one-sided
-         * and two-sided.
+         * and two-sided (always allocated).
          */
         std::shared_ptr<gko::matrix::Dense<ValueType>> recv_buffer;
+
+        /**
+         * The mixed precision recv buffer used for the actual communication for
+         * both one-sided and two-sided.
+         */
+        std::shared_ptr<gko::matrix::Dense<MixedValueType>> mixedt_recv_buffer;
 
         /**
          * The displacements for the receiving of the buffer.
@@ -235,13 +247,15 @@ public:
      *
      * @param settings  The settings struct.
      * @param metadata  The metadata struct.
-     * @param solution_vector  The solution vector being exchanged between the
+     * @param global_solution  The solution vector being exchanged between the
      *                     subdomains.
      */
     virtual void exchange_boundary(
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector) = 0;
+        const std::shared_ptr<gko::matrix::Dense<ValueType>>
+            &prev_global_solution,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution) = 0;
 
     /**
      * Transforms data from a local vector to a global vector
@@ -265,7 +279,7 @@ public:
      * @param metadata  The metadata struct.
      * @param local_solution  The local solution vector in the subdomain.
      * @param local_rhs  The local right hand side vector in the subdomain.
-     * @param solution_vector  The workspace solution vector.
+     * @param global_solution  The workspace solution vector.
      * @param global_old_solution  The global solution vector of the previous
      *                             iteration.
      * @param interface_matrix The interface matrix containing the interface and
@@ -277,8 +291,7 @@ public:
         const Metadata<ValueType, IndexType> &metadata,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &local_solution,
         const std::shared_ptr<gko::matrix::Dense<ValueType>> &local_rhs,
-        const std::shared_ptr<gko::matrix::Dense<ValueType>> &solution_vector,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &global_old_solution,
+        const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &interface_matrix) = 0;
 
@@ -289,7 +302,7 @@ public:
 };
 
 
-}  // namespace SchwarzWrappers
+}  // namespace schwz
 
 
 #endif  // communicate.hpp

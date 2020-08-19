@@ -2,7 +2,12 @@ Schwarz Library
 -------------------
 
 [![Build status](https://github.com/pratikvn/schwarz-lib/workflows/Build/badge.svg)](https://github.com/pratikvn/schwarz-lib/actions?query=workflow%3ABuild-status)
-[![Documentation](https://github.com/pratikvn/schwarz-lib/workflows/Build-doc/badge.svg?branch=develop)](https://pratikvn.github.io/schwarz-lib/doc/doc-setup/index.html)
+[![Documentation](https://github.com/pratikvn/schwarz-lib/workflows/Build-doc/badge.svg?branch=develop)](https://pratikvn.github.io/schwarz-lib/doc/develop/index.html)
+
+Performance results
+-------------------
+1. [Paper in IJHPCA](https://journals.sagepub.com/doi/10.1177/1094342020946814); [Alternative arXiv version](https://arxiv.org/abs/2003.05361)
+
 
 ## Required components
 
@@ -10,8 +15,6 @@ The required components include:
 1. Ginkgo: The Ginkgo library is needed. It needs to be installed and preferably the installation path
    provided as an environment variable in `Ginkgo_DIR` variable.
 2. MPI: As multiple nodes and a domain decomposition is used, an MPI implementation is necessary.
-3. Boost: A Boost library is also required as one of its header files `mpi_datatype.hpp` is used to 
-   detect the `MPI_type` needed at run-time.
 
 ## Quick Install
 
@@ -37,10 +40,15 @@ For more CMake options please refer to the [Installation page](./INSTALL.md)
 + [x] OpenMP.
 + [ ] Single rank per node and threading in one node.
 
+1. Factorization paradigm:
+  + [x] CHOLMOD.
+  + [x] UMFPACK.
+
 2. Solving paradigm:
   * Direct:
   + [x] Ginkgo.
   + [x] CHOLMOD.
+  + [x] UMFPACK.
   * Iterative:
   + [x] Ginkgo.
   + [ ] deal.ii.

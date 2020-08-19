@@ -1,7 +1,0 @@
-<map id="SchwarzWrappers::Solve&lt; ValueType, IndexType &gt;" name="SchwarzWrappers::Solve&lt; ValueType, IndexType &gt;">
-<area shape="rect" id="node2" href="$structSchwarzWrappers_1_1Settings.html" title="The struct that contains the solver settings and the parameters to be set by the user. " alt="" coords="775,87,960,114"/>
-<area shape="rect" id="node3" href="$structSchwarzWrappers_1_1Settings_1_1convergence__settings.html" title="The various convergence settings available. " alt="" coords="409,5,595,47"/>
-<area shape="rect" id="node4" title="STL class. " alt="" coords="462,81,542,107"/>
-<area shape="rect" id="node6" title="STL class. " alt="" coords="5,73,132,115"/>
-<area shape="rect" id="node7" href="$structSchwarzWrappers_1_1Settings_1_1comm__settings.html" title="The settings for the various available communication paradigms. " alt="" coords="409,132,595,173"/>
-</map>

@@ -1,7 +1,8 @@
 var searchData=
 [
   ['testing_20instructions',['Testing Instructions',['../testing_schwarz.html',1,'']]],
-  ['time_5fstruct',['time_struct',['../structSchwarzWrappers_1_1Metadata.html#ab7ada6e651162c2f2399bf35f7a13098',1,'SchwarzWrappers::Metadata']]],
-  ['tolerance',['tolerance',['../structSchwarzWrappers_1_1Metadata.html#aed5beadd821e0ccb6cea69770e1371f7',1,'SchwarzWrappers::Metadata']]],
-  ['triangular_5ffactor',['triangular_factor',['../classSchwarzWrappers_1_1SchwarzBase.html#a3a11ec2c6d980ab0fcc0dc784e9244df',1,'SchwarzWrappers::SchwarzBase']]]
+  ['time_5fstruct',['time_struct',['../structschwz_1_1Metadata.html#a50bb2b3dc28c0eabbd423a069e560951',1,'schwz::Metadata']]],
+  ['tolerance',['tolerance',['../structschwz_1_1Metadata.html#a366db94e2a75dbdd82616e0d0b33bb86',1,'schwz::Metadata']]],
+  ['triangular_5ffactor_5fl',['triangular_factor_l',['../classschwz_1_1SchwarzBase.html#a2101edf81d65ecfa1bc119f69779f640',1,'schwz::SchwarzBase']]],
+  ['triangular_5ffactor_5fu',['triangular_factor_u',['../classschwz_1_1SchwarzBase.html#ac97e4db97595c4e72789c5692009c910',1,'schwz::SchwarzBase']]]
 ];

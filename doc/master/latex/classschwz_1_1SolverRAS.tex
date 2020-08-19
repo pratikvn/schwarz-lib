@@ -1,0 +1,213 @@
+\hypertarget{classschwz_1_1SolverRAS}{}\section{schwz\+:\+:Solver\+R\+AS$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$ Class Template Reference}
+\label{classschwz_1_1SolverRAS}\index{schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$@{schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$}}
+
+
+An implementation of the solver interface using the R\+AS solver.  
+
+
+
+
+{\ttfamily \#include $<$restricted\+\_\+schwarz.\+hpp$>$}
+
+
+
+Collaboration diagram for schwz\+:\+:Solver\+R\+AS$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classschwz_1_1SolverRAS__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classschwz_1_1SolverRAS_afc4b02a6ec47a155f6a7822d1615fd9c}{Solver\+R\+AS} (\hyperlink{structschwz_1_1Settings}{Settings} \&settings, \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata)
+\begin{DoxyCompactList}\small\item\em The constructor that takes in the user settings and a metadata struct containing the solver metadata. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1SolverRAS_ab31f86ccc8300a0212eca77c91de132a}{setup\+\_\+local\+\_\+matrices} (\hyperlink{structschwz_1_1Settings}{Settings} \&settings, \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::vector$<$ unsigned int $>$ \&\hyperlink{classschwz_1_1Initialize_a007426e21221298b6dca9b7c9fbd1c10}{partition\+\_\+indices}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&\hyperlink{classschwz_1_1SchwarzBase_ac58982f23d2cb0a023a64ca76795954d}{global\+\_\+matrix}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&\hyperlink{classschwz_1_1SchwarzBase_a0af5b057a4036eeb2d37fac629d5b5c7}{local\+\_\+matrix}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&\hyperlink{classschwz_1_1SchwarzBase_afeb8f503b58440a45ec901cae4708f29}{interface\+\_\+matrix}) override
+\begin{DoxyCompactList}\small\item\em Sets up the local and the interface matrices from the global matrix and the partition indices. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classschwz_1_1SolverRAS_a2f069e78a9627d3421c8973d80dd91c7}\label{classschwz_1_1SolverRAS_a2f069e78a9627d3421c8973d80dd91c7}} 
+void \hyperlink{classschwz_1_1SolverRAS_a2f069e78a9627d3421c8973d80dd91c7}{setup\+\_\+comm\+\_\+buffers} () override
+\begin{DoxyCompactList}\small\item\em Sets up the communication buffers needed for the boundary exchange. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1SolverRAS_adc313354f7ae256d375316516d0f655e}{setup\+\_\+windows} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&main\+\_\+buffer) override
+\begin{DoxyCompactList}\small\item\em Sets up the windows needed for the asynchronous communication. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1SolverRAS_af33d7cc7aec6bb8bf26864f576ded42d}{exchange\+\_\+boundary} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&prev\+\_\+global\+\_\+solution, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&\hyperlink{classschwz_1_1SchwarzBase_a8b1916399b8d0272cfd95dac495f0c92}{global\+\_\+solution}) override
+\begin{DoxyCompactList}\small\item\em Exchanges the elements of the solution vector. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1SolverRAS_ae0d9bc193a40fb1f27738a2436a3fa36}{update\+\_\+boundary} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&\hyperlink{classschwz_1_1SchwarzBase_a50b156f241360f12dd025b790203c58a}{local\+\_\+solution}, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&\hyperlink{classschwz_1_1SchwarzBase_a186d54605688f53f50bb6305efe9c5fd}{local\+\_\+rhs}, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&\hyperlink{classschwz_1_1SchwarzBase_a8b1916399b8d0272cfd95dac495f0c92}{global\+\_\+solution}, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&\hyperlink{classschwz_1_1SchwarzBase_afeb8f503b58440a45ec901cae4708f29}{interface\+\_\+matrix}) override
+\begin{DoxyCompactList}\small\item\em Update the values into local vector from obtained from the neighboring sub-\/domains using the interface matrix. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Value\+Type = gko\+::default\+\_\+precision, typename Index\+Type = gko\+::int32, typename Mixed\+Value\+Type = gko\+::default\+\_\+precision$>$\newline
+class schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$}
+
+An implementation of the solver interface using the R\+AS solver. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Value\+Type} & The type of the floating point values. \\
+\hline
+{\em Index\+Type} & The type of the index type values. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classschwz_1_1SolverRAS_afc4b02a6ec47a155f6a7822d1615fd9c}\label{classschwz_1_1SolverRAS_afc4b02a6ec47a155f6a7822d1615fd9c}} 
+\index{schwz\+::\+Solver\+R\+AS@{schwz\+::\+Solver\+R\+AS}!Solver\+R\+AS@{Solver\+R\+AS}}
+\index{Solver\+R\+AS@{Solver\+R\+AS}!schwz\+::\+Solver\+R\+AS@{schwz\+::\+Solver\+R\+AS}}
+\subsubsection{\texorpdfstring{Solver\+R\+A\+S()}{SolverRAS()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ \\
+\hyperlink{classschwz_1_1SolverRAS}{schwz\+::\+Solver\+R\+AS}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::\hyperlink{classschwz_1_1SolverRAS}{Solver\+R\+AS} (\begin{DoxyParamCaption}\item[{\hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{\hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata }\end{DoxyParamCaption})}
+
+
+
+The constructor that takes in the user settings and a metadata struct containing the solver metadata. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+{\em data} & The additional data struct. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classschwz_1_1SolverRAS_af33d7cc7aec6bb8bf26864f576ded42d}\label{classschwz_1_1SolverRAS_af33d7cc7aec6bb8bf26864f576ded42d}} 
+\index{schwz\+::\+Solver\+R\+AS@{schwz\+::\+Solver\+R\+AS}!exchange\+\_\+boundary@{exchange\+\_\+boundary}}
+\index{exchange\+\_\+boundary@{exchange\+\_\+boundary}!schwz\+::\+Solver\+R\+AS@{schwz\+::\+Solver\+R\+AS}}
+\subsubsection{\texorpdfstring{exchange\+\_\+boundary()}{exchange\_boundary()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ \\
+void \hyperlink{classschwz_1_1SolverRAS}{schwz\+::\+Solver\+R\+AS}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::exchange\+\_\+boundary (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{prev\+\_\+global\+\_\+solution,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{global\+\_\+solution }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Exchanges the elements of the solution vector. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+{\em global\+\_\+solution} & The solution vector being exchanged between the subdomains. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classschwz_1_1Communicate_a78864f8bdc7feb992c740b49d80b8d53}{schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$}.
+
+
+
+References schwz\+::\+Settings\+::comm\+\_\+settings\+::enable\+\_\+onesided, and schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::global\+\_\+solution.
+
+\mbox{\Hypertarget{classschwz_1_1SolverRAS_ab31f86ccc8300a0212eca77c91de132a}\label{classschwz_1_1SolverRAS_ab31f86ccc8300a0212eca77c91de132a}} 
+\index{schwz\+::\+Solver\+R\+AS@{schwz\+::\+Solver\+R\+AS}!setup\+\_\+local\+\_\+matrices@{setup\+\_\+local\+\_\+matrices}}
+\index{setup\+\_\+local\+\_\+matrices@{setup\+\_\+local\+\_\+matrices}!schwz\+::\+Solver\+R\+AS@{schwz\+::\+Solver\+R\+AS}}
+\subsubsection{\texorpdfstring{setup\+\_\+local\+\_\+matrices()}{setup\_local\_matrices()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ \\
+void \hyperlink{classschwz_1_1SolverRAS}{schwz\+::\+Solver\+R\+AS}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+local\+\_\+matrices (\begin{DoxyParamCaption}\item[{\hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{\hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{std\+::vector$<$ unsigned int $>$ \&}]{partition\+\_\+indices,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{global\+\_\+matrix,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{local\+\_\+matrix,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{interface\+\_\+matrix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Sets up the local and the interface matrices from the global matrix and the partition indices. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+{\em partition\+\_\+indices} & The array containing the partition indices. \\
+\hline
+{\em global\+\_\+matrix} & The global system matrix. \\
+\hline
+{\em local\+\_\+matrix} & The local system matrix. \\
+\hline
+{\em interface\+\_\+matrix} & The interface matrix containing the interface and the overlap data mainly used for exchanging values between different sub-\/domains. \\
+\hline
+{\em local\+\_\+perm} & The local permutation, obtained through R\+CM or M\+E\+T\+IS. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classschwz_1_1Initialize_ad24764a4ded54c2af6a5111ba8c8228f}{schwz\+::\+Initialize$<$ Value\+Type, Index\+Type $>$}.
+
+
+
+References schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::comm\+\_\+size, schwz\+::\+Settings\+::executor, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::first\+\_\+row, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::global\+\_\+matrix, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+size, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::global\+\_\+to\+\_\+local, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::i\+\_\+permutation, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::interface\+\_\+matrix, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::local\+\_\+matrix, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+size, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+size\+\_\+o, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+size\+\_\+x, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+to\+\_\+global, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::my\+\_\+rank, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::num\+\_\+subdomains, schwz\+::\+Settings\+::overlap, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::overlap\+\_\+row, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::overlap\+\_\+size, and schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::permutation.
+
+\mbox{\Hypertarget{classschwz_1_1SolverRAS_adc313354f7ae256d375316516d0f655e}\label{classschwz_1_1SolverRAS_adc313354f7ae256d375316516d0f655e}} 
+\index{schwz\+::\+Solver\+R\+AS@{schwz\+::\+Solver\+R\+AS}!setup\+\_\+windows@{setup\+\_\+windows}}
+\index{setup\+\_\+windows@{setup\+\_\+windows}!schwz\+::\+Solver\+R\+AS@{schwz\+::\+Solver\+R\+AS}}
+\subsubsection{\texorpdfstring{setup\+\_\+windows()}{setup\_windows()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ \\
+void \hyperlink{classschwz_1_1SolverRAS}{schwz\+::\+Solver\+R\+AS}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+windows (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{main\+\_\+buffer }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Sets up the windows needed for the asynchronous communication. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+{\em main\+\_\+buffer} & The main buffer being exchanged between the subdomains. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classschwz_1_1Communicate_a13190372f3a6193f92226d08e822fde7}{schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$}.
+
+
+
+References schwz\+::\+Settings\+::comm\+\_\+settings\+::enable\+\_\+get, schwz\+::\+Settings\+::comm\+\_\+settings\+::enable\+\_\+lock\+\_\+all, schwz\+::\+Settings\+::comm\+\_\+settings\+::enable\+\_\+one\+\_\+by\+\_\+one, schwz\+::\+Settings\+::comm\+\_\+settings\+::enable\+\_\+onesided, schwz\+::\+Settings\+::comm\+\_\+settings\+::enable\+\_\+overlap, schwz\+::\+Settings\+::comm\+\_\+settings\+::enable\+\_\+put, schwz\+::\+Settings\+::executor, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::get\+\_\+displacements, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::get\+\_\+request, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::global\+\_\+get, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::global\+\_\+put, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::global\+\_\+solution, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::is\+\_\+local\+\_\+neighbor, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::iter\+\_\+count, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+get, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+neighbors\+\_\+in, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+neighbors\+\_\+out, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+num\+\_\+neighbors\+\_\+in, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+num\+\_\+neighbors\+\_\+out, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+put, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+size\+\_\+o, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::mixedt\+\_\+recv\+\_\+buffer, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::mixedt\+\_\+send\+\_\+buffer, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::neighbors\+\_\+in, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::neighbors\+\_\+out, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::num\+\_\+neighbors\+\_\+in, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::num\+\_\+neighbors\+\_\+out, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::num\+\_\+subdomains, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::put\+\_\+displacements, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::put\+\_\+request, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::recv\+\_\+buffer, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::remote\+\_\+get, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::remote\+\_\+put, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::send\+\_\+buffer, schwz\+::\+Settings\+::use\+\_\+mixed\+\_\+precision, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::window\+\_\+recv\+\_\+buffer, schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::window\+\_\+send\+\_\+buffer, and schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::window\+\_\+x.
+
+\mbox{\Hypertarget{classschwz_1_1SolverRAS_ae0d9bc193a40fb1f27738a2436a3fa36}\label{classschwz_1_1SolverRAS_ae0d9bc193a40fb1f27738a2436a3fa36}} 
+\index{schwz\+::\+Solver\+R\+AS@{schwz\+::\+Solver\+R\+AS}!update\+\_\+boundary@{update\+\_\+boundary}}
+\index{update\+\_\+boundary@{update\+\_\+boundary}!schwz\+::\+Solver\+R\+AS@{schwz\+::\+Solver\+R\+AS}}
+\subsubsection{\texorpdfstring{update\+\_\+boundary()}{update\_boundary()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ \\
+void \hyperlink{classschwz_1_1SolverRAS}{schwz\+::\+Solver\+R\+AS}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::update\+\_\+boundary (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{local\+\_\+solution,  }\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{local\+\_\+rhs,  }\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{global\+\_\+solution,  }\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&}]{interface\+\_\+matrix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Update the values into local vector from obtained from the neighboring sub-\/domains using the interface matrix. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em settings} & The settings struct. \\
+\hline
+{\em metadata} & The metadata struct. \\
+\hline
+{\em local\+\_\+solution} & The local solution vector in the subdomain. \\
+\hline
+{\em local\+\_\+rhs} & The local right hand side vector in the subdomain. \\
+\hline
+{\em global\+\_\+solution} & The workspace solution vector. \\
+\hline
+{\em global\+\_\+old\+\_\+solution} & The global solution vector of the previous iteration. \\
+\hline
+{\em interface\+\_\+matrix} & The interface matrix containing the interface and the overlap data mainly used for exchanging values between different sub-\/domains. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classschwz_1_1Communicate_a371fb6c61c0bd9b619bbe7e154d18696}{schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$}.
+
+
+
+References schwz\+::\+Settings\+::executor, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::global\+\_\+solution, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::interface\+\_\+matrix, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::local\+\_\+rhs, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::local\+\_\+size\+\_\+x, schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::local\+\_\+solution, schwz\+::\+Metadata$<$ Value\+Type, Index\+Type $>$\+::num\+\_\+subdomains, and schwz\+::\+Settings\+::overlap.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+restricted\+\_\+schwarz.\+hpp (7c9a9f7)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/restricted\+\_\+schwarz.\+cpp (6e43099)\end{DoxyCompactItemize}

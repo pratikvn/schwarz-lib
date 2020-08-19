@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['commhelpers',['CommHelpers',['../namespaceSchwarzWrappers_1_1CommHelpers.html',1,'SchwarzWrappers']]],
-  ['convergencetools',['ConvergenceTools',['../namespaceSchwarzWrappers_1_1ConvergenceTools.html',1,'SchwarzWrappers']]],
-  ['partitiontools',['PartitionTools',['../namespaceSchwarzWrappers_1_1PartitionTools.html',1,'SchwarzWrappers']]],
-  ['schwarzwrappers',['SchwarzWrappers',['../namespaceSchwarzWrappers.html',1,'']]],
-  ['solvertools',['SolverTools',['../namespaceSchwarzWrappers_1_1SolverTools.html',1,'SchwarzWrappers']]]
+  ['commhelpers',['CommHelpers',['../namespaceschwz_1_1CommHelpers.html',1,'schwz']]],
+  ['conv_5ftools',['conv_tools',['../namespaceschwz_1_1conv__tools.html',1,'schwz']]],
+  ['partitiontools',['PartitionTools',['../namespaceschwz_1_1PartitionTools.html',1,'schwz']]],
+  ['schwz',['schwz',['../namespaceschwz.html',1,'']]],
+  ['solvertools',['SolverTools',['../namespaceschwz_1_1SolverTools.html',1,'schwz']]]
 ];

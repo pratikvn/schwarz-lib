@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['gatherscatter',['GatherScatter',['../structGatherScatter.html',1,'']]]
+  ['gather',['Gather',['../structschwz_1_1Gather.html',1,'schwz']]]
 ];

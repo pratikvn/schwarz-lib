@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['partition',['partition',['../classSchwarzWrappers_1_1Initialize.html#a2a7a5d4e8ac0312541c3e82ce9d2ae7f',1,'SchwarzWrappers::Initialize']]],
-  ['print_5fmatrix',['print_matrix',['../classSchwarzWrappers_1_1SchwarzBase.html#a7f738c1b03eba45f57cf72bb123febd8',1,'SchwarzWrappers::SchwarzBase']]],
-  ['print_5fvector',['print_vector',['../classSchwarzWrappers_1_1SchwarzBase.html#a505c5388da6cb1082412bfe5ef3675df',1,'SchwarzWrappers::SchwarzBase']]]
+  ['partition',['partition',['../classschwz_1_1Initialize.html#a23a10058e35a442c564c0748b66dcb08',1,'schwz::Initialize']]],
+  ['print_5fmatrix',['print_matrix',['../classschwz_1_1SchwarzBase.html#a835d94bb5649850365f6adab8983754e',1,'schwz::SchwarzBase']]],
+  ['print_5fvector',['print_vector',['../classschwz_1_1SchwarzBase.html#a5bdfc70b9c31bb7d25382646f679ebfa',1,'schwz::SchwarzBase']]]
 ];

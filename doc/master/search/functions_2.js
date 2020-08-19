@@ -1,5 +1,5 @@
 var searchData=
 [
   ['error',['Error',['../classError.html#a146e7d37cbd73162b88a91ffa7fa776a',1,'Error']]],
-  ['exchange_5fboundary',['exchange_boundary',['../classSchwarzWrappers_1_1Communicate.html#af6ef7b0a4d98427c8c0ea4f4244b08d1',1,'SchwarzWrappers::Communicate::exchange_boundary()'],['../classSchwarzWrappers_1_1SolverRAS.html#a22203360e0b48da8d610e2b9c81f78e7',1,'SchwarzWrappers::SolverRAS::exchange_boundary()']]]
+  ['exchange_5fboundary',['exchange_boundary',['../classschwz_1_1Communicate.html#a78864f8bdc7feb992c740b49d80b8d53',1,'schwz::Communicate::exchange_boundary()'],['../classschwz_1_1SolverRAS.html#af33d7cc7aec6bb8bf26864f576ded42d',1,'schwz::SolverRAS::exchange_boundary()']]]
 ];

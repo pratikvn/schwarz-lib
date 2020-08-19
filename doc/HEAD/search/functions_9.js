@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['run',['run',['../classSchwarzWrappers_1_1SchwarzBase.html#aebea3613aa52c69427081f8cb0965d9c',1,'SchwarzWrappers::SchwarzBase']]]
+  ['run',['run',['../classschwz_1_1SchwarzBase.html#aed3ccf8d66549af755b39da5e26f79f3',1,'schwz::SchwarzBase']]]
 ];

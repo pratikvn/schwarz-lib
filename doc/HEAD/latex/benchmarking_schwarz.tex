@@ -1,9 +1,125 @@
-\section*{\# Benchmark example 1. }
+The flag {\ttfamily -\/\+D\+S\+C\+H\+W\+A\+R\+Z\+\_\+\+B\+U\+I\+L\+D\+\_\+\+B\+E\+N\+C\+H\+M\+A\+R\+K\+I\+NG} (default {\ttfamily ON}) enables the examples and benchmarking snippets.
 
-\subsection*{\#\# Poisson solver using Restricted Additive Schwarz with overlap. }
-
-The flag {\ttfamily -\/\+D\+S\+C\+H\+W\+A\+R\+Z\+\_\+\+B\+U\+I\+L\+D\+\_\+\+B\+E\+N\+C\+H\+M\+A\+R\+K\+I\+NG} (default {\ttfamily ON}) enables the example and benchmarking snippets. The following command line options are available for this example. This is setup using {\ttfamily gflags}.
+If {\ttfamily schwarz-\/lib} has been built with {\ttfamily deal.\+ii}, then the {\ttfamily deal.\+ii} examples, {\ttfamily ex\+\_\+6} and {\ttfamily ex\+\_\+9} are also built, else only the {\ttfamily bench\+\_\+ras} example is built. The following command line options are available for this example. This is setup using {\ttfamily gflags}.
 
 The executable is run in the following fashion\+:
 
-```sh \mbox{[}M\+P\+I\+\_\+\+C\+O\+M\+M\+A\+ND\mbox{]} \mbox{[}M\+P\+I\+\_\+\+O\+P\+T\+I\+O\+NS\mbox{]} 
+
+\begin{DoxyCode}
+[MPI\_COMMAND] [MPI\_OPTIONS] PATH\_TO\_EXECUTABLE [FLAGS]
+\end{DoxyCode}
+
+
+Where {\ttfamily F\+L\+A\+GS} are the options below with the template {\ttfamily flag\+\_\+name \mbox{[}type\mbox{]}\mbox{[}default\+\_\+value\mbox{]}}. For example, to set the number of iterations of the R\+AS solver to 100 one would add {\ttfamily -\/-\/num\+\_\+iters=100} to the executable command above.
+
+\subsubsection*{Generic settings}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily executor} \mbox{[}std\+::string\mbox{]}\mbox{[}reference\mbox{]} \+: The executor used to run the solver, one of {\ttfamily reference}, {\ttfamily cuda} or {\ttfamily omp}.
+\item {\ttfamily explicit\+\_\+laplacian} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Use the explicit laplacian instead of deal.\+ii\textquotesingle{}s matrix.
+\item {\ttfamily set\+\_\+1d\+\_\+laplacian\+\_\+size}\mbox{[}uint32\mbox{]}\mbox{[}16\mbox{]} \+: The number of grid points in one dimension for the 2D laplacian problem.
+\item {\ttfamily enable\+\_\+random\+\_\+rhs} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Use a random rhs instead of the default 1.\+0\textquotesingle{}s .
+\item {\ttfamily overlap} \mbox{[}uint32\mbox{]}\mbox{[}2\mbox{]} \+: Overlap between the domains.
+\item {\ttfamily timings\+\_\+file} \mbox{[}std\+::string\mbox{]}\mbox{[}null\mbox{]} \+: The filename for the timings.
+\item {\ttfamily partition} \mbox{[}std\+::string\mbox{]}\mbox{[}regular\mbox{]} \+: The partitioner used. The choices are {\ttfamily metis}, {\ttfamily regular} or {\ttfamily regular2d}.
+\item {\ttfamily metis\+\_\+objtype} \mbox{[}std\+::string\mbox{]}\mbox{[}null\mbox{]} \+: The objective type to minimize for the metis partitioner. The choices are {\ttfamily edgecut} and {\ttfamily totalvol}.
+\item {\ttfamily num\+\_\+threads} \mbox{[}uint32\mbox{]}\mbox{[}1\mbox{]} \+: Number of threads to bind to a process.
+\item {\ttfamily non\+\_\+symmetric\+\_\+matrix} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Explicitly state that the matrix is non-\/symmetric so that the local G\+M\+R\+ES solver is used.
+\item {\ttfamily use\+\_\+mixed\+\_\+precision} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Use mixed precision in the communication.
+\end{DoxyItemize}
+
+\subsubsection*{Input settings}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily matrix\+\_\+filename} \mbox{[}std\+::string\mbox{]}\mbox{[}null\mbox{]} \+: The matrix file to read the global system matrix from.
+\end{DoxyItemize}
+
+\subsubsection*{Output settings}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily enable\+\_\+debug\+\_\+write} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Enable some debugging outputs to stdout.
+\item {\ttfamily write\+\_\+comm\+\_\+data} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Write the number of sends and recvs of each subdomain to files.
+\item {\ttfamily write\+\_\+perm\+\_\+data} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Write the permutation data from C\+H\+O\+L\+M\+OD to a file.
+\item {\ttfamily print\+\_\+config} \mbox{[}bool\mbox{]}\mbox{[}true\mbox{]} \+: Print the configuration of the run.
+\item {\ttfamily print\+\_\+matrices} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Print the local system matrices to a file.
+\item {\ttfamily debug} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Enable some possible expensive debug checks.
+\item {\ttfamily enable\+\_\+logging} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Enable some possible expensive logging from Ginkgo.
+\end{DoxyItemize}
+
+\subsubsection*{Solver settings}
+
+\paragraph*{Generic settings}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily num\+\_\+iters} \mbox{[}uint32\mbox{]}\mbox{[}100\mbox{]} \+: The number of outer iterations for the R\+AS solver.
+\item {\ttfamily set\+\_\+tol} \mbox{[}double\mbox{]}\mbox{[}1e-\/6\mbox{]} \+: The Outer tolerance for the R\+AS solver.
+\item {\ttfamily local\+\_\+tol} \mbox{[}double\mbox{]}\mbox{[}1e-\/12\mbox{]} \+: The Inner tolerance for the local iterative solver. \paragraph*{Communication settings}
+\end{DoxyItemize}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily enable\+\_\+onesided} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Enable the onesided asynchronous communication.
+\item {\ttfamily enable\+\_\+twosided} \mbox{[}bool\mbox{]}\mbox{[}true\mbox{]} \+: Enable the twosided asynchronous communication. A dummy flag.
+\item {\ttfamily enable\+\_\+one\+\_\+by\+\_\+one} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Enable putting/getting of each element in onesided communication.
+\item {\ttfamily enable\+\_\+put\+\_\+all\+\_\+local\+\_\+residual\+\_\+norms} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Enable putting of all local residual norms"
+\item {\ttfamily enable\+\_\+comm\+\_\+overlap} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Enable overlap of communication and computation.
+\item {\ttfamily flush\+\_\+type} \mbox{[}std\+::string\mbox{]}\mbox{[}flush-\/all\mbox{]} \+: The window flush strategy. The choices are {\ttfamily flush-\/local} and {\ttfamily flush-\/all}.
+\item {\ttfamily lock\+\_\+type} \mbox{[}std\+::string\mbox{]}\mbox{[}lock-\/all\mbox{]} \+: The window lock strategy. The choices are {\ttfamily lock-\/local} and {\ttfamily lock-\/all}.
+\item {\ttfamily remote\+\_\+comm\+\_\+type} \mbox{[}std\+::string\mbox{]}\mbox{[}get\mbox{]} \+: The type of the remote communication. {\ttfamily get} uses {\ttfamily M\+P\+I\+\_\+\+Get} and {\ttfamily put} uses {\ttfamily M\+P\+I\+\_\+\+Put}.
+\end{DoxyItemize}
+
+\paragraph*{Convergence settings}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily enable\+\_\+global\+\_\+check} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Use the global convergence check for twosided.
+\item {\ttfamily global\+\_\+convergence\+\_\+type} \mbox{[}std\+::string\mbox{]}\mbox{[}centralized-\/tree\mbox{]} \+: Choose the convergence detection algorithm for onesided.
+\item {\ttfamily enable\+\_\+decentralized\+\_\+accumulate} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Use accumulate strategy for decentralized convergence check..
+\item {\ttfamily enable\+\_\+global\+\_\+check\+\_\+iter\+\_\+offset} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Enable global convergence check only after a certain number of iterations.
+\end{DoxyItemize}
+
+\paragraph*{Local solver settings}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily local\+\_\+solver} \mbox{[}std\+::string\mbox{]}\mbox{[}iterative-\/ginkgo\mbox{]} \+: The local solver used in the local domains. The current choices are {\ttfamily direct-\/cholmod} , {\ttfamily direct-\/ginkgo} or {\ttfamily iterative-\/ginkgo}.
+\item {\ttfamily local\+\_\+factorization} \mbox{[}std\+::string\mbox{]}\mbox{[}cholmod\mbox{]} \+: The factorization for the local direct solver \char`\"{}cholmod\char`\"{} or \char`\"{}umfpack\char`\"{}.
+\item {\ttfamily local\+\_\+reordering} \mbox{[}std\+::string\mbox{]}\mbox{[}none\mbox{]} \+: The reordering for the local direct solver \char`\"{}none\char`\"{}, \char`\"{}metis\+\_\+reordering\char`\"{} or \char`\"{}rcm\+\_\+reordering\char`\"{}.
+\item {\ttfamily factor\+\_\+ordering\+\_\+natural} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: If true uses natural ordering instead of the default optimized ordering. This is needed for C\+U\+DA runs as the factorization ordering needs to be given to the solver.
+\item {\ttfamily enable\+\_\+local\+\_\+precond} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: If true uses the Block jacobi preconditioning for the local iterative solver.
+\item {\ttfamily precond\+\_\+max\+\_\+block\+\_\+size} \mbox{[}uint32\mbox{]}\mbox{[}16\mbox{]}\+: Maximum size of the blocks for the block jacobi preconditioner
+\item {\ttfamily shifted\+\_\+iter} \mbox{[}uint32\mbox{]}\mbox{[}1\mbox{]} \+: The number of iterations to communicate for the local subdomains.
+\item {\ttfamily local\+\_\+max\+\_\+iters} \mbox{[}int32\mbox{]}\mbox{[}-\/1\mbox{]} \+: The maximum number of iterations for the local iterative solver.
+\item {\ttfamily restart\+\_\+iter} \mbox{[}uint32\mbox{]}\mbox{[}1\mbox{]} \+: The restart iter for the G\+M\+R\+ES solver.
+\item {\ttfamily reset\+\_\+local\+\_\+crit\+\_\+iter} \mbox{[}int32\mbox{]}\mbox{[}-\/1\mbox{]} \+: The R\+AS iteration to reset the local iteration count.
+\end{DoxyItemize}
+
+\subsubsection*{Poisson solver using Restricted Additive Schwarz with overlap.}
+
+This example runs is written within the {\ttfamily benchmarking/bench\+\_\+ras.\+cpp} file. This demonstrates the basic capabilities of {\ttfamily schwarz-\/lib}. You can use it to solve the 2D Poisson equation with a 5 point stencil or solve a generic matrix by providing it a matrix file.
+
+\subsubsection*{Examples with deal.\+ii}
+
+These examples use {\ttfamily deal.\+ii}\textquotesingle{}s capabilities to generate a matrix and solution is computed with the R\+AS method.
+
+Possible settings are\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily num\+\_\+refine\+\_\+cycles} \mbox{[}uint32\mbox{]}\mbox{[}1\mbox{]}\mbox{[}disabled\mbox{]} \+: The number of refinement cycles when used with {\ttfamily deal.\+ii}.
+\item {\ttfamily init\+\_\+refine\+\_\+level} \mbox{[}uint32\mbox{]}\mbox{[}4\mbox{]} \+: The initial refinement level of the problem. This sets the initial number of dof\textquotesingle{}s.
+\item {\ttfamily dealii\+\_\+orig} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Solve with the deal.\+ii iterative CG instead of the R\+AS solver.
+\item {\ttfamily vis\+\_\+sol} \mbox{[}bool\mbox{]}\mbox{[}false\mbox{]} \+: Print the solution for visualization.
+\end{DoxyItemize}
+
+\paragraph*{Solving the n-\/dimensional Poisson equation with F\+EM.}
+
+The {\ttfamily benchmarking/dealii\+\_\+ex\+\_\+6.\+cpp} demonstrates the solution of the Poisson equation with adaptive refinement as explained on the \href{https://www.dealii.org/developer/doxygen/deal.II/step_6.html}{\tt {\ttfamily deal.\+ii example documentation page}}
+
+\paragraph*{Solving the Advection equation with F\+EM.}
+
+The {\ttfamily benchmarking/dealii\+\_\+ex\+\_\+9.\+cpp} demonstrates the solution of the Advection equation with adaptive refinement as explained on the \href{https://www.dealii.org/developer/doxygen/deal.II/step_9.html}{\tt {\ttfamily deal.\+ii example documentation page}} 

@@ -1,4 +1,5 @@
-# Installation process.
+# Installation Instructions                      {#install_schwarz}
+-------------------------------------
 
 ## Building 
 

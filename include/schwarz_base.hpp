@@ -182,6 +182,12 @@ public:
     std::shared_ptr<gko::matrix::Dense<ValueType>> local_solution;
 
     /**
+     * The (local+overlap) solution vector at time of last event of communication
+     * The size of this vector is considered global_size to account for overlap
+     */
+    std::shared_ptr<gko::matrix::Dense<ValueType>> last_solution;    
+
+    /**
      * The global solution vector.
      */
     std::shared_ptr<gko::matrix::Dense<ValueType>> global_solution;

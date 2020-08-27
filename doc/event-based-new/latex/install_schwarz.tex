@@ -1,0 +1,33 @@
+\subsection*{Building}
+
+Use the standard cmake build procedure\+:
+
+
+\begin{DoxyCode}
+mkdir build; cd build
+cmake -G "Unix Makefiles" [OPTIONS] .. && make
+\end{DoxyCode}
+
+
+Replace {\ttfamily \mbox{[}O\+P\+T\+I\+O\+NS\mbox{]}} with desired cmake options for your build. The library adds the following additional switches to control what is being built\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily -\/\+D\+S\+C\+H\+W\+A\+R\+Z\+\_\+\+B\+U\+I\+L\+D\+\_\+\+B\+E\+N\+C\+H\+M\+A\+R\+K\+I\+NG=\{ON, O\+FF\}} Builds some example benchmarks. Default is {\ttfamily ON}
+\item {\ttfamily -\/\+D\+S\+C\+H\+W\+A\+R\+Z\+\_\+\+B\+U\+I\+L\+D\+\_\+\+M\+E\+T\+IS=\{ON, O\+FF\}} Builds with support for the {\ttfamily M\+E\+T\+IS} partitioner. User needs to provide the path to the installation of the {\ttfamily M\+E\+T\+IS} library in {\ttfamily M\+E\+T\+I\+S\+\_\+\+D\+IR}, preferably as an environment variable. Default is {\ttfamily O\+FF}
+\item {\ttfamily -\/\+D\+S\+C\+H\+W\+A\+R\+Z\+\_\+\+B\+U\+I\+L\+D\+\_\+\+C\+H\+O\+L\+M\+OD=\{ON, O\+FF\}} Builds with support for the {\ttfamily C\+H\+O\+L\+M\+OD} module from the Suitesparse library. User needs to set an environment variable {\ttfamily C\+H\+O\+L\+M\+O\+D\+\_\+\+D\+IR} to the path containing the {\ttfamily C\+H\+O\+L\+M\+OD} installation. Default is {\ttfamily O\+FF}
+\item {\ttfamily -\/\+D\+S\+C\+H\+W\+A\+R\+Z\+\_\+\+B\+U\+I\+L\+D\+\_\+\+C\+U\+DA=\{ON, O\+FF\}} Builds with C\+U\+DA support. Though Ginkgo provides most of the required C\+U\+DA support, we do need to link to C\+U\+DA for explicit setting of G\+PU affinities, some custom gather and scatter operations. Default is {\ttfamily O\+FF}.
+\item {\ttfamily -\/\+D\+S\+C\+H\+W\+A\+R\+Z\+\_\+\+B\+U\+I\+L\+D\+\_\+\+C\+L\+A\+N\+G\+\_\+\+T\+I\+DY=\{ON, O\+FF\}} Builds with support for {\ttfamily clang-\/tidy} Default is {\ttfamily O\+FF}
+\item {\ttfamily -\/\+D\+S\+C\+H\+W\+A\+R\+Z\+\_\+\+B\+U\+I\+L\+D\+\_\+\+D\+E\+A\+L\+II=\{ON, O\+FF\}} Builds with support for the finite element library {\ttfamily deal.\+ii} Default is {\ttfamily O\+FF}
+\item {\ttfamily -\/\+D\+S\+C\+H\+W\+A\+R\+Z\+\_\+\+W\+I\+T\+H\+\_\+\+H\+W\+L\+OC=\{ON, O\+FF\}} Builds with support for the hardware locality library used for binding hardware. {\ttfamily hwloc} is distributed as a part of the Open-\/\+M\+PI project. Default is {\ttfamily ON}
+\item {\ttfamily -\/\+D\+S\+C\+H\+W\+A\+R\+Z\+\_\+\+D\+E\+V\+E\+L\+\_\+\+T\+O\+O\+LS=\{ON, O\+FF\}} Builds with some developer tools support. Default is {\ttfamily ON}. In particular uses \href{https://github.com/ginkgo-project/git-cmake-format}{\tt {\ttfamily git-\/cmake-\/format}} to automatically format the source files with {\ttfamily clang-\/format}.
+\end{DoxyItemize}
+
+\subsection*{Tips}
+
+
+\begin{DoxyItemize}
+\item If you are having C\+U\+DA problems and you are not using C\+U\+DA, then feel free to switch the C\+U\+DA module off with {\ttfamily -\/\+D\+S\+C\+H\+W\+A\+R\+Z\+\_\+\+B\+U\+I\+L\+D\+\_\+\+C\+U\+DA=off}.
+\item Installing C\+H\+O\+L\+M\+OD can be a bit annoying. T\+O\+DO add some details on fixing Suitesparse compilation.
+\item When doing merge commits it is possible that make format does not work. You can run {\ttfamily cmake -\/\+D\+S\+C\+H\+W\+A\+R\+Z\+\_\+\+D\+E\+V\+E\+L\+\_\+\+T\+O\+O\+LS=O\+FF ..} to temporarily switch off the formatting. Please switch it on again when committing normally. 
+\end{DoxyItemize}

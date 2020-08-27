@@ -103,6 +103,9 @@ public:
         const std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
         const std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>>
             &interface_matrix) override;
+
+    ValueType get_threshold(const Settings &settings,
+                            const Metadata<ValueType, IndexType> &metadata);
 };
 
 

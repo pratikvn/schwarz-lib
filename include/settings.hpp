@@ -129,6 +129,16 @@ struct Settings {
     bool enable_random_rhs = false;
 
     /**
+     * Flag to choose thres type. Choices are "cgammak" or "slope"
+     */
+    std::string thres_type = "cgammak";
+
+    /**
+     * Flag to choose norm type. Choices are "L1" or "L2"
+     */
+    std::string norm_type = "L1";
+
+    /**
      * Flag to enable printing of matrices.
      */
     bool print_matrices = false;
@@ -160,7 +170,7 @@ struct Settings {
     /**
      * The restart iter for the GMRES solver.
      */
-    unsigned int restart_iter = 1u;
+    int restart_iter = 1;
 
     /**
      * The global iter at which to reset the local solver criterion.
@@ -429,6 +439,45 @@ struct Metadata {
      * The minimum residual norm of the subdomain.
      */
     ValueType min_residual_norm = -1.0;
+
+    /**
+     * Value of constant for event threshold
+     * Relevant for cgammak threshold
+     */
+    ValueType constant = 0.0;
+
+    /**
+     * Value of gamma for event threshold
+     * Relevant for cgammak threshold
+     */
+    ValueType gamma = 0.0;
+
+    /**
+     * Value of horizon for the event threshold
+     * Relevant for slope-based threshold
+     */
+    ValueType horizon = 0.0;
+
+    /**
+     * Value of decay parameter for the event threshold
+     * Relevant for slope-based threshold
+     */
+    ValueType decay_param = 0.0;
+
+    /**
+     * Value of history at the sender
+     */
+    IndexType sent_history = 0;
+
+    /**
+     * Value of history at the receiver
+     */
+    IndexType recv_history = 0;
+
+    /**
+     * Number of iterations to communicate before event comm
+     */
+    IndexType comm_start_iters = 0;
 
     /**
      * The struct used to measure the timings of each function within the solver

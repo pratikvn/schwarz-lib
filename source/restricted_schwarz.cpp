@@ -361,6 +361,8 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
         }
     }
 
+    this->comm_struct.num_recv = num_recv;
+
     std::vector<MPI_Request> send_req1(comm_size);
     std::vector<MPI_Request> send_req2(comm_size);
     std::vector<MPI_Request> recv_req1(comm_size);
@@ -421,6 +423,8 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
     }
     this->comm_struct.num_neighbors_out = pp;
 
+    this->comm_struct.num_send = num_send;
+
     // allocate MPI buffer
     // one-sided
     if (settings.comm_settings.enable_onesided) {
@@ -438,11 +442,60 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
             } else {
                 this->comm_struct.recv_buffer = vec_vtype::create(
                     settings.executor, gko::dim<2>(num_recv, 1));
+                this->comm_struct.extra_buffer =
+                    vec_vtype::create(settings.executor, gko::dim<2>(num_recv, 1));
+
+                // initializing recv and extrapolation buffer
+                for (int i = 0; i < num_recv; i++) {
+                    this->comm_struct.recv_buffer->get_values()[i] = 0.0;
+                    this->comm_struct.extra_buffer->get_values()[i] = 0.0;
+                } 
+
+                // allocating values necessary for calculating threshold and
+                // extrapolation at receiver
+                this->comm_struct.last_recv_bdy = vec_vtype::create(
+                    settings.executor->get_master(), gko::dim<2>(num_recv, 1));
+
+                this->comm_struct.last_recv_iter = std::shared_ptr<vec_itype>(
+                    new vec_itype(settings.executor->get_master(),
+                                  this->comm_struct.num_neighbors_in),
+                    std::default_delete<vec_itype>());
+
+                this->comm_struct.last_recv_slopes = vec_vtype::create(
+                    settings.executor->get_master(),
+                    gko::dim<2>(num_recv * metadata.recv_history, 1));
+
+                this->comm_struct.curr_recv_avg = vec_vtype::create(
+                    settings.executor->get_master(),
+                    gko::dim<2>(this->comm_struct.num_neighbors_in, 1));
+
+                this->comm_struct.last_recv_avg = vec_vtype::create(
+                     settings.executor->get_master(),
+                     gko::dim<2>(this->comm_struct.num_neighbors_in, 1));   
+
+                // Initializing these values
+                for (int i = 0; i < num_recv; i++) {
+                     this->comm_struct.last_recv_bdy->get_values()[i] = 0.0;
+
+                     for (int j = 0; j < metadata.recv_history; j++) {
+                         this->comm_struct.last_recv_slopes
+                             ->get_values()[j * num_recv + i] = 0.0;
+                     }
+                }
+
+                for (int i = 0; i < this->comm_struct.num_neighbors_in; i++) {
+                    this->comm_struct.last_recv_iter->get_data()[i] = 0;
+
+                    this->comm_struct.curr_recv_avg->get_values()[i] = 0.0;
+                    this->comm_struct.last_recv_avg->get_values()[i] = 0.0;
+                }
+
+
                 MPI_Win_create(this->comm_struct.recv_buffer->get_values(),
                                num_recv * sizeof(ValueType), sizeof(ValueType),
                                MPI_INFO_NULL, MPI_COMM_WORLD,
                                &(this->comm_struct.window_recv_buffer));
-            }
+            } //end if mixed precision
 
             this->comm_struct.windows_from = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
@@ -506,11 +559,65 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
             } else {
                 this->comm_struct.send_buffer = vec_vtype::create(
                     settings.executor, gko::dim<2>(num_send, 1));
+
+                this->comm_struct.curr_send_avg = vec_vtype::create(
+                    settings.executor,
+                    gko::dim<2>(this->comm_struct.num_neighbors_out, 1));
+                this->comm_struct.last_send_avg = vec_vtype::create(
+                    settings.executor,
+                    gko::dim<2>(this->comm_struct.num_neighbors_out, 1));
+
+                this->comm_struct.last_sent_slopes_avg = vec_vtype::create(
+                    settings.executor,
+                    gko::dim<2>(
+                         this->comm_struct.num_neighbors_out * metadata.sent_history,
+                         1));
+
+                this->comm_struct.last_sent_iter = std::shared_ptr<vec_itype>(
+                    new vec_itype(settings.executor->get_master(),
+                                  this->comm_struct.num_neighbors_out),
+                    std::default_delete<vec_itype>());
+
+                this->comm_struct.msg_count = std::shared_ptr<vec_itype>(
+                    new vec_itype(settings.executor->get_master(),
+                                  this->comm_struct.num_neighbors_out),
+                    std::default_delete<vec_itype>());
+
+                // Allocating for threshold
+                this->comm_struct.thres = vec_vtype::create(
+                    settings.executor,
+                    gko::dim<2>(this->comm_struct.num_neighbors_out, 1));
+
+                // initializing send buffer
+                for (int i = 0; i < num_send; i++) {
+                    this->comm_struct.send_buffer->get_values()[i] = 0.0;
+                }
+
+                // initializing remaining values
+                for (int i = 0; i < this->comm_struct.num_neighbors_out; i++) {
+                    this->comm_struct.curr_send_avg->get_values()[i] = 0.0;
+                    this->comm_struct.last_send_avg->get_values()[i] = 0.0;
+
+                    for (int j = 0; j < metadata.sent_history; j++) {
+                        this->comm_struct.last_sent_slopes_avg
+                            ->get_values()[j * this->comm_struct.num_neighbors_out +
+                                           i] = 0.0;
+                    }
+
+                    this->comm_struct.last_sent_iter->get_data()[i] = 0;
+
+                    this->comm_struct.msg_count->get_data()[i] = 0;
+
+                    this->comm_struct.thres->get_values()[i] = 0.0;
+                }
+
+
                 MPI_Win_create(this->comm_struct.send_buffer->get_values(),
                                num_send * sizeof(ValueType), sizeof(ValueType),
                                MPI_INFO_NULL, MPI_COMM_WORLD,
                                &(this->comm_struct.window_send_buffer));
-            }
+            } //end if mixed precision
+
             this->comm_struct.windows_to = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
                               this->comm_struct.num_neighbors_out),

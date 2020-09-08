@@ -335,6 +335,9 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     MixedValueType dummy1 = 0.0;
     ValueType dummy2 = 1.0;
 
+    auto num_neighbors_out = this->comm_struct.num_neighbors_out;
+    auto neighbors_out = this->comm_struct.neighbors_out->get_data();
+
     if (metadata.my_rank == 0) {
         std::cout << " MixedValueType: " << typeid(dummy1).name()
                   << " ValueType: " << typeid(dummy2).name() << std::endl;
@@ -342,12 +345,19 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     // The main solution vector
     std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
+
     // The previous iteration solution vector
     std::shared_ptr<vec_vtype> prev_global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
+
+    // The solution vector at the previous event of communication
+    std::shared_ptr<vec_vtype> prev_event_solution = vec_vtype::create(
+        settings.executor, gko::dim<2>(metadata.global_size, 1));
+
     // A work vector.
     std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
         settings.executor, gko::dim<2>(2 * this->metadata.local_size_x, 1));
+
     // An initial guess.
     std::shared_ptr<vec_vtype> init_guess = vec_vtype::create(
         settings.executor, gko::dim<2>(this->metadata.local_size_x, 1));
@@ -415,7 +425,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
         // Exchange the boundary values. The communication part.
         MEASURE_ELAPSED_FUNC_TIME(
             this->exchange_boundary(settings, metadata, prev_global_solution,
-                                    global_solution, fps, fpr),
+                                    global_solution, prev_event_solution, fps, fpr),
             0, metadata.my_rank, boundary_exchange, metadata.iter_count);
         prev_global_solution->copy_from(gko::lend(global_solution));
 

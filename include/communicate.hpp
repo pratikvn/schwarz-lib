@@ -329,7 +329,9 @@ public:
         const Metadata<ValueType, IndexType> &metadata,
         const std::shared_ptr<gko::matrix::Dense<ValueType>>
             &prev_global_solution,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution) = 0;
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_event_solution,
+        std::ofstream &fps, std::ofstream &fpr) = 0;
 
     /**
      * Transforms data from a local vector to a global vector

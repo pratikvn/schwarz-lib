@@ -93,7 +93,10 @@ public:
                            const std::shared_ptr<gko::matrix::Dense<ValueType>>
                                &prev_global_solution,
                            std::shared_ptr<gko::matrix::Dense<ValueType>>
-                               &global_solution) override;
+                               &global_solution,
+                           std::shared_ptr<gko::matrix::Dense<ValueType>>
+                               &prev_event_solution,
+                           std::ofstream &fps, std::ofstream &fpr) override;
 
     void update_boundary(
         const Settings &settings,

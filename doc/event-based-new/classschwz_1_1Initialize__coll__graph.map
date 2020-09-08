@@ -1,10 +1,10 @@
 <map id="schwz::Initialize&lt; ValueType, IndexType &gt;" name="schwz::Initialize&lt; ValueType, IndexType &gt;">
-<area shape="rect" id="node2" href="$structschwz_1_1Settings.html" title="The struct that contains the solver settings and the parameters to be set by the user. " alt="" coords="1266,439,1382,465"/>
-<area shape="rect" id="node3" href="$structschwz_1_1Settings_1_1comm__settings.html" title="The settings for the various available communication paradigms. " alt="" coords="839,454,999,495"/>
-<area shape="rect" id="node4" title="STL class. " alt="" coords="879,400,959,427"/>
+<area shape="rect" id="node2" href="$structschwz_1_1Settings.html" title="The struct that contains the solver settings and the parameters to be set by the user. " alt="" coords="1266,483,1382,509"/>
+<area shape="rect" id="node3" href="$structschwz_1_1Settings_1_1comm__settings.html" title="The settings for the various available communication paradigms. " alt="" coords="839,498,999,539"/>
+<area shape="rect" id="node4" title="STL class. " alt="" coords="879,423,959,449"/>
 <area shape="rect" id="node8" href="$structschwz_1_1Metadata.html" title="The solver metadata struct. " alt="" coords="1224,245,1424,286"/>
-<area shape="rect" id="node6" title="STL class. " alt="" coords="5,393,132,434"/>
-<area shape="rect" id="node7" href="$structschwz_1_1Settings_1_1convergence__settings.html" title="The various convergence settings available. " alt="" coords="820,519,1019,561"/>
+<area shape="rect" id="node6" title="STL class. " alt="" coords="5,415,132,457"/>
+<area shape="rect" id="node7" href="$structschwz_1_1Settings_1_1convergence__settings.html" title="The various convergence settings available. " alt="" coords="820,563,1019,605"/>
 <area shape="rect" id="node10" title="STL class. " alt="" coords="11,187,127,213"/>
 <area shape="rect" id="node11" href="$structschwz_1_1Metadata_1_1post__process__data.html" title="The struct used for storing data for post&#45;processing. " alt="" coords="811,210,1028,251"/>
 </map>

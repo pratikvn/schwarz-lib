@@ -27,6 +27,10 @@ Collaboration diagram for schwz\+:\+:Initialize$<$ Value\+Type, Index\+Type $>$\
 \item 
 void \hyperlink{classschwz_1_1Initialize_a9dee6b55c599df30410cdf45819b3e28}{generate\+\_\+rhs} (std\+::vector$<$ Value\+Type $>$ \&rhs)
 \begin{DoxyCompactList}\small\item\em Generates the right hand side vector. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1Initialize_ab72493ff27a800067c9c48effbc1747b}{generate\+\_\+dipole\+\_\+rhs} (std\+::vector$<$ Value\+Type $>$ \&rhs)
+\begin{DoxyCompactList}\small\item\em Generates a dipole right hand side vector. \end{DoxyCompactList}\item 
+void \hyperlink{classschwz_1_1Initialize_a1b1151ac7f561c1ca4eeac389841e898}{generate\+\_\+sin\+\_\+rhs} (std\+::vector$<$ Value\+Type $>$ \&rhs)
+\begin{DoxyCompactList}\small\item\em Generates a sinusoidal right hand side vector. \end{DoxyCompactList}\item 
 void \hyperlink{classschwz_1_1Initialize_af655816bbed181e0a243efa7e35e942f}{setup\+\_\+global\+\_\+matrix} (const std\+::string \&filename, const gko\+::size\+\_\+type \&\hyperlink{structschwz_1_1Metadata_a1333605c0573688ce4d71173f52ef2b4}{oned\+\_\+laplacian\+\_\+size}, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix)
 \begin{DoxyCompactList}\small\item\em Generates the 2D global laplacian matrix. \end{DoxyCompactList}\item 
 void \hyperlink{classschwz_1_1Initialize_a23a10058e35a442c564c0748b66dcb08}{partition} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&global\+\_\+matrix, std\+::vector$<$ unsigned int $>$ \&\hyperlink{classschwz_1_1Initialize_a007426e21221298b6dca9b7c9fbd1c10}{partition\+\_\+indices})
@@ -63,6 +67,26 @@ The initialization class that provides methods for initialization of the solver.
 \hyperlink{group__init}{Initialization} 
 
 \subsection{Member Function Documentation}
+\mbox{\Hypertarget{classschwz_1_1Initialize_ab72493ff27a800067c9c48effbc1747b}\label{classschwz_1_1Initialize_ab72493ff27a800067c9c48effbc1747b}} 
+\index{schwz\+::\+Initialize@{schwz\+::\+Initialize}!generate\+\_\+dipole\+\_\+rhs@{generate\+\_\+dipole\+\_\+rhs}}
+\index{generate\+\_\+dipole\+\_\+rhs@{generate\+\_\+dipole\+\_\+rhs}!schwz\+::\+Initialize@{schwz\+::\+Initialize}}
+\subsubsection{\texorpdfstring{generate\+\_\+dipole\+\_\+rhs()}{generate\_dipole\_rhs()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classschwz_1_1Initialize}{schwz\+::\+Initialize}$<$ Value\+Type, Index\+Type $>$\+::generate\+\_\+dipole\+\_\+rhs (\begin{DoxyParamCaption}\item[{std\+::vector$<$ Value\+Type $>$ \&}]{rhs }\end{DoxyParamCaption})}
+
+
+
+Generates a dipole right hand side vector. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em rhs} & The rhs vector. \\
+\hline
+\end{DoxyParams}
+
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::initialize().
+
 \mbox{\Hypertarget{classschwz_1_1Initialize_a9dee6b55c599df30410cdf45819b3e28}\label{classschwz_1_1Initialize_a9dee6b55c599df30410cdf45819b3e28}} 
 \index{schwz\+::\+Initialize@{schwz\+::\+Initialize}!generate\+\_\+rhs@{generate\+\_\+rhs}}
 \index{generate\+\_\+rhs@{generate\+\_\+rhs}!schwz\+::\+Initialize@{schwz\+::\+Initialize}}
@@ -73,6 +97,26 @@ void \hyperlink{classschwz_1_1Initialize}{schwz\+::\+Initialize}$<$ Value\+Type,
 
 
 Generates the right hand side vector. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em rhs} & The rhs vector. \\
+\hline
+\end{DoxyParams}
+
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::initialize().
+
+\mbox{\Hypertarget{classschwz_1_1Initialize_a1b1151ac7f561c1ca4eeac389841e898}\label{classschwz_1_1Initialize_a1b1151ac7f561c1ca4eeac389841e898}} 
+\index{schwz\+::\+Initialize@{schwz\+::\+Initialize}!generate\+\_\+sin\+\_\+rhs@{generate\+\_\+sin\+\_\+rhs}}
+\index{generate\+\_\+sin\+\_\+rhs@{generate\+\_\+sin\+\_\+rhs}!schwz\+::\+Initialize@{schwz\+::\+Initialize}}
+\subsubsection{\texorpdfstring{generate\+\_\+sin\+\_\+rhs()}{generate\_sin\_rhs()}}
+{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type $>$ \\
+void \hyperlink{classschwz_1_1Initialize}{schwz\+::\+Initialize}$<$ Value\+Type, Index\+Type $>$\+::generate\+\_\+sin\+\_\+rhs (\begin{DoxyParamCaption}\item[{std\+::vector$<$ Value\+Type $>$ \&}]{rhs }\end{DoxyParamCaption})}
+
+
+
+Generates a sinusoidal right hand side vector. 
 
 
 \begin{DoxyParams}{Parameters}
@@ -139,7 +183,7 @@ Generates the 2D global laplacian matrix.
 \end{DoxyParams}
 
 
-Referenced by schwz\+::\+Initialize$<$ Value\+Type, Index\+Type $>$\+::generate\+\_\+rhs(), and schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::initialize().
+Referenced by schwz\+::\+Initialize$<$ Value\+Type, Index\+Type $>$\+::generate\+\_\+sin\+\_\+rhs(), and schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::initialize().
 
 \mbox{\Hypertarget{classschwz_1_1Initialize_ad24764a4ded54c2af6a5111ba8c8228f}\label{classschwz_1_1Initialize_ad24764a4ded54c2af6a5111ba8c8228f}} 
 \index{schwz\+::\+Initialize@{schwz\+::\+Initialize}!setup\+\_\+local\+\_\+matrices@{setup\+\_\+local\+\_\+matrices}}
@@ -213,5 +257,5 @@ Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-initialization.\+hpp (200bbde)\item 
-/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/initialization.\+cpp (92dbd95)\end{DoxyCompactItemize}
+initialization.\+hpp (b74805c)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/initialization.\+cpp (55ad704)\end{DoxyCompactItemize}

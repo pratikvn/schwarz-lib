@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">schwz
-   &#160;<span id="projectnumber">Generated automatically from tags/v1.0^2</span>
+   &#160;<span id="projectnumber">Generated automatically from event-based-new</span>
    </div>
   </td>
  </tr>
@@ -92,6 +92,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9dee6b55c599df30410cdf45819b3e28"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Initialize.html#a9dee6b55c599df30410cdf45819b3e28">generate_rhs</a> (std::vector&lt; ValueType &gt; &amp;rhs)</td></tr>
 <tr class="memdesc:a9dee6b55c599df30410cdf45819b3e28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the right hand side vector.  <a href="#a9dee6b55c599df30410cdf45819b3e28">More...</a><br /></td></tr>
 <tr class="separator:a9dee6b55c599df30410cdf45819b3e28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab72493ff27a800067c9c48effbc1747b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Initialize.html#ab72493ff27a800067c9c48effbc1747b">generate_dipole_rhs</a> (std::vector&lt; ValueType &gt; &amp;rhs)</td></tr>
+<tr class="memdesc:ab72493ff27a800067c9c48effbc1747b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a dipole right hand side vector.  <a href="#ab72493ff27a800067c9c48effbc1747b">More...</a><br /></td></tr>
+<tr class="separator:ab72493ff27a800067c9c48effbc1747b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b1151ac7f561c1ca4eeac389841e898"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Initialize.html#a1b1151ac7f561c1ca4eeac389841e898">generate_sin_rhs</a> (std::vector&lt; ValueType &gt; &amp;rhs)</td></tr>
+<tr class="memdesc:a1b1151ac7f561c1ca4eeac389841e898"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a sinusoidal right hand side vector.  <a href="#a1b1151ac7f561c1ca4eeac389841e898">More...</a><br /></td></tr>
+<tr class="separator:a1b1151ac7f561c1ca4eeac389841e898"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af655816bbed181e0a243efa7e35e942f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Initialize.html#af655816bbed181e0a243efa7e35e942f">setup_global_matrix</a> (const std::string &amp;filename, const gko::size_type &amp;<a class="el" href="structschwz_1_1Metadata.html#a1333605c0573688ce4d71173f52ef2b4">oned_laplacian_size</a>, std::shared_ptr&lt; gko::matrix::Csr&lt; ValueType, IndexType &gt;&gt; &amp;global_matrix)</td></tr>
 <tr class="memdesc:af655816bbed181e0a243efa7e35e942f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the 2D global laplacian matrix.  <a href="#af655816bbed181e0a243efa7e35e942f">More...</a><br /></td></tr>
 <tr class="separator:af655816bbed181e0a243efa7e35e942f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,6 +160,16 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a04760b39513414af70498808c0a6b317">enable_random_rhs</a> = false</td></tr>
 <tr class="memdesc:a04760b39513414af70498808c0a6b317 inherit pub_attribs_structschwz_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to enable a random rhs. <br /></td></tr>
 <tr class="separator:a04760b39513414af70498808c0a6b317 inherit pub_attribs_structschwz_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba9fca6688555f4d5eb902ca5f0706f3 inherit pub_attribs_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="aba9fca6688555f4d5eb902ca5f0706f3"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#aba9fca6688555f4d5eb902ca5f0706f3">rhs_type</a> = &quot;ones&quot;</td></tr>
+<tr class="memdesc:aba9fca6688555f4d5eb902ca5f0706f3 inherit pub_attribs_structschwz_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to enable a random rhs. <br /></td></tr>
+<tr class="separator:aba9fca6688555f4d5eb902ca5f0706f3 inherit pub_attribs_structschwz_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ca3e3368be250c94af8330e293920db inherit pub_attribs_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a6ca3e3368be250c94af8330e293920db">thres_type</a> = &quot;cgammak&quot;</td></tr>
+<tr class="memdesc:a6ca3e3368be250c94af8330e293920db inherit pub_attribs_structschwz_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to choose thres type.  <a href="structschwz_1_1Settings.html#a6ca3e3368be250c94af8330e293920db">More...</a><br /></td></tr>
+<tr class="separator:a6ca3e3368be250c94af8330e293920db inherit pub_attribs_structschwz_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0aa45e3ca102e6a985f25b6c5467088a inherit pub_attribs_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a0aa45e3ca102e6a985f25b6c5467088a">norm_type</a> = &quot;L1&quot;</td></tr>
+<tr class="memdesc:a0aa45e3ca102e6a985f25b6c5467088a inherit pub_attribs_structschwz_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to choose norm type.  <a href="structschwz_1_1Settings.html#a0aa45e3ca102e6a985f25b6c5467088a">More...</a><br /></td></tr>
+<tr class="separator:a0aa45e3ca102e6a985f25b6c5467088a inherit pub_attribs_structschwz_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afdf517a873a887a21a03b75c1011f903 inherit pub_attribs_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="afdf517a873a887a21a03b75c1011f903"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#afdf517a873a887a21a03b75c1011f903">print_matrices</a> = false</td></tr>
 <tr class="memdesc:afdf517a873a887a21a03b75c1011f903 inherit pub_attribs_structschwz_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to enable printing of matrices. <br /></td></tr>
@@ -168,10 +184,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a5f110676f929eebeb357cb07398e2048">non_symmetric_matrix</a> = false</td></tr>
 <tr class="memdesc:a5f110676f929eebeb357cb07398e2048 inherit pub_attribs_structschwz_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the matrix non-symmetric ? , Use GMRES for local solves. <br /></td></tr>
 <tr class="separator:a5f110676f929eebeb357cb07398e2048 inherit pub_attribs_structschwz_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d26302ccb58fd96c795046ecc577694 inherit pub_attribs_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="a7d26302ccb58fd96c795046ecc577694"></a>
-unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a7d26302ccb58fd96c795046ecc577694">restart_iter</a> = 1u</td></tr>
-<tr class="memdesc:a7d26302ccb58fd96c795046ecc577694 inherit pub_attribs_structschwz_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">The restart iter for the GMRES solver. <br /></td></tr>
-<tr class="separator:a7d26302ccb58fd96c795046ecc577694 inherit pub_attribs_structschwz_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a443c7d58eb0df515d1c863640cffb654 inherit pub_attribs_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="a443c7d58eb0df515d1c863640cffb654"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#a443c7d58eb0df515d1c863640cffb654">restart_iter</a> = 1</td></tr>
+<tr class="memdesc:a443c7d58eb0df515d1c863640cffb654 inherit pub_attribs_structschwz_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">The restart iter for the GMRES solver. <br /></td></tr>
+<tr class="separator:a443c7d58eb0df515d1c863640cffb654 inherit pub_attribs_structschwz_1_1Settings"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af257396850c46e4d3217b4bb1a858114 inherit pub_attribs_structschwz_1_1Settings"><td class="memItemLeft" align="right" valign="top"><a id="af257396850c46e4d3217b4bb1a858114"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Settings.html#af257396850c46e4d3217b4bb1a858114">reset_local_crit_iter</a> = -1</td></tr>
 <tr class="memdesc:af257396850c46e4d3217b4bb1a858114 inherit pub_attribs_structschwz_1_1Settings"><td class="mdescLeft">&#160;</td><td class="mdescRight">The global iter at which to reset the local solver criterion. <br /></td></tr>
@@ -311,6 +327,34 @@ ValueType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 ValueType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#a04bd75fb60c4085481a3fc3e96269452">min_residual_norm</a> = -1.0</td></tr>
 <tr class="memdesc:a04bd75fb60c4085481a3fc3e96269452 inherit pub_attribs_structschwz_1_1Metadata"><td class="mdescLeft">&#160;</td><td class="mdescRight">The minimum residual norm of the subdomain. <br /></td></tr>
 <tr class="separator:a04bd75fb60c4085481a3fc3e96269452 inherit pub_attribs_structschwz_1_1Metadata"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed13edafeb7b695ab134a594957b08da inherit pub_attribs_structschwz_1_1Metadata"><td class="memItemLeft" align="right" valign="top"><a id="aed13edafeb7b695ab134a594957b08da"></a>
+ValueType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#aed13edafeb7b695ab134a594957b08da">constant</a> = 0.0</td></tr>
+<tr class="memdesc:aed13edafeb7b695ab134a594957b08da inherit pub_attribs_structschwz_1_1Metadata"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value of constant for event threshold Relevant for cgammak threshold. <br /></td></tr>
+<tr class="separator:aed13edafeb7b695ab134a594957b08da inherit pub_attribs_structschwz_1_1Metadata"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e6d7acc51f4dd26e50b2dc902a92d1e inherit pub_attribs_structschwz_1_1Metadata"><td class="memItemLeft" align="right" valign="top"><a id="a3e6d7acc51f4dd26e50b2dc902a92d1e"></a>
+ValueType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#a3e6d7acc51f4dd26e50b2dc902a92d1e">gamma</a> = 0.0</td></tr>
+<tr class="memdesc:a3e6d7acc51f4dd26e50b2dc902a92d1e inherit pub_attribs_structschwz_1_1Metadata"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value of gamma for event threshold Relevant for cgammak threshold. <br /></td></tr>
+<tr class="separator:a3e6d7acc51f4dd26e50b2dc902a92d1e inherit pub_attribs_structschwz_1_1Metadata"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c12719250c5c44ca3096af308d93e4c inherit pub_attribs_structschwz_1_1Metadata"><td class="memItemLeft" align="right" valign="top"><a id="a9c12719250c5c44ca3096af308d93e4c"></a>
+ValueType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#a9c12719250c5c44ca3096af308d93e4c">horizon</a> = 0.0</td></tr>
+<tr class="memdesc:a9c12719250c5c44ca3096af308d93e4c inherit pub_attribs_structschwz_1_1Metadata"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value of horizon for the event threshold Relevant for slope-based threshold. <br /></td></tr>
+<tr class="separator:a9c12719250c5c44ca3096af308d93e4c inherit pub_attribs_structschwz_1_1Metadata"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff6fee03271a0615b86d8631d94f505e inherit pub_attribs_structschwz_1_1Metadata"><td class="memItemLeft" align="right" valign="top"><a id="aff6fee03271a0615b86d8631d94f505e"></a>
+ValueType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#aff6fee03271a0615b86d8631d94f505e">decay_param</a> = 0.0</td></tr>
+<tr class="memdesc:aff6fee03271a0615b86d8631d94f505e inherit pub_attribs_structschwz_1_1Metadata"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value of decay parameter for the event threshold Relevant for slope-based threshold. <br /></td></tr>
+<tr class="separator:aff6fee03271a0615b86d8631d94f505e inherit pub_attribs_structschwz_1_1Metadata"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b400902089b06b47f230306b51252d5 inherit pub_attribs_structschwz_1_1Metadata"><td class="memItemLeft" align="right" valign="top"><a id="a2b400902089b06b47f230306b51252d5"></a>
+IndexType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#a2b400902089b06b47f230306b51252d5">sent_history</a> = 0</td></tr>
+<tr class="memdesc:a2b400902089b06b47f230306b51252d5 inherit pub_attribs_structschwz_1_1Metadata"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value of history at the sender. <br /></td></tr>
+<tr class="separator:a2b400902089b06b47f230306b51252d5 inherit pub_attribs_structschwz_1_1Metadata"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa03846a987e8d185f1b35ce3a8155422 inherit pub_attribs_structschwz_1_1Metadata"><td class="memItemLeft" align="right" valign="top"><a id="aa03846a987e8d185f1b35ce3a8155422"></a>
+IndexType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#aa03846a987e8d185f1b35ce3a8155422">recv_history</a> = 0</td></tr>
+<tr class="memdesc:aa03846a987e8d185f1b35ce3a8155422 inherit pub_attribs_structschwz_1_1Metadata"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value of history at the receiver. <br /></td></tr>
+<tr class="separator:aa03846a987e8d185f1b35ce3a8155422 inherit pub_attribs_structschwz_1_1Metadata"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a716f809953505b19e0f1d9398c167bd4 inherit pub_attribs_structschwz_1_1Metadata"><td class="memItemLeft" align="right" valign="top"><a id="a716f809953505b19e0f1d9398c167bd4"></a>
+IndexType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#a716f809953505b19e0f1d9398c167bd4">comm_start_iters</a> = 0</td></tr>
+<tr class="memdesc:a716f809953505b19e0f1d9398c167bd4 inherit pub_attribs_structschwz_1_1Metadata"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of iterations to communicate before event comm. <br /></td></tr>
+<tr class="separator:a716f809953505b19e0f1d9398c167bd4 inherit pub_attribs_structschwz_1_1Metadata"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50bb2b3dc28c0eabbd423a069e560951 inherit pub_attribs_structschwz_1_1Metadata"><td class="memItemLeft" align="right" valign="top"><a id="a50bb2b3dc28c0eabbd423a069e560951"></a>
 std::vector&lt; std::tuple&lt; int, int, int, std::string, std::vector&lt; ValueType &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Metadata.html#a50bb2b3dc28c0eabbd423a069e560951">time_struct</a></td></tr>
 <tr class="memdesc:a50bb2b3dc28c0eabbd423a069e560951 inherit pub_attribs_structschwz_1_1Metadata"><td class="mdescLeft">&#160;</td><td class="mdescRight">The struct used to measure the timings of each function within the solver loop. <br /></td></tr>
@@ -391,6 +435,36 @@ class schwz::Initialize&lt; ValueType, IndexType &gt;</h3>
 </dl>
 <p><a class="el" href="group__init.html">Initialization</a> </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="ab72493ff27a800067c9c48effbc1747b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab72493ff27a800067c9c48effbc1747b">&#9670;&nbsp;</a></span>generate_dipole_rhs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType , typename IndexType &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classschwz_1_1Initialize.html">schwz::Initialize</a>&lt; ValueType, IndexType &gt;::generate_dipole_rhs </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; ValueType &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generates a dipole right hand side vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rhs</td><td>The rhs vector. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="reference">Referenced by <a class="el" href="classschwz_1_1SchwarzBase.html#ac3dbbbe6c63db7d669f9f5de85d9b264">schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;::initialize()</a>.</p>
+
+</div>
+</div>
 <a id="a9dee6b55c599df30410cdf45819b3e28"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9dee6b55c599df30410cdf45819b3e28">&#9670;&nbsp;</a></span>generate_rhs()</h2>
 
@@ -410,6 +484,36 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
 </div><div class="memdoc">
 
 <p>Generates the right hand side vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rhs</td><td>The rhs vector. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="reference">Referenced by <a class="el" href="classschwz_1_1SchwarzBase.html#ac3dbbbe6c63db7d669f9f5de85d9b264">schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;::initialize()</a>.</p>
+
+</div>
+</div>
+<a id="a1b1151ac7f561c1ca4eeac389841e898"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b1151ac7f561c1ca4eeac389841e898">&#9670;&nbsp;</a></span>generate_sin_rhs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType , typename IndexType &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classschwz_1_1Initialize.html">schwz::Initialize</a>&lt; ValueType, IndexType &gt;::generate_sin_rhs </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; ValueType &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generates a sinusoidal right hand side vector. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">rhs</td><td>The rhs vector. </td></tr>
@@ -524,7 +628,7 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
   </dd>
 </dl>
 
-<p class="reference">Referenced by <a class="el" href="classschwz_1_1Initialize.html#a9dee6b55c599df30410cdf45819b3e28">schwz::Initialize&lt; ValueType, IndexType &gt;::generate_rhs()</a>, and <a class="el" href="classschwz_1_1SchwarzBase.html#ac3dbbbe6c63db7d669f9f5de85d9b264">schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;::initialize()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="classschwz_1_1Initialize.html#a1b1151ac7f561c1ca4eeac389841e898">schwz::Initialize&lt; ValueType, IndexType &gt;::generate_sin_rhs()</a>, and <a class="el" href="classschwz_1_1SchwarzBase.html#ac3dbbbe6c63db7d669f9f5de85d9b264">schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;::initialize()</a>.</p>
 
 </div>
 </div>
@@ -679,8 +783,8 @@ template&lt;typename ValueType , typename IndexType &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li><a class="el" href="include_2initialization_8hpp_source.html">initialization.hpp (200bbde)</a></li>
-<li>/home/runner/work/schwarz-lib/schwarz-lib/source/initialization.cpp (92dbd95)</li>
+<li><a class="el" href="include_2initialization_8hpp_source.html">initialization.hpp (b74805c)</a></li>
+<li>/home/runner/work/schwarz-lib/schwarz-lib/source/initialization.cpp (55ad704)</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">schwz
-   &#160;<span id="projectnumber">Generated automatically from tags/v1.0^2</span>
+   &#160;<span id="projectnumber">Generated automatically from event-based-new</span>
    </div>
   </td>
  </tr>
@@ -354,10 +354,14 @@ template&lt;typename ValueType , typename IndexType , typename AdditionalOperati
 <tr class="memitem:a443a272fc6c66825dc7a958e824e32e3"><td class="memItemLeft" align="right" valign="top"><a id="a443a272fc6c66825dc7a958e824e32e3"></a>
 gko::size_type&#160;</td><td class="memItemRight" valign="bottom"><b>linearize_index</b> (const gko::size_type row, const gko::size_type col, const gko::size_type num_rows)</td></tr>
 <tr class="separator:a443a272fc6c66825dc7a958e824e32e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ca248698ba2885cac5b477083f44505"><td class="memTemplParams" colspan="2"><a id="a3ca248698ba2885cac5b477083f44505"></a>
+<tr class="memitem:a77f43267a5630bb5e4a86e9634c69fe9"><td class="memTemplParams" colspan="2"><a id="a77f43267a5630bb5e4a86e9634c69fe9"></a>
+template&lt;typename ValueType , typename IndexType &gt; </td></tr>
+<tr class="memitem:a77f43267a5630bb5e4a86e9634c69fe9"><td class="memTemplItemLeft" align="right" valign="top">ValueType&#160;</td><td class="memTemplItemRight" valign="bottom"><b>get_threshold</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata)</td></tr>
+<tr class="separator:a77f43267a5630bb5e4a86e9634c69fe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e81df68d1918c37ac0c1d4a9a406ba9"><td class="memTemplParams" colspan="2"><a id="a4e81df68d1918c37ac0c1d4a9a406ba9"></a>
 template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </td></tr>
-<tr class="memitem:a3ca248698ba2885cac5b477083f44505"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>exchange_boundary_onesided</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, struct <a class="el" href="classschwz_1_1Communicate.html">Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct &amp;comm_struct, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;prev_global_solution, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution)</td></tr>
-<tr class="separator:a3ca248698ba2885cac5b477083f44505"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e81df68d1918c37ac0c1d4a9a406ba9"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>exchange_boundary_onesided</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, struct <a class="el" href="classschwz_1_1Communicate.html">Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct &amp;comm_struct, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;prev_global_solution, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;prev_event_solution, std::ofstream &amp;fps, std::ofstream &amp;fpr)</td></tr>
+<tr class="separator:a4e81df68d1918c37ac0c1d4a9a406ba9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f69ce81eaf85081073d0f45e11ce149"><td class="memTemplParams" colspan="2"><a id="a1f69ce81eaf85081073d0f45e11ce149"></a>
 template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </td></tr>
 <tr class="memitem:a1f69ce81eaf85081073d0f45e11ce149"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>exchange_boundary_twosided</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, struct <a class="el" href="classschwz_1_1Communicate.html">Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct &amp;comm_struct, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;prev_global_solution, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution)</td></tr>

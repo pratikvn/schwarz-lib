@@ -85,6 +85,13 @@ bool \hyperlink{structschwz_1_1Settings_a1bb8b8ee875222bd73899ebf0447fa4e}{use\+
 \mbox{\Hypertarget{structschwz_1_1Settings_a04760b39513414af70498808c0a6b317}\label{structschwz_1_1Settings_a04760b39513414af70498808c0a6b317}} 
 bool \hyperlink{structschwz_1_1Settings_a04760b39513414af70498808c0a6b317}{enable\+\_\+random\+\_\+rhs} = false
 \begin{DoxyCompactList}\small\item\em Flag to enable a random rhs. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Settings_aba9fca6688555f4d5eb902ca5f0706f3}\label{structschwz_1_1Settings_aba9fca6688555f4d5eb902ca5f0706f3}} 
+std\+::string \hyperlink{structschwz_1_1Settings_aba9fca6688555f4d5eb902ca5f0706f3}{rhs\+\_\+type} = \char`\"{}ones\char`\"{}
+\begin{DoxyCompactList}\small\item\em Flag to enable a random rhs. \end{DoxyCompactList}\item 
+std\+::string \hyperlink{structschwz_1_1Settings_a6ca3e3368be250c94af8330e293920db}{thres\+\_\+type} = \char`\"{}cgammak\char`\"{}
+\begin{DoxyCompactList}\small\item\em Flag to choose thres type. \end{DoxyCompactList}\item 
+std\+::string \hyperlink{structschwz_1_1Settings_a0aa45e3ca102e6a985f25b6c5467088a}{norm\+\_\+type} = \char`\"{}L1\char`\"{}
+\begin{DoxyCompactList}\small\item\em Flag to choose norm type. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structschwz_1_1Settings_afdf517a873a887a21a03b75c1011f903}\label{structschwz_1_1Settings_afdf517a873a887a21a03b75c1011f903}} 
 bool \hyperlink{structschwz_1_1Settings_afdf517a873a887a21a03b75c1011f903}{print\+\_\+matrices} = false
 \begin{DoxyCompactList}\small\item\em Flag to enable printing of matrices. \end{DoxyCompactList}\item 
@@ -96,8 +103,8 @@ bool \hyperlink{structschwz_1_1Settings_a5573fab398e7bba73e793eea06aa1e11}{debug
 \mbox{\Hypertarget{structschwz_1_1Settings_a5f110676f929eebeb357cb07398e2048}\label{structschwz_1_1Settings_a5f110676f929eebeb357cb07398e2048}} 
 bool \hyperlink{structschwz_1_1Settings_a5f110676f929eebeb357cb07398e2048}{non\+\_\+symmetric\+\_\+matrix} = false
 \begin{DoxyCompactList}\small\item\em Is the matrix non-\/symmetric ? , Use G\+M\+R\+ES for local solves. \end{DoxyCompactList}\item 
-\mbox{\Hypertarget{structschwz_1_1Settings_a7d26302ccb58fd96c795046ecc577694}\label{structschwz_1_1Settings_a7d26302ccb58fd96c795046ecc577694}} 
-unsigned int \hyperlink{structschwz_1_1Settings_a7d26302ccb58fd96c795046ecc577694}{restart\+\_\+iter} = 1u
+\mbox{\Hypertarget{structschwz_1_1Settings_a443c7d58eb0df515d1c863640cffb654}\label{structschwz_1_1Settings_a443c7d58eb0df515d1c863640cffb654}} 
+int \hyperlink{structschwz_1_1Settings_a443c7d58eb0df515d1c863640cffb654}{restart\+\_\+iter} = 1
 \begin{DoxyCompactList}\small\item\em The restart iter for the G\+M\+R\+ES solver. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structschwz_1_1Settings_af257396850c46e4d3217b4bb1a858114}\label{structschwz_1_1Settings_af257396850c46e4d3217b4bb1a858114}} 
 int \hyperlink{structschwz_1_1Settings_af257396850c46e4d3217b4bb1a858114}{reset\+\_\+local\+\_\+crit\+\_\+iter} = -\/1
@@ -192,8 +199,36 @@ Disables the re-\/ordering of the matrix before computing the triangular factors
 \begin{DoxyNote}{Note}
 This is mainly to allow compatibility with G\+PU solution. 
 \end{DoxyNote}
+\mbox{\Hypertarget{structschwz_1_1Settings_a0aa45e3ca102e6a985f25b6c5467088a}\label{structschwz_1_1Settings_a0aa45e3ca102e6a985f25b6c5467088a}} 
+\index{schwz\+::\+Settings@{schwz\+::\+Settings}!norm\+\_\+type@{norm\+\_\+type}}
+\index{norm\+\_\+type@{norm\+\_\+type}!schwz\+::\+Settings@{schwz\+::\+Settings}}
+\subsubsection{\texorpdfstring{norm\+\_\+type}{norm\_type}}
+{\footnotesize\ttfamily std\+::string schwz\+::\+Settings\+::norm\+\_\+type = \char`\"{}L1\char`\"{}}
+
+
+
+Flag to choose norm type. 
+
+Choices are \char`\"{}\+L1\char`\"{} or \char`\"{}\+L2\char`\"{} 
+
+Referenced by schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+windows().
+
+\mbox{\Hypertarget{structschwz_1_1Settings_a6ca3e3368be250c94af8330e293920db}\label{structschwz_1_1Settings_a6ca3e3368be250c94af8330e293920db}} 
+\index{schwz\+::\+Settings@{schwz\+::\+Settings}!thres\+\_\+type@{thres\+\_\+type}}
+\index{thres\+\_\+type@{thres\+\_\+type}!schwz\+::\+Settings@{schwz\+::\+Settings}}
+\subsubsection{\texorpdfstring{thres\+\_\+type}{thres\_type}}
+{\footnotesize\ttfamily std\+::string schwz\+::\+Settings\+::thres\+\_\+type = \char`\"{}cgammak\char`\"{}}
+
+
+
+Flag to choose thres type. 
+
+Choices are \char`\"{}cgammak\char`\"{} or \char`\"{}slope\char`\"{} 
+
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::run(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+windows().
+
 
 
 The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-settings.\+hpp (92dbd95)\end{DoxyCompactItemize}
+settings.\+hpp (1a4d86f)\end{DoxyCompactItemize}

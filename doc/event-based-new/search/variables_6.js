@@ -1,23 +1,7 @@
 var searchData=
 [
-  ['local_5fget',['local_get',['../structschwz_1_1Communicate_1_1comm__struct.html#ab4e91a457646f43106da98a58c332754',1,'schwz::Communicate::comm_struct']]],
-  ['local_5finv_5fperm',['local_inv_perm',['../classschwz_1_1SchwarzBase.html#a9abc8c1238176db0b0f9518696ea7f29',1,'schwz::SchwarzBase']]],
-  ['local_5fmatrix',['local_matrix',['../classschwz_1_1SchwarzBase.html#a0af5b057a4036eeb2d37fac629d5b5c7',1,'schwz::SchwarzBase']]],
-  ['local_5fmax_5fiters',['local_max_iters',['../structschwz_1_1Metadata.html#a54d674e16789df0e5c226ec669d0c6e4',1,'schwz::Metadata']]],
-  ['local_5fneighbors_5fin',['local_neighbors_in',['../structschwz_1_1Communicate_1_1comm__struct.html#a4e43434348a60554ecfdbd448fa54f73',1,'schwz::Communicate::comm_struct']]],
-  ['local_5fneighbors_5fout',['local_neighbors_out',['../structschwz_1_1Communicate_1_1comm__struct.html#a087b62605d0889090c6e67325dfa3fb0',1,'schwz::Communicate::comm_struct']]],
-  ['local_5fnum_5fneighbors_5fin',['local_num_neighbors_in',['../structschwz_1_1Communicate_1_1comm__struct.html#a9d4febd22c050bd5bbeb0f122d74fdd0',1,'schwz::Communicate::comm_struct']]],
-  ['local_5fnum_5fneighbors_5fout',['local_num_neighbors_out',['../structschwz_1_1Communicate_1_1comm__struct.html#a8b211e456ef9f0947df8fad0e0428990',1,'schwz::Communicate::comm_struct']]],
-  ['local_5fnum_5fprocs',['local_num_procs',['../structschwz_1_1Metadata.html#a1023b28f7655d4053423d75d0e98eee8',1,'schwz::Metadata']]],
-  ['local_5fperm',['local_perm',['../classschwz_1_1SchwarzBase.html#a0f787009281de1f5c993d05866adf467',1,'schwz::SchwarzBase']]],
-  ['local_5fprecond',['local_precond',['../structschwz_1_1Metadata.html#a4ea47eff6a067a4a166d4236a75efe30',1,'schwz::Metadata']]],
-  ['local_5fput',['local_put',['../structschwz_1_1Communicate_1_1comm__struct.html#ace7588b81dd2aa7a84e118df8137252b',1,'schwz::Communicate::comm_struct']]],
-  ['local_5fresidual_5fvector_5fout',['local_residual_vector_out',['../classschwz_1_1SchwarzBase.html#ad3f18c1a861f3502992545befaa5da6a',1,'schwz::SchwarzBase']]],
-  ['local_5frhs',['local_rhs',['../classschwz_1_1SchwarzBase.html#a186d54605688f53f50bb6305efe9c5fd',1,'schwz::SchwarzBase']]],
-  ['local_5fsize',['local_size',['../structschwz_1_1Metadata.html#a1e24cc843abc923c309fb74243323d8c',1,'schwz::Metadata']]],
-  ['local_5fsize_5fo',['local_size_o',['../structschwz_1_1Metadata.html#ad5cf4b6c627cb4f5be927f2c968c7e0d',1,'schwz::Metadata']]],
-  ['local_5fsize_5fx',['local_size_x',['../structschwz_1_1Metadata.html#a64639c8f3ff4c240e50a3862e95303dc',1,'schwz::Metadata']]],
-  ['local_5fsolution',['local_solution',['../classschwz_1_1SchwarzBase.html#a50b156f241360f12dd025b790203c58a',1,'schwz::SchwarzBase']]],
-  ['local_5fsolver_5ftolerance',['local_solver_tolerance',['../structschwz_1_1Metadata.html#a0fec5924fa99f07cabf560cc461887b5',1,'schwz::Metadata']]],
-  ['local_5fto_5fglobal',['local_to_global',['../structschwz_1_1Metadata.html#acadbecaaeb439bc25e079a595fb084fa',1,'schwz::Metadata']]]
+  ['i_5fpermutation',['i_permutation',['../structschwz_1_1Metadata.html#a9ede19ac4f54b4161bed0a39bf7f5767',1,'schwz::Metadata']]],
+  ['interface_5fmatrix',['interface_matrix',['../classschwz_1_1SchwarzBase.html#afeb8f503b58440a45ec901cae4708f29',1,'schwz::SchwarzBase']]],
+  ['is_5flocal_5fneighbor',['is_local_neighbor',['../structschwz_1_1Communicate_1_1comm__struct.html#ae36319cfa4fc09154135a2b121377d3b',1,'schwz::Communicate::comm_struct']]],
+  ['iter_5fcount',['iter_count',['../structschwz_1_1Metadata.html#acd8efc17b3d0a1804dc0a5bf40af586c',1,'schwz::Metadata']]]
 ];

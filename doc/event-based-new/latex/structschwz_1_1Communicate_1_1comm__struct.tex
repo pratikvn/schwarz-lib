@@ -28,6 +28,12 @@ int \hyperlink{structschwz_1_1Communicate_1_1comm__struct_aab657581d6c8ea5aba32f
 \mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a356e1582f7d5b0c4c8cba3eb11014b76}\label{structschwz_1_1Communicate_1_1comm__struct_a356e1582f7d5b0c4c8cba3eb11014b76}} 
 int \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a356e1582f7d5b0c4c8cba3eb11014b76}{num\+\_\+neighbors\+\_\+out}
 \begin{DoxyCompactList}\small\item\em The number of neighbors this subdomain has to send data to. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a956bfe9ef9cd9ae0e08cfef23b197259}\label{structschwz_1_1Communicate_1_1comm__struct_a956bfe9ef9cd9ae0e08cfef23b197259}} 
+int \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a956bfe9ef9cd9ae0e08cfef23b197259}{num\+\_\+recv}
+\begin{DoxyCompactList}\small\item\em The total number of elements received from all neighbors. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a7b5dc332e1d8d88da08aae0214b6ae73}\label{structschwz_1_1Communicate_1_1comm__struct_a7b5dc332e1d8d88da08aae0214b6ae73}} 
+int \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a7b5dc332e1d8d88da08aae0214b6ae73}{num\+\_\+send}
+\begin{DoxyCompactList}\small\item\em The total number of elements sent to all neighbors. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a0dcb204149fb4f730e62255a84bc156a}\label{structschwz_1_1Communicate_1_1comm__struct_a0dcb204149fb4f730e62255a84bc156a}} 
 std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a0dcb204149fb4f730e62255a84bc156a}{neighbors\+\_\+in}
 \begin{DoxyCompactList}\small\item\em The neighbors this subdomain has to receive data from. \end{DoxyCompactList}\item 
@@ -87,6 +93,42 @@ std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyper
 \mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a93ca78673122ad09e24bebd0b1ec9750}\label{structschwz_1_1Communicate_1_1comm__struct_a93ca78673122ad09e24bebd0b1ec9750}} 
 std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Mixed\+Value\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a93ca78673122ad09e24bebd0b1ec9750}{mixedt\+\_\+recv\+\_\+buffer}
 \begin{DoxyCompactList}\small\item\em The mixed precision recv buffer used for the actual communication for both one-\/sided and two-\/sided. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a3e207eb58b3c8ce0a3d500b8c8354b3b}\label{structschwz_1_1Communicate_1_1comm__struct_a3e207eb58b3c8ce0a3d500b8c8354b3b}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a3e207eb58b3c8ce0a3d500b8c8354b3b}{extra\+\_\+buffer}
+\begin{DoxyCompactList}\small\item\em The extrapolation buffer used for extrapolation of values at the receiver. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a68ae17fc0df0139f44e0e0675e1f350b}\label{structschwz_1_1Communicate_1_1comm__struct_a68ae17fc0df0139f44e0e0675e1f350b}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a68ae17fc0df0139f44e0e0675e1f350b}{last\+\_\+recv\+\_\+bdy}
+\begin{DoxyCompactList}\small\item\em The last received boundary values for each of the in neighbors for extrapolation. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_ab11efe0dbfb7e5c51c637079ac3e9f48}\label{structschwz_1_1Communicate_1_1comm__struct_ab11efe0dbfb7e5c51c637079ac3e9f48}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_ab11efe0dbfb7e5c51c637079ac3e9f48}{curr\+\_\+send\+\_\+avg}
+\begin{DoxyCompactList}\small\item\em Average of values in the send buffer for each of the out neighbors. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a24b0b5fb1bd9ca5338e90594b564a7a4}\label{structschwz_1_1Communicate_1_1comm__struct_a24b0b5fb1bd9ca5338e90594b564a7a4}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a24b0b5fb1bd9ca5338e90594b564a7a4}{last\+\_\+send\+\_\+avg}
+\begin{DoxyCompactList}\small\item\em Average of values in the last send buffer for each of the out neighbors. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a2c19ee506240e91d5d68a5dc428053d2}\label{structschwz_1_1Communicate_1_1comm__struct_a2c19ee506240e91d5d68a5dc428053d2}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a2c19ee506240e91d5d68a5dc428053d2}{curr\+\_\+recv\+\_\+avg}
+\begin{DoxyCompactList}\small\item\em Average of values in the recv buffer for each of the out neighbors. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a08f577d014229ed2db068f5e8cadcbc2}\label{structschwz_1_1Communicate_1_1comm__struct_a08f577d014229ed2db068f5e8cadcbc2}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a08f577d014229ed2db068f5e8cadcbc2}{last\+\_\+recv\+\_\+avg}
+\begin{DoxyCompactList}\small\item\em Average of values in the last recv buffer for each of the out neighbors. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a5aa7956063f722e0b5490dbc251e6679}\label{structschwz_1_1Communicate_1_1comm__struct_a5aa7956063f722e0b5490dbc251e6679}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a5aa7956063f722e0b5490dbc251e6679}{msg\+\_\+count}
+\begin{DoxyCompactList}\small\item\em Number of messages sent. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_afc9b61063cdf5ef92106220c19df143f}\label{structschwz_1_1Communicate_1_1comm__struct_afc9b61063cdf5ef92106220c19df143f}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_afc9b61063cdf5ef92106220c19df143f}{last\+\_\+recv\+\_\+iter}
+\begin{DoxyCompactList}\small\item\em Iteration stamp of last received values. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a8f6c826c4f13b8f3e8c611f13254fabf}\label{structschwz_1_1Communicate_1_1comm__struct_a8f6c826c4f13b8f3e8c611f13254fabf}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a8f6c826c4f13b8f3e8c611f13254fabf}{last\+\_\+recv\+\_\+slopes}
+\begin{DoxyCompactList}\small\item\em Last recv slopes. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a06f2c470810bc90065caee045ac8d5a0}\label{structschwz_1_1Communicate_1_1comm__struct_a06f2c470810bc90065caee045ac8d5a0}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a06f2c470810bc90065caee045ac8d5a0}{last\+\_\+sent\+\_\+slopes\+\_\+avg}
+\begin{DoxyCompactList}\small\item\em Last sent slopes. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a1c01e46ae44660795dd205c647ff980c}\label{structschwz_1_1Communicate_1_1comm__struct_a1c01e46ae44660795dd205c647ff980c}} 
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a1c01e46ae44660795dd205c647ff980c}{last\+\_\+sent\+\_\+iter}
+\begin{DoxyCompactList}\small\item\em Iteration stamp of last received values. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a662f0688ae944724166cc09c83437c94}\label{structschwz_1_1Communicate_1_1comm__struct_a662f0688ae944724166cc09c83437c94}} 
+std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a662f0688ae944724166cc09c83437c94}{thres}
+\begin{DoxyCompactList}\small\item\em Threshold. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_aa9d510fb291e896fa14fe3e0f00f0454}\label{structschwz_1_1Communicate_1_1comm__struct_aa9d510fb291e896fa14fe3e0f00f0454}} 
 std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_aa9d510fb291e896fa14fe3e0f00f0454}{get\+\_\+displacements}
 \begin{DoxyCompactList}\small\item\em The displacements for the receiving of the buffer. \end{DoxyCompactList}\item 
@@ -220,4 +262,4 @@ Referenced by schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Val
 
 The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-communicate.\+hpp (7c9a9f7)\end{DoxyCompactItemize}
+communicate.\+hpp (1bdbc6b)\end{DoxyCompactItemize}

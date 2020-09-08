@@ -1,13 +1,9 @@
 var searchData=
 [
-  ['what',['what',['../classError.html#aeca4bfa7822e73acddcb68276dc1f306',1,'Error']]],
-  ['window_5fids',['window_ids',['../structschwz_1_1Communicate_1_1comm__struct.html#a179dd67dc2d6ea4b71a6d5964cac18c6',1,'schwz::Communicate::comm_struct']]],
-  ['window_5frecv_5fbuffer',['window_recv_buffer',['../structschwz_1_1Communicate_1_1comm__struct.html#a6257c71a7ebf30ecfc390059ceef0e1f',1,'schwz::Communicate::comm_struct']]],
-  ['window_5fsend_5fbuffer',['window_send_buffer',['../structschwz_1_1Communicate_1_1comm__struct.html#af2c5d4bfea8073b2c885eec175b92416',1,'schwz::Communicate::comm_struct']]],
-  ['window_5fx',['window_x',['../structschwz_1_1Communicate_1_1comm__struct.html#a5da0c24baf9d9955d764fe4b3274a982',1,'schwz::Communicate::comm_struct']]],
-  ['windows_5ffrom',['windows_from',['../structschwz_1_1Communicate_1_1comm__struct.html#a167c62a1a0cf2be8351e1ab65a264cf2',1,'schwz::Communicate::comm_struct']]],
-  ['windows_5fto',['windows_to',['../structschwz_1_1Communicate_1_1comm__struct.html#aef866f16ced557ba1496cffaf7c2473e',1,'schwz::Communicate::comm_struct']]],
-  ['write_5fdebug_5fout',['write_debug_out',['../structschwz_1_1Settings.html#af81ff061a4d7220d380fb7f579d7a6e1',1,'schwz::Settings']]],
-  ['write_5fiters_5fand_5fresiduals',['write_iters_and_residuals',['../structschwz_1_1Settings.html#a5555cf4340e7918ce22d00b26ccca6a7',1,'schwz::Settings']]],
-  ['write_5fperm_5fdata',['write_perm_data',['../structschwz_1_1Settings.html#af692ca8550d16b538dcfddb5208e73f3',1,'schwz::Settings']]]
+  ['umfpackerror',['UmfpackError',['../classUmfpackError.html',1,'UmfpackError'],['../classUmfpackError.html#a3df702dc59370f9ff8f097f8657d3fff',1,'UmfpackError::UmfpackError()']]],
+  ['update_5fboundary',['update_boundary',['../classschwz_1_1Communicate.html#a371fb6c61c0bd9b619bbe7e154d18696',1,'schwz::Communicate::update_boundary()'],['../classschwz_1_1SolverRAS.html#ae0d9bc193a40fb1f27738a2436a3fa36',1,'schwz::SolverRAS::update_boundary()']]],
+  ['updated_5fmax_5fiters',['updated_max_iters',['../structschwz_1_1Metadata.html#adabb7ff33b5002eebbdca546dadaefc4',1,'schwz::Metadata']]],
+  ['use_5fmixed_5fprecision',['use_mixed_precision',['../structschwz_1_1Settings.html#a1bb8b8ee875222bd73899ebf0447fa4e',1,'schwz::Settings']]],
+  ['use_5fprecond',['use_precond',['../structschwz_1_1Settings.html#ab51cf8eda75e05280084e89895121ca7',1,'schwz::Settings']]],
+  ['utils',['Utils',['../structschwz_1_1Utils.html',1,'schwz::Utils&lt; ValueType, IndexType &gt;'],['../group__utils.html',1,'(Global Namespace)']]]
 ];

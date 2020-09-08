@@ -1,9 +1,10 @@
 var searchData=
 [
-  ['umfpackerror',['UmfpackError',['../classUmfpackError.html',1,'UmfpackError'],['../classUmfpackError.html#a3df702dc59370f9ff8f097f8657d3fff',1,'UmfpackError::UmfpackError()']]],
-  ['update_5fboundary',['update_boundary',['../classschwz_1_1Communicate.html#a371fb6c61c0bd9b619bbe7e154d18696',1,'schwz::Communicate::update_boundary()'],['../classschwz_1_1SolverRAS.html#ae0d9bc193a40fb1f27738a2436a3fa36',1,'schwz::SolverRAS::update_boundary()']]],
-  ['updated_5fmax_5fiters',['updated_max_iters',['../structschwz_1_1Metadata.html#adabb7ff33b5002eebbdca546dadaefc4',1,'schwz::Metadata']]],
-  ['use_5fmixed_5fprecision',['use_mixed_precision',['../structschwz_1_1Settings.html#a1bb8b8ee875222bd73899ebf0447fa4e',1,'schwz::Settings']]],
-  ['use_5fprecond',['use_precond',['../structschwz_1_1Settings.html#ab51cf8eda75e05280084e89895121ca7',1,'schwz::Settings']]],
-  ['utils',['Utils',['../structschwz_1_1Utils.html',1,'schwz::Utils&lt; ValueType, IndexType &gt;'],['../group__utils.html',1,'(Global Namespace)']]]
+  ['testing_20instructions',['Testing Instructions',['../testing_schwarz.html',1,'']]],
+  ['thres',['thres',['../structschwz_1_1Communicate_1_1comm__struct.html#a662f0688ae944724166cc09c83437c94',1,'schwz::Communicate::comm_struct']]],
+  ['thres_5ftype',['thres_type',['../structschwz_1_1Settings.html#a6ca3e3368be250c94af8330e293920db',1,'schwz::Settings']]],
+  ['time_5fstruct',['time_struct',['../structschwz_1_1Metadata.html#a50bb2b3dc28c0eabbd423a069e560951',1,'schwz::Metadata']]],
+  ['tolerance',['tolerance',['../structschwz_1_1Metadata.html#a366db94e2a75dbdd82616e0d0b33bb86',1,'schwz::Metadata']]],
+  ['triangular_5ffactor_5fl',['triangular_factor_l',['../classschwz_1_1SchwarzBase.html#a2101edf81d65ecfa1bc119f69779f640',1,'schwz::SchwarzBase']]],
+  ['triangular_5ffactor_5fu',['triangular_factor_u',['../classschwz_1_1SchwarzBase.html#ac97e4db97595c4e72789c5692009c910',1,'schwz::SchwarzBase']]]
 ];

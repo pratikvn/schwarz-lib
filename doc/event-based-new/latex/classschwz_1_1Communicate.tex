@@ -32,7 +32,7 @@ virtual void \hyperlink{classschwz_1_1Communicate_a76b0d6b0571107ab2cd58e309902a
 \begin{DoxyCompactList}\small\item\em Sets up the communication buffers needed for the boundary exchange. \end{DoxyCompactList}\item 
 virtual void \hyperlink{classschwz_1_1Communicate_a13190372f3a6193f92226d08e822fde7}{setup\+\_\+windows} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&main\+\_\+buffer)=0
 \begin{DoxyCompactList}\small\item\em Sets up the windows needed for the asynchronous communication. \end{DoxyCompactList}\item 
-virtual void \hyperlink{classschwz_1_1Communicate_a78864f8bdc7feb992c740b49d80b8d53}{exchange\+\_\+boundary} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&prev\+\_\+global\+\_\+solution, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+solution)=0
+virtual void \hyperlink{classschwz_1_1Communicate_ac2a1e0aae9a645a1733e4f1e47cdd691}{exchange\+\_\+boundary} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&prev\+\_\+global\+\_\+solution, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+solution, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&prev\+\_\+event\+\_\+solution, std\+::ofstream \&fps, std\+::ofstream \&fpr)=0
 \begin{DoxyCompactList}\small\item\em Exchanges the elements of the solution vector. \end{DoxyCompactList}\item 
 void \hyperlink{classschwz_1_1Communicate_a8c1ed0c5f86c458038b4062f57337d44}{local\+\_\+to\+\_\+global\+\_\+vector} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&local\+\_\+vector, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+vector)
 \begin{DoxyCompactList}\small\item\em Transforms data from a local vector to a global vector. \end{DoxyCompactList}\item 
@@ -71,12 +71,12 @@ The communication class that provides the methods for the communication between 
 \hyperlink{group__comm}{Communicate} 
 
 \subsection{Member Function Documentation}
-\mbox{\Hypertarget{classschwz_1_1Communicate_a78864f8bdc7feb992c740b49d80b8d53}\label{classschwz_1_1Communicate_a78864f8bdc7feb992c740b49d80b8d53}} 
+\mbox{\Hypertarget{classschwz_1_1Communicate_ac2a1e0aae9a645a1733e4f1e47cdd691}\label{classschwz_1_1Communicate_ac2a1e0aae9a645a1733e4f1e47cdd691}} 
 \index{schwz\+::\+Communicate@{schwz\+::\+Communicate}!exchange\+\_\+boundary@{exchange\+\_\+boundary}}
 \index{exchange\+\_\+boundary@{exchange\+\_\+boundary}!schwz\+::\+Communicate@{schwz\+::\+Communicate}}
 \subsubsection{\texorpdfstring{exchange\+\_\+boundary()}{exchange\_boundary()}}
 {\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ \\
-void \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::exchange\+\_\+boundary (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{prev\+\_\+global\+\_\+solution,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{global\+\_\+solution }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+void \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::exchange\+\_\+boundary (\begin{DoxyParamCaption}\item[{const \hyperlink{structschwz_1_1Settings}{Settings} \&}]{settings,  }\item[{const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&}]{metadata,  }\item[{const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{prev\+\_\+global\+\_\+solution,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{global\+\_\+solution,  }\item[{std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&}]{prev\+\_\+event\+\_\+solution,  }\item[{std\+::ofstream \&}]{fps,  }\item[{std\+::ofstream \&}]{fpr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
 
 
 
@@ -93,7 +93,7 @@ Exchanges the elements of the solution vector.
 \end{DoxyParams}
 
 
-Implemented in \hyperlink{classschwz_1_1SolverRAS_af33d7cc7aec6bb8bf26864f576ded42d}{schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$}.
+Implemented in \hyperlink{classschwz_1_1SolverRAS_ad0f8ae7a06a4e2aba75198b04e91e2f4}{schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$}.
 
 
 
@@ -193,5 +193,5 @@ Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-communicate.\+hpp (7c9a9f7)\item 
-/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/communicate.\+cpp (7c9a9f7)\end{DoxyCompactItemize}
+communicate.\+hpp (1bdbc6b)\item 
+/home/runner/work/schwarz-\/lib/schwarz-\/lib/source/communicate.\+cpp (c6f2d70)\end{DoxyCompactItemize}

@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">schwz
-   &#160;<span id="projectnumber">Generated automatically from tags/v1.0^2</span>
+   &#160;<span id="projectnumber">Generated automatically from event-based-new</span>
    </div>
   </td>
  </tr>
@@ -93,6 +93,14 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struc
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a356e1582f7d5b0c4c8cba3eb11014b76">num_neighbors_out</a></td></tr>
 <tr class="memdesc:a356e1582f7d5b0c4c8cba3eb11014b76"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of neighbors this subdomain has to send data to. <br /></td></tr>
 <tr class="separator:a356e1582f7d5b0c4c8cba3eb11014b76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a956bfe9ef9cd9ae0e08cfef23b197259"><td class="memItemLeft" align="right" valign="top"><a id="a956bfe9ef9cd9ae0e08cfef23b197259"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a956bfe9ef9cd9ae0e08cfef23b197259">num_recv</a></td></tr>
+<tr class="memdesc:a956bfe9ef9cd9ae0e08cfef23b197259"><td class="mdescLeft">&#160;</td><td class="mdescRight">The total number of elements received from all neighbors. <br /></td></tr>
+<tr class="separator:a956bfe9ef9cd9ae0e08cfef23b197259"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b5dc332e1d8d88da08aae0214b6ae73"><td class="memItemLeft" align="right" valign="top"><a id="a7b5dc332e1d8d88da08aae0214b6ae73"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a7b5dc332e1d8d88da08aae0214b6ae73">num_send</a></td></tr>
+<tr class="memdesc:a7b5dc332e1d8d88da08aae0214b6ae73"><td class="mdescLeft">&#160;</td><td class="mdescRight">The total number of elements sent to all neighbors. <br /></td></tr>
+<tr class="separator:a7b5dc332e1d8d88da08aae0214b6ae73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0dcb204149fb4f730e62255a84bc156a"><td class="memItemLeft" align="right" valign="top"><a id="a0dcb204149fb4f730e62255a84bc156a"></a>
 std::shared_ptr&lt; gko::Array&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a0dcb204149fb4f730e62255a84bc156a">neighbors_in</a></td></tr>
 <tr class="memdesc:a0dcb204149fb4f730e62255a84bc156a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The neighbors this subdomain has to receive data from. <br /></td></tr>
@@ -174,6 +182,54 @@ std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt; &gt;&#160;</td><td cla
 std::shared_ptr&lt; gko::matrix::Dense&lt; MixedValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a93ca78673122ad09e24bebd0b1ec9750">mixedt_recv_buffer</a></td></tr>
 <tr class="memdesc:a93ca78673122ad09e24bebd0b1ec9750"><td class="mdescLeft">&#160;</td><td class="mdescRight">The mixed precision recv buffer used for the actual communication for both one-sided and two-sided. <br /></td></tr>
 <tr class="separator:a93ca78673122ad09e24bebd0b1ec9750"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e207eb58b3c8ce0a3d500b8c8354b3b"><td class="memItemLeft" align="right" valign="top"><a id="a3e207eb58b3c8ce0a3d500b8c8354b3b"></a>
+std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a3e207eb58b3c8ce0a3d500b8c8354b3b">extra_buffer</a></td></tr>
+<tr class="memdesc:a3e207eb58b3c8ce0a3d500b8c8354b3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The extrapolation buffer used for extrapolation of values at the receiver. <br /></td></tr>
+<tr class="separator:a3e207eb58b3c8ce0a3d500b8c8354b3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68ae17fc0df0139f44e0e0675e1f350b"><td class="memItemLeft" align="right" valign="top"><a id="a68ae17fc0df0139f44e0e0675e1f350b"></a>
+std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a68ae17fc0df0139f44e0e0675e1f350b">last_recv_bdy</a></td></tr>
+<tr class="memdesc:a68ae17fc0df0139f44e0e0675e1f350b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The last received boundary values for each of the in neighbors for extrapolation. <br /></td></tr>
+<tr class="separator:a68ae17fc0df0139f44e0e0675e1f350b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab11efe0dbfb7e5c51c637079ac3e9f48"><td class="memItemLeft" align="right" valign="top"><a id="ab11efe0dbfb7e5c51c637079ac3e9f48"></a>
+std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#ab11efe0dbfb7e5c51c637079ac3e9f48">curr_send_avg</a></td></tr>
+<tr class="memdesc:ab11efe0dbfb7e5c51c637079ac3e9f48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Average of values in the send buffer for each of the out neighbors. <br /></td></tr>
+<tr class="separator:ab11efe0dbfb7e5c51c637079ac3e9f48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24b0b5fb1bd9ca5338e90594b564a7a4"><td class="memItemLeft" align="right" valign="top"><a id="a24b0b5fb1bd9ca5338e90594b564a7a4"></a>
+std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a24b0b5fb1bd9ca5338e90594b564a7a4">last_send_avg</a></td></tr>
+<tr class="memdesc:a24b0b5fb1bd9ca5338e90594b564a7a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Average of values in the last send buffer for each of the out neighbors. <br /></td></tr>
+<tr class="separator:a24b0b5fb1bd9ca5338e90594b564a7a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c19ee506240e91d5d68a5dc428053d2"><td class="memItemLeft" align="right" valign="top"><a id="a2c19ee506240e91d5d68a5dc428053d2"></a>
+std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a2c19ee506240e91d5d68a5dc428053d2">curr_recv_avg</a></td></tr>
+<tr class="memdesc:a2c19ee506240e91d5d68a5dc428053d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Average of values in the recv buffer for each of the out neighbors. <br /></td></tr>
+<tr class="separator:a2c19ee506240e91d5d68a5dc428053d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08f577d014229ed2db068f5e8cadcbc2"><td class="memItemLeft" align="right" valign="top"><a id="a08f577d014229ed2db068f5e8cadcbc2"></a>
+std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a08f577d014229ed2db068f5e8cadcbc2">last_recv_avg</a></td></tr>
+<tr class="memdesc:a08f577d014229ed2db068f5e8cadcbc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Average of values in the last recv buffer for each of the out neighbors. <br /></td></tr>
+<tr class="separator:a08f577d014229ed2db068f5e8cadcbc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5aa7956063f722e0b5490dbc251e6679"><td class="memItemLeft" align="right" valign="top"><a id="a5aa7956063f722e0b5490dbc251e6679"></a>
+std::shared_ptr&lt; gko::Array&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a5aa7956063f722e0b5490dbc251e6679">msg_count</a></td></tr>
+<tr class="memdesc:a5aa7956063f722e0b5490dbc251e6679"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of messages sent. <br /></td></tr>
+<tr class="separator:a5aa7956063f722e0b5490dbc251e6679"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc9b61063cdf5ef92106220c19df143f"><td class="memItemLeft" align="right" valign="top"><a id="afc9b61063cdf5ef92106220c19df143f"></a>
+std::shared_ptr&lt; gko::Array&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#afc9b61063cdf5ef92106220c19df143f">last_recv_iter</a></td></tr>
+<tr class="memdesc:afc9b61063cdf5ef92106220c19df143f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iteration stamp of last received values. <br /></td></tr>
+<tr class="separator:afc9b61063cdf5ef92106220c19df143f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f6c826c4f13b8f3e8c611f13254fabf"><td class="memItemLeft" align="right" valign="top"><a id="a8f6c826c4f13b8f3e8c611f13254fabf"></a>
+std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a8f6c826c4f13b8f3e8c611f13254fabf">last_recv_slopes</a></td></tr>
+<tr class="memdesc:a8f6c826c4f13b8f3e8c611f13254fabf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Last recv slopes. <br /></td></tr>
+<tr class="separator:a8f6c826c4f13b8f3e8c611f13254fabf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06f2c470810bc90065caee045ac8d5a0"><td class="memItemLeft" align="right" valign="top"><a id="a06f2c470810bc90065caee045ac8d5a0"></a>
+std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a06f2c470810bc90065caee045ac8d5a0">last_sent_slopes_avg</a></td></tr>
+<tr class="memdesc:a06f2c470810bc90065caee045ac8d5a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Last sent slopes. <br /></td></tr>
+<tr class="separator:a06f2c470810bc90065caee045ac8d5a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c01e46ae44660795dd205c647ff980c"><td class="memItemLeft" align="right" valign="top"><a id="a1c01e46ae44660795dd205c647ff980c"></a>
+std::shared_ptr&lt; gko::Array&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a1c01e46ae44660795dd205c647ff980c">last_sent_iter</a></td></tr>
+<tr class="memdesc:a1c01e46ae44660795dd205c647ff980c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iteration stamp of last received values. <br /></td></tr>
+<tr class="separator:a1c01e46ae44660795dd205c647ff980c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a662f0688ae944724166cc09c83437c94"><td class="memItemLeft" align="right" valign="top"><a id="a662f0688ae944724166cc09c83437c94"></a>
+std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a662f0688ae944724166cc09c83437c94">thres</a></td></tr>
+<tr class="memdesc:a662f0688ae944724166cc09c83437c94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Threshold. <br /></td></tr>
+<tr class="separator:a662f0688ae944724166cc09c83437c94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9d510fb291e896fa14fe3e0f00f0454"><td class="memItemLeft" align="right" valign="top"><a id="aa9d510fb291e896fa14fe3e0f00f0454"></a>
 std::shared_ptr&lt; gko::Array&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#aa9d510fb291e896fa14fe3e0f00f0454">get_displacements</a></td></tr>
 <tr class="memdesc:aa9d510fb291e896fa14fe3e0f00f0454"><td class="mdescLeft">&#160;</td><td class="mdescRight">The displacements for the receiving of the buffer. <br /></td></tr>
@@ -348,7 +404,7 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li><a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp (7c9a9f7)</a></li>
+<li><a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp (1bdbc6b)</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

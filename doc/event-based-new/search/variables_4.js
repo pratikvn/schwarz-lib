@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['gamma',['gamma',['../structschwz_1_1Metadata.html#a3e6d7acc51f4dd26e50b2dc902a92d1e',1,'schwz::Metadata']]],
   ['get_5fdisplacements',['get_displacements',['../structschwz_1_1Communicate_1_1comm__struct.html#aa9d510fb291e896fa14fe3e0f00f0454',1,'schwz::Communicate::comm_struct']]],
   ['get_5frequest',['get_request',['../structschwz_1_1Communicate_1_1comm__struct.html#a91cc6e7d906fbb693e4dff2dee609c94',1,'schwz::Communicate::comm_struct']]],
   ['global_5fget',['global_get',['../structschwz_1_1Communicate_1_1comm__struct.html#a4166e2bb75eeaf48ee39ca7cdc3adb01',1,'schwz::Communicate::comm_struct']]],

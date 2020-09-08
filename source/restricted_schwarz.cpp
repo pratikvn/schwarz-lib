@@ -716,6 +716,11 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
     // setup windows
     if (settings.comm_settings.enable_onesided) {
         // Onesided
+        
+        for (int i = 0; i < main_buffer->get_size()[0]; i++) {
+            main_buffer->get_values()[i] = 0.0;
+        }
+
         MPI_Win_create(main_buffer->get_values(),
                        main_buffer->get_size()[0] * sizeof(ValueType),
                        sizeof(ValueType), MPI_INFO_NULL, MPI_COMM_WORLD,
@@ -725,6 +730,11 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
 
     if (settings.comm_settings.enable_onesided) {
         // MPI_Alloc_mem ? Custom allocator ?  TODO
+        
+        for (int i = 0; i < num_subdomains; i++) {
+            this->local_residual_vector->get_values()[i] = 0.0;
+        }
+
         MPI_Win_create(this->local_residual_vector->get_values(),
                        (num_subdomains) * sizeof(ValueType), sizeof(ValueType),
                        MPI_INFO_NULL, MPI_COMM_WORLD,
@@ -741,6 +751,13 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
         this->convergence_local = std::shared_ptr<vec_itype>(
             new vec_itype(settings.executor->get_master(), num_subdomains),
             std::default_delete<vec_itype>());
+
+        for (int i = 0; i < num_subdomains; i++) {
+            this->convergence_vector->get_data()[i] = 0;
+            this->convergence_sent->get_data()[i] = 0;
+            this->convergence_local->get_data()[i] = 0;
+        }
+
         MPI_Win_create(this->convergence_vector->get_data(),
                        (num_subdomains) * sizeof(IndexType), sizeof(IndexType),
                        MPI_INFO_NULL, MPI_COMM_WORLD,
@@ -766,6 +783,17 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
     }
 }
 
+// implement threshold - constant * gamma^k
+template <typename ValueType, typename IndexType>
+ValueType get_threshold(const Settings &settings,
+                        const Metadata<ValueType, IndexType> &metadata)
+{
+    auto constant = metadata.constant;
+    auto gamma = metadata.gamma;
+
+    return constant * std::pow(gamma, metadata.iter_count);
+}
+
 
 template <typename ValueType, typename IndexType, typename MixedValueType>
 void exchange_boundary_onesided(
@@ -773,7 +801,9 @@ void exchange_boundary_onesided(
     struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
         &comm_struct,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_global_solution,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_event_solution,
+    std::ofstream &fps, std::ofstream &fpr)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using arr = gko::Array<IndexType>;
@@ -791,6 +821,7 @@ void exchange_boundary_onesided(
     auto put_displacements = comm_struct.put_displacements->get_data();
     auto send_buffer = comm_struct.send_buffer;
     auto mixedt_send_buffer = comm_struct.mixedt_send_buffer;
+    auto num_send = comm_struct.num_send;
 
     auto num_neighbors_in = comm_struct.num_neighbors_in;
     auto local_num_neighbors_in = comm_struct.local_num_neighbors_in;
@@ -801,8 +832,10 @@ void exchange_boundary_onesided(
     auto remote_get = comm_struct.remote_get->get_data();
     auto get_displacements = comm_struct.get_displacements->get_data();
     auto recv_buffer = comm_struct.recv_buffer;
+    auto extra_buffer = comm_struct.extra_buffer;
     auto mixedt_recv_buffer = comm_struct.mixedt_recv_buffer;
     auto is_local_neighbor = comm_struct.is_local_neighbor;
+    auto num_recv = comm_struct.num_recv;
 
 
     if (settings.comm_settings.enable_put) {
@@ -811,8 +844,9 @@ void exchange_boundary_onesided(
                                              MixedValueType>(
                 settings, comm_struct, global_solution->get_values(),
                 global_put, num_neighbors_out, neighbors_out);
-        } else {
+        } else { //not push one by one
             int num_put = 0;
+
             for (auto p = 0; p < num_neighbors_out; p++) {
                 // send
                 if ((global_put[p])[0] > 0) {
@@ -820,37 +854,276 @@ void exchange_boundary_onesided(
                         settings, prev_global_solution->get_values(),
                         global_solution->get_values(),
                         send_buffer->get_values(), global_put, num_put, p);
+
                     if (settings.use_mixed_precision) {
                         send_buffer->convert_to(gko::lend(mixedt_send_buffer));
                         CommHelpers::transfer_buffer(
                             settings, comm_struct.window_recv_buffer,
                             mixedt_send_buffer->get_values(), global_put,
                             num_put, p, neighbors_out, put_displacements);
-                    } else {
-                        CommHelpers::transfer_buffer(
-                            settings, comm_struct.window_recv_buffer,
-                            send_buffer->get_values(), global_put, num_put, p,
-                            neighbors_out, put_displacements);
-                    }
-                    num_put += (global_put[p])[0];
-                }
-            }
-        }
+                    } else { //not mixed precision
+
+                        ValueType temp_sum = 0.0;
+
+                        // calculating avg of send buffer - doing euclidean norm now
+                        if (settings.norm_type == "L2") {
+                           for (auto i = 0; i < (global_put[p])[0]; i++) {
+                                temp_sum +=
+                                     std::pow(comm_struct.send_buffer
+                                                ->get_values()[num_put + i],
+                                              2);
+                           }
+                           comm_struct.curr_send_avg->get_values()[p] =
+                                sqrt(temp_sum) / (global_put[p])[0];
+                        } else {  // L1
+                           for (auto i = 0; i < (global_put[p])[0]; i++) {
+                                temp_sum += comm_struct.send_buffer
+                                                ->get_values()[num_put + i];
+                           }
+                           comm_struct.curr_send_avg->get_values()[p] =
+                                temp_sum / (global_put[p])[0];
+                        }
+
+                        auto diff =
+                            std::fabs(comm_struct.curr_send_avg->get_values()[p] -
+                                      comm_struct.last_send_avg->get_values()[p]);
+                        auto iter_diff = metadata.iter_count -
+                                         comm_struct.last_sent_iter->get_data()[p];
+
+                        if (settings.thres_type == "cgammak") {
+                            comm_struct.thres->get_values()[p] =
+                                get_threshold(settings, metadata);
+                        }
+
+                        auto thres = comm_struct.thres->get_values()[p] * metadata.horizon *
+                                     std::pow(metadata.decay_param, iter_diff);
+
+                        if (settings.debug_print) {
+                            fps << comm_struct.curr_send_avg->get_values()[p]
+                                << ", " << diff << ", " << thres << ",    ";
+
+                            /*
+                            for (auto i = 0; i < (global_put[p])[0]; i++) {
+                                 fps << comm_struct.send_buffer->get_values()[num_put
+                                 + i] << ", ";
+                            }
+                            */
+                        }
+
+                        if (diff >= thres || metadata.iter_count < metadata.comm_start_iters) {
+
+                            if (settings.debug_print) {
+                                fps << "1, ";
+                            }
+
+
+                            CommHelpers::transfer_buffer(
+                                settings, comm_struct.window_recv_buffer,
+                                send_buffer->get_values(), global_put, num_put, p,
+                                neighbors_out, put_displacements);
+
+                            if (settings.thres_type == "slope") {
+                                auto slope_avg = 0.0;
+                                int i;
+                                for (i = 0; i < metadata.sent_history - 1; i++) {
+                                     comm_struct.last_sent_slopes_avg
+                                         ->get_values()[i * num_neighbors_out + p] =
+                                     comm_struct.last_sent_slopes_avg
+                                         ->get_values()[(i + 1) *
+                                                           num_neighbors_out +
+                                                       p];
+                                     slope_avg +=
+                                          comm_struct.last_sent_slopes_avg
+                                              ->get_values()[i * num_neighbors_out +
+                                                             p];
+                                }
+
+                                if (iter_diff != 0) {
+                                    comm_struct.last_sent_slopes_avg
+                                        ->get_values()[i * num_neighbors_out + p] =
+                                        diff / iter_diff;
+                                }
+                                
+                                slope_avg +=
+                                     comm_struct.last_sent_slopes_avg
+                                         ->get_values()[i * num_neighbors_out + p];
+                                slope_avg = slope_avg / metadata.sent_history;
+
+                                // calculating next threshold
+                                comm_struct.thres->get_values()[p] = slope_avg;
+                            }
+
+                            // copy current to last communicated
+                            comm_struct.last_send_avg->get_values()[p] =
+                                comm_struct.curr_send_avg->get_values()[p];
+                            comm_struct.last_sent_iter->get_data()[p] =
+                                metadata.iter_count;
+
+                            // increment counter
+                            comm_struct.msg_count->get_data()[p]++;
+
+                            num_put += (global_put[p])[0];
+
+                        } 
+                        else {
+                             if (settings.debug_print) {
+                                 fps << "0, ";
+                             }
+                        } //end if-else event condition
+                    } //end if else mixed precision
+                } // end if (global_put[p] > 0)
+            } // end for (iterating over neighbors)
+        } //end if-else one by one
+
         if (settings.use_mixed_precision) {
             mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
         }
+
         // unpack receive buffer
         int num_get = 0;
         for (auto p = 0; p < num_neighbors_in; p++) {
             if ((global_get[p])[0] > 0) {
-                CommHelpers::unpack_buffer(
-                    settings, prev_global_solution->get_values(),
-                    global_solution->get_values(), recv_buffer->get_values(),
-                    global_get, num_get, p);
+
+                ValueType temp_avg = 0.0;
+
+                // calculate avg to check if new msg received
+                for (auto i = 0; i < (global_get[p])[0]; i++) {
+                    temp_avg +=
+                        comm_struct.recv_buffer->get_values()[num_get + i];
+                }
+
+                temp_avg = temp_avg / (global_get[p])[0];
+                comm_struct.curr_recv_avg->get_values()[p] = temp_avg;
+
+                if (std::fabs(comm_struct.curr_recv_avg->get_values()[p] -
+                              comm_struct.last_recv_avg->get_values()[p]) >
+                    0) {
+                    if (settings.debug_print) {
+                        // Printing 1 as an indicator that new
+                        // value is received
+                        fpr << "1, ";
+                    }                
+
+                    // unpack recv buffer
+                    CommHelpers::unpack_buffer(
+                        settings, prev_global_solution->get_values(),
+                        global_solution->get_values(), recv_buffer->get_values(),
+                        global_get, num_get, p);
+
+
+                    // assign old values and calculate new values
+                    for (auto i = 0; i < (global_get[p])[0]; i++) {
+                         // shift old slopes
+                         int j;
+                         for (j = 0; j < metadata.recv_history - 1; j++) {
+                             comm_struct.last_recv_slopes
+                                 ->get_values()[j * num_recv +
+                                                (num_get + i)] =
+                             comm_struct.last_recv_slopes
+                                 ->get_values()[(j + 1) * num_recv +
+                                                (num_get + i)];
+                         } 
+
+                         // calculate new last_recv_slope using received
+                         // values
+                         auto iter_diff =
+                             metadata.iter_count -
+                             comm_struct.last_recv_iter->get_data()[p];
+                         if (iter_diff != 0) {
+                             comm_struct.last_recv_slopes
+                                 ->get_values()[j * num_recv +
+                                                (num_get + i)] =
+                                 (comm_struct.recv_buffer
+                                      ->get_values()[num_get + i] -
+                                  comm_struct.last_recv_bdy
+                                      ->get_values()[num_get + i]) /
+                                  iter_diff;
+                          }
+                          else {
+                              comm_struct.last_recv_slopes
+                                  ->get_values()[j * num_recv +
+                                                 (num_get + i)] = 0.0;
+                          }
+
+                          // assign new last_recv_bdy
+                          comm_struct.last_recv_bdy
+                              ->get_values()[num_get + i] =
+                              comm_struct.recv_buffer
+                                  ->get_values()[num_get + i];
+
+                    }  // end for
+
+                    // update avg
+                    comm_struct.last_recv_avg->get_values()[p] =
+                        comm_struct.curr_recv_avg->get_values()[p];
+
+                    // update last recvd iter
+                    comm_struct.last_recv_iter->get_data()[p] =
+                        metadata.iter_count;
+
+                } // end if new value recvd
+
+                else {
+                    // no new value received, do extrapolation
+                    if (settings.debug_print) {
+                        fpr << "0, ";
+                    }
+
+                    if (metadata.horizon != 0) {
+                        temp_avg = 0.0;  // calculate avg again
+
+                        for (auto i = 0; i < (global_get[p])[0]; i++) {
+                            // calculate the avg slope for extrapolation
+                            auto slope_avg = 0.0;
+                            for (auto j = 0; j < metadata.recv_history;
+                                 j++) {
+                                 slope_avg +=
+                                      comm_struct.last_recv_slopes
+                                          ->get_values()[j * num_recv +
+                                                         (num_get + i)];
+                            }
+                            slope_avg = slope_avg / metadata.recv_history;
+
+                            comm_struct.extra_buffer
+                                ->get_values()[num_get + i] =
+                                comm_struct.last_recv_bdy
+                                    ->get_values()[num_get + i] +
+                                slope_avg * (metadata.iter_count -
+                                             comm_struct.last_recv_iter
+                                                 ->get_data()[p]);
+
+                            temp_avg += comm_struct.extra_buffer
+                                            ->get_values()[num_get + i];
+                         }
+                         temp_avg = temp_avg / (global_get[p])[0];
+
+                         // unpack extrapolated buffer
+                         CommHelpers::unpack_buffer(
+                             settings, prev_global_solution->get_values(), 
+                             global_solution->get_values(),
+                             comm_struct.extra_buffer->get_values(),
+                             global_get, num_get, p);
+
+                   }  // end thres != 0
+
+                } // end if extrapolation done       
+
+                if (settings.debug_print) {
+                    // Printing avg of current bdy values (received or
+                    // extrapolated)
+                    fpr << temp_avg << ", ";
+                }
+
                 num_get += (global_get[p])[0];
-            }
-        }
-    } else if (settings.comm_settings.enable_get) {
+
+            } // end if (global_get[p] > 0)
+
+        } // end for (iterating over neighbors)
+
+        if (settings.debug_print) fpr << std::endl;
+    } // end if (enable put) 
+
+    else if (settings.comm_settings.enable_get) {
         if (settings.comm_settings.enable_one_by_one) {
             CommHelpers::transfer_one_by_one<ValueType, IndexType,
                                              MixedValueType>(
@@ -1068,12 +1341,14 @@ template <typename ValueType, typename IndexType, typename MixedValueType>
 void SolverRAS<ValueType, IndexType, MixedValueType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_global_solution,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_event_solution,
+    std::ofstream &fps, std::ofstream &fpr)
 {
     if (settings.comm_settings.enable_onesided) {
         exchange_boundary_onesided<ValueType, IndexType, MixedValueType>(
             settings, metadata, this->comm_struct, prev_global_solution,
-            global_solution);
+            global_solution, prev_event_solution, fps, fpr);
     } else {
         exchange_boundary_twosided<ValueType, IndexType, MixedValueType>(
             settings, metadata, this->comm_struct, prev_global_solution,

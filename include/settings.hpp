@@ -129,6 +129,11 @@ struct Settings {
     bool enable_random_rhs = false;
 
     /**
+     * Flag to enable a random rhs.
+     */
+    std::string rhs_type = "ones";
+
+    /**
      * Flag to choose thres type. Choices are "cgammak" or "slope"
      */
     std::string thres_type = "cgammak";

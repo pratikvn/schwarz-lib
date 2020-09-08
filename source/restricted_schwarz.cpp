@@ -442,14 +442,14 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
             } else {
                 this->comm_struct.recv_buffer = vec_vtype::create(
                     settings.executor, gko::dim<2>(num_recv, 1));
-                this->comm_struct.extra_buffer =
-                    vec_vtype::create(settings.executor, gko::dim<2>(num_recv, 1));
+                this->comm_struct.extra_buffer = vec_vtype::create(
+                    settings.executor, gko::dim<2>(num_recv, 1));
 
                 // initializing recv and extrapolation buffer
                 for (int i = 0; i < num_recv; i++) {
                     this->comm_struct.recv_buffer->get_values()[i] = 0.0;
                     this->comm_struct.extra_buffer->get_values()[i] = 0.0;
-                } 
+                }
 
                 // allocating values necessary for calculating threshold and
                 // extrapolation at receiver
@@ -470,17 +470,17 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
                     gko::dim<2>(this->comm_struct.num_neighbors_in, 1));
 
                 this->comm_struct.last_recv_avg = vec_vtype::create(
-                     settings.executor->get_master(),
-                     gko::dim<2>(this->comm_struct.num_neighbors_in, 1));   
+                    settings.executor->get_master(),
+                    gko::dim<2>(this->comm_struct.num_neighbors_in, 1));
 
                 // Initializing these values
                 for (int i = 0; i < num_recv; i++) {
-                     this->comm_struct.last_recv_bdy->get_values()[i] = 0.0;
+                    this->comm_struct.last_recv_bdy->get_values()[i] = 0.0;
 
-                     for (int j = 0; j < metadata.recv_history; j++) {
-                         this->comm_struct.last_recv_slopes
-                             ->get_values()[j * num_recv + i] = 0.0;
-                     }
+                    for (int j = 0; j < metadata.recv_history; j++) {
+                        this->comm_struct.last_recv_slopes
+                            ->get_values()[j * num_recv + i] = 0.0;
+                    }
                 }
 
                 for (int i = 0; i < this->comm_struct.num_neighbors_in; i++) {
@@ -495,7 +495,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
                                num_recv * sizeof(ValueType), sizeof(ValueType),
                                MPI_INFO_NULL, MPI_COMM_WORLD,
                                &(this->comm_struct.window_recv_buffer));
-            } //end if mixed precision
+            }  // end if mixed precision
 
             this->comm_struct.windows_from = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
@@ -569,9 +569,9 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
 
                 this->comm_struct.last_sent_slopes_avg = vec_vtype::create(
                     settings.executor,
-                    gko::dim<2>(
-                         this->comm_struct.num_neighbors_out * metadata.sent_history,
-                         1));
+                    gko::dim<2>(this->comm_struct.num_neighbors_out *
+                                    metadata.sent_history,
+                                1));
 
                 this->comm_struct.last_sent_iter = std::shared_ptr<vec_itype>(
                     new vec_itype(settings.executor->get_master(),
@@ -599,9 +599,8 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
                     this->comm_struct.last_send_avg->get_values()[i] = 0.0;
 
                     for (int j = 0; j < metadata.sent_history; j++) {
-                        this->comm_struct.last_sent_slopes_avg
-                            ->get_values()[j * this->comm_struct.num_neighbors_out +
-                                           i] = 0.0;
+                        this->comm_struct.last_sent_slopes_avg->get_values()
+                            [j * this->comm_struct.num_neighbors_out + i] = 0.0;
                     }
 
                     this->comm_struct.last_sent_iter->get_data()[i] = 0;
@@ -616,7 +615,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
                                num_send * sizeof(ValueType), sizeof(ValueType),
                                MPI_INFO_NULL, MPI_COMM_WORLD,
                                &(this->comm_struct.window_send_buffer));
-            } //end if mixed precision
+            }  // end if mixed precision
 
             this->comm_struct.windows_to = std::shared_ptr<vec_itype>(
                 new vec_itype(settings.executor->get_master(),
@@ -716,7 +715,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
     // setup windows
     if (settings.comm_settings.enable_onesided) {
         // Onesided
-        
+
         for (int i = 0; i < main_buffer->get_size()[0]; i++) {
             main_buffer->get_values()[i] = 0.0;
         }
@@ -730,7 +729,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
 
     if (settings.comm_settings.enable_onesided) {
         // MPI_Alloc_mem ? Custom allocator ?  TODO
-        
+
         for (int i = 0; i < num_subdomains; i++) {
             this->local_residual_vector->get_values()[i] = 0.0;
         }
@@ -844,7 +843,7 @@ void exchange_boundary_onesided(
                                              MixedValueType>(
                 settings, comm_struct, global_solution->get_values(),
                 global_put, num_neighbors_out, neighbors_out);
-        } else { //not push one by one
+        } else {  // not push one by one
             int num_put = 0;
 
             for (auto p = 0; p < num_neighbors_out; p++) {
@@ -861,41 +860,44 @@ void exchange_boundary_onesided(
                             settings, comm_struct.window_recv_buffer,
                             mixedt_send_buffer->get_values(), global_put,
                             num_put, p, neighbors_out, put_displacements);
-                    } else { //not mixed precision
+                    } else {  // not mixed precision
 
                         ValueType temp_sum = 0.0;
 
-                        // calculating avg of send buffer - doing euclidean norm now
+                        // calculating avg of send buffer - doing euclidean norm
+                        // now
                         if (settings.norm_type == "L2") {
-                           for (auto i = 0; i < (global_put[p])[0]; i++) {
+                            for (auto i = 0; i < (global_put[p])[0]; i++) {
                                 temp_sum +=
-                                     std::pow(comm_struct.send_buffer
-                                                ->get_values()[num_put + i],
-                                              2);
-                           }
-                           comm_struct.curr_send_avg->get_values()[p] =
+                                    std::pow(comm_struct.send_buffer
+                                                 ->get_values()[num_put + i],
+                                             2);
+                            }
+                            comm_struct.curr_send_avg->get_values()[p] =
                                 sqrt(temp_sum) / (global_put[p])[0];
                         } else {  // L1
-                           for (auto i = 0; i < (global_put[p])[0]; i++) {
+                            for (auto i = 0; i < (global_put[p])[0]; i++) {
                                 temp_sum += comm_struct.send_buffer
                                                 ->get_values()[num_put + i];
-                           }
-                           comm_struct.curr_send_avg->get_values()[p] =
+                            }
+                            comm_struct.curr_send_avg->get_values()[p] =
                                 temp_sum / (global_put[p])[0];
                         }
 
-                        auto diff =
-                            std::fabs(comm_struct.curr_send_avg->get_values()[p] -
-                                      comm_struct.last_send_avg->get_values()[p]);
-                        auto iter_diff = metadata.iter_count -
-                                         comm_struct.last_sent_iter->get_data()[p];
+                        auto diff = std::fabs(
+                            comm_struct.curr_send_avg->get_values()[p] -
+                            comm_struct.last_send_avg->get_values()[p]);
+                        auto iter_diff =
+                            metadata.iter_count -
+                            comm_struct.last_sent_iter->get_data()[p];
 
                         if (settings.thres_type == "cgammak") {
                             comm_struct.thres->get_values()[p] =
                                 get_threshold(settings, metadata);
                         }
 
-                        auto thres = comm_struct.thres->get_values()[p] * metadata.horizon *
+                        auto thres = comm_struct.thres->get_values()[p] *
+                                     metadata.horizon *
                                      std::pow(metadata.decay_param, iter_diff);
 
                         if (settings.debug_print) {
@@ -904,14 +906,15 @@ void exchange_boundary_onesided(
 
                             /*
                             for (auto i = 0; i < (global_put[p])[0]; i++) {
-                                 fps << comm_struct.send_buffer->get_values()[num_put
+                                 fps <<
+                            comm_struct.send_buffer->get_values()[num_put
                                  + i] << ", ";
                             }
                             */
                         }
 
-                        if (diff >= thres || metadata.iter_count < metadata.comm_start_iters) {
-
+                        if (diff >= thres ||
+                            metadata.iter_count < metadata.comm_start_iters) {
                             if (settings.debug_print) {
                                 fps << "1, ";
                             }
@@ -919,34 +922,37 @@ void exchange_boundary_onesided(
 
                             CommHelpers::transfer_buffer(
                                 settings, comm_struct.window_recv_buffer,
-                                send_buffer->get_values(), global_put, num_put, p,
-                                neighbors_out, put_displacements);
+                                send_buffer->get_values(), global_put, num_put,
+                                p, neighbors_out, put_displacements);
 
                             if (settings.thres_type == "slope") {
                                 auto slope_avg = 0.0;
                                 int i;
-                                for (i = 0; i < metadata.sent_history - 1; i++) {
-                                     comm_struct.last_sent_slopes_avg
-                                         ->get_values()[i * num_neighbors_out + p] =
-                                     comm_struct.last_sent_slopes_avg
-                                         ->get_values()[(i + 1) *
-                                                           num_neighbors_out +
-                                                       p];
-                                     slope_avg +=
-                                          comm_struct.last_sent_slopes_avg
-                                              ->get_values()[i * num_neighbors_out +
-                                                             p];
+                                for (i = 0; i < metadata.sent_history - 1;
+                                     i++) {
+                                    comm_struct.last_sent_slopes_avg
+                                        ->get_values()[i * num_neighbors_out +
+                                                       p] =
+                                        comm_struct.last_sent_slopes_avg
+                                            ->get_values()
+                                                [(i + 1) * num_neighbors_out +
+                                                 p];
+                                    slope_avg +=
+                                        comm_struct.last_sent_slopes_avg
+                                            ->get_values()
+                                                [i * num_neighbors_out + p];
                                 }
 
                                 if (iter_diff != 0) {
                                     comm_struct.last_sent_slopes_avg
-                                        ->get_values()[i * num_neighbors_out + p] =
-                                        diff / iter_diff;
+                                        ->get_values()[i * num_neighbors_out +
+                                                       p] = diff / iter_diff;
                                 }
-                                
+
                                 slope_avg +=
-                                     comm_struct.last_sent_slopes_avg
-                                         ->get_values()[i * num_neighbors_out + p];
+                                    comm_struct.last_sent_slopes_avg
+                                        ->get_values()[i * num_neighbors_out +
+                                                       p];
                                 slope_avg = slope_avg / metadata.sent_history;
 
                                 // calculating next threshold
@@ -964,16 +970,15 @@ void exchange_boundary_onesided(
 
                             num_put += (global_put[p])[0];
 
-                        } 
-                        else {
-                             if (settings.debug_print) {
-                                 fps << "0, ";
-                             }
-                        } //end if-else event condition
-                    } //end if else mixed precision
-                } // end if (global_put[p] > 0)
-            } // end for (iterating over neighbors)
-        } //end if-else one by one
+                        } else {
+                            if (settings.debug_print) {
+                                fps << "0, ";
+                            }
+                        }  // end if-else event condition
+                    }      // end if else mixed precision
+                }          // end if (global_put[p] > 0)
+            }              // end for (iterating over neighbors)
+        }                  // end if-else one by one
 
         if (settings.use_mixed_precision) {
             mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
@@ -983,7 +988,6 @@ void exchange_boundary_onesided(
         int num_get = 0;
         for (auto p = 0; p < num_neighbors_in; p++) {
             if ((global_get[p])[0] > 0) {
-
                 ValueType temp_avg = 0.0;
 
                 // calculate avg to check if new msg received
@@ -996,60 +1000,54 @@ void exchange_boundary_onesided(
                 comm_struct.curr_recv_avg->get_values()[p] = temp_avg;
 
                 if (std::fabs(comm_struct.curr_recv_avg->get_values()[p] -
-                              comm_struct.last_recv_avg->get_values()[p]) >
-                    0) {
+                              comm_struct.last_recv_avg->get_values()[p]) > 0) {
                     if (settings.debug_print) {
                         // Printing 1 as an indicator that new
                         // value is received
                         fpr << "1, ";
-                    }                
+                    }
 
                     // unpack recv buffer
                     CommHelpers::unpack_buffer(
                         settings, prev_global_solution->get_values(),
-                        global_solution->get_values(), recv_buffer->get_values(),
-                        global_get, num_get, p);
+                        global_solution->get_values(),
+                        recv_buffer->get_values(), global_get, num_get, p);
 
 
                     // assign old values and calculate new values
                     for (auto i = 0; i < (global_get[p])[0]; i++) {
-                         // shift old slopes
-                         int j;
-                         for (j = 0; j < metadata.recv_history - 1; j++) {
-                             comm_struct.last_recv_slopes
-                                 ->get_values()[j * num_recv +
-                                                (num_get + i)] =
-                             comm_struct.last_recv_slopes
-                                 ->get_values()[(j + 1) * num_recv +
-                                                (num_get + i)];
-                         } 
+                        // shift old slopes
+                        int j;
+                        for (j = 0; j < metadata.recv_history - 1; j++) {
+                            comm_struct.last_recv_slopes
+                                ->get_values()[j * num_recv + (num_get + i)] =
+                                comm_struct.last_recv_slopes
+                                    ->get_values()[(j + 1) * num_recv +
+                                                   (num_get + i)];
+                        }
 
-                         // calculate new last_recv_slope using received
-                         // values
-                         auto iter_diff =
-                             metadata.iter_count -
-                             comm_struct.last_recv_iter->get_data()[p];
-                         if (iter_diff != 0) {
-                             comm_struct.last_recv_slopes
-                                 ->get_values()[j * num_recv +
-                                                (num_get + i)] =
-                                 (comm_struct.recv_buffer
-                                      ->get_values()[num_get + i] -
-                                  comm_struct.last_recv_bdy
-                                      ->get_values()[num_get + i]) /
-                                  iter_diff;
-                          }
-                          else {
-                              comm_struct.last_recv_slopes
-                                  ->get_values()[j * num_recv +
-                                                 (num_get + i)] = 0.0;
-                          }
+                        // calculate new last_recv_slope using received
+                        // values
+                        auto iter_diff =
+                            metadata.iter_count -
+                            comm_struct.last_recv_iter->get_data()[p];
+                        if (iter_diff != 0) {
+                            comm_struct.last_recv_slopes
+                                ->get_values()[j * num_recv + (num_get + i)] =
+                                (comm_struct.recv_buffer
+                                     ->get_values()[num_get + i] -
+                                 comm_struct.last_recv_bdy
+                                     ->get_values()[num_get + i]) /
+                                iter_diff;
+                        } else {
+                            comm_struct.last_recv_slopes
+                                ->get_values()[j * num_recv + (num_get + i)] =
+                                0.0;
+                        }
 
-                          // assign new last_recv_bdy
-                          comm_struct.last_recv_bdy
-                              ->get_values()[num_get + i] =
-                              comm_struct.recv_buffer
-                                  ->get_values()[num_get + i];
+                        // assign new last_recv_bdy
+                        comm_struct.last_recv_bdy->get_values()[num_get + i] =
+                            comm_struct.recv_buffer->get_values()[num_get + i];
 
                     }  // end for
 
@@ -1061,7 +1059,7 @@ void exchange_boundary_onesided(
                     comm_struct.last_recv_iter->get_data()[p] =
                         metadata.iter_count;
 
-                } // end if new value recvd
+                }  // end if new value recvd
 
                 else {
                     // no new value received, do extrapolation
@@ -1075,12 +1073,10 @@ void exchange_boundary_onesided(
                         for (auto i = 0; i < (global_get[p])[0]; i++) {
                             // calculate the avg slope for extrapolation
                             auto slope_avg = 0.0;
-                            for (auto j = 0; j < metadata.recv_history;
-                                 j++) {
-                                 slope_avg +=
-                                      comm_struct.last_recv_slopes
-                                          ->get_values()[j * num_recv +
-                                                         (num_get + i)];
+                            for (auto j = 0; j < metadata.recv_history; j++) {
+                                slope_avg += comm_struct.last_recv_slopes
+                                                 ->get_values()[j * num_recv +
+                                                                (num_get + i)];
                             }
                             slope_avg = slope_avg / metadata.recv_history;
 
@@ -1088,25 +1084,25 @@ void exchange_boundary_onesided(
                                 ->get_values()[num_get + i] =
                                 comm_struct.last_recv_bdy
                                     ->get_values()[num_get + i] +
-                                slope_avg * (metadata.iter_count -
-                                             comm_struct.last_recv_iter
-                                                 ->get_data()[p]);
+                                slope_avg *
+                                    (metadata.iter_count -
+                                     comm_struct.last_recv_iter->get_data()[p]);
 
                             temp_avg += comm_struct.extra_buffer
                                             ->get_values()[num_get + i];
-                         }
-                         temp_avg = temp_avg / (global_get[p])[0];
+                        }
+                        temp_avg = temp_avg / (global_get[p])[0];
 
-                         // unpack extrapolated buffer
-                         CommHelpers::unpack_buffer(
-                             settings, prev_global_solution->get_values(), 
-                             global_solution->get_values(),
-                             comm_struct.extra_buffer->get_values(),
-                             global_get, num_get, p);
+                        // unpack extrapolated buffer
+                        CommHelpers::unpack_buffer(
+                            settings, prev_global_solution->get_values(),
+                            global_solution->get_values(),
+                            comm_struct.extra_buffer->get_values(), global_get,
+                            num_get, p);
 
-                   }  // end thres != 0
+                    }  // end thres != 0
 
-                } // end if extrapolation done       
+                }  // end if extrapolation done
 
                 if (settings.debug_print) {
                     // Printing avg of current bdy values (received or
@@ -1116,12 +1112,12 @@ void exchange_boundary_onesided(
 
                 num_get += (global_get[p])[0];
 
-            } // end if (global_get[p] > 0)
+            }  // end if (global_get[p] > 0)
 
-        } // end for (iterating over neighbors)
+        }  // end for (iterating over neighbors)
 
         if (settings.debug_print) fpr << std::endl;
-    } // end if (enable put) 
+    }  // end if (enable put)
 
     else if (settings.comm_settings.enable_get) {
         if (settings.comm_settings.enable_one_by_one) {

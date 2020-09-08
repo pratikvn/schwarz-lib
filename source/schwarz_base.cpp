@@ -179,7 +179,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
             std::cout << "Dipole rhs." << std::endl;
         } else {
             std::cout << "Default rhs with ones." << std::endl;
-        } 
+        }
     }
 #if SCHW_HAVE_DEALII
     if (metadata.my_rank == 0 && !settings.explicit_laplacian) {
@@ -266,9 +266,9 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
 
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType, MixedValueType>::setup_local_solver(
-        this->settings, this->metadata, this->local_matrix, this->triangular_factor_l,
-        this->triangular_factor_u, this->local_perm, this->local_inv_perm,
-        this->local_rhs);
+        this->settings, this->metadata, this->local_matrix,
+        this->triangular_factor_l, this->triangular_factor_u, this->local_perm,
+        this->local_inv_perm, this->local_rhs);
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
@@ -417,7 +417,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
                   << ", Recv history - " << metadata.recv_history << std::endl;
         std::cout << "Thres type - " << settings.thres_type << std::endl;
         std::cout << "Overlap - " << settings.overlap << std::endl;
-    }   
+    }
 
     auto start_time = std::chrono::steady_clock::now();
 
@@ -425,7 +425,8 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
         // Exchange the boundary values. The communication part.
         MEASURE_ELAPSED_FUNC_TIME(
             this->exchange_boundary(settings, metadata, prev_global_solution,
-                                    global_solution, prev_event_solution, fps, fpr),
+                                    global_solution, prev_event_solution, fps,
+                                    fpr),
             0, metadata.my_rank, boundary_exchange, metadata.iter_count);
         prev_global_solution->copy_from(gko::lend(global_solution));
 

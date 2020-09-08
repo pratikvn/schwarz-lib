@@ -52,8 +52,7 @@ void Communicate<ValueType, IndexType, MixedValueType>::exchange_boundary(
     const std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_global_solution,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_event_solution,
-    std::ofstream &fps, std::ofstream &fpr)
-    SCHWARZ_NOT_IMPLEMENTED;
+    std::ofstream &fps, std::ofstream &fpr) SCHWARZ_NOT_IMPLEMENTED;
 
 template <typename ValueType, typename IndexType, typename MixedValueType>
 void Communicate<ValueType, IndexType, MixedValueType>::update_boundary(

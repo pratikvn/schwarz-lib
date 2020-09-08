@@ -143,7 +143,8 @@ protected:
      * @param triangular_factor_l  The lower triangular factor.
      * @param triangular_factor_u  The upper triangular factor.
      * @param local_perm  The local permutation vector in the subdomain.
-     * @param local_inv_perm  The local inverse permutation vector in the subdomain.
+     * @param local_inv_perm  The local inverse permutation vector in the
+     * subdomain.
      * @param init_guess  The initial solution for the local iterative solver.
      * @param local_solution The local solution vector in the subdomain.
      */

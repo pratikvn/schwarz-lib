@@ -497,7 +497,7 @@ void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
     settings.thres_type = FLAGS_thres_type;
     settings.norm_type = FLAGS_norm_type;
 
-   
+
     int gsize = 0;
     if (metadata.my_rank == 0) {
         metadata.global_size = system_matrix.m();

@@ -2,6 +2,7 @@ var searchData=
 [
   ['commhelpers',['CommHelpers',['../namespaceschwz_1_1CommHelpers.html',1,'schwz']]],
   ['conv_5ftools',['conv_tools',['../namespaceschwz_1_1conv__tools.html',1,'schwz']]],
+  ['eventhelpers',['EventHelpers',['../namespaceschwz_1_1EventHelpers.html',1,'schwz']]],
   ['partitiontools',['PartitionTools',['../namespaceschwz_1_1PartitionTools.html',1,'schwz']]],
   ['scatter',['Scatter',['../structschwz_1_1Scatter.html',1,'schwz']]],
   ['schwarz_20class',['Schwarz Class',['../group__schwarz__class.html',1,'']]],

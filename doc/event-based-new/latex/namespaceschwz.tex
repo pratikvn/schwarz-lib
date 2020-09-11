@@ -12,6 +12,8 @@ The Schwarz wrappers namespace.
 \begin{DoxyCompactList}\small\item\em The Comm\+Helper namespace . \end{DoxyCompactList}\item 
  \hyperlink{namespaceschwz_1_1conv__tools}{conv\+\_\+tools}
 \begin{DoxyCompactList}\small\item\em The \hyperlink{namespaceschwz_1_1conv__tools}{conv\+\_\+tools} namespace . \end{DoxyCompactList}\item 
+ \hyperlink{namespaceschwz_1_1EventHelpers}{Event\+Helpers}
+\begin{DoxyCompactList}\small\item\em The Event\+Helper namespace . \end{DoxyCompactList}\item 
  \hyperlink{namespaceschwz_1_1PartitionTools}{Partition\+Tools}
 \begin{DoxyCompactList}\small\item\em The \hyperlink{namespaceschwz_1_1PartitionTools}{Partition\+Tools} namespace . \end{DoxyCompactList}\item 
  \hyperlink{namespaceschwz_1_1SolverTools}{Solver\+Tools}
@@ -265,9 +267,6 @@ template void {\bfseries scatter\+\_\+avg\+\_\+values} (const long int, const lo
 \item 
 \mbox{\Hypertarget{namespaceschwz_a443a272fc6c66825dc7a958e824e32e3}\label{namespaceschwz_a443a272fc6c66825dc7a958e824e32e3}} 
 gko\+::size\+\_\+type {\bfseries linearize\+\_\+index} (const gko\+::size\+\_\+type row, const gko\+::size\+\_\+type col, const gko\+::size\+\_\+type num\+\_\+rows)
-\item 
-\mbox{\Hypertarget{namespaceschwz_a77f43267a5630bb5e4a86e9634c69fe9}\label{namespaceschwz_a77f43267a5630bb5e4a86e9634c69fe9}} 
-{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\Value\+Type {\bfseries get\+\_\+threshold} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata)
 \item 
 \mbox{\Hypertarget{namespaceschwz_a4e81df68d1918c37ac0c1d4a9a406ba9}\label{namespaceschwz_a4e81df68d1918c37ac0c1d4a9a406ba9}} 
 {\footnotesize template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ }\\void {\bfseries exchange\+\_\+boundary\+\_\+onesided} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, struct \hyperlink{classschwz_1_1Communicate}{Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct \&comm\+\_\+struct, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&prev\+\_\+global\+\_\+solution, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+solution, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&prev\+\_\+event\+\_\+solution, std\+::ofstream \&fps, std\+::ofstream \&fpr)

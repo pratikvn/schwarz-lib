@@ -400,13 +400,13 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
         char send_name[30], recv_name[30], pe_str[3];
         sprintf(pe_str, "%d", metadata.my_rank);
 
-        strcpy(send_name, "send");
-        strcat(send_name, pe_str);
-        strcat(send_name, ".txt");
+        std::strcpy(send_name, "send");
+        std::strcat(send_name, pe_str);
+        std::strcat(send_name, ".txt");
 
-        strcpy(recv_name, "recv");
-        strcat(recv_name, pe_str);
-        strcat(recv_name, ".txt");
+        std::strcpy(recv_name, "recv");
+        std::strcat(recv_name, pe_str);
+        std::strcat(recv_name, ".txt");
 
         fps.open(send_name);
         fpr.open(recv_name);
@@ -490,7 +490,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     }
 
     // adding 1 to include the 0-th iteration
-    metadata.iter_count = metadata.iter_count + 1;
+    //metadata.iter_count = metadata.iter_count + 1;
 
     // number of messages a PE would send without event-based
     int noevent_msg_count = metadata.iter_count * num_neighbors_out;

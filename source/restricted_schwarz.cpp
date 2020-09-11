@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <comm_helpers.hpp>
+#include <event_helpers.hpp>
 #include <exception_helpers.hpp>
 #include <process_topology.hpp>
 #include <restricted_schwarz.hpp>
@@ -782,18 +783,6 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
     }
 }
 
-// implement threshold - constant * gamma^k
-template <typename ValueType, typename IndexType>
-ValueType get_threshold(const Settings &settings,
-                        const Metadata<ValueType, IndexType> &metadata)
-{
-    auto constant = metadata.constant;
-    auto gamma = metadata.gamma;
-
-    return constant * std::pow(gamma, metadata.iter_count);
-}
-
-
 template <typename ValueType, typename IndexType, typename MixedValueType>
 void exchange_boundary_onesided(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
@@ -887,22 +876,25 @@ void exchange_boundary_onesided(
                         auto diff = std::fabs(
                             comm_struct.curr_send_avg->get_values()[p] -
                             comm_struct.last_send_avg->get_values()[p]);
-                        auto iter_diff =
+                        auto send_iter_diff =
                             metadata.iter_count -
                             comm_struct.last_sent_iter->get_data()[p];
 
+                        ValueType threshold = 0.0;
                         if (settings.thres_type == "cgammak") {
-                            comm_struct.thres->get_values()[p] =
-                                get_threshold(settings, metadata);
+                            threshold = EventHelpers::compute_nonadaptive_threshold
+                                        <ValueType, IndexType, MixedValueType>(
+                                        settings, metadata);
                         }
-
-                        auto thres = comm_struct.thres->get_values()[p] *
-                                     metadata.horizon *
-                                     std::pow(metadata.decay_param, iter_diff);
+                        else if (settings.thres_type == "slope") {
+                            threshold = EventHelpers::compute_adaptive_threshold
+                                        <ValueType, IndexType, MixedValueType>(
+                                        settings, metadata, comm_struct, p, send_iter_diff);
+                        }
 
                         if (settings.debug_print) {
                             fps << comm_struct.curr_send_avg->get_values()[p]
-                                << ", " << diff << ", " << thres << ",    ";
+                                << ", " << diff << ", " << threshold << ",    ";
 
                             /*
                             for (auto i = 0; i < (global_put[p])[0]; i++) {
@@ -913,12 +905,11 @@ void exchange_boundary_onesided(
                             */
                         }
 
-                        if (diff >= thres ||
+                        if (diff >= threshold ||
                             metadata.iter_count < metadata.comm_start_iters) {
                             if (settings.debug_print) {
                                 fps << "1, ";
                             }
-
 
                             CommHelpers::transfer_buffer(
                                 settings, comm_struct.window_recv_buffer,
@@ -926,37 +917,9 @@ void exchange_boundary_onesided(
                                 p, neighbors_out, put_displacements);
 
                             if (settings.thres_type == "slope") {
-                                auto slope_avg = 0.0;
-                                int i;
-                                for (i = 0; i < metadata.sent_history - 1;
-                                     i++) {
-                                    comm_struct.last_sent_slopes_avg
-                                        ->get_values()[i * num_neighbors_out +
-                                                       p] =
-                                        comm_struct.last_sent_slopes_avg
-                                            ->get_values()
-                                                [(i + 1) * num_neighbors_out +
-                                                 p];
-                                    slope_avg +=
-                                        comm_struct.last_sent_slopes_avg
-                                            ->get_values()
-                                                [i * num_neighbors_out + p];
-                                }
-
-                                if (iter_diff != 0) {
-                                    comm_struct.last_sent_slopes_avg
-                                        ->get_values()[i * num_neighbors_out +
-                                                       p] = diff / iter_diff;
-                                }
-
-                                slope_avg +=
-                                    comm_struct.last_sent_slopes_avg
-                                        ->get_values()[i * num_neighbors_out +
-                                                       p];
-                                slope_avg = slope_avg / metadata.sent_history;
-
-                                // calculating next threshold
-                                comm_struct.thres->get_values()[p] = slope_avg;
+                                EventHelpers::compute_sender_slopes
+                                              <ValueType, IndexType, MixedValueType>(
+                                              settings, metadata, comm_struct, p, send_iter_diff, diff);                 
                             }
 
                             // copy current to last communicated
@@ -999,6 +962,10 @@ void exchange_boundary_onesided(
                 temp_avg = temp_avg / (global_get[p])[0];
                 comm_struct.curr_recv_avg->get_values()[p] = temp_avg;
 
+                auto recv_iter_diff =
+                            metadata.iter_count -
+                            comm_struct.last_recv_iter->get_data()[p];
+
                 if (std::fabs(comm_struct.curr_recv_avg->get_values()[p] -
                               comm_struct.last_recv_avg->get_values()[p]) > 0) {
                     if (settings.debug_print) {
@@ -1013,43 +980,9 @@ void exchange_boundary_onesided(
                         global_solution->get_values(),
                         recv_buffer->get_values(), global_get, num_get, p);
 
-
-                    // assign old values and calculate new values
-                    for (auto i = 0; i < (global_get[p])[0]; i++) {
-                        // shift old slopes
-                        int j;
-                        for (j = 0; j < metadata.recv_history - 1; j++) {
-                            comm_struct.last_recv_slopes
-                                ->get_values()[j * num_recv + (num_get + i)] =
-                                comm_struct.last_recv_slopes
-                                    ->get_values()[(j + 1) * num_recv +
-                                                   (num_get + i)];
-                        }
-
-                        // calculate new last_recv_slope using received
-                        // values
-                        auto iter_diff =
-                            metadata.iter_count -
-                            comm_struct.last_recv_iter->get_data()[p];
-                        if (iter_diff != 0) {
-                            comm_struct.last_recv_slopes
-                                ->get_values()[j * num_recv + (num_get + i)] =
-                                (comm_struct.recv_buffer
-                                     ->get_values()[num_get + i] -
-                                 comm_struct.last_recv_bdy
-                                     ->get_values()[num_get + i]) /
-                                iter_diff;
-                        } else {
-                            comm_struct.last_recv_slopes
-                                ->get_values()[j * num_recv + (num_get + i)] =
-                                0.0;
-                        }
-
-                        // assign new last_recv_bdy
-                        comm_struct.last_recv_bdy->get_values()[num_get + i] =
-                            comm_struct.recv_buffer->get_values()[num_get + i];
-
-                    }  // end for
+                    EventHelpers::compute_receiver_slopes
+                                  <ValueType, IndexType, MixedValueType>(
+                                  settings, metadata, comm_struct, p, recv_iter_diff, num_get);
 
                     // update avg
                     comm_struct.last_recv_avg->get_values()[p] =
@@ -1070,29 +1003,10 @@ void exchange_boundary_onesided(
                     if (metadata.horizon != 0) {
                         temp_avg = 0.0;  // calculate avg again
 
-                        for (auto i = 0; i < (global_get[p])[0]; i++) {
-                            // calculate the avg slope for extrapolation
-                            auto slope_avg = 0.0;
-                            for (auto j = 0; j < metadata.recv_history; j++) {
-                                slope_avg += comm_struct.last_recv_slopes
-                                                 ->get_values()[j * num_recv +
-                                                                (num_get + i)];
-                            }
-                            slope_avg = slope_avg / metadata.recv_history;
-
-                            comm_struct.extra_buffer
-                                ->get_values()[num_get + i] =
-                                comm_struct.last_recv_bdy
-                                    ->get_values()[num_get + i] +
-                                slope_avg *
-                                    (metadata.iter_count -
-                                     comm_struct.last_recv_iter->get_data()[p]);
-
-                            temp_avg += comm_struct.extra_buffer
-                                            ->get_values()[num_get + i];
-                        }
-                        temp_avg = temp_avg / (global_get[p])[0];
-
+                        temp_avg = EventHelpers::generate_extrapolated_buffer
+                                   <ValueType, IndexType, MixedValueType>(
+                                   settings, metadata, comm_struct, p, recv_iter_diff, num_get);                        
+ 
                         // unpack extrapolated buffer
                         CommHelpers::unpack_buffer(
                             settings, prev_global_solution->get_values(),

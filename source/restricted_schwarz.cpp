@@ -882,14 +882,16 @@ void exchange_boundary_onesided(
 
                         ValueType threshold = 0.0;
                         if (settings.thres_type == "cgammak") {
-                            threshold = EventHelpers::compute_nonadaptive_threshold
-                                        <ValueType, IndexType, MixedValueType>(
-                                        settings, metadata);
-                        }
-                        else if (settings.thres_type == "slope") {
-                            threshold = EventHelpers::compute_adaptive_threshold
-                                        <ValueType, IndexType, MixedValueType>(
-                                        settings, metadata, comm_struct, p, send_iter_diff);
+                            threshold =
+                                EventHelpers::compute_nonadaptive_threshold<
+                                    ValueType, IndexType, MixedValueType>(
+                                    settings, metadata);
+                        } else if (settings.thres_type == "slope") {
+                            threshold =
+                                EventHelpers::compute_adaptive_threshold<
+                                    ValueType, IndexType, MixedValueType>(
+                                    settings, metadata, comm_struct, p,
+                                    send_iter_diff);
                         }
 
                         if (settings.debug_print) {
@@ -917,9 +919,10 @@ void exchange_boundary_onesided(
                                 p, neighbors_out, put_displacements);
 
                             if (settings.thres_type == "slope") {
-                                EventHelpers::compute_sender_slopes
-                                              <ValueType, IndexType, MixedValueType>(
-                                              settings, metadata, comm_struct, p, send_iter_diff, diff);                 
+                                EventHelpers::compute_sender_slopes<
+                                    ValueType, IndexType, MixedValueType>(
+                                    settings, metadata, comm_struct, p,
+                                    send_iter_diff, diff);
                             }
 
                             // copy current to last communicated
@@ -962,9 +965,8 @@ void exchange_boundary_onesided(
                 temp_avg = temp_avg / (global_get[p])[0];
                 comm_struct.curr_recv_avg->get_values()[p] = temp_avg;
 
-                auto recv_iter_diff =
-                            metadata.iter_count -
-                            comm_struct.last_recv_iter->get_data()[p];
+                auto recv_iter_diff = metadata.iter_count -
+                                      comm_struct.last_recv_iter->get_data()[p];
 
                 if (std::fabs(comm_struct.curr_recv_avg->get_values()[p] -
                               comm_struct.last_recv_avg->get_values()[p]) > 0) {
@@ -980,9 +982,10 @@ void exchange_boundary_onesided(
                         global_solution->get_values(),
                         recv_buffer->get_values(), global_get, num_get, p);
 
-                    EventHelpers::compute_receiver_slopes
-                                  <ValueType, IndexType, MixedValueType>(
-                                  settings, metadata, comm_struct, p, recv_iter_diff, num_get);
+                    EventHelpers::compute_receiver_slopes<ValueType, IndexType,
+                                                          MixedValueType>(
+                        settings, metadata, comm_struct, p, recv_iter_diff,
+                        num_get);
 
                     // update avg
                     comm_struct.last_recv_avg->get_values()[p] =
@@ -1003,10 +1006,11 @@ void exchange_boundary_onesided(
                     if (metadata.horizon != 0) {
                         temp_avg = 0.0;  // calculate avg again
 
-                        temp_avg = EventHelpers::generate_extrapolated_buffer
-                                   <ValueType, IndexType, MixedValueType>(
-                                   settings, metadata, comm_struct, p, recv_iter_diff, num_get);                        
- 
+                        temp_avg = EventHelpers::generate_extrapolated_buffer<
+                            ValueType, IndexType, MixedValueType>(
+                            settings, metadata, comm_struct, p, recv_iter_diff,
+                            num_get);
+
                         // unpack extrapolated buffer
                         CommHelpers::unpack_buffer(
                             settings, prev_global_solution->get_values(),

@@ -101,7 +101,7 @@ SchwarzBase<ValueType, IndexType, MixedValueType>::SchwarzBase(
         Utils<ValueType, IndexType>::assert_correct_cuda_devices(
             num_devices, metadata.my_rank);
         settings.executor = gko::CudaExecutor::create(
-            my_local_rank, gko::OmpExecutor::create());
+            my_local_rank, gko::OmpExecutor::create(), false);
         auto exec_info = static_cast<gko::OmpExecutor *>(
                              settings.executor->get_master().get())
                              ->get_exec_info();
@@ -250,6 +250,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
                                                   metadata.my_rank, "int_mat");
     }
 
+    this->settings.executor->synchronize();
     // Setup the local vectors on each of the subddomains.
     Initialize<ValueType, IndexType>::setup_vectors(
         this->settings, this->metadata, rhs, this->local_rhs, this->global_rhs,
@@ -334,8 +335,9 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
     // The previous iteration solution vector
-    std::shared_ptr<vec_vtype> prev_global_solution = vec_vtype::create(
-        this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
+    std::shared_ptr<vec_vtype> prev_global_solution =
+        vec_vtype::create(this->settings.executor->get_master(),
+                          gko::dim<2>(this->metadata.global_size, 1));
     // A work vector.
     std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
         settings.executor, gko::dim<2>(2 * this->metadata.local_size_x, 1));
@@ -374,11 +376,12 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
 
     for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
         // Exchange the boundary values. The communication part.
-        MEASURE_ELAPSED_FUNC_TIME(
-            this->exchange_boundary(settings, metadata, prev_global_solution,
-                                    global_solution),
-            0, metadata.my_rank, boundary_exchange, metadata.iter_count);
         prev_global_solution->copy_from(gko::lend(global_solution));
+        MEASURE_ELAPSED_FUNC_TIME(
+            this->exchange_boundary(settings, metadata, global_solution,
+                                    prev_global_solution),
+            0, metadata.my_rank, boundary_exchange, metadata.iter_count);
+        global_solution->copy_from(gko::lend(prev_global_solution));
 
         // Update the boundary and interior values after the exchanging from
         // other processes.

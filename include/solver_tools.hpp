@@ -105,13 +105,25 @@ void extract_local_vector(const Settings &settings,
                           const gko::matrix::Dense<ValueType> *vector,
                           const IndexType &vec_index)
 {
+    using vec = gko::matrix::Dense<ValueType>;
     sub_vector->get_executor()->get_mem_space()->copy_from(
         settings.executor->get_mem_space().get(), metadata.local_size,
         vector->get_const_values() + vec_index, sub_vector->get_values());
-    settings.executor->run(Gather<ValueType, IndexType>(
-        metadata.overlap_size, metadata.overlap_row->get_data(),
-        vector->get_const_values(),
-        &(sub_vector->get_values()[metadata.local_size]), copy));
+    auto tmp = vec::create(settings.executor->get_master());
+    tmp->copy_from(vector);
+    auto sub_tmp = vec::create(settings.executor->get_master());
+    auto idx_arr = gko::Array<IndexType>(settings.executor->get_master(),
+                                         metadata.overlap_row->get_data(),
+                                         metadata.overlap_row->get_num_elems() +
+                                             metadata.overlap_row->get_data());
+    sub_tmp->copy_from(sub_vector);
+
+    settings.executor->synchronize();
+    settings.executor->get_master()->run(Gather<ValueType, IndexType>(
+        metadata.overlap_size, idx_arr.get_const_data(),
+        tmp->get_const_values(), &(sub_tmp->get_values()[metadata.local_size]),
+        copy));
+    sub_vector->copy_from(sub_tmp.get());
 }
 
 

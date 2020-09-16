@@ -474,7 +474,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
                     settings.executor, gko::dim<2>(num_recv, 1));
             } else {
                 this->comm_struct.recv_buffer = vec_vtype::create(
-                    settings.executor, gko::dim<2>(num_recv, 1));
+                    settings.executor->get_master(), gko::dim<2>(num_recv, 1));
             }
         } else {
             this->comm_struct.recv_buffer = nullptr;
@@ -540,7 +540,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
                     settings.executor, gko::dim<2>(num_send, 1));
             } else {
                 this->comm_struct.send_buffer = vec_vtype::create(
-                    settings.executor, gko::dim<2>(num_send, 1));
+                    settings.executor->get_master(), gko::dim<2>(num_send, 1));
             }
         } else {
             this->comm_struct.send_buffer = nullptr;
@@ -819,19 +819,6 @@ void exchange_boundary_twosided(
 
     MixedValueType dummy_mixed = 0.0;
     auto mpi_mixedvtype = schwz::mpi::get_mpi_datatype(dummy_mixed);
-    // auto diff_buf =
-    //     vec_vtype::create(settings.executor,
-    //     prev_global_solution->get_size());
-    // if (settings.executor_string == "omp") {
-    //     // for (auto q = 0; q < diff_buf->get_size()[0]; ++q) {
-    //     //     diff_buf->get_values()[q] = global_solution->get_values()[q] -
-    //     // prev_global_solution->get_values()[q];
-    //     // }
-    //     diff_buf->copy_from(gko::lend(global_solution));
-    // } else {
-    //     diff_buf->copy_from(gko::lend(global_solution));
-    // }
-
 
     {
         auto mpi_vtype =
@@ -846,13 +833,13 @@ void exchange_boundary_twosided(
                     MPI_Wait(&p_r, &status);
                 }
 
-                settings.executor->run(Gather<ValueType, IndexType>(
-                    (global_put[p])[0], &((local_put[p])[1]),
-                    global_solution->get_values(),
-                    &(send_buffer->get_values()[num_put]), copy));
+                settings.executor->get_master()->run(
+                    Gather<ValueType, IndexType>(
+                        (global_put[p])[0], &((local_put[p])[1]),
+                        global_solution->get_values(),
+                        &(send_buffer->get_values()[num_put]), copy));
                 if (settings.use_mixed_precision) {
                     send_buffer->convert_to(gko::lend(mixedt_send_buffer));
-                    // mixedt_send_buffer->copy_from(gko::lend(send_buffer));
                     MPI_Isend(&(mixedt_send_buffer->get_values()[num_put]),
                               (global_put[p])[0], mpi_mixedvtype,
                               neighbors_out[p], 0, MPI_COMM_WORLD,
@@ -909,10 +896,11 @@ void exchange_boundary_twosided(
                     mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
                     // recv_buffer->copy_from(gko::lend(mixedt_recv_buffer));
                 }
-                settings.executor->run(Scatter<ValueType, IndexType>(
-                    (global_get[p])[0], &((local_get[p])[1]),
-                    &(recv_buffer->get_values()[num_get]),
-                    global_solution->get_values(), avg));
+                settings.executor->get_master()->run(
+                    Scatter<ValueType, IndexType>(
+                        (global_get[p])[0], &((local_get[p])[1]),
+                        &(recv_buffer->get_values()[num_get]),
+                        global_solution->get_values(), avg));
                 if (settings.use_mixed_precision) {
                     if (settings.comm_settings.enable_overlap) {
                         // start the next receive
@@ -934,17 +922,6 @@ void exchange_boundary_twosided(
             }
         }
     }
-    // if (settings.executor_string == "omp") {
-    //     for (auto q = 0; q < diff_buf->get_size()[0]; ++q) {
-    //         global_solution->get_values()[q] =
-    //             (global_solution->get_values()[q] +
-    //             diff_buf->get_values()[q]) / 2;
-    //         // prev_global_solution->get_values()[q];
-    //     }
-    //     // global_solution->copy_from(gko::lend(diff_buf));
-    // } else {
-    //     global_solution->copy_from(gko::lend(diff_buf));
-    // }
     // wait for send
     if (!settings.comm_settings.enable_overlap) {
         for (auto p = 0; p < num_neighbors_out; p++) {

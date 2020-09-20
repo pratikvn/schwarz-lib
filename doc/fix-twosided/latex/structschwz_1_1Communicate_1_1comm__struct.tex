@@ -48,13 +48,13 @@ std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{struc
 \mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a087b62605d0889090c6e67325dfa3fb0}\label{structschwz_1_1Communicate_1_1comm__struct_a087b62605d0889090c6e67325dfa3fb0}} 
 std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a087b62605d0889090c6e67325dfa3fb0}{local\+\_\+neighbors\+\_\+out}
 \begin{DoxyCompactList}\small\item\em The neighbors this subdomain has to send data to. \end{DoxyCompactList}\item 
-gko\+::\+Array$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_aa359ee58c0e15abd8f63695c05e436ea}{global\+\_\+put}
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a285d921b098febe80aac99d969bf8578}{global\+\_\+put}
 \begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain sends from the other. \end{DoxyCompactList}\item 
-gko\+::\+Array$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a24320ef129e2070deaa936f33f3076e0}{local\+\_\+put}
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a54265ad85a040dc7d0d83054e5734896}{local\+\_\+put}
 \begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain sends from the other. \end{DoxyCompactList}\item 
-gko\+::\+Array$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a3b209dc2a9b9f28cc10af56fa197c1e1}{global\+\_\+get}
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_af731221ad6cff21da65ab08810d85501}{global\+\_\+get}
 \begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain gets from the other. \end{DoxyCompactList}\item 
-gko\+::\+Array$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a645056881f547c1ada09a37c9d94df38}{local\+\_\+get}
+std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a1c290b090a86e6ad6ae500014773ffb1}{local\+\_\+get}
 \begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain gets from the other. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a179dd67dc2d6ea4b71a6d5964cac18c6}\label{structschwz_1_1Communicate_1_1comm__struct_a179dd67dc2d6ea4b71a6d5964cac18c6}} 
 std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a179dd67dc2d6ea4b71a6d5964cac18c6}{window\+\_\+ids}
@@ -107,12 +107,12 @@ struct schwz\+::\+Communicate$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>
 The communication struct used to store the communication data. 
 
 \subsection{Member Data Documentation}
-\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a3b209dc2a9b9f28cc10af56fa197c1e1}\label{structschwz_1_1Communicate_1_1comm__struct_a3b209dc2a9b9f28cc10af56fa197c1e1}} 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_af731221ad6cff21da65ab08810d85501}\label{structschwz_1_1Communicate_1_1comm__struct_af731221ad6cff21da65ab08810d85501}} 
 \index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!global\+\_\+get@{global\+\_\+get}}
 \index{global\+\_\+get@{global\+\_\+get}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
 \subsubsection{\texorpdfstring{global\+\_\+get}{global\_get}}
 {\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ \\
-gko\+::\+Array$<$gko\+::\+Array$<$Index\+Type$>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::global\+\_\+get}
+std\+::shared\+\_\+ptr$<$gko\+::\+Array$<$gko\+::\+Array$<$Index\+Type$>$ $>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::global\+\_\+get}
 
 
 
@@ -122,12 +122,12 @@ For example. global\+\_\+get\mbox{[}p\mbox{]}\mbox{[}0\mbox{]} contains the over
 
 Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::initialize(), schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+windows().
 
-\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_aa359ee58c0e15abd8f63695c05e436ea}\label{structschwz_1_1Communicate_1_1comm__struct_aa359ee58c0e15abd8f63695c05e436ea}} 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a285d921b098febe80aac99d969bf8578}\label{structschwz_1_1Communicate_1_1comm__struct_a285d921b098febe80aac99d969bf8578}} 
 \index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!global\+\_\+put@{global\+\_\+put}}
 \index{global\+\_\+put@{global\+\_\+put}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
 \subsubsection{\texorpdfstring{global\+\_\+put}{global\_put}}
 {\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ \\
-gko\+::\+Array$<$gko\+::\+Array$<$Index\+Type$>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::global\+\_\+put}
+std\+::shared\+\_\+ptr$<$gko\+::\+Array$<$gko\+::\+Array$<$Index\+Type$>$ $>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::global\+\_\+put}
 
 
 
@@ -152,12 +152,12 @@ The bool vector which is true if the neighbors of a subdomain are in one node.
 
 Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::initialize(), schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+windows().
 
-\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a645056881f547c1ada09a37c9d94df38}\label{structschwz_1_1Communicate_1_1comm__struct_a645056881f547c1ada09a37c9d94df38}} 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a1c290b090a86e6ad6ae500014773ffb1}\label{structschwz_1_1Communicate_1_1comm__struct_a1c290b090a86e6ad6ae500014773ffb1}} 
 \index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!local\+\_\+get@{local\+\_\+get}}
 \index{local\+\_\+get@{local\+\_\+get}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
 \subsubsection{\texorpdfstring{local\+\_\+get}{local\_get}}
 {\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ \\
-gko\+::\+Array$<$gko\+::\+Array$<$Index\+Type$>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+get}
+std\+::shared\+\_\+ptr$<$gko\+::\+Array$<$gko\+::\+Array$<$Index\+Type$>$ $>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+get}
 
 
 
@@ -167,12 +167,12 @@ For example. global\+\_\+get\mbox{[}p\mbox{]}\mbox{[}0\mbox{]} contains the over
 
 Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::initialize(), schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+windows().
 
-\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a24320ef129e2070deaa936f33f3076e0}\label{structschwz_1_1Communicate_1_1comm__struct_a24320ef129e2070deaa936f33f3076e0}} 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a54265ad85a040dc7d0d83054e5734896}\label{structschwz_1_1Communicate_1_1comm__struct_a54265ad85a040dc7d0d83054e5734896}} 
 \index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!local\+\_\+put@{local\+\_\+put}}
 \index{local\+\_\+put@{local\+\_\+put}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
 \subsubsection{\texorpdfstring{local\+\_\+put}{local\_put}}
 {\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ \\
-gko\+::\+Array$<$gko\+::\+Array$<$Index\+Type$>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+put}
+std\+::shared\+\_\+ptr$<$gko\+::\+Array$<$gko\+::\+Array$<$Index\+Type$>$ $>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::local\+\_\+put}
 
 
 
@@ -186,4 +186,4 @@ Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value
 
 The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-communicate.\+hpp (522dfaf)\end{DoxyCompactItemize}
+communicate.\+hpp (92ed22b)\end{DoxyCompactItemize}

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['local_5fget',['local_get',['../structschwz_1_1Communicate_1_1comm__struct.html#a645056881f547c1ada09a37c9d94df38',1,'schwz::Communicate::comm_struct']]],
+  ['local_5fget',['local_get',['../structschwz_1_1Communicate_1_1comm__struct.html#a1c290b090a86e6ad6ae500014773ffb1',1,'schwz::Communicate::comm_struct']]],
   ['local_5finv_5fperm',['local_inv_perm',['../classschwz_1_1SchwarzBase.html#a9abc8c1238176db0b0f9518696ea7f29',1,'schwz::SchwarzBase']]],
   ['local_5fmatrix',['local_matrix',['../classschwz_1_1SchwarzBase.html#a0af5b057a4036eeb2d37fac629d5b5c7',1,'schwz::SchwarzBase']]],
   ['local_5fmax_5fiters',['local_max_iters',['../structschwz_1_1Metadata.html#a54d674e16789df0e5c226ec669d0c6e4',1,'schwz::Metadata']]],
@@ -11,7 +11,7 @@ var searchData=
   ['local_5fnum_5fprocs',['local_num_procs',['../structschwz_1_1Metadata.html#a1023b28f7655d4053423d75d0e98eee8',1,'schwz::Metadata']]],
   ['local_5fperm',['local_perm',['../classschwz_1_1SchwarzBase.html#a0f787009281de1f5c993d05866adf467',1,'schwz::SchwarzBase']]],
   ['local_5fprecond',['local_precond',['../structschwz_1_1Metadata.html#a4ea47eff6a067a4a166d4236a75efe30',1,'schwz::Metadata']]],
-  ['local_5fput',['local_put',['../structschwz_1_1Communicate_1_1comm__struct.html#a24320ef129e2070deaa936f33f3076e0',1,'schwz::Communicate::comm_struct']]],
+  ['local_5fput',['local_put',['../structschwz_1_1Communicate_1_1comm__struct.html#a54265ad85a040dc7d0d83054e5734896',1,'schwz::Communicate::comm_struct']]],
   ['local_5fresidual_5fvector_5fout',['local_residual_vector_out',['../classschwz_1_1SchwarzBase.html#ad3f18c1a861f3502992545befaa5da6a',1,'schwz::SchwarzBase']]],
   ['local_5frhs',['local_rhs',['../classschwz_1_1SchwarzBase.html#a186d54605688f53f50bb6305efe9c5fd',1,'schwz::SchwarzBase']]],
   ['local_5fsize',['local_size',['../structschwz_1_1Metadata.html#a1e24cc843abc923c309fb74243323d8c',1,'schwz::Metadata']]],

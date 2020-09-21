@@ -78,7 +78,6 @@ SchwarzBase<ValueType, IndexType, MixedValueType>::SchwarzBase(
       metadata(metadata)
 {
     using vec_itype = gko::Array<IndexType>;
-    using vec_vecshared = gko::Array<IndexType *>;
     metadata.my_local_rank =
         Utils<ValueType, IndexType>::get_local_rank(metadata.mpi_communicator);
     metadata.local_num_procs = Utils<ValueType, IndexType>::get_local_num_procs(
@@ -137,6 +136,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using vec_itype = gko::Array<IndexType>;
     using vec_vecshared = gko::Array<IndexType *>;
+    using vec_vecshared2 = gko::Array<gko::Array<IndexType>>;
     // Setup the global matrix
     // if explicit_laplacian has been enabled or an external matrix has been
     if (settings.explicit_laplacian || settings.matrix_filename != "null") {
@@ -213,10 +213,16 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
         new vec_itype(settings.executor->get_master(), num_subdomains + 1),
         std::default_delete<vec_itype>());
     comm_struct.is_local_neighbor = std::vector<bool>(num_subdomains + 1, 0);
+    comm_struct.global_put = std::shared_ptr<vec_vecshared>(
+        new vec_vecshared(settings.executor->get_master(), num_subdomains + 1),
+        std::default_delete<vec_vecshared>());
+    comm_struct.local_put = std::shared_ptr<vec_vecshared>(
+        new vec_vecshared(settings.executor->get_master(), num_subdomains + 1),
+        std::default_delete<vec_vecshared>());
     comm_struct.global_get = std::shared_ptr<vec_vecshared>(
         new vec_vecshared(settings.executor->get_master(), num_subdomains + 1),
         std::default_delete<vec_vecshared>());
-    comm_struct.global_put = std::shared_ptr<vec_vecshared>(
+    comm_struct.local_get = std::shared_ptr<vec_vecshared>(
         new vec_vecshared(settings.executor->get_master(), num_subdomains + 1),
         std::default_delete<vec_vecshared>());
     // Need this to initialize the arrays with zeros.

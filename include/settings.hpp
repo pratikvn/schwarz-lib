@@ -472,7 +472,7 @@ struct Metadata {
     /**
      * The overlap row indices.
      */
-    std::shared_ptr<gko::Array<IndexType>> overlap_row;
+    gko::Array<IndexType> overlap_row;
 
     /**
      * The starting row of each subdomain in the matrix.

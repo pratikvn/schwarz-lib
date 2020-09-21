@@ -79,7 +79,7 @@ $(function() {
 <div class="dynheader">
 Collaboration diagram for schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structschwz_1_1Communicate_1_1comm__struct__coll__graph.svg" width="206" height="260"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="structschwz_1_1Communicate_1_1comm__struct__coll__graph.svg" width="347" height="275"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -120,18 +120,26 @@ std::shared_ptr&lt; gko::Array&lt; IndexType &gt; &gt;&#160;</td><td class="memI
 std::shared_ptr&lt; gko::Array&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a087b62605d0889090c6e67325dfa3fb0">local_neighbors_out</a></td></tr>
 <tr class="memdesc:a087b62605d0889090c6e67325dfa3fb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The neighbors this subdomain has to send data to. <br /></td></tr>
 <tr class="separator:a087b62605d0889090c6e67325dfa3fb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a285d921b098febe80aac99d969bf8578"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; gko::Array&lt; IndexType &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a285d921b098febe80aac99d969bf8578">global_put</a></td></tr>
-<tr class="memdesc:a285d921b098febe80aac99d969bf8578"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain sends from the other.  <a href="#a285d921b098febe80aac99d969bf8578">More...</a><br /></td></tr>
-<tr class="separator:a285d921b098febe80aac99d969bf8578"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54265ad85a040dc7d0d83054e5734896"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; gko::Array&lt; IndexType &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a54265ad85a040dc7d0d83054e5734896">local_put</a></td></tr>
-<tr class="memdesc:a54265ad85a040dc7d0d83054e5734896"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain sends from the other.  <a href="#a54265ad85a040dc7d0d83054e5734896">More...</a><br /></td></tr>
-<tr class="separator:a54265ad85a040dc7d0d83054e5734896"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af731221ad6cff21da65ab08810d85501"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; gko::Array&lt; IndexType &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#af731221ad6cff21da65ab08810d85501">global_get</a></td></tr>
-<tr class="memdesc:af731221ad6cff21da65ab08810d85501"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain gets from the other.  <a href="#af731221ad6cff21da65ab08810d85501">More...</a><br /></td></tr>
-<tr class="separator:af731221ad6cff21da65ab08810d85501"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c290b090a86e6ad6ae500014773ffb1"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; gko::Array&lt; IndexType &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a1c290b090a86e6ad6ae500014773ffb1">local_get</a></td></tr>
-<tr class="memdesc:a1c290b090a86e6ad6ae500014773ffb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain gets from the other.  <a href="#a1c290b090a86e6ad6ae500014773ffb1">More...</a><br /></td></tr>
-<tr class="separator:a1c290b090a86e6ad6ae500014773ffb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9186bd26e5826aa6ad88c863798593ac"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; IndexType * &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a9186bd26e5826aa6ad88c863798593ac">global_put</a></td></tr>
+<tr class="memdesc:a9186bd26e5826aa6ad88c863798593ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain sends from the other.  <a href="#a9186bd26e5826aa6ad88c863798593ac">More...</a><br /></td></tr>
+<tr class="separator:a9186bd26e5826aa6ad88c863798593ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace7588b81dd2aa7a84e118df8137252b"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; IndexType * &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#ace7588b81dd2aa7a84e118df8137252b">local_put</a></td></tr>
+<tr class="memdesc:ace7588b81dd2aa7a84e118df8137252b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain sends from the other.  <a href="#ace7588b81dd2aa7a84e118df8137252b">More...</a><br /></td></tr>
+<tr class="separator:ace7588b81dd2aa7a84e118df8137252b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4166e2bb75eeaf48ee39ca7cdc3adb01"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; IndexType * &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a4166e2bb75eeaf48ee39ca7cdc3adb01">global_get</a></td></tr>
+<tr class="memdesc:a4166e2bb75eeaf48ee39ca7cdc3adb01"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain gets from the other.  <a href="#a4166e2bb75eeaf48ee39ca7cdc3adb01">More...</a><br /></td></tr>
+<tr class="separator:a4166e2bb75eeaf48ee39ca7cdc3adb01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4e91a457646f43106da98a58c332754"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; IndexType * &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#ab4e91a457646f43106da98a58c332754">local_get</a></td></tr>
+<tr class="memdesc:ab4e91a457646f43106da98a58c332754"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain gets from the other.  <a href="#ab4e91a457646f43106da98a58c332754">More...</a><br /></td></tr>
+<tr class="separator:ab4e91a457646f43106da98a58c332754"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5af75e92c875f3546b739be84d2c927"><td class="memItemLeft" align="right" valign="top"><a id="ac5af75e92c875f3546b739be84d2c927"></a>
+std::vector&lt; IndexType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#ac5af75e92c875f3546b739be84d2c927">send</a></td></tr>
+<tr class="memdesc:ac5af75e92c875f3546b739be84d2c927"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of elements being sent to each subdomain. <br /></td></tr>
+<tr class="separator:ac5af75e92c875f3546b739be84d2c927"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39634304cc492cf00a2d60eea9a97799"><td class="memItemLeft" align="right" valign="top"><a id="a39634304cc492cf00a2d60eea9a97799"></a>
+std::vector&lt; IndexType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a39634304cc492cf00a2d60eea9a97799">recv</a></td></tr>
+<tr class="memdesc:a39634304cc492cf00a2d60eea9a97799"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of elements being sent to each subdomain. <br /></td></tr>
+<tr class="separator:a39634304cc492cf00a2d60eea9a97799"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a179dd67dc2d6ea4b71a6d5964cac18c6"><td class="memItemLeft" align="right" valign="top"><a id="a179dd67dc2d6ea4b71a6d5964cac18c6"></a>
 std::shared_ptr&lt; gko::Array&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a179dd67dc2d6ea4b71a6d5964cac18c6">window_ids</a></td></tr>
 <tr class="memdesc:a179dd67dc2d6ea4b71a6d5964cac18c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The RDMA window ids. <br /></td></tr>
@@ -195,8 +203,8 @@ struct schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt;::comm_st
 
 <p>The communication struct used to store the communication data. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
-<a id="af731221ad6cff21da65ab08810d85501"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af731221ad6cff21da65ab08810d85501">&#9670;&nbsp;</a></span>global_get</h2>
+<a id="a4166e2bb75eeaf48ee39ca7cdc3adb01"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4166e2bb75eeaf48ee39ca7cdc3adb01">&#9670;&nbsp;</a></span>global_get</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -204,7 +212,7 @@ struct schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt;::comm_st
 template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;gko::Array&lt;gko::Array&lt;IndexType&gt; &gt; &gt; <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct::global_get</td>
+          <td class="memname">std::shared_ptr&lt;gko::Array&lt;IndexType *&gt; &gt; <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct::global_get</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -216,8 +224,8 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 
 </div>
 </div>
-<a id="a285d921b098febe80aac99d969bf8578"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a285d921b098febe80aac99d969bf8578">&#9670;&nbsp;</a></span>global_put</h2>
+<a id="a9186bd26e5826aa6ad88c863798593ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9186bd26e5826aa6ad88c863798593ac">&#9670;&nbsp;</a></span>global_put</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -225,7 +233,7 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;gko::Array&lt;gko::Array&lt;IndexType&gt; &gt; &gt; <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct::global_put</td>
+          <td class="memname">std::shared_ptr&lt;gko::Array&lt;IndexType *&gt; &gt; <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct::global_put</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -257,8 +265,8 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 
 </div>
 </div>
-<a id="a1c290b090a86e6ad6ae500014773ffb1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1c290b090a86e6ad6ae500014773ffb1">&#9670;&nbsp;</a></span>local_get</h2>
+<a id="ab4e91a457646f43106da98a58c332754"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4e91a457646f43106da98a58c332754">&#9670;&nbsp;</a></span>local_get</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -266,7 +274,7 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;gko::Array&lt;gko::Array&lt;IndexType&gt; &gt; &gt; <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct::local_get</td>
+          <td class="memname">std::shared_ptr&lt;gko::Array&lt;IndexType *&gt; &gt; <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct::local_get</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -278,8 +286,8 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 
 </div>
 </div>
-<a id="a54265ad85a040dc7d0d83054e5734896"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54265ad85a040dc7d0d83054e5734896">&#9670;&nbsp;</a></span>local_put</h2>
+<a id="ace7588b81dd2aa7a84e118df8137252b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace7588b81dd2aa7a84e118df8137252b">&#9670;&nbsp;</a></span>local_put</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -287,7 +295,7 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;gko::Array&lt;gko::Array&lt;IndexType&gt; &gt; &gt; <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct::local_put</td>
+          <td class="memname">std::shared_ptr&lt;gko::Array&lt;IndexType *&gt; &gt; <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct::local_put</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -300,7 +308,7 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li><a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp (92ed22b)</a></li>
+<li><a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp (544e47f)</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

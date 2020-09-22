@@ -90,15 +90,15 @@ void transfer_one_by_one(
 
 
 template <typename ValueType, typename IndexType>
-void pack_buffer(const Settings &settings, const ValueType *prev_buffer,
-                 const ValueType *buffer, ValueType *send_buffer,
-                 IndexType **num_send_elems, IndexType **host_num_send_elems,
-                 int offset, int send_subd)
+void pack_buffer(const Settings &settings, const ValueType *buffer,
+                 ValueType *send_buffer, IndexType **num_send_elems,
+                 IndexType **host_num_send_elems, int offset, int send_subd)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using arr = gko::Array<IndexType>;
     using varr = gko::Array<ValueType>;
-    if (settings.executor_string == "cuda") {
+    if (settings.executor_string == "cuda" &&
+        !settings.comm_settings.stage_through_host) {
         auto tmp_send_buf = vec_vtype::create(
             settings.executor,
             gko::dim<2>((host_num_send_elems[send_subd])[0], 1));
@@ -110,10 +110,10 @@ void pack_buffer(const Settings &settings, const ValueType *prev_buffer,
                                 tmp_send_buf->get_values(),
                                 &(send_buffer[offset]));
     } else {
-        for (auto i = 0; i < (num_send_elems[send_subd])[0]; i++) {
-            send_buffer[offset + i] =
-                buffer[(num_send_elems[send_subd])[i + 1]];
-        }
+        settings.executor->get_master()->run(
+            Gather<ValueType, IndexType>((host_num_send_elems[send_subd])[0],
+                                         (host_num_send_elems[send_subd]) + 1,
+                                         buffer, &(send_buffer[offset]), copy));
     }
 }
 
@@ -151,16 +151,16 @@ void transfer_buffer(const Settings &settings, MPI_Win &window,
 
 
 template <typename ValueType, typename IndexType>
-void unpack_buffer(const Settings &settings, const ValueType *prev_buffer,
-                   ValueType *buffer, const ValueType *recv_buffer,
-                   IndexType **num_recv_elems, IndexType **host_num_recv_elems,
-                   int offset, int recv_subd)
+void unpack_buffer(const Settings &settings, ValueType *buffer,
+                   const ValueType *recv_buffer, IndexType **num_recv_elems,
+                   IndexType **host_num_recv_elems, int offset, int recv_subd)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using arr = gko::Array<IndexType>;
     using varr = gko::Array<ValueType>;
     auto num_elems = (host_num_recv_elems[recv_subd])[0];
-    if (settings.executor_string == "cuda") {
+    if (settings.executor_string == "cuda" &&
+        !settings.comm_settings.stage_through_host) {
         auto tmp_recv_buf = vec_vtype::create(
             settings.executor,
             gko::dim<2>((host_num_recv_elems[recv_subd])[0], 1));
@@ -170,10 +170,9 @@ void unpack_buffer(const Settings &settings, const ValueType *prev_buffer,
             num_elems, (num_recv_elems[recv_subd]) + 1,
             tmp_recv_buf->get_values(), buffer, copy));
     } else {
-        for (auto i = 0; i < num_elems; i++) {
-            buffer[(num_recv_elems[recv_subd])[i + 1]] =
-                recv_buffer[offset + i];
-        }
+        settings.executor->get_master()->run(Scatter<ValueType, IndexType>(
+            num_elems, (num_recv_elems[recv_subd]) + 1, &(recv_buffer[offset]),
+            buffer, copy));
     }
 }
 

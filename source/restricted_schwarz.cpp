@@ -474,21 +474,25 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
 
     // allocate MPI buffer
     // one-sided
+    auto actual_exec = settings.executor;
+    if (settings.comm_settings.stage_through_host) {
+        actual_exec = settings.executor->get_master();
+    }
     if (settings.comm_settings.enable_onesided) {
         if (num_recv > 0) {
             if (settings.use_mixed_precision) {
-                this->comm_struct.recv_buffer = vec_vtype::create(
-                    settings.executor, gko::dim<2>(num_recv, 1));
+                this->comm_struct.recv_buffer =
+                    vec_vtype::create(actual_exec, gko::dim<2>(num_recv, 1));
                 this->comm_struct.mixedt_recv_buffer = vec_mixedtype::create(
-                    settings.executor, gko::dim<2>(num_recv, 1));
+                    actual_exec, gko::dim<2>(num_recv, 1));
                 MPI_Win_create(
                     this->comm_struct.mixedt_recv_buffer->get_values(),
                     num_recv * sizeof(MixedValueType), sizeof(MixedValueType),
                     MPI_INFO_NULL, MPI_COMM_WORLD,
                     &(this->comm_struct.window_recv_buffer));
             } else {
-                this->comm_struct.recv_buffer = vec_vtype::create(
-                    settings.executor, gko::dim<2>(num_recv, 1));
+                this->comm_struct.recv_buffer =
+                    vec_vtype::create(actual_exec, gko::dim<2>(num_recv, 1));
                 MPI_Win_create(this->comm_struct.recv_buffer->get_values(),
                                num_recv * sizeof(ValueType), sizeof(ValueType),
                                MPI_INFO_NULL, MPI_COMM_WORLD,
@@ -506,12 +510,12 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
         } else {
             if (settings.use_mixed_precision) {
                 this->comm_struct.recv_buffer =
-                    vec_vtype::create(settings.executor, gko::dim<2>(1, 1));
+                    vec_vtype::create(actual_exec, gko::dim<2>(1, 1));
                 this->comm_struct.mixedt_recv_buffer =
-                    vec_mixedtype::create(settings.executor, gko::dim<2>(1, 1));
+                    vec_mixedtype::create(actual_exec, gko::dim<2>(1, 1));
             } else {
                 this->comm_struct.recv_buffer =
-                    vec_vtype::create(settings.executor, gko::dim<2>(1, 1));
+                    vec_vtype::create(actual_exec, gko::dim<2>(1, 1));
             }
         }
     }
@@ -519,13 +523,13 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
     else {
         if (num_recv > 0) {
             if (settings.use_mixed_precision) {
-                this->comm_struct.recv_buffer = vec_vtype::create(
-                    settings.executor, gko::dim<2>(num_recv, 1));
+                this->comm_struct.recv_buffer =
+                    vec_vtype::create(actual_exec, gko::dim<2>(num_recv, 1));
                 this->comm_struct.mixedt_recv_buffer = vec_mixedtype::create(
-                    settings.executor, gko::dim<2>(num_recv, 1));
+                    actual_exec, gko::dim<2>(num_recv, 1));
             } else {
-                this->comm_struct.recv_buffer = vec_vtype::create(
-                    settings.executor, gko::dim<2>(num_recv, 1));
+                this->comm_struct.recv_buffer =
+                    vec_vtype::create(actual_exec, gko::dim<2>(num_recv, 1));
             }
         } else {
             this->comm_struct.recv_buffer = nullptr;
@@ -545,18 +549,18 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
     if (settings.comm_settings.enable_onesided) {
         if (num_send > 0) {
             if (settings.use_mixed_precision) {
-                this->comm_struct.send_buffer = vec_vtype::create(
-                    settings.executor, gko::dim<2>(num_send, 1));
+                this->comm_struct.send_buffer =
+                    vec_vtype::create(actual_exec, gko::dim<2>(num_send, 1));
                 this->comm_struct.mixedt_send_buffer = vec_mixedtype::create(
-                    settings.executor, gko::dim<2>(num_send, 1));
+                    actual_exec, gko::dim<2>(num_send, 1));
                 MPI_Win_create(
                     this->comm_struct.mixedt_send_buffer->get_values(),
                     num_send * sizeof(MixedValueType), sizeof(MixedValueType),
                     MPI_INFO_NULL, MPI_COMM_WORLD,
                     &(this->comm_struct.window_send_buffer));
             } else {
-                this->comm_struct.send_buffer = vec_vtype::create(
-                    settings.executor, gko::dim<2>(num_send, 1));
+                this->comm_struct.send_buffer =
+                    vec_vtype::create(actual_exec, gko::dim<2>(num_send, 1));
                 MPI_Win_create(this->comm_struct.send_buffer->get_values(),
                                num_send * sizeof(ValueType), sizeof(ValueType),
                                MPI_INFO_NULL, MPI_COMM_WORLD,
@@ -572,12 +576,12 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
         } else {
             if (settings.use_mixed_precision) {
                 this->comm_struct.send_buffer =
-                    vec_vtype::create(settings.executor, gko::dim<2>(1, 1));
+                    vec_vtype::create(actual_exec, gko::dim<2>(1, 1));
                 this->comm_struct.mixedt_send_buffer =
-                    vec_mixedtype::create(settings.executor, gko::dim<2>(1, 1));
+                    vec_mixedtype::create(actual_exec, gko::dim<2>(1, 1));
             } else {
                 this->comm_struct.send_buffer =
-                    vec_vtype::create(settings.executor, gko::dim<2>(1, 1));
+                    vec_vtype::create(actual_exec, gko::dim<2>(1, 1));
             }
         }
     }
@@ -585,13 +589,13 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
     else {
         if (num_send > 0) {
             if (settings.use_mixed_precision) {
-                this->comm_struct.send_buffer = vec_vtype::create(
-                    settings.executor, gko::dim<2>(num_send, 1));
+                this->comm_struct.send_buffer =
+                    vec_vtype::create(actual_exec, gko::dim<2>(num_send, 1));
                 this->comm_struct.mixedt_send_buffer = vec_mixedtype::create(
-                    settings.executor, gko::dim<2>(num_send, 1));
+                    actual_exec, gko::dim<2>(num_send, 1));
             } else {
-                this->comm_struct.send_buffer = vec_vtype::create(
-                    settings.executor, gko::dim<2>(num_send, 1));
+                this->comm_struct.send_buffer =
+                    vec_vtype::create(actual_exec, gko::dim<2>(num_send, 1));
             }
         } else {
             this->comm_struct.send_buffer = nullptr;
@@ -712,7 +716,6 @@ void exchange_boundary_onesided(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
         &comm_struct,
-    const std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_global_solution,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
@@ -742,7 +745,11 @@ void exchange_boundary_onesided(
     auto mixedt_recv_buffer = comm_struct.mixedt_recv_buffer;
     auto is_local_neighbor = comm_struct.is_local_neighbor;
 
-
+    auto actual_exec = settings.executor;
+    if (settings.comm_settings.stage_through_host) {
+        actual_exec = settings.executor->get_master();
+    }
+    auto host_flag = actual_exec == settings.executor->get_master();
     if (settings.comm_settings.enable_put) {
         if (settings.comm_settings.enable_one_by_one) {
             CommHelpers::transfer_one_by_one<ValueType, IndexType,
@@ -754,11 +761,11 @@ void exchange_boundary_onesided(
             for (auto p = 0; p < num_neighbors_out; p++) {
                 // send
                 if ((global_put[p])[0] > 0) {
-                    CommHelpers::pack_buffer(settings,
-                                             prev_global_solution->get_values(),
-                                             global_solution->get_values(),
-                                             send_buffer->get_values(),
-                                             local_put, global_put, num_put, p);
+                    CommHelpers::pack_buffer(
+                        settings, global_solution->get_values(),
+                        send_buffer->get_values(),
+                        (host_flag ? global_put : local_put), global_put,
+                        num_put, p);
                     if (settings.use_mixed_precision) {
                         send_buffer->convert_to(gko::lend(mixedt_send_buffer));
                         CommHelpers::transfer_buffer(
@@ -782,10 +789,11 @@ void exchange_boundary_onesided(
         int num_get = 0;
         for (auto p = 0; p < num_neighbors_in; p++) {
             if ((global_get[p])[0] > 0) {
-                CommHelpers::unpack_buffer(
-                    settings, prev_global_solution->get_values(),
-                    global_solution->get_values(), recv_buffer->get_values(),
-                    local_get, global_get, num_get, p);
+                CommHelpers::unpack_buffer(settings,
+                                           global_solution->get_values(),
+                                           recv_buffer->get_values(),
+                                           (host_flag ? global_get : local_get),
+                                           global_get, num_get, p);
                 num_get += (global_get[p])[0];
             }
         }
@@ -800,17 +808,16 @@ void exchange_boundary_onesided(
             int num_put = 0;
             for (auto p = 0; p < num_neighbors_out; p++) {
                 if ((global_put[p])[0] > 0) {
-                    CommHelpers::pack_buffer(settings,
-                                             prev_global_solution->get_values(),
-                                             global_solution->get_values(),
-                                             send_buffer->get_values(),
-                                             local_put, global_put, num_put, p);
+                    CommHelpers::pack_buffer(
+                        settings, global_solution->get_values(),
+                        send_buffer->get_values(),
+                        (host_flag ? global_put : local_put), global_put,
+                        num_put, p);
                 }
                 num_put += (global_put[p])[0];
             }
             if (settings.use_mixed_precision) {
                 send_buffer->convert_to(gko::lend(mixedt_send_buffer));
-                // mixedt_send_buffer->copy_from(gko::lend(send_buffer));
             }
             int num_get = 0;
             for (auto p = 0; p < num_neighbors_in; p++) {
@@ -821,11 +828,10 @@ void exchange_boundary_onesided(
                             mixedt_recv_buffer->get_values(), global_get,
                             num_get, p, neighbors_in, get_displacements);
                         mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
-                        // recv_buffer->copy_from(gko::lend(mixedt_recv_buffer));
                         CommHelpers::unpack_buffer(
-                            settings, prev_global_solution->get_values(),
-                            global_solution->get_values(),
-                            recv_buffer->get_values(), local_get, global_get,
+                            settings, global_solution->get_values(),
+                            recv_buffer->get_values(),
+                            (host_flag ? global_get : local_get), global_get,
                             num_get, p);
                     } else {
                         CommHelpers::transfer_buffer(
@@ -833,9 +839,9 @@ void exchange_boundary_onesided(
                             recv_buffer->get_values(), global_get, num_get, p,
                             neighbors_in, get_displacements);
                         CommHelpers::unpack_buffer(
-                            settings, prev_global_solution->get_values(),
-                            global_solution->get_values(),
-                            recv_buffer->get_values(), local_get, global_get,
+                            settings, global_solution->get_values(),
+                            recv_buffer->get_values(),
+                            (host_flag ? global_get : local_get), global_get,
                             num_get, p);
                     }
                 }
@@ -851,7 +857,6 @@ void exchange_boundary_twosided(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
     struct Communicate<ValueType, IndexType, MixedValueType>::comm_struct
         &comm_struct,
-    const std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_global_solution,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     using vec = gko::matrix::Dense<ValueType>;
@@ -868,7 +873,11 @@ void exchange_boundary_twosided(
 
     MixedValueType dummy_mixed = 0.0;
     auto mpi_mixedvtype = schwz::mpi::get_mpi_datatype(dummy_mixed);
-
+    auto actual_exec = settings.executor;
+    if (settings.comm_settings.stage_through_host) {
+        actual_exec = settings.executor->get_master();
+    }
+    auto host_flag = actual_exec == settings.executor->get_master();
     {
         auto mpi_vtype =
             schwz::mpi::get_mpi_datatype(send_buffer->get_values()[0]);
@@ -881,8 +890,9 @@ void exchange_boundary_twosided(
                     auto p_r = put_request[p];
                     MPI_Wait(&p_r, &status);
                 }
-                settings.executor->run(Gather<ValueType, IndexType>(
-                    (global_put[p])[0], (local_put[p]) + 1,
+                actual_exec->run(Gather<ValueType, IndexType>(
+                    (global_put[p])[0],
+                    (host_flag ? (global_put[p] + 1) : (local_put[p] + 1)),
                     global_solution->get_values(),
                     &(send_buffer->get_values()[num_put]), copy));
                 if (settings.use_mixed_precision) {
@@ -942,8 +952,9 @@ void exchange_boundary_twosided(
                 if (settings.use_mixed_precision) {
                     mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
                 }
-                settings.executor->run(Scatter<ValueType, IndexType>(
-                    (global_get[p])[0], (local_get[p]) + 1,
+                actual_exec->run(Scatter<ValueType, IndexType>(
+                    (global_get[p])[0],
+                    (host_flag ? (global_get[p] + 1) : (local_get[p] + 1)),
                     &(recv_buffer->get_values()[num_get]),
                     global_solution->get_values(), copy));
                 num_get += (global_get[p])[0];
@@ -965,17 +976,14 @@ void exchange_boundary_twosided(
 template <typename ValueType, typename IndexType, typename MixedValueType>
 void SolverRAS<ValueType, IndexType, MixedValueType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
-    const std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_global_solution,
     std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
 {
     if (settings.comm_settings.enable_onesided) {
         exchange_boundary_onesided<ValueType, IndexType, MixedValueType>(
-            settings, metadata, this->comm_struct, prev_global_solution,
-            global_solution);
+            settings, metadata, this->comm_struct, global_solution);
     } else {
         exchange_boundary_twosided<ValueType, IndexType, MixedValueType>(
-            settings, metadata, this->comm_struct, prev_global_solution,
-            global_solution);
+            settings, metadata, this->comm_struct, global_solution);
     }
 }
 

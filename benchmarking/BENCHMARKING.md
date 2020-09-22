@@ -47,6 +47,7 @@ Where `FLAGS` are the options below with the template `flag_name [type][default_
 #### Communication settings
 * `enable_onesided` [bool][false] : Enable the onesided asynchronous communication.
 * `enable_twosided` [bool][true] : Enable the twosided asynchronous communication. A dummy flag.
+* `stage_through_host` [bool][false] : Enable staging transfers through host.
 * `enable_one_by_one` [bool][false] : Enable putting/getting of each element in onesided communication.
 * `enable_put_all_local_residual_norms`  [bool][false] : Enable putting of all local residual norms"
 * `enable_comm_overlap` [bool][false] : Enable overlap of communication and computation.

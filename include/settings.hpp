@@ -236,6 +236,11 @@ struct Settings {
         bool enable_get = true;
 
         /**
+         * Stage the MPI transfers through the host.
+         */
+        bool stage_through_host = false;
+
+        /**
          * Push each element separately directly into the buffer.
          */
         bool enable_one_by_one = false;

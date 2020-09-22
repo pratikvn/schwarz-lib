@@ -11,14 +11,14 @@ The Comm\+Helper namespace .
 \mbox{\Hypertarget{namespaceschwz_1_1CommHelpers_ad55122b484f131b8b63e7d82e8ff6e88}\label{namespaceschwz_1_1CommHelpers_ad55122b484f131b8b63e7d82e8ff6e88}} 
 {\footnotesize template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ }\\void {\bfseries transfer\+\_\+one\+\_\+by\+\_\+one} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, struct \hyperlink{classschwz_1_1Communicate}{Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct \&comm\+\_\+struct, Value\+Type $\ast$buffer, Index\+Type $\ast$$\ast$offset, int num\+\_\+neighbors, Index\+Type $\ast$neighbors)
 \item 
-\mbox{\Hypertarget{namespaceschwz_1_1CommHelpers_a95fa62fcdefd833a653b6d19a5009351}\label{namespaceschwz_1_1CommHelpers_a95fa62fcdefd833a653b6d19a5009351}} 
-{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries pack\+\_\+buffer} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const Value\+Type $\ast$prev\+\_\+buffer, const Value\+Type $\ast$buffer, Value\+Type $\ast$send\+\_\+buffer, Index\+Type $\ast$$\ast$num\+\_\+send\+\_\+elems, Index\+Type $\ast$$\ast$host\+\_\+num\+\_\+send\+\_\+elems, int offset, int send\+\_\+subd)
+\mbox{\Hypertarget{namespaceschwz_1_1CommHelpers_a148493e3f4700ee1a664fa67990614a2}\label{namespaceschwz_1_1CommHelpers_a148493e3f4700ee1a664fa67990614a2}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries pack\+\_\+buffer} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const Value\+Type $\ast$buffer, Value\+Type $\ast$send\+\_\+buffer, Index\+Type $\ast$$\ast$num\+\_\+send\+\_\+elems, Index\+Type $\ast$$\ast$host\+\_\+num\+\_\+send\+\_\+elems, int offset, int send\+\_\+subd)
 \item 
 \mbox{\Hypertarget{namespaceschwz_1_1CommHelpers_a48e42ab3e145c65c626520486b5d56fb}\label{namespaceschwz_1_1CommHelpers_a48e42ab3e145c65c626520486b5d56fb}} 
 {\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries transfer\+\_\+buffer} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, M\+P\+I\+\_\+\+Win \&window, Value\+Type $\ast$target\+\_\+buffer, Index\+Type $\ast$$\ast$host\+\_\+num\+\_\+elems, int offset, int target\+\_\+subd, Index\+Type $\ast$neighbors, Index\+Type $\ast$displacements)
 \item 
-\mbox{\Hypertarget{namespaceschwz_1_1CommHelpers_a11798855a0b37f48deb5ba25eaa8ca50}\label{namespaceschwz_1_1CommHelpers_a11798855a0b37f48deb5ba25eaa8ca50}} 
-{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries unpack\+\_\+buffer} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const Value\+Type $\ast$prev\+\_\+buffer, Value\+Type $\ast$buffer, const Value\+Type $\ast$recv\+\_\+buffer, Index\+Type $\ast$$\ast$num\+\_\+recv\+\_\+elems, Index\+Type $\ast$$\ast$host\+\_\+num\+\_\+recv\+\_\+elems, int offset, int recv\+\_\+subd)
+\mbox{\Hypertarget{namespaceschwz_1_1CommHelpers_a695b33870ef4a17434d134f644590478}\label{namespaceschwz_1_1CommHelpers_a695b33870ef4a17434d134f644590478}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries unpack\+\_\+buffer} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, Value\+Type $\ast$buffer, const Value\+Type $\ast$recv\+\_\+buffer, Index\+Type $\ast$$\ast$num\+\_\+recv\+\_\+elems, Index\+Type $\ast$$\ast$host\+\_\+num\+\_\+recv\+\_\+elems, int offset, int recv\+\_\+subd)
 \end{DoxyCompactItemize}
 
 

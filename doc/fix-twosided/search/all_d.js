@@ -18,5 +18,6 @@ var searchData=
   ['shifted_5fiter',['shifted_iter',['../structschwz_1_1Settings.html#a33a9382f1b5961a8cb2133cb0c22daf0',1,'schwz::Settings']]],
   ['solve',['Solve',['../classschwz_1_1Solve.html',1,'schwz::Solve&lt; ValueType, IndexType, MixedValueType &gt;'],['../group__solve.html',1,'(Global Namespace)']]],
   ['solverras',['SolverRAS',['../classschwz_1_1SolverRAS.html',1,'schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;'],['../classschwz_1_1SolverRAS.html#afc4b02a6ec47a155f6a7822d1615fd9c',1,'schwz::SolverRAS::SolverRAS()']]],
-  ['solvertools',['SolverTools',['../namespaceschwz_1_1SolverTools.html',1,'schwz']]]
+  ['solvertools',['SolverTools',['../namespaceschwz_1_1SolverTools.html',1,'schwz']]],
+  ['stage_5fthrough_5fhost',['stage_through_host',['../structschwz_1_1Settings_1_1comm__settings.html#aa4b8ae4d62df13f3376663d4c2cd28d5',1,'schwz::Settings::comm_settings']]]
 ];

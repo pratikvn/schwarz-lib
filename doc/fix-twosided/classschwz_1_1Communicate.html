@@ -101,9 +101,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:a13190372f3a6193f92226d08e822fde7"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#a13190372f3a6193f92226d08e822fde7">setup_windows</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;main_buffer)=0</td></tr>
 <tr class="memdesc:a13190372f3a6193f92226d08e822fde7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the windows needed for the asynchronous communication.  <a href="#a13190372f3a6193f92226d08e822fde7">More...</a><br /></td></tr>
 <tr class="separator:a13190372f3a6193f92226d08e822fde7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78864f8bdc7feb992c740b49d80b8d53"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#a78864f8bdc7feb992c740b49d80b8d53">exchange_boundary</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;prev_global_solution, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution)=0</td></tr>
-<tr class="memdesc:a78864f8bdc7feb992c740b49d80b8d53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exchanges the elements of the solution vector.  <a href="#a78864f8bdc7feb992c740b49d80b8d53">More...</a><br /></td></tr>
-<tr class="separator:a78864f8bdc7feb992c740b49d80b8d53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41794ecd95f7f7e590ae27bb6ca6e6e1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#a41794ecd95f7f7e590ae27bb6ca6e6e1">exchange_boundary</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_solution)=0</td></tr>
+<tr class="memdesc:a41794ecd95f7f7e590ae27bb6ca6e6e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exchanges the elements of the solution vector.  <a href="#a41794ecd95f7f7e590ae27bb6ca6e6e1">More...</a><br /></td></tr>
+<tr class="separator:a41794ecd95f7f7e590ae27bb6ca6e6e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c1ed0c5f86c458038b4062f57337d44"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classschwz_1_1Communicate.html#a8c1ed0c5f86c458038b4062f57337d44">local_to_global_vector</a> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;metadata, const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;local_vector, std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;global_vector)</td></tr>
 <tr class="memdesc:a8c1ed0c5f86c458038b4062f57337d44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms data from a local vector to a global vector.  <a href="#a8c1ed0c5f86c458038b4062f57337d44">More...</a><br /></td></tr>
 <tr class="separator:a8c1ed0c5f86c458038b4062f57337d44"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,8 +141,8 @@ class schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt;</h3>
 </dl>
 <p><a class="el" href="group__comm.html">Communicate</a> </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a78864f8bdc7feb992c740b49d80b8d53"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a78864f8bdc7feb992c740b49d80b8d53">&#9670;&nbsp;</a></span>exchange_boundary()</h2>
+<a id="a41794ecd95f7f7e590ae27bb6ca6e6e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41794ecd95f7f7e590ae27bb6ca6e6e1">&#9670;&nbsp;</a></span>exchange_boundary()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -163,12 +163,6 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
           <td></td>
           <td class="paramtype">const <a class="el" href="structschwz_1_1Metadata.html">Metadata</a>&lt; ValueType, IndexType &gt; &amp;&#160;</td>
           <td class="paramname"><em>metadata</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::shared_ptr&lt; gko::matrix::Dense&lt; ValueType &gt;&gt; &amp;&#160;</td>
-          <td class="paramname"><em>prev_global_solution</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -199,7 +193,7 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classschwz_1_1SolverRAS.html#af33d7cc7aec6bb8bf26864f576ded42d">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classschwz_1_1SolverRAS.html#ab8983c89cdc7b45d15f9f4bf276e9753">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="classschwz_1_1SchwarzBase.html#aed3ccf8d66549af755b39da5e26f79f3">schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;::run()</a>.</p>
 
@@ -399,8 +393,8 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li><a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp (544e47f)</a></li>
-<li>/home/runner/work/schwarz-lib/schwarz-lib/source/communicate.cpp (7c9a9f7)</li>
+<li><a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp (d458d06)</a></li>
+<li>/home/runner/work/schwarz-lib/schwarz-lib/source/communicate.cpp (d458d06)</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

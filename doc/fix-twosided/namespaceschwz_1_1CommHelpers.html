@@ -80,18 +80,18 @@ Functions</h2></td></tr>
 template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </td></tr>
 <tr class="memitem:ad55122b484f131b8b63e7d82e8ff6e88"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>transfer_one_by_one</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, struct <a class="el" href="classschwz_1_1Communicate.html">Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct &amp;comm_struct, ValueType *buffer, IndexType **offset, int num_neighbors, IndexType *neighbors)</td></tr>
 <tr class="separator:ad55122b484f131b8b63e7d82e8ff6e88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95fa62fcdefd833a653b6d19a5009351"><td class="memTemplParams" colspan="2"><a id="a95fa62fcdefd833a653b6d19a5009351"></a>
+<tr class="memitem:a148493e3f4700ee1a664fa67990614a2"><td class="memTemplParams" colspan="2"><a id="a148493e3f4700ee1a664fa67990614a2"></a>
 template&lt;typename ValueType , typename IndexType &gt; </td></tr>
-<tr class="memitem:a95fa62fcdefd833a653b6d19a5009351"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>pack_buffer</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const ValueType *prev_buffer, const ValueType *buffer, ValueType *send_buffer, IndexType **num_send_elems, IndexType **host_num_send_elems, int offset, int send_subd)</td></tr>
-<tr class="separator:a95fa62fcdefd833a653b6d19a5009351"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a148493e3f4700ee1a664fa67990614a2"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>pack_buffer</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const ValueType *buffer, ValueType *send_buffer, IndexType **num_send_elems, IndexType **host_num_send_elems, int offset, int send_subd)</td></tr>
+<tr class="separator:a148493e3f4700ee1a664fa67990614a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a48e42ab3e145c65c626520486b5d56fb"><td class="memTemplParams" colspan="2"><a id="a48e42ab3e145c65c626520486b5d56fb"></a>
 template&lt;typename ValueType , typename IndexType &gt; </td></tr>
 <tr class="memitem:a48e42ab3e145c65c626520486b5d56fb"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>transfer_buffer</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, MPI_Win &amp;window, ValueType *target_buffer, IndexType **host_num_elems, int offset, int target_subd, IndexType *neighbors, IndexType *displacements)</td></tr>
 <tr class="separator:a48e42ab3e145c65c626520486b5d56fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11798855a0b37f48deb5ba25eaa8ca50"><td class="memTemplParams" colspan="2"><a id="a11798855a0b37f48deb5ba25eaa8ca50"></a>
+<tr class="memitem:a695b33870ef4a17434d134f644590478"><td class="memTemplParams" colspan="2"><a id="a695b33870ef4a17434d134f644590478"></a>
 template&lt;typename ValueType , typename IndexType &gt; </td></tr>
-<tr class="memitem:a11798855a0b37f48deb5ba25eaa8ca50"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>unpack_buffer</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, const ValueType *prev_buffer, ValueType *buffer, const ValueType *recv_buffer, IndexType **num_recv_elems, IndexType **host_num_recv_elems, int offset, int recv_subd)</td></tr>
-<tr class="separator:a11798855a0b37f48deb5ba25eaa8ca50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a695b33870ef4a17434d134f644590478"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>unpack_buffer</b> (const <a class="el" href="structschwz_1_1Settings.html">Settings</a> &amp;settings, ValueType *buffer, const ValueType *recv_buffer, IndexType **num_recv_elems, IndexType **host_num_recv_elems, int offset, int recv_subd)</td></tr>
+<tr class="separator:a695b33870ef4a17434d134f644590478"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The CommHelper namespace . </p>

@@ -167,9 +167,18 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
 
     // Setup the right hand side vector.
     std::vector<ValueType> rhs(metadata.global_size, 1.0);
-    if (settings.enable_random_rhs && settings.explicit_laplacian) {
-        if (metadata.my_rank == 0) {
+    if (metadata.my_rank == 0 && settings.explicit_laplacian) {
+        if (settings.rhs_type == "random") {
             Initialize<ValueType, IndexType>::generate_rhs(rhs);
+            std::cout << "Random rhs." << std::endl;
+        } else if (settings.rhs_type == "sinusoidal") {
+            Initialize<ValueType, IndexType>::generate_sin_rhs(rhs);
+            std::cout << "Sinusoidal rhs." << std::endl;
+        } else if (settings.rhs_type == "dipole") {
+            Initialize<ValueType, IndexType>::generate_dipole_rhs(rhs);
+            std::cout << "Dipole rhs." << std::endl;
+        } else {
+            std::cout << "Default rhs with ones." << std::endl;
         }
     }
 #if SCHW_HAVE_DEALII
@@ -263,9 +272,9 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
 
     // Setup the local solver on each of the subddomains.
     Solve<ValueType, IndexType, MixedValueType>::setup_local_solver(
-        this->settings, metadata, this->local_matrix, this->triangular_factor_l,
-        this->triangular_factor_u, this->local_perm, this->local_inv_perm,
-        this->local_rhs);
+        this->settings, this->metadata, this->local_matrix,
+        this->triangular_factor_l, this->triangular_factor_u, this->local_perm,
+        this->local_inv_perm, this->local_rhs);
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
@@ -332,6 +341,9 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     MixedValueType dummy1 = 0.0;
     ValueType dummy2 = 1.0;
 
+    auto num_neighbors_out = this->comm_struct.num_neighbors_out;
+    auto neighbors_out = this->comm_struct.neighbors_out->get_data();
+
     if (metadata.my_rank == 0) {
         std::cout << " MixedValueType: " << typeid(dummy1).name()
                   << " ValueType: " << typeid(dummy2).name() << std::endl;
@@ -346,9 +358,14 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
             vec_vtype::create(this->settings.executor->get_master(),
                               gko::dim<2>(this->metadata.global_size, 1));
     }
+    // The solution vector at the previous event of communication
+    std::shared_ptr<vec_vtype> prev_event_solution = vec_vtype::create(
+        settings.executor, gko::dim<2>(metadata.global_size, 1));
+
     // A work vector.
     std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
         settings.executor, gko::dim<2>(2 * this->metadata.local_size_x, 1));
+
     // An initial guess.
     std::shared_ptr<vec_vtype> init_guess = vec_vtype::create(
         settings.executor, gko::dim<2>(this->metadata.local_size_x, 1));
@@ -361,6 +378,8 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
         std::cout << " Rank " << this->metadata.my_rank << " sum local rhs "
                   << sum_rhs << std::endl;
     }
+
+    // Initialize all vectors - tbd
 
     // std::vector<IndexType> local_converged_iter_count;
 
@@ -381,8 +400,29 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     ValueType local_residual_norm = -1.0, local_residual_norm0 = -1.0,
               global_residual_norm = 0.0, global_residual_norm0 = -1.0;
     metadata.iter_count = 0;
-    auto start_time = std::chrono::steady_clock::now();
     int num_converged_procs = 0;
+
+    std::string rank_string = std::to_string(metadata.my_rank);
+    if (metadata.my_rank < 10) {
+        rank_string = "0" + std::to_string(metadata.my_rank);
+    }
+
+    std::ofstream fps;  // file for sending log
+    std::ofstream fpr;  // file for receiving log
+    if (settings.debug_print) {
+        // Opening files for event logs
+        fps.open("send" + rank_string + ".txt");
+        fpr.open("recv" + rank_string + ".txt");
+    }
+
+    if (metadata.my_rank == 0) {
+        std::cout << "Send history - " << metadata.sent_history
+                  << ", Recv history - " << metadata.recv_history << std::endl;
+        std::cout << "Thres type - " << settings.thres_type << std::endl;
+        std::cout << "Overlap - " << settings.overlap << std::endl;
+    }
+
+    auto start_time = std::chrono::steady_clock::now();
 
     for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
         // Exchange the boundary values. The communication part.
@@ -392,13 +432,15 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
             // instead of on device global_solution
             MEASURE_ELAPSED_FUNC_TIME(
                 this->exchange_boundary(settings, metadata,
-                                        host_global_solution),
+                                        host_global_solution,
+                                        prev_event_solution, fps, fpr),
                 0, metadata.my_rank, boundary_exchange, metadata.iter_count);
             global_solution->copy_from(gko::lend(host_global_solution));
         } else {
             MEASURE_ELAPSED_FUNC_TIME(
-                this->exchange_boundary(settings, metadata, global_solution), 0,
-                metadata.my_rank, boundary_exchange, metadata.iter_count);
+                this->exchange_boundary(settings, metadata, global_solution,
+                                        prev_event_solution, fps, fpr),
+                0, metadata.my_rank, boundary_exchange, metadata.iter_count);
         }
 
         // Update the boundary and interior values after the exchanging from
@@ -453,14 +495,48 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     MPI_Barrier(MPI_COMM_WORLD);
     auto elapsed_time = std::chrono::duration<ValueType>(
         std::chrono::steady_clock::now() - start_time);
+
+    if (settings.debug_print) {
+        // Closing event log files
+        fps.close();
+        fpr.close();
+    }
+
+    // adding 1 to include the 0-th iteration
+    // metadata.iter_count = metadata.iter_count + 1;
+
+    // number of messages a PE would send without event-based
+    int noevent_msg_count = metadata.iter_count * num_neighbors_out;
+
+    int total_events = 0;
+
+    // Printing msg count
+    if (settings.debug_print) {
+        for (int k = 0; k < num_neighbors_out; k++) {
+            std::cout << " Rank: " << metadata.my_rank << " to "
+                      << neighbors_out[k] << " : "
+                      << this->comm_struct.msg_count->get_data()[k];
+            total_events += this->comm_struct.msg_count->get_data()[k];
+        }
+        std::cout << std::endl;
+    }
+
+    // Total no of messages in all PEs
+    MPI_Allreduce(MPI_IN_PLACE, &total_events, 1, MPI_INT, MPI_SUM,
+                  MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, &noevent_msg_count, 1, MPI_INT, MPI_SUM,
+                  MPI_COMM_WORLD);
+
+    if (metadata.my_rank == 0) {
+        std::cout << "Total number of events - " << total_events << std::endl;
+        std::cout << "Total number of msgs without event - "
+                  << noevent_msg_count << std::endl;
+    }
+
     // Write the residuals and iterations to files
     if (settings.write_iters_and_residuals &&
         solver_settings ==
             Settings::local_solver_settings::iterative_solver_ginkgo) {
-        std::string rank_string = std::to_string(metadata.my_rank);
-        if (metadata.my_rank < 10) {
-            rank_string = "0" + std::to_string(metadata.my_rank);
-        }
         std::string filename = "iter_res_" + rank_string + ".csv";
         write_iters_and_residuals(
             metadata.num_subdomains, metadata.my_rank,

@@ -49,8 +49,9 @@ void Communicate<ValueType, IndexType, MixedValueType>::setup_windows(
 template <typename ValueType, typename IndexType, typename MixedValueType>
 void Communicate<ValueType, IndexType, MixedValueType>::exchange_boundary(
     const Settings &settings, const Metadata<ValueType, IndexType> &metadata,
-    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution)
-    SCHWARZ_NOT_IMPLEMENTED;
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
+    std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_event_solution,
+    std::ofstream &fps, std::ofstream &fpr) SCHWARZ_NOT_IMPLEMENTED;
 
 template <typename ValueType, typename IndexType, typename MixedValueType>
 void Communicate<ValueType, IndexType, MixedValueType>::update_boundary(

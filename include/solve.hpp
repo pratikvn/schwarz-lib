@@ -144,6 +144,7 @@ protected:
      * @param triangular_factor_u  The upper triangular factor.
      * @param local_perm  The local permutation vector in the subdomain.
      * @param local_inv_perm  The local inverse permutation vector in the
+     * subdomain.
      * @param init_guess  The initial solution for the local iterative solver.
      * @param local_solution The local solution vector in the subdomain.
      */
@@ -296,11 +297,6 @@ private:
      * The local iterative solver residual criterion.
      */
     std::shared_ptr<gko::stop::Combined::Factory> combined_criterion;
-
-    // /**
-    //  * The local iterative solver iteration criterion.
-    //  */
-    // std::shared_ptr<IterationCriterionFactory> iteration_criterion;
 
     /**
      * The local iterative solver iteration criterion.

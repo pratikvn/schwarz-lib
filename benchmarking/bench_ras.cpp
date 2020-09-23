@@ -115,9 +115,9 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
     settings.non_symmetric_matrix = FLAGS_non_symmetric_matrix;
     settings.restart_iter = FLAGS_restart_iter;
     metadata.precond_max_block_size = FLAGS_precond_max_block_size;
-    metadata.precond_max_block_size = FLAGS_precond_max_block_size;
     settings.matrix_filename = FLAGS_matrix_filename;
     settings.explicit_laplacian = FLAGS_explicit_laplacian;
+    settings.rhs_type = FLAGS_rhs_type;
     settings.enable_random_rhs = FLAGS_enable_random_rhs;
     settings.overlap = FLAGS_overlap;
     settings.naturally_ordered_factor = FLAGS_factor_ordering_natural;
@@ -148,6 +148,15 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
             schwz::Settings::local_solver_settings::direct_solver_ginkgo;
     }
     settings.debug_print = FLAGS_debug;
+
+    // Event settings
+    metadata.constant = FLAGS_constant;
+    metadata.gamma = FLAGS_gamma;
+    metadata.horizon = FLAGS_horizon;
+    metadata.decay_param = FLAGS_decay_param;
+    metadata.sent_history = FLAGS_sent_history;
+    metadata.recv_history = FLAGS_recv_history;
+    settings.thres_type = FLAGS_thres_type;
 
     // The global solution vector to be passed in to the RAS solver.
     std::shared_ptr<gko::matrix::Dense<ValueType>> explicit_laplacian_solution;
@@ -186,6 +195,23 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
         this->write_comm_data(metadata.num_subdomains, metadata.my_rank,
                               metadata.comm_data_struct, filename_send,
                               filename_recv);
+    }
+
+    if (FLAGS_debug) {
+        // Print final solution to file
+        std::string fname("final_sol.csv");
+        std::ofstream fp;
+        if (metadata.my_rank == 0) {
+            fp.open(fname);
+            auto num_elem = explicit_laplacian_solution->get_size()[0];
+            auto dim = (int)sqrt(num_elem);
+            // iterating over
+            for (auto i = 0; i < num_elem; i++) {
+                if (i % dim == 0 && i != 0) fp << std::endl;
+                fp << explicit_laplacian_solution->get_values()[i] << ",";
+            }
+            fp.close();
+        }
     }
 }
 

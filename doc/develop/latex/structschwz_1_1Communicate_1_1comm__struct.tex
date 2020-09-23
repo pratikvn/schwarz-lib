@@ -16,7 +16,7 @@ Collaboration diagram for schwz\+:\+:Communicate$<$ Value\+Type, Index\+Type, Mi
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=226pt]{structschwz_1_1Communicate_1_1comm__struct__coll__graph}
+\includegraphics[width=332pt]{structschwz_1_1Communicate_1_1comm__struct__coll__graph}
 \end{center}
 \end{figure}
 \subsection*{Public Attributes}
@@ -52,14 +52,16 @@ std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $\ast$ $>$ $>$ \hyperlin
 \begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain sends from the other. \end{DoxyCompactList}\item 
 std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $\ast$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_ace7588b81dd2aa7a84e118df8137252b}{local\+\_\+put}
 \begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain sends from the other. \end{DoxyCompactList}\item 
-std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $\ast$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a206d13b093699bf04bd1efb51c4290f2}{remote\+\_\+put}
-\begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain sends from the other. \end{DoxyCompactList}\item 
 std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $\ast$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a4166e2bb75eeaf48ee39ca7cdc3adb01}{global\+\_\+get}
 \begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain gets from the other. \end{DoxyCompactList}\item 
 std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $\ast$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_ab4e91a457646f43106da98a58c332754}{local\+\_\+get}
 \begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain gets from the other. \end{DoxyCompactList}\item 
-std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $\ast$ $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a70f57e5c0ab445089ca9d8bdc0fa3838}{remote\+\_\+get}
-\begin{DoxyCompactList}\small\item\em The array containing the number of elements that each subdomain gets from the other. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_ac5af75e92c875f3546b739be84d2c927}\label{structschwz_1_1Communicate_1_1comm__struct_ac5af75e92c875f3546b739be84d2c927}} 
+std\+::vector$<$ Index\+Type $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_ac5af75e92c875f3546b739be84d2c927}{send}
+\begin{DoxyCompactList}\small\item\em The number of elements being sent to each subdomain. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a39634304cc492cf00a2d60eea9a97799}\label{structschwz_1_1Communicate_1_1comm__struct_a39634304cc492cf00a2d60eea9a97799}} 
+std\+::vector$<$ Index\+Type $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a39634304cc492cf00a2d60eea9a97799}{recv}
+\begin{DoxyCompactList}\small\item\em The number of elements being sent to each subdomain. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a179dd67dc2d6ea4b71a6d5964cac18c6}\label{structschwz_1_1Communicate_1_1comm__struct_a179dd67dc2d6ea4b71a6d5964cac18c6}} 
 std\+::shared\+\_\+ptr$<$ gko\+::\+Array$<$ Index\+Type $>$ $>$ \hyperlink{structschwz_1_1Communicate_1_1comm__struct_a179dd67dc2d6ea4b71a6d5964cac18c6}{window\+\_\+ids}
 \begin{DoxyCompactList}\small\item\em The R\+D\+MA window ids. \end{DoxyCompactList}\item 
@@ -169,7 +171,7 @@ The array containing the number of elements that each subdomain gets from the ot
 
 For example. global\+\_\+get\mbox{[}p\mbox{]}\mbox{[}0\mbox{]} contains the overall number of elements to be received to subdomain p and global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}i\mbox{]} contains the index of the solution vector to be received from subdomain p. 
 
-Referenced by schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+windows().
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::initialize(), schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+windows().
 
 \mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_ace7588b81dd2aa7a84e118df8137252b}\label{structschwz_1_1Communicate_1_1comm__struct_ace7588b81dd2aa7a84e118df8137252b}} 
 \index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!local\+\_\+put@{local\+\_\+put}}
@@ -184,40 +186,10 @@ The array containing the number of elements that each subdomain sends from the o
 
 For example. global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}0\mbox{]} contains the overall number of elements to be sent to subdomain p and global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}i\mbox{]} contains the index of the solution vector to be sent to subdomain p. 
 
-Referenced by schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+windows().
-
-\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a70f57e5c0ab445089ca9d8bdc0fa3838}\label{structschwz_1_1Communicate_1_1comm__struct_a70f57e5c0ab445089ca9d8bdc0fa3838}} 
-\index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!remote\+\_\+get@{remote\+\_\+get}}
-\index{remote\+\_\+get@{remote\+\_\+get}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
-\subsubsection{\texorpdfstring{remote\+\_\+get}{remote\_get}}
-{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ \\
-std\+::shared\+\_\+ptr$<$gko\+::\+Array$<$Index\+Type $\ast$$>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::remote\+\_\+get}
-
-
-
-The array containing the number of elements that each subdomain gets from the other. 
-
-For example. global\+\_\+get\mbox{[}p\mbox{]}\mbox{[}0\mbox{]} contains the overall number of elements to be received to subdomain p and global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}i\mbox{]} contains the index of the solution vector to be received from subdomain p. 
-
-Referenced by schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+windows().
-
-\mbox{\Hypertarget{structschwz_1_1Communicate_1_1comm__struct_a206d13b093699bf04bd1efb51c4290f2}\label{structschwz_1_1Communicate_1_1comm__struct_a206d13b093699bf04bd1efb51c4290f2}} 
-\index{schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}!remote\+\_\+put@{remote\+\_\+put}}
-\index{remote\+\_\+put@{remote\+\_\+put}!schwz\+::\+Communicate\+::comm\+\_\+struct@{schwz\+::\+Communicate\+::comm\+\_\+struct}}
-\subsubsection{\texorpdfstring{remote\+\_\+put}{remote\_put}}
-{\footnotesize\ttfamily template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ \\
-std\+::shared\+\_\+ptr$<$gko\+::\+Array$<$Index\+Type $\ast$$>$ $>$ \hyperlink{classschwz_1_1Communicate}{schwz\+::\+Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct\+::remote\+\_\+put}
-
-
-
-The array containing the number of elements that each subdomain sends from the other. 
-
-For example. global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}0\mbox{]} contains the overall number of elements to be sent to subdomain p and global\+\_\+put\mbox{[}p\mbox{]}\mbox{[}i\mbox{]} contains the index of the solution vector to be sent to subdomain p. 
-
-Referenced by schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+windows().
+Referenced by schwz\+::\+Schwarz\+Base$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::initialize(), schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+comm\+\_\+buffers(), and schwz\+::\+Solver\+R\+A\+S$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::setup\+\_\+windows().
 
 
 
 The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-communicate.\+hpp (7c9a9f7)\end{DoxyCompactItemize}
+communicate.\+hpp (cd61077)\end{DoxyCompactItemize}

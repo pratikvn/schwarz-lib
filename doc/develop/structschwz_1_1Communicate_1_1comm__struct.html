@@ -79,7 +79,7 @@ $(function() {
 <div class="dynheader">
 Collaboration diagram for schwz::Communicate&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structschwz_1_1Communicate_1_1comm__struct__coll__graph.svg" width="206" height="260"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="structschwz_1_1Communicate_1_1comm__struct__coll__graph.svg" width="347" height="275"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -126,18 +126,20 @@ std::shared_ptr&lt; gko::Array&lt; IndexType &gt; &gt;&#160;</td><td class="memI
 <tr class="memitem:ace7588b81dd2aa7a84e118df8137252b"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; IndexType * &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#ace7588b81dd2aa7a84e118df8137252b">local_put</a></td></tr>
 <tr class="memdesc:ace7588b81dd2aa7a84e118df8137252b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain sends from the other.  <a href="#ace7588b81dd2aa7a84e118df8137252b">More...</a><br /></td></tr>
 <tr class="separator:ace7588b81dd2aa7a84e118df8137252b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a206d13b093699bf04bd1efb51c4290f2"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; IndexType * &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a206d13b093699bf04bd1efb51c4290f2">remote_put</a></td></tr>
-<tr class="memdesc:a206d13b093699bf04bd1efb51c4290f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain sends from the other.  <a href="#a206d13b093699bf04bd1efb51c4290f2">More...</a><br /></td></tr>
-<tr class="separator:a206d13b093699bf04bd1efb51c4290f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4166e2bb75eeaf48ee39ca7cdc3adb01"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; IndexType * &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a4166e2bb75eeaf48ee39ca7cdc3adb01">global_get</a></td></tr>
 <tr class="memdesc:a4166e2bb75eeaf48ee39ca7cdc3adb01"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain gets from the other.  <a href="#a4166e2bb75eeaf48ee39ca7cdc3adb01">More...</a><br /></td></tr>
 <tr class="separator:a4166e2bb75eeaf48ee39ca7cdc3adb01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4e91a457646f43106da98a58c332754"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; IndexType * &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#ab4e91a457646f43106da98a58c332754">local_get</a></td></tr>
 <tr class="memdesc:ab4e91a457646f43106da98a58c332754"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain gets from the other.  <a href="#ab4e91a457646f43106da98a58c332754">More...</a><br /></td></tr>
 <tr class="separator:ab4e91a457646f43106da98a58c332754"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70f57e5c0ab445089ca9d8bdc0fa3838"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; gko::Array&lt; IndexType * &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a70f57e5c0ab445089ca9d8bdc0fa3838">remote_get</a></td></tr>
-<tr class="memdesc:a70f57e5c0ab445089ca9d8bdc0fa3838"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array containing the number of elements that each subdomain gets from the other.  <a href="#a70f57e5c0ab445089ca9d8bdc0fa3838">More...</a><br /></td></tr>
-<tr class="separator:a70f57e5c0ab445089ca9d8bdc0fa3838"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5af75e92c875f3546b739be84d2c927"><td class="memItemLeft" align="right" valign="top"><a id="ac5af75e92c875f3546b739be84d2c927"></a>
+std::vector&lt; IndexType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#ac5af75e92c875f3546b739be84d2c927">send</a></td></tr>
+<tr class="memdesc:ac5af75e92c875f3546b739be84d2c927"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of elements being sent to each subdomain. <br /></td></tr>
+<tr class="separator:ac5af75e92c875f3546b739be84d2c927"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39634304cc492cf00a2d60eea9a97799"><td class="memItemLeft" align="right" valign="top"><a id="a39634304cc492cf00a2d60eea9a97799"></a>
+std::vector&lt; IndexType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a39634304cc492cf00a2d60eea9a97799">recv</a></td></tr>
+<tr class="memdesc:a39634304cc492cf00a2d60eea9a97799"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of elements being sent to each subdomain. <br /></td></tr>
+<tr class="separator:a39634304cc492cf00a2d60eea9a97799"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a179dd67dc2d6ea4b71a6d5964cac18c6"><td class="memItemLeft" align="right" valign="top"><a id="a179dd67dc2d6ea4b71a6d5964cac18c6"></a>
 std::shared_ptr&lt; gko::Array&lt; IndexType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structschwz_1_1Communicate_1_1comm__struct.html#a179dd67dc2d6ea4b71a6d5964cac18c6">window_ids</a></td></tr>
 <tr class="memdesc:a179dd67dc2d6ea4b71a6d5964cac18c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The RDMA window ids. <br /></td></tr>
@@ -280,7 +282,7 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 <p>The array containing the number of elements that each subdomain gets from the other. </p>
 <p>For example. global_get[p][0] contains the overall number of elements to be received to subdomain p and global_put[p][i] contains the index of the solution vector to be received from subdomain p. </p>
 
-<p class="reference">Referenced by <a class="el" href="classschwz_1_1SolverRAS.html#a2f069e78a9627d3421c8973d80dd91c7">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;::setup_comm_buffers()</a>, and <a class="el" href="classschwz_1_1SolverRAS.html#adc313354f7ae256d375316516d0f655e">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;::setup_windows()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="classschwz_1_1SchwarzBase.html#ac3dbbbe6c63db7d669f9f5de85d9b264">schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;::initialize()</a>, <a class="el" href="classschwz_1_1SolverRAS.html#a2f069e78a9627d3421c8973d80dd91c7">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;::setup_comm_buffers()</a>, and <a class="el" href="classschwz_1_1SolverRAS.html#adc313354f7ae256d375316516d0f655e">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;::setup_windows()</a>.</p>
 
 </div>
 </div>
@@ -301,54 +303,12 @@ template&lt;typename ValueType , typename IndexType , typename MixedValueType &g
 <p>The array containing the number of elements that each subdomain sends from the other. </p>
 <p>For example. global_put[p][0] contains the overall number of elements to be sent to subdomain p and global_put[p][i] contains the index of the solution vector to be sent to subdomain p. </p>
 
-<p class="reference">Referenced by <a class="el" href="classschwz_1_1SolverRAS.html#a2f069e78a9627d3421c8973d80dd91c7">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;::setup_comm_buffers()</a>, and <a class="el" href="classschwz_1_1SolverRAS.html#adc313354f7ae256d375316516d0f655e">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;::setup_windows()</a>.</p>
-
-</div>
-</div>
-<a id="a70f57e5c0ab445089ca9d8bdc0fa3838"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a70f57e5c0ab445089ca9d8bdc0fa3838">&#9670;&nbsp;</a></span>remote_get</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">std::shared_ptr&lt;gko::Array&lt;IndexType *&gt; &gt; <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct::remote_get</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The array containing the number of elements that each subdomain gets from the other. </p>
-<p>For example. global_get[p][0] contains the overall number of elements to be received to subdomain p and global_put[p][i] contains the index of the solution vector to be received from subdomain p. </p>
-
-<p class="reference">Referenced by <a class="el" href="classschwz_1_1SolverRAS.html#a2f069e78a9627d3421c8973d80dd91c7">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;::setup_comm_buffers()</a>, and <a class="el" href="classschwz_1_1SolverRAS.html#adc313354f7ae256d375316516d0f655e">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;::setup_windows()</a>.</p>
-
-</div>
-</div>
-<a id="a206d13b093699bf04bd1efb51c4290f2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a206d13b093699bf04bd1efb51c4290f2">&#9670;&nbsp;</a></span>remote_put</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename ValueType , typename IndexType , typename MixedValueType &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">std::shared_ptr&lt;gko::Array&lt;IndexType *&gt; &gt; <a class="el" href="classschwz_1_1Communicate.html">schwz::Communicate</a>&lt; ValueType, IndexType, MixedValueType &gt;::comm_struct::remote_put</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The array containing the number of elements that each subdomain sends from the other. </p>
-<p>For example. global_put[p][0] contains the overall number of elements to be sent to subdomain p and global_put[p][i] contains the index of the solution vector to be sent to subdomain p. </p>
-
-<p class="reference">Referenced by <a class="el" href="classschwz_1_1SolverRAS.html#a2f069e78a9627d3421c8973d80dd91c7">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;::setup_comm_buffers()</a>, and <a class="el" href="classschwz_1_1SolverRAS.html#adc313354f7ae256d375316516d0f655e">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;::setup_windows()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="classschwz_1_1SchwarzBase.html#ac3dbbbe6c63db7d669f9f5de85d9b264">schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;::initialize()</a>, <a class="el" href="classschwz_1_1SolverRAS.html#a2f069e78a9627d3421c8973d80dd91c7">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;::setup_comm_buffers()</a>, and <a class="el" href="classschwz_1_1SolverRAS.html#adc313354f7ae256d375316516d0f655e">schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;::setup_windows()</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li><a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp (7c9a9f7)</a></li>
+<li><a class="el" href="include_2communicate_8hpp_source.html">communicate.hpp (cd61077)</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

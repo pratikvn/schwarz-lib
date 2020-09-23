@@ -7,6 +7,7 @@ var searchData=
   ['schwarz_20class',['Schwarz Class',['../group__schwarz__class.html',1,'']]],
   ['schwarzbase',['SchwarzBase',['../classschwz_1_1SchwarzBase.html',1,'schwz::SchwarzBase&lt; ValueType, IndexType, MixedValueType &gt;'],['../classschwz_1_1SchwarzBase.html#adf9cd07681409095deecfb3bf63f1bf8',1,'schwz::SchwarzBase::SchwarzBase()']]],
   ['schwz',['schwz',['../namespaceschwz.html',1,'']]],
+  ['send',['send',['../structschwz_1_1Communicate_1_1comm__struct.html#ac5af75e92c875f3546b739be84d2c927',1,'schwz::Communicate::comm_struct']]],
   ['send_5fbuffer',['send_buffer',['../structschwz_1_1Communicate_1_1comm__struct.html#afc441e718856c45bd3cc462780886ca8',1,'schwz::Communicate::comm_struct']]],
   ['settings',['Settings',['../structschwz_1_1Settings.html',1,'schwz']]],
   ['setup_5fcomm_5fbuffers',['setup_comm_buffers',['../classschwz_1_1Communicate.html#a76b0d6b0571107ab2cd58e309902a666',1,'schwz::Communicate::setup_comm_buffers()'],['../classschwz_1_1SolverRAS.html#a2f069e78a9627d3421c8973d80dd91c7',1,'schwz::SolverRAS::setup_comm_buffers()']]],
@@ -17,5 +18,6 @@ var searchData=
   ['shifted_5fiter',['shifted_iter',['../structschwz_1_1Settings.html#a33a9382f1b5961a8cb2133cb0c22daf0',1,'schwz::Settings']]],
   ['solve',['Solve',['../classschwz_1_1Solve.html',1,'schwz::Solve&lt; ValueType, IndexType, MixedValueType &gt;'],['../group__solve.html',1,'(Global Namespace)']]],
   ['solverras',['SolverRAS',['../classschwz_1_1SolverRAS.html',1,'schwz::SolverRAS&lt; ValueType, IndexType, MixedValueType &gt;'],['../classschwz_1_1SolverRAS.html#afc4b02a6ec47a155f6a7822d1615fd9c',1,'schwz::SolverRAS::SolverRAS()']]],
-  ['solvertools',['SolverTools',['../namespaceschwz_1_1SolverTools.html',1,'schwz']]]
+  ['solvertools',['SolverTools',['../namespaceschwz_1_1SolverTools.html',1,'schwz']]],
+  ['stage_5fthrough_5fhost',['stage_through_host',['../structschwz_1_1Settings_1_1comm__settings.html#aa4b8ae4d62df13f3376663d4c2cd28d5',1,'schwz::Settings::comm_settings']]]
 ];

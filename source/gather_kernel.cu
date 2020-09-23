@@ -31,6 +31,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************<SCHWARZ LIB LICENSE>*************************/
 
+#include <cstdio>
 #include <functional>
 
 #include <cuda_runtime.h>
@@ -38,7 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define BLOCK_SIZE 512
 
+
 namespace schwz {
+
 
 template <typename ValueType, typename IndexType, typename AdditionalOperation>
 __global__ void gather_kernel(const IndexType num_elems,
@@ -48,6 +51,7 @@ __global__ void gather_kernel(const IndexType num_elems,
 {
     int row = blockDim.x * blockIdx.x + threadIdx.x;
     if (row < num_elems) {
+        // printf("indices at row %d, %d\n", indices[row], row);
         gather_into[row] = op(gather_into[row], gather_from[indices[row]]);
     }
 }
@@ -65,6 +69,7 @@ void gather_values(const IndexType num_elems, const IndexType *indices,
                                               gather_into, op);
 }
 
+
 template <typename ValueType, typename IndexType>
 void gather_add_values(const IndexType num_elems, const IndexType *indices,
                        const ValueType *gather_from, ValueType *gather_into)
@@ -76,6 +81,7 @@ void gather_add_values(const IndexType num_elems, const IndexType *indices,
     gather_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(num_elems, indices, gather_from,
                                               gather_into, op);
 }
+
 
 template <typename ValueType, typename IndexType>
 void gather_diff_values(const IndexType num_elems, const IndexType *indices,
@@ -89,6 +95,7 @@ void gather_diff_values(const IndexType num_elems, const IndexType *indices,
                                               gather_into, op);
 }
 
+
 template <typename ValueType, typename IndexType>
 void gather_avg_values(const IndexType num_elems, const IndexType *indices,
                        const ValueType *gather_from, ValueType *gather_into)
@@ -100,6 +107,7 @@ void gather_avg_values(const IndexType num_elems, const IndexType *indices,
     gather_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(num_elems, indices, gather_from,
                                               gather_into, op);
 }
+
 
 #define INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
     template _macro(float, int);                          \

@@ -15,6 +15,8 @@ option(SCHWARZ_BUILD_DEALII "Build with deal.ii support" OFF)
 option(SCHWARZ_BUILD_CLANG_TIDY "Use clang-tidy for static checks of code." OFF)
 option(SCHWARZ_DEVEL_TOOLS "Switch on some developer tools" ON)
 option(SCHWARZ_BUILD_DOC "Build the doxygen documentation" OFF)
+set(SCHWARZ_CUDA_COMPILER_FLAGS "" CACHE STRING
+  "Set the required NVCC compiler flags, mainly used for warnings. Current default is an empty string")
 
 # Optional packages
 include(cmake/package_helpers.cmake)
@@ -138,6 +140,9 @@ if(SCHWARZ_BUILD_CUDA)
   target_compile_options(${TARGET}
     PRIVATE
     $<$<COMPILE_LANGUAGE:CUDA>:--expt-extended-lambda>)
+  target_compile_options(${TARGET}
+    PRIVATE
+    $<$<COMPILE_LANGUAGE:CUDA>:${SCHWARZ_CUDA_COMPILER_FLAGS}>)
 else()
   target_sources(${TARGET} PRIVATE
     source/cuda_dummy_gather.cpp)

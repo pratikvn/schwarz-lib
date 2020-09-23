@@ -90,38 +90,37 @@ void transfer_one_by_one(
 
 
 template <typename ValueType, typename IndexType>
-void pack_buffer(const Settings &settings, const ValueType *prev_buffer,
-                 const ValueType *buffer, ValueType *send_buffer,
-                 IndexType **num_send_elems, int offset, int send_subd)
+void pack_buffer(const Settings &settings, const ValueType *buffer,
+                 ValueType *send_buffer, IndexType **num_send_elems,
+                 IndexType **host_num_send_elems, int offset, int send_subd)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using arr = gko::Array<IndexType>;
     using varr = gko::Array<ValueType>;
-    if (settings.executor_string == "cuda") {
+    if (settings.executor_string == "cuda" &&
+        !settings.comm_settings.stage_through_host) {
         auto tmp_send_buf = vec_vtype::create(
-            settings.executor, gko::dim<2>((num_send_elems[send_subd])[0], 1));
-        auto tmp_idx_s = arr(settings.executor,
-                             arr::view(settings.executor->get_master(),
-                                       ((num_send_elems)[send_subd])[0],
-                                       &((num_send_elems[send_subd])[1])));
+            settings.executor,
+            gko::dim<2>((host_num_send_elems[send_subd])[0], 1));
         settings.executor->run(Gather<ValueType, IndexType>(
-            (num_send_elems[send_subd])[0], tmp_idx_s.get_data(), buffer,
-            tmp_send_buf->get_values(), copy));
-        settings.executor->copy(((num_send_elems)[send_subd])[0],
+            (host_num_send_elems[send_subd])[0],
+            (num_send_elems[send_subd]) + 1, buffer, tmp_send_buf->get_values(),
+            copy));
+        settings.executor->copy((host_num_send_elems[send_subd])[0],
                                 tmp_send_buf->get_values(),
                                 &(send_buffer[offset]));
     } else {
-        for (auto i = 0; i < (num_send_elems[send_subd])[0]; i++) {
-            send_buffer[offset + i] =
-                buffer[(num_send_elems[send_subd])[i + 1]];
-        }
+        settings.executor->get_master()->run(
+            Gather<ValueType, IndexType>((host_num_send_elems[send_subd])[0],
+                                         (host_num_send_elems[send_subd]) + 1,
+                                         buffer, &(send_buffer[offset]), copy));
     }
 }
 
 
 template <typename ValueType, typename IndexType>
 void transfer_buffer(const Settings &settings, MPI_Win &window,
-                     ValueType *target_buffer, IndexType **num_elems,
+                     ValueType *target_buffer, IndexType **host_num_elems,
                      int offset, int target_subd, IndexType *neighbors,
                      IndexType *displacements)
 {
@@ -130,13 +129,15 @@ void transfer_buffer(const Settings &settings, MPI_Win &window,
         MPI_Win_lock(MPI_LOCK_SHARED, neighbors[target_subd], 0, window);
     }
     if (settings.comm_settings.enable_put) {
-        MPI_Put(&target_buffer[offset], (num_elems[target_subd])[0], mpi_vtype,
-                neighbors[target_subd], displacements[neighbors[target_subd]],
-                (num_elems[target_subd])[0], mpi_vtype, window);
+        MPI_Put(&target_buffer[offset], (host_num_elems[target_subd])[0],
+                mpi_vtype, neighbors[target_subd],
+                displacements[neighbors[target_subd]],
+                (host_num_elems[target_subd])[0], mpi_vtype, window);
     } else if (settings.comm_settings.enable_get) {
-        MPI_Get(&target_buffer[offset], (num_elems[target_subd])[0], mpi_vtype,
-                neighbors[target_subd], displacements[neighbors[target_subd]],
-                (num_elems[target_subd])[0], mpi_vtype, window);
+        MPI_Get(&target_buffer[offset], (host_num_elems[target_subd])[0],
+                mpi_vtype, neighbors[target_subd],
+                displacements[neighbors[target_subd]],
+                (host_num_elems[target_subd])[0], mpi_vtype, window);
     }
     if (settings.comm_settings.enable_flush_all) {
         MPI_Win_flush(neighbors[target_subd], window);
@@ -150,31 +151,28 @@ void transfer_buffer(const Settings &settings, MPI_Win &window,
 
 
 template <typename ValueType, typename IndexType>
-void unpack_buffer(const Settings &settings, const ValueType *prev_buffer,
-                   ValueType *buffer, const ValueType *recv_buffer,
-                   IndexType **num_recv_elems, int offset, int recv_subd)
+void unpack_buffer(const Settings &settings, ValueType *buffer,
+                   const ValueType *recv_buffer, IndexType **num_recv_elems,
+                   IndexType **host_num_recv_elems, int offset, int recv_subd)
 {
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using arr = gko::Array<IndexType>;
     using varr = gko::Array<ValueType>;
-    if (settings.executor_string == "cuda") {
+    auto num_elems = (host_num_recv_elems[recv_subd])[0];
+    if (settings.executor_string == "cuda" &&
+        !settings.comm_settings.stage_through_host) {
         auto tmp_recv_buf = vec_vtype::create(
-            settings.executor, gko::dim<2>((num_recv_elems[recv_subd])[0], 1));
-        settings.executor->copy(((num_recv_elems)[recv_subd])[0],
-                                &(recv_buffer[offset]),
+            settings.executor,
+            gko::dim<2>((host_num_recv_elems[recv_subd])[0], 1));
+        settings.executor->copy(num_elems, &(recv_buffer[offset]),
                                 tmp_recv_buf->get_values());
-        auto tmp_idx_r = arr(settings.executor,
-                             arr::view(settings.executor->get_master(),
-                                       ((num_recv_elems)[recv_subd])[0],
-                                       &((num_recv_elems[recv_subd])[1])));
         settings.executor->run(Scatter<ValueType, IndexType>(
-            (num_recv_elems[recv_subd])[0], tmp_idx_r.get_data(),
+            num_elems, (num_recv_elems[recv_subd]) + 1,
             tmp_recv_buf->get_values(), buffer, copy));
     } else {
-        for (auto i = 0; i < (num_recv_elems[recv_subd])[0]; i++) {
-            buffer[(num_recv_elems[recv_subd])[i + 1]] =
-                recv_buffer[offset + i];
-        }
+        settings.executor->get_master()->run(Scatter<ValueType, IndexType>(
+            num_elems, (num_recv_elems[recv_subd]) + 1, &(recv_buffer[offset]),
+            buffer, copy));
     }
 }
 

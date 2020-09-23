@@ -78,7 +78,6 @@ SchwarzBase<ValueType, IndexType, MixedValueType>::SchwarzBase(
       metadata(metadata)
 {
     using vec_itype = gko::Array<IndexType>;
-    using vec_vecshared = gko::Array<IndexType *>;
     metadata.my_local_rank =
         Utils<ValueType, IndexType>::get_local_rank(metadata.mpi_communicator);
     metadata.local_num_procs = Utils<ValueType, IndexType>::get_local_num_procs(
@@ -101,7 +100,7 @@ SchwarzBase<ValueType, IndexType, MixedValueType>::SchwarzBase(
         Utils<ValueType, IndexType>::assert_correct_cuda_devices(
             num_devices, metadata.my_rank);
         settings.executor = gko::CudaExecutor::create(
-            my_local_rank, gko::OmpExecutor::create());
+            my_local_rank, gko::OmpExecutor::create(), false);
         auto exec_info = static_cast<gko::OmpExecutor *>(
                              settings.executor->get_master().get())
                              ->get_exec_info();
@@ -137,6 +136,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
     using vec_vtype = gko::matrix::Dense<ValueType>;
     using vec_itype = gko::Array<IndexType>;
     using vec_vecshared = gko::Array<IndexType *>;
+    using vec_vecshared2 = gko::Array<gko::Array<IndexType>>;
     // Setup the global matrix
     // if explicit_laplacian has been enabled or an external matrix has been
     if (settings.explicit_laplacian || settings.matrix_filename != "null") {
@@ -213,10 +213,16 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
         new vec_itype(settings.executor->get_master(), num_subdomains + 1),
         std::default_delete<vec_itype>());
     comm_struct.is_local_neighbor = std::vector<bool>(num_subdomains + 1, 0);
+    comm_struct.global_put = std::shared_ptr<vec_vecshared>(
+        new vec_vecshared(settings.executor->get_master(), num_subdomains + 1),
+        std::default_delete<vec_vecshared>());
+    comm_struct.local_put = std::shared_ptr<vec_vecshared>(
+        new vec_vecshared(settings.executor->get_master(), num_subdomains + 1),
+        std::default_delete<vec_vecshared>());
     comm_struct.global_get = std::shared_ptr<vec_vecshared>(
         new vec_vecshared(settings.executor->get_master(), num_subdomains + 1),
         std::default_delete<vec_vecshared>());
-    comm_struct.global_put = std::shared_ptr<vec_vecshared>(
+    comm_struct.local_get = std::shared_ptr<vec_vecshared>(
         new vec_vecshared(settings.executor->get_master(), num_subdomains + 1),
         std::default_delete<vec_vecshared>());
     // Need this to initialize the arrays with zeros.
@@ -333,9 +339,13 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     // The main solution vector
     std::shared_ptr<vec_vtype> global_solution = vec_vtype::create(
         this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
-    // The previous iteration solution vector
-    std::shared_ptr<vec_vtype> prev_global_solution = vec_vtype::create(
-        this->settings.executor, gko::dim<2>(this->metadata.global_size, 1));
+    // The main solution vector on the host
+    std::shared_ptr<vec_vtype> host_global_solution;
+    if (settings.comm_settings.stage_through_host) {
+        host_global_solution =
+            vec_vtype::create(this->settings.executor->get_master(),
+                              gko::dim<2>(this->metadata.global_size, 1));
+    }
     // A work vector.
     std::shared_ptr<vec_vtype> work_vector = vec_vtype::create(
         settings.executor, gko::dim<2>(2 * this->metadata.local_size_x, 1));
@@ -344,7 +354,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
         settings.executor, gko::dim<2>(this->metadata.local_size_x, 1));
     // init_guess->copy_from(local_rhs.get());
 
-    if (settings.executor_string == "omp") {
+    if (settings.executor_string == "omp" && settings.debug_print) {
         ValueType sum_rhs = std::accumulate(
             local_rhs->get_values(),
             local_rhs->get_values() + local_rhs->get_size()[0], 0.0);
@@ -364,7 +374,9 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
          Settings::local_solver_settings::iterative_solver_dealii |
          Settings::local_solver_settings::iterative_solver_ginkgo) &
         settings.local_solver;
-    prev_global_solution->copy_from(gko::lend(global_solution));
+    if (settings.comm_settings.stage_through_host) {
+        host_global_solution->copy_from(gko::lend(global_solution));
+    }
 
     ValueType local_residual_norm = -1.0, local_residual_norm0 = -1.0,
               global_residual_norm = 0.0, global_residual_norm0 = -1.0;
@@ -374,11 +386,20 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
 
     for (; metadata.iter_count < metadata.max_iters; ++(metadata.iter_count)) {
         // Exchange the boundary values. The communication part.
-        MEASURE_ELAPSED_FUNC_TIME(
-            this->exchange_boundary(settings, metadata, prev_global_solution,
-                                    global_solution),
-            0, metadata.my_rank, boundary_exchange, metadata.iter_count);
-        prev_global_solution->copy_from(gko::lend(global_solution));
+        if (settings.comm_settings.stage_through_host) {
+            host_global_solution->copy_from(gko::lend(global_solution));
+            // By staging through host just transfer the host_global_solution
+            // instead of on device global_solution
+            MEASURE_ELAPSED_FUNC_TIME(
+                this->exchange_boundary(settings, metadata,
+                                        host_global_solution),
+                0, metadata.my_rank, boundary_exchange, metadata.iter_count);
+            global_solution->copy_from(gko::lend(host_global_solution));
+        } else {
+            MEASURE_ELAPSED_FUNC_TIME(
+                this->exchange_boundary(settings, metadata, global_solution), 0,
+                metadata.my_rank, boundary_exchange, metadata.iter_count);
+        }
 
         // Update the boundary and interior values after the exchanging from
         // other processes.

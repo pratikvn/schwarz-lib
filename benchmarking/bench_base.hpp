@@ -65,6 +65,7 @@ DEFINE_bool(enable_twosided, true,
             "Use the twosided communication version for the solver");
 DEFINE_bool(enable_one_by_one, false,
             "Enable one element after another in onesided");
+DEFINE_bool(stage_through_host, false, "Stage MPI transfers through host");
 DEFINE_string(remote_comm_type, "get",
               " The remote memory function to use, MPI_Put / MPI_Get, options "
               "are put or get");
@@ -293,6 +294,11 @@ void BenchBase<ValueType, IndexType>::print_config()
               << " Remote comm type: " << FLAGS_remote_comm_type << "\n"
               << " Element sending strategy:  "
               << (FLAGS_enable_one_by_one ? "one by one" : "gathered") << "\n"
+              << " Staging through host ? "
+              << (FLAGS_stage_through_host
+                      ? "Yes"
+                      : "No, using CUDA-Aware transfers, if on cuda executor.")
+              << "\n"
               << std::endl;
 }
 

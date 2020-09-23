@@ -236,6 +236,11 @@ struct Settings {
         bool enable_get = true;
 
         /**
+         * Stage the MPI transfers through the host.
+         */
+        bool stage_through_host = false;
+
+        /**
          * Push each element separately directly into the buffer.
          */
         bool enable_one_by_one = false;
@@ -472,7 +477,7 @@ struct Metadata {
     /**
      * The overlap row indices.
      */
-    std::shared_ptr<gko::Array<IndexType>> overlap_row;
+    gko::Array<IndexType> overlap_row;
 
     /**
      * The starting row of each subdomain in the matrix.

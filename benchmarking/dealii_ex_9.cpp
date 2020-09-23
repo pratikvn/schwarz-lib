@@ -411,6 +411,7 @@ void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
         settings.comm_settings.enable_get = true;
     }
     settings.comm_settings.enable_one_by_one = FLAGS_enable_one_by_one;
+    settings.comm_settings.stage_through_host = FLAGS_stage_through_host;
     settings.comm_settings.enable_overlap = FLAGS_enable_comm_overlap;
     if (FLAGS_flush_type == "flush-all") {
         settings.comm_settings.enable_flush_all = true;

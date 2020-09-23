@@ -125,11 +125,6 @@ public:
         std::shared_ptr<gko::Array<IndexType *>> local_put;
 
         /**
-         * @copydoc global_put
-         */
-        std::shared_ptr<gko::Array<IndexType *>> remote_put;
-
-        /**
          * The array containing the number of elements that each subdomain gets
          * from the other. For example. global_get[p][0] contains the overall
          * number of elements to be received to subdomain p and global_put[p][i]
@@ -144,9 +139,14 @@ public:
         std::shared_ptr<gko::Array<IndexType *>> local_get;
 
         /**
-         * @copydoc global_get
+         * The number of elements being sent to each subdomain.
          */
-        std::shared_ptr<gko::Array<IndexType *>> remote_get;
+        std::vector<IndexType> send;
+
+        /**
+         * The number of elements being sent to each subdomain.
+         */
+        std::vector<IndexType> recv;
 
         /**
          * The RDMA window ids.
@@ -253,8 +253,6 @@ public:
     virtual void exchange_boundary(
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
-        const std::shared_ptr<gko::matrix::Dense<ValueType>>
-            &prev_global_solution,
         std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution) = 0;
 
     /**

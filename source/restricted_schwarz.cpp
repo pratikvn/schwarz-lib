@@ -498,14 +498,14 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
             } else {
                 this->comm_struct.recv_buffer =
                     vec_vtype::create(actual_exec, gko::dim<2>(num_recv, 1));
-                this->comm_struct.extra_buffer = vec_vtype::create(
-                    settings.executor, gko::dim<2>(num_recv, 1));
+                this->comm_struct.extra_buffer =
+                    vec_vtype::create(actual_exec, gko::dim<2>(num_recv, 1));
 
-                // initializing recv and extrapolation buffer
-                for (int i = 0; i < num_recv; i++) {
-                    this->comm_struct.recv_buffer->get_values()[i] = 0.0;
-                    this->comm_struct.extra_buffer->get_values()[i] = 0.0;
-                }
+                // // initializing recv and extrapolation buffer
+                // for (int i = 0; i < num_recv; i++) {
+                //     this->comm_struct.recv_buffer->get_values()[i] = 0.0;
+                //     this->comm_struct.extra_buffer->get_values()[i] = 0.0;
+                // }
 
                 // allocating values necessary for calculating threshold and
                 // extrapolation at receiver
@@ -513,12 +513,12 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
                     settings.executor->get_master(), gko::dim<2>(num_recv, 1));
 
                 this->comm_struct.last_recv_iter = std::shared_ptr<vec_itype>(
-                    new vec_itype(settings.executor->get_master(),
+                    new vec_itype(actual_exec,
                                   this->comm_struct.num_neighbors_in),
                     std::default_delete<vec_itype>());
 
                 this->comm_struct.last_recv_slopes = vec_vtype::create(
-                    settings.executor->get_master(),
+                    actual_exec,
                     gko::dim<2>(num_recv * metadata.recv_history, 1));
 
                 this->comm_struct.curr_recv_avg = vec_vtype::create(
@@ -526,7 +526,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
                     gko::dim<2>(this->comm_struct.num_neighbors_in, 1));
 
                 this->comm_struct.last_recv_avg = vec_vtype::create(
-                    settings.executor->get_master(),
+                    actual_exec,
                     gko::dim<2>(this->comm_struct.num_neighbors_in, 1));
 
                 // Initializing these values
@@ -568,6 +568,8 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
                     vec_mixedtype::create(actual_exec, gko::dim<2>(1, 1));
             } else {
                 this->comm_struct.recv_buffer =
+                    vec_vtype::create(actual_exec, gko::dim<2>(1, 1));
+                this->comm_struct.extra_buffer =
                     vec_vtype::create(actual_exec, gko::dim<2>(1, 1));
             }
         }
@@ -616,14 +618,14 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
                     vec_vtype::create(actual_exec, gko::dim<2>(num_send, 1));
 
                 this->comm_struct.curr_send_avg = vec_vtype::create(
-                    settings.executor,
+                    actual_exec,
                     gko::dim<2>(this->comm_struct.num_neighbors_out, 1));
                 this->comm_struct.last_send_avg = vec_vtype::create(
-                    settings.executor,
+                    actual_exec,
                     gko::dim<2>(this->comm_struct.num_neighbors_out, 1));
 
                 this->comm_struct.last_sent_slopes_avg = vec_vtype::create(
-                    settings.executor,
+                    actual_exec,
                     gko::dim<2>(this->comm_struct.num_neighbors_out *
                                     metadata.sent_history,
                                 1));
@@ -640,7 +642,7 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
 
                 // Allocating for threshold
                 this->comm_struct.thres = vec_vtype::create(
-                    settings.executor,
+                    actual_exec,
                     gko::dim<2>(this->comm_struct.num_neighbors_out, 1));
 
                 // initializing send buffer
@@ -765,11 +767,6 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
     // setup windows
     if (settings.comm_settings.enable_onesided) {
         // Onesided
-
-        for (int i = 0; i < main_buffer->get_size()[0]; i++) {
-            main_buffer->get_values()[i] = 0.0;
-        }
-
         MPI_Win_create(main_buffer->get_values(),
                        main_buffer->get_size()[0] * sizeof(ValueType),
                        sizeof(ValueType), MPI_INFO_NULL, MPI_COMM_WORLD,
@@ -779,11 +776,6 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
 
     if (settings.comm_settings.enable_onesided) {
         // MPI_Alloc_mem ? Custom allocator ?  TODO
-
-        for (int i = 0; i < num_subdomains; i++) {
-            this->local_residual_vector->get_values()[i] = 0.0;
-        }
-
         MPI_Win_create(this->local_residual_vector->get_values(),
                        (num_subdomains) * sizeof(ValueType), sizeof(ValueType),
                        MPI_INFO_NULL, MPI_COMM_WORLD,
@@ -800,13 +792,6 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_windows(
         this->convergence_local = std::shared_ptr<vec_itype>(
             new vec_itype(settings.executor->get_master(), num_subdomains),
             std::default_delete<vec_itype>());
-
-        for (int i = 0; i < num_subdomains; i++) {
-            this->convergence_vector->get_data()[i] = 0;
-            this->convergence_sent->get_data()[i] = 0;
-            this->convergence_local->get_data()[i] = 0;
-        }
-
         MPI_Win_create(this->convergence_vector->get_data(),
                        (num_subdomains) * sizeof(IndexType), sizeof(IndexType),
                        MPI_INFO_NULL, MPI_COMM_WORLD,

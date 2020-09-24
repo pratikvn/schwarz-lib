@@ -275,6 +275,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::initialize(
         this->settings, this->metadata, this->local_matrix,
         this->triangular_factor_l, this->triangular_factor_u, this->local_perm,
         this->local_inv_perm, this->local_rhs);
+
     // Setup the communication buffers on each of the subddomains.
     this->setup_comm_buffers();
 }
@@ -379,12 +380,13 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
                   << sum_rhs << std::endl;
     }
 
-    // Initialize all vectors - tbd
-
-    // std::vector<IndexType> local_converged_iter_count;
-
     // Setup the windows for the onesided communication.
-    this->setup_windows(this->settings, this->metadata, global_solution);
+    if (settings.comm_settings.stage_through_host) {
+        this->setup_windows(this->settings, this->metadata,
+                            host_global_solution);
+    } else {
+        this->setup_windows(this->settings, this->metadata, global_solution);
+    }
 
     const auto solver_settings =
         (Settings::local_solver_settings::direct_solver_cholmod |

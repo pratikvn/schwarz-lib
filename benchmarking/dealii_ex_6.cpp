@@ -289,7 +289,7 @@ void BenchDealiiLaplace<dim, ValueType, IndexType, MixedValueType>::solve(
     }
     settings.debug_print = FLAGS_debug;
 
-    // Event Settings
+    // Event based flags
     metadata.constant = FLAGS_constant;
     metadata.gamma = FLAGS_gamma;
     metadata.horizon = FLAGS_horizon;

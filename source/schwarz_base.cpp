@@ -411,7 +411,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
 
     std::ofstream fps;  // file for sending log
     std::ofstream fpr;  // file for receiving log
-    if (settings.debug_print) {
+    if (settings.debug_print && settings.event_log_print) {
         // Opening files for event logs
         fps.open("send" + rank_string + ".txt");
         fpr.open("recv" + rank_string + ".txt");
@@ -498,7 +498,7 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
     auto elapsed_time = std::chrono::duration<ValueType>(
         std::chrono::steady_clock::now() - start_time);
 
-    if (settings.debug_print) {
+    if (settings.debug_print && settings.event_log_print) {
         // Closing event log files
         fps.close();
         fpr.close();
@@ -518,9 +518,11 @@ void SchwarzBase<ValueType, IndexType, MixedValueType>::run(
             std::cout << " Rank: " << metadata.my_rank << " to "
                       << neighbors_out[k] << " : "
                       << this->comm_struct.msg_count->get_data()[k];
-            total_events += this->comm_struct.msg_count->get_data()[k];
         }
         std::cout << std::endl;
+    }
+    for (int k = 0; k < num_neighbors_out; k++) {
+        total_events += this->comm_struct.msg_count->get_data()[k];
     }
 
     // Total no of messages in all PEs

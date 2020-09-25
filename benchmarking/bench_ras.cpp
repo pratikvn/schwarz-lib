@@ -147,7 +147,8 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
         settings.local_solver =
             schwz::Settings::local_solver_settings::direct_solver_ginkgo;
     }
-    settings.debug_print = FLAGS_debug;
+    settings.debug_print = FLAGS_debug_print;
+    settings.event_log_print = FLAGS_event_log_print;
 
     // Event settings
     metadata.constant = FLAGS_constant;
@@ -197,7 +198,7 @@ void BenchRas<ValueType, IndexType>::solve(MPI_Comm mpi_communicator)
                               filename_recv);
     }
 
-    if (FLAGS_debug) {
+    if (FLAGS_debug_print) {
         // Print final solution to file
         std::string fname("final_sol.csv");
         std::ofstream fp;

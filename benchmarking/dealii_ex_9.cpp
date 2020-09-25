@@ -485,7 +485,8 @@ void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
         settings.local_solver =
             schwz::Settings::local_solver_settings::direct_solver_ginkgo;
     }
-    settings.debug_print = FLAGS_debug;
+    settings.debug_print = FLAGS_debug_print;
+    settings.event_log_print = FLAGS_event_log_print;
 
     // Event Settings
     metadata.constant = FLAGS_constant;

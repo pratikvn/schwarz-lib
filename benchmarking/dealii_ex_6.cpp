@@ -287,7 +287,8 @@ void BenchDealiiLaplace<dim, ValueType, IndexType, MixedValueType>::solve(
         settings.local_solver =
             schwz::Settings::local_solver_settings::direct_solver_ginkgo;
     }
-    settings.debug_print = FLAGS_debug;
+    settings.debug_print = FLAGS_debug_print;
+    settings.event_log_print = FLAGS_event_log_print;
 
     // Event based flags
     metadata.constant = FLAGS_constant;

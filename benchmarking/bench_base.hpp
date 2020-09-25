@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <restricted_schwarz.hpp>
 #include <solve.hpp>
 
-DEFINE_bool(debug, false, "Enable some possibly expensive debug checks");
+DEFINE_bool(debug_print, false, "Enable some possibly expensive debug checks");
 DEFINE_bool(non_symmetric_matrix, false, "The matrix is non-symmetric");
 DEFINE_bool(use_mixed_precision, false, "Use a mixed precision version");
 DEFINE_uint32(restart_iter, 1, "Restart iter for the GMRES solver");
@@ -145,6 +145,7 @@ DEFINE_string(metis_objtype, "null",
               "Defines the objective type for the metis partitioning, options "
               "are edgecut and totalvol ");
 
+DEFINE_bool(event_log_print, false, "Enable event based logging to files");
 DEFINE_double(constant, 0.0,
               "constant for the non-adaptive cgammak event threshold");
 DEFINE_double(gamma, 0.0, "gamma for the non-adaptive cgammak event threshold");

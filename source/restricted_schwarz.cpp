@@ -501,11 +501,11 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_comm_buffers()
                 this->comm_struct.extra_buffer =
                     vec_vtype::create(actual_exec, gko::dim<2>(num_recv, 1));
 
-                // // initializing recv and extrapolation buffer
-                // for (int i = 0; i < num_recv; i++) {
-                //     this->comm_struct.recv_buffer->get_values()[i] = 0.0;
-                //     this->comm_struct.extra_buffer->get_values()[i] = 0.0;
-                // }
+                // initializing recv and extrapolation buffer
+                for (int i = 0; i < num_recv; i++) {
+                    this->comm_struct.recv_buffer->get_values()[i] = 0.0;
+                    this->comm_struct.extra_buffer->get_values()[i] = 0.0;
+                }
 
                 // allocating values necessary for calculating threshold and
                 // extrapolation at receiver
@@ -929,22 +929,23 @@ void exchange_boundary_onesided(
                                     send_iter_diff);
                         }
 
-                        if (settings.debug_print) {
+                        if (settings.debug_print && settings.event_log_print) {
                             fps << comm_struct.curr_send_avg->get_values()[p]
                                 << ", " << diff << ", " << threshold << ",    ";
 
                             /*
-                            for (auto i = 0; i < (global_put[p])[0]; i++) {
-                                 fps <<
-                            comm_struct.send_buffer->get_values()[num_put
-                                 + i] << ", ";
-                            }
+                              for (auto i = 0; i < (global_put[p])[0]; i++) {
+                              fps <<
+                              comm_struct.send_buffer->get_values()[num_put
+                              + i] << ", ";
+                              }
                             */
                         }
 
                         if (diff >= threshold ||
                             metadata.iter_count < metadata.comm_start_iters) {
-                            if (settings.debug_print) {
+                            if (settings.debug_print &&
+                                settings.event_log_print) {
                                 fps << "1, ";
                             }
 
@@ -972,7 +973,8 @@ void exchange_boundary_onesided(
                             num_put += (global_put[p])[0];
 
                         } else {
-                            if (settings.debug_print) {
+                            if (settings.debug_print &&
+                                settings.event_log_print) {
                                 fps << "0, ";
                             }
                         }  // end if-else event condition
@@ -1005,7 +1007,7 @@ void exchange_boundary_onesided(
 
                 if (std::fabs(comm_struct.curr_recv_avg->get_values()[p] -
                               comm_struct.last_recv_avg->get_values()[p]) > 0) {
-                    if (settings.debug_print) {
+                    if (settings.debug_print && settings.event_log_print) {
                         // Printing 1 as an indicator that new
                         // value is received
                         fpr << "1, ";
@@ -1035,7 +1037,7 @@ void exchange_boundary_onesided(
 
                 else {
                     // no new value received, do extrapolation
-                    if (settings.debug_print) {
+                    if (settings.debug_print && settings.event_log_print) {
                         fpr << "0, ";
                     }
 
@@ -1057,7 +1059,7 @@ void exchange_boundary_onesided(
 
                 }  // end if extrapolation done
 
-                if (settings.debug_print) {
+                if (settings.debug_print && settings.event_log_print) {
                     // Printing avg of current bdy values (received or
                     // extrapolated)
                     fpr << temp_avg << ", ";
@@ -1069,7 +1071,9 @@ void exchange_boundary_onesided(
 
         }  // end for (iterating over neighbors)
 
-        if (settings.debug_print) fpr << std::endl;
+        if (settings.debug_print && settings.event_log_print) {
+            fpr << std::endl;
+        }
     }  // end if (enable put)
 
     else if (settings.comm_settings.enable_get) {

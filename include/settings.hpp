@@ -154,6 +154,11 @@ struct Settings {
     bool debug_print = false;
 
     /**
+     * Flag to enable some event based logging to files.
+     */
+    bool event_log_print = false;
+
+    /**
      * The local solver algorithm for the local subdomain solves.
      */
     enum local_solver_settings {

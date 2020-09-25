@@ -1,0 +1,295 @@
+\hypertarget{namespaceschwz}{}\section{schwz Namespace Reference}
+\label{namespaceschwz}\index{schwz@{schwz}}
+
+
+The Schwarz wrappers namespace.  
+
+
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespaceschwz_1_1CommHelpers}{Comm\+Helpers}
+\begin{DoxyCompactList}\small\item\em The Comm\+Helper namespace . \end{DoxyCompactList}\item 
+ \hyperlink{namespaceschwz_1_1conv__tools}{conv\+\_\+tools}
+\begin{DoxyCompactList}\small\item\em The \hyperlink{namespaceschwz_1_1conv__tools}{conv\+\_\+tools} namespace . \end{DoxyCompactList}\item 
+ \hyperlink{namespaceschwz_1_1EventHelpers}{Event\+Helpers}
+\begin{DoxyCompactList}\small\item\em The Event\+Helper namespace . \end{DoxyCompactList}\item 
+ \hyperlink{namespaceschwz_1_1PartitionTools}{Partition\+Tools}
+\begin{DoxyCompactList}\small\item\em The \hyperlink{namespaceschwz_1_1PartitionTools}{Partition\+Tools} namespace . \end{DoxyCompactList}\item 
+ \hyperlink{namespaceschwz_1_1SolverTools}{Solver\+Tools}
+\begin{DoxyCompactList}\small\item\em The \hyperlink{namespaceschwz_1_1SolverTools}{Solver\+Tools} namespace . \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classschwz_1_1Communicate}{Communicate}
+\begin{DoxyCompactList}\small\item\em The communication class that provides the methods for the communication between the subdomains. \end{DoxyCompactList}\item 
+class \hyperlink{classschwz_1_1device__guard}{device\+\_\+guard}
+\begin{DoxyCompactList}\small\item\em This class defines a device guard for the cuda functions and the cuda module. \end{DoxyCompactList}\item 
+struct \hyperlink{structschwz_1_1Gather}{Gather}
+\item 
+class \hyperlink{classschwz_1_1Initialize}{Initialize}
+\begin{DoxyCompactList}\small\item\em The initialization class that provides methods for initialization of the solver. \end{DoxyCompactList}\item 
+struct \hyperlink{structschwz_1_1Metadata}{Metadata}
+\begin{DoxyCompactList}\small\item\em The solver metadata struct. \end{DoxyCompactList}\item 
+struct \hyperlink{structschwz_1_1Scatter}{Scatter}
+\item 
+class \hyperlink{classschwz_1_1SchwarzBase}{Schwarz\+Base}
+\begin{DoxyCompactList}\small\item\em The Base solver class is meant to be the class implementing the common implementations for all the schwarz methods. \end{DoxyCompactList}\item 
+struct \hyperlink{structschwz_1_1Settings}{Settings}
+\begin{DoxyCompactList}\small\item\em The struct that contains the solver settings and the parameters to be set by the user. \end{DoxyCompactList}\item 
+class \hyperlink{classschwz_1_1Solve}{Solve}
+\begin{DoxyCompactList}\small\item\em The Solver class the provides the solver and the convergence checking methods. \end{DoxyCompactList}\item 
+class \hyperlink{classschwz_1_1SolverRAS}{Solver\+R\+AS}
+\begin{DoxyCompactList}\small\item\em An implementation of the solver interface using the R\+AS solver. \end{DoxyCompactList}\item 
+struct \hyperlink{structschwz_1_1Utils}{Utils}
+\begin{DoxyCompactList}\small\item\em The utilities class which provides some checks and basic utilities. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespaceschwz_ac8ffee819a786a73e83401fa69803795}\label{namespaceschwz_ac8ffee819a786a73e83401fa69803795}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries gather\+\_\+add\+\_\+values} (const Index\+Type num\+\_\+elems, const Index\+Type $\ast$indices, const Value\+Type $\ast$from\+\_\+array, Value\+Type $\ast$into\+\_\+array)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a61c3a595834b5807415d04042ce74715}\label{namespaceschwz_a61c3a595834b5807415d04042ce74715}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries gather\+\_\+diff\+\_\+values} (const Index\+Type num\+\_\+elems, const Index\+Type $\ast$indices, const Value\+Type $\ast$from\+\_\+array, Value\+Type $\ast$into\+\_\+array)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a896f3d4b86393dc8ce73982e23073d9a}\label{namespaceschwz_a896f3d4b86393dc8ce73982e23073d9a}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries gather\+\_\+avg\+\_\+values} (const Index\+Type num\+\_\+elems, const Index\+Type $\ast$indices, const Value\+Type $\ast$from\+\_\+array, Value\+Type $\ast$into\+\_\+array)
+\item 
+\mbox{\Hypertarget{namespaceschwz_ac0d7361baa5ceaa2596da4586960cafc}\label{namespaceschwz_ac0d7361baa5ceaa2596da4586960cafc}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries gather\+\_\+values} (const Index\+Type num\+\_\+elems, const Index\+Type $\ast$indices, const Value\+Type $\ast$from\+\_\+array, Value\+Type $\ast$into\+\_\+array)
+\item 
+\mbox{\Hypertarget{namespaceschwz_ab76087fa81e1d29484501e5f3a193ed5}\label{namespaceschwz_ab76087fa81e1d29484501e5f3a193ed5}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries scatter\+\_\+add\+\_\+values} (const Index\+Type num\+\_\+elems, const Index\+Type $\ast$indices, const Value\+Type $\ast$from\+\_\+array, Value\+Type $\ast$into\+\_\+array)
+\item 
+\mbox{\Hypertarget{namespaceschwz_adbc33f65188d6040744e0e022bc99d62}\label{namespaceschwz_adbc33f65188d6040744e0e022bc99d62}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries scatter\+\_\+diff\+\_\+values} (const Index\+Type num\+\_\+elems, const Index\+Type $\ast$indices, const Value\+Type $\ast$from\+\_\+array, Value\+Type $\ast$into\+\_\+array)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a07d5a0ad6fe3b1c9692a933ccf402ab4}\label{namespaceschwz_a07d5a0ad6fe3b1c9692a933ccf402ab4}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries scatter\+\_\+avg\+\_\+values} (const Index\+Type num\+\_\+elems, const Index\+Type $\ast$indices, const Value\+Type $\ast$from\+\_\+array, Value\+Type $\ast$into\+\_\+array)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a8e9cee5617c5c8270b831925ea4e6575}\label{namespaceschwz_a8e9cee5617c5c8270b831925ea4e6575}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries scatter\+\_\+values} (const Index\+Type num\+\_\+elems, const Index\+Type $\ast$indices, const Value\+Type $\ast$from\+\_\+array, Value\+Type $\ast$into\+\_\+array)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a7ab38225d7d861d19a8832cfffb7efe5}\label{namespaceschwz_a7ab38225d7d861d19a8832cfffb7efe5}} 
+template void {\bfseries gather\+\_\+values} (const int, const int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_aa6c2935754fee8a672b1ead7a7ca0fe3}\label{namespaceschwz_aa6c2935754fee8a672b1ead7a7ca0fe3}} 
+template void {\bfseries gather\+\_\+values} (const int, const int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a4bed0b908c287eb731936d0fcece6c6e}\label{namespaceschwz_a4bed0b908c287eb731936d0fcece6c6e}} 
+template void {\bfseries gather\+\_\+values} (const int, const int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_aab13b4ded1cd7a8c5bd9e738035c36e6}\label{namespaceschwz_aab13b4ded1cd7a8c5bd9e738035c36e6}} 
+template void {\bfseries gather\+\_\+values} (const int, const int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a758923b00d860044630d1b5cd4c4235a}\label{namespaceschwz_a758923b00d860044630d1b5cd4c4235a}} 
+template void {\bfseries gather\+\_\+values} (const long int, const long int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a71821c9bb49d9dc02bcdad25f414bf35}\label{namespaceschwz_a71821c9bb49d9dc02bcdad25f414bf35}} 
+template void {\bfseries gather\+\_\+values} (const long int, const long int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a3d12e403a66aba1b9d5b5a08d8e3013b}\label{namespaceschwz_a3d12e403a66aba1b9d5b5a08d8e3013b}} 
+template void {\bfseries gather\+\_\+values} (const long int, const long int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a3d79bead3c437129ee3f0e4fb9539a2e}\label{namespaceschwz_a3d79bead3c437129ee3f0e4fb9539a2e}} 
+template void {\bfseries gather\+\_\+values} (const long int, const long int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a608fa0d41c169ac77975688d1192ca9b}\label{namespaceschwz_a608fa0d41c169ac77975688d1192ca9b}} 
+template void {\bfseries gather\+\_\+add\+\_\+values} (const int, const int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_ae44b8950fbaff078114f2fd70dae814d}\label{namespaceschwz_ae44b8950fbaff078114f2fd70dae814d}} 
+template void {\bfseries gather\+\_\+add\+\_\+values} (const int, const int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_aaa932205d942d675ce5193c901b51ca8}\label{namespaceschwz_aaa932205d942d675ce5193c901b51ca8}} 
+template void {\bfseries gather\+\_\+add\+\_\+values} (const int, const int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a19bce0fe76febda77ab85a7a42e9f246}\label{namespaceschwz_a19bce0fe76febda77ab85a7a42e9f246}} 
+template void {\bfseries gather\+\_\+add\+\_\+values} (const int, const int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_aed13f03b9a8d44eb43ce16ea4dd489a0}\label{namespaceschwz_aed13f03b9a8d44eb43ce16ea4dd489a0}} 
+template void {\bfseries gather\+\_\+add\+\_\+values} (const long int, const long int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a779e1ca076ad997ce50d54ecdef0a3fb}\label{namespaceschwz_a779e1ca076ad997ce50d54ecdef0a3fb}} 
+template void {\bfseries gather\+\_\+add\+\_\+values} (const long int, const long int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a29acf621d2dc1e5fcf181c9daed0ad6c}\label{namespaceschwz_a29acf621d2dc1e5fcf181c9daed0ad6c}} 
+template void {\bfseries gather\+\_\+add\+\_\+values} (const long int, const long int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_ac5b57e7bd1e1def39a59ebd97fdfbfb2}\label{namespaceschwz_ac5b57e7bd1e1def39a59ebd97fdfbfb2}} 
+template void {\bfseries gather\+\_\+add\+\_\+values} (const long int, const long int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_afbede3c73f67fb283f62517b71f93fe1}\label{namespaceschwz_afbede3c73f67fb283f62517b71f93fe1}} 
+template void {\bfseries gather\+\_\+diff\+\_\+values} (const int, const int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_af0bde8e5792d69e70e61eb8722f1b283}\label{namespaceschwz_af0bde8e5792d69e70e61eb8722f1b283}} 
+template void {\bfseries gather\+\_\+diff\+\_\+values} (const int, const int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_af4c83d3aff6a056dc2e2da6397245c24}\label{namespaceschwz_af4c83d3aff6a056dc2e2da6397245c24}} 
+template void {\bfseries gather\+\_\+diff\+\_\+values} (const int, const int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a00aa4cb20044923725a71a96d1bd812c}\label{namespaceschwz_a00aa4cb20044923725a71a96d1bd812c}} 
+template void {\bfseries gather\+\_\+diff\+\_\+values} (const int, const int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a76b4f4cf99358eb91f85f1a41f72cb1c}\label{namespaceschwz_a76b4f4cf99358eb91f85f1a41f72cb1c}} 
+template void {\bfseries gather\+\_\+diff\+\_\+values} (const long int, const long int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a8a6322efe1ef6c5acda8d5673241ce55}\label{namespaceschwz_a8a6322efe1ef6c5acda8d5673241ce55}} 
+template void {\bfseries gather\+\_\+diff\+\_\+values} (const long int, const long int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_abf11ae3dd34298145fa6c6be53e9c62d}\label{namespaceschwz_abf11ae3dd34298145fa6c6be53e9c62d}} 
+template void {\bfseries gather\+\_\+diff\+\_\+values} (const long int, const long int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a6b906ed90cfe429146cb1e253fe06116}\label{namespaceschwz_a6b906ed90cfe429146cb1e253fe06116}} 
+template void {\bfseries gather\+\_\+diff\+\_\+values} (const long int, const long int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_afa5bc78e39b6982bf8f9b3d0687647c0}\label{namespaceschwz_afa5bc78e39b6982bf8f9b3d0687647c0}} 
+template void {\bfseries gather\+\_\+avg\+\_\+values} (const int, const int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a4a966e8da22076968cde59487e74e248}\label{namespaceschwz_a4a966e8da22076968cde59487e74e248}} 
+template void {\bfseries gather\+\_\+avg\+\_\+values} (const int, const int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a9ad25532a91580ee41f3f21a9ef6e1e6}\label{namespaceschwz_a9ad25532a91580ee41f3f21a9ef6e1e6}} 
+template void {\bfseries gather\+\_\+avg\+\_\+values} (const int, const int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a598e57814eb4b4266415619c6e01ea8a}\label{namespaceschwz_a598e57814eb4b4266415619c6e01ea8a}} 
+template void {\bfseries gather\+\_\+avg\+\_\+values} (const int, const int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a4c9e5b9195d16742a8e09ae8eb1b948d}\label{namespaceschwz_a4c9e5b9195d16742a8e09ae8eb1b948d}} 
+template void {\bfseries gather\+\_\+avg\+\_\+values} (const long int, const long int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_ad44f654032dc8868eeb4000d8953d87c}\label{namespaceschwz_ad44f654032dc8868eeb4000d8953d87c}} 
+template void {\bfseries gather\+\_\+avg\+\_\+values} (const long int, const long int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a9209d8313c0da94428a5ebd8ab6d955f}\label{namespaceschwz_a9209d8313c0da94428a5ebd8ab6d955f}} 
+template void {\bfseries gather\+\_\+avg\+\_\+values} (const long int, const long int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_ab80e27a06c01f85e821b1fd0b20342b5}\label{namespaceschwz_ab80e27a06c01f85e821b1fd0b20342b5}} 
+template void {\bfseries gather\+\_\+avg\+\_\+values} (const long int, const long int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_af2581a54865ba2cf58b58dfd35725798}\label{namespaceschwz_af2581a54865ba2cf58b58dfd35725798}} 
+template void {\bfseries scatter\+\_\+values} (const int, const int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a936497bda52c4576c12e53e253cceab2}\label{namespaceschwz_a936497bda52c4576c12e53e253cceab2}} 
+template void {\bfseries scatter\+\_\+values} (const int, const int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a166460cb963d5ee838ced61ad3d382f6}\label{namespaceschwz_a166460cb963d5ee838ced61ad3d382f6}} 
+template void {\bfseries scatter\+\_\+values} (const int, const int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_aa8f9c56f2d0a9aaf5509c3bc86c8155e}\label{namespaceschwz_aa8f9c56f2d0a9aaf5509c3bc86c8155e}} 
+template void {\bfseries scatter\+\_\+values} (const int, const int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a3fec6640931ec9c0e528e90d27d0951d}\label{namespaceschwz_a3fec6640931ec9c0e528e90d27d0951d}} 
+template void {\bfseries scatter\+\_\+values} (const long int, const long int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a30054ec4df2645e3b13bc3df228d1273}\label{namespaceschwz_a30054ec4df2645e3b13bc3df228d1273}} 
+template void {\bfseries scatter\+\_\+values} (const long int, const long int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a24803b7dd7b84c7c8054e11d6a9194fb}\label{namespaceschwz_a24803b7dd7b84c7c8054e11d6a9194fb}} 
+template void {\bfseries scatter\+\_\+values} (const long int, const long int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a9136fe3be2935ea9e1baf81e3e190635}\label{namespaceschwz_a9136fe3be2935ea9e1baf81e3e190635}} 
+template void {\bfseries scatter\+\_\+values} (const long int, const long int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a5f049658ff61cb915da9215e10b42ecc}\label{namespaceschwz_a5f049658ff61cb915da9215e10b42ecc}} 
+template void {\bfseries scatter\+\_\+add\+\_\+values} (const int, const int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a1a15b2c2b084f065b99bcae1bd055ca1}\label{namespaceschwz_a1a15b2c2b084f065b99bcae1bd055ca1}} 
+template void {\bfseries scatter\+\_\+add\+\_\+values} (const int, const int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_ac501d1bffab5f31ad4cc9c63ec4bad86}\label{namespaceschwz_ac501d1bffab5f31ad4cc9c63ec4bad86}} 
+template void {\bfseries scatter\+\_\+add\+\_\+values} (const int, const int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_adeea7daa5b0f92d1b09e55720fa63bb6}\label{namespaceschwz_adeea7daa5b0f92d1b09e55720fa63bb6}} 
+template void {\bfseries scatter\+\_\+add\+\_\+values} (const int, const int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a08d3a3036763cfa75d455f6b71844cb3}\label{namespaceschwz_a08d3a3036763cfa75d455f6b71844cb3}} 
+template void {\bfseries scatter\+\_\+add\+\_\+values} (const long int, const long int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_ac1dc2225592f5f39274b6cf7dd6a5117}\label{namespaceschwz_ac1dc2225592f5f39274b6cf7dd6a5117}} 
+template void {\bfseries scatter\+\_\+add\+\_\+values} (const long int, const long int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a632ab20939f9053831bf45bf6a426ad8}\label{namespaceschwz_a632ab20939f9053831bf45bf6a426ad8}} 
+template void {\bfseries scatter\+\_\+add\+\_\+values} (const long int, const long int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a6c2e0122e5402b8f4d92358983aee12e}\label{namespaceschwz_a6c2e0122e5402b8f4d92358983aee12e}} 
+template void {\bfseries scatter\+\_\+add\+\_\+values} (const long int, const long int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_ad1434310b9a8066f5b4c2addea42ac14}\label{namespaceschwz_ad1434310b9a8066f5b4c2addea42ac14}} 
+template void {\bfseries scatter\+\_\+diff\+\_\+values} (const int, const int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a290715fb4948e0e9b86990bd1944eb70}\label{namespaceschwz_a290715fb4948e0e9b86990bd1944eb70}} 
+template void {\bfseries scatter\+\_\+diff\+\_\+values} (const int, const int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_ada8676d66f231b3a53e5e1ff7d999e50}\label{namespaceschwz_ada8676d66f231b3a53e5e1ff7d999e50}} 
+template void {\bfseries scatter\+\_\+diff\+\_\+values} (const int, const int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a454b51812416f906f354513e14b8575c}\label{namespaceschwz_a454b51812416f906f354513e14b8575c}} 
+template void {\bfseries scatter\+\_\+diff\+\_\+values} (const int, const int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a5d8ea9635fd2508d326deeccd62eca20}\label{namespaceschwz_a5d8ea9635fd2508d326deeccd62eca20}} 
+template void {\bfseries scatter\+\_\+diff\+\_\+values} (const long int, const long int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a5204d95c2a2ac0411bc32e532d17ad8f}\label{namespaceschwz_a5204d95c2a2ac0411bc32e532d17ad8f}} 
+template void {\bfseries scatter\+\_\+diff\+\_\+values} (const long int, const long int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a9706758b09de68439483045a467392e8}\label{namespaceschwz_a9706758b09de68439483045a467392e8}} 
+template void {\bfseries scatter\+\_\+diff\+\_\+values} (const long int, const long int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a7ac82936a1eec570aac68dc6042f4823}\label{namespaceschwz_a7ac82936a1eec570aac68dc6042f4823}} 
+template void {\bfseries scatter\+\_\+diff\+\_\+values} (const long int, const long int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a88529ad74a3f7548c85f26f636e24212}\label{namespaceschwz_a88529ad74a3f7548c85f26f636e24212}} 
+template void {\bfseries scatter\+\_\+avg\+\_\+values} (const int, const int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_adeb6898dd28ee5b0345a973d17106372}\label{namespaceschwz_adeb6898dd28ee5b0345a973d17106372}} 
+template void {\bfseries scatter\+\_\+avg\+\_\+values} (const int, const int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_ac473f48d68800895d95bb377496827a8}\label{namespaceschwz_ac473f48d68800895d95bb377496827a8}} 
+template void {\bfseries scatter\+\_\+avg\+\_\+values} (const int, const int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a26eb04ab096688b4ad522fef0eab204e}\label{namespaceschwz_a26eb04ab096688b4ad522fef0eab204e}} 
+template void {\bfseries scatter\+\_\+avg\+\_\+values} (const int, const int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_ac104918c72369958d827881200e6b0f2}\label{namespaceschwz_ac104918c72369958d827881200e6b0f2}} 
+template void {\bfseries scatter\+\_\+avg\+\_\+values} (const long int, const long int $\ast$, const float $\ast$, float $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a7857bd3c6d5819613725a25e46c8fb2c}\label{namespaceschwz_a7857bd3c6d5819613725a25e46c8fb2c}} 
+template void {\bfseries scatter\+\_\+avg\+\_\+values} (const long int, const long int $\ast$, const double $\ast$, double $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a0c7a01a33460207f5c3d063ef9eb015a}\label{namespaceschwz_a0c7a01a33460207f5c3d063ef9eb015a}} 
+template void {\bfseries scatter\+\_\+avg\+\_\+values} (const long int, const long int $\ast$, const int $\ast$, int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_aba9e74f2b7d99cfe0e27bb1577e61331}\label{namespaceschwz_aba9e74f2b7d99cfe0e27bb1577e61331}} 
+template void {\bfseries scatter\+\_\+avg\+\_\+values} (const long int, const long int $\ast$, const long int $\ast$, long int $\ast$)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a5e68ca208e6176c2ba8f7da99786bd75}\label{namespaceschwz_a5e68ca208e6176c2ba8f7da99786bd75}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type , typename Additional\+Operation $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void {\bfseries gather\+\_\+kernel} (const Index\+Type num\+\_\+elems, const Index\+Type $\ast$indices, const Value\+Type $\ast$gather\+\_\+from, Value\+Type $\ast$gather\+\_\+into, Additional\+Operation op)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a443a272fc6c66825dc7a958e824e32e3}\label{namespaceschwz_a443a272fc6c66825dc7a958e824e32e3}} 
+gko\+::size\+\_\+type {\bfseries linearize\+\_\+index} (const gko\+::size\+\_\+type row, const gko\+::size\+\_\+type col, const gko\+::size\+\_\+type num\+\_\+rows)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a4e81df68d1918c37ac0c1d4a9a406ba9}\label{namespaceschwz_a4e81df68d1918c37ac0c1d4a9a406ba9}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ }\\void {\bfseries exchange\+\_\+boundary\+\_\+onesided} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, struct \hyperlink{classschwz_1_1Communicate}{Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct \&comm\+\_\+struct, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&prev\+\_\+global\+\_\+solution, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+solution, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&prev\+\_\+event\+\_\+solution, std\+::ofstream \&fps, std\+::ofstream \&fpr)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a1f69ce81eaf85081073d0f45e11ce149}\label{namespaceschwz_a1f69ce81eaf85081073d0f45e11ce149}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ }\\void {\bfseries exchange\+\_\+boundary\+\_\+twosided} (const \hyperlink{structschwz_1_1Settings}{Settings} \&settings, const \hyperlink{structschwz_1_1Metadata}{Metadata}$<$ Value\+Type, Index\+Type $>$ \&metadata, struct \hyperlink{classschwz_1_1Communicate}{Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct \&comm\+\_\+struct, const std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&prev\+\_\+global\+\_\+solution, std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Dense$<$ Value\+Type $>$$>$ \&global\+\_\+solution)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a1149b1cad510b1ae7285480c970fd2b3}\label{namespaceschwz_a1149b1cad510b1ae7285480c970fd2b3}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type , typename Additional\+Operation $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void {\bfseries scatter\+\_\+kernel} (const Index\+Type num\+\_\+elems, const Index\+Type $\ast$indices, const Value\+Type $\ast$scatter\+\_\+from, Value\+Type $\ast$scatter\+\_\+into, Additional\+Operation op)
+\item 
+\mbox{\Hypertarget{namespaceschwz_af5437b273e3d364a2b3fa80929aeded9}\label{namespaceschwz_af5437b273e3d364a2b3fa80929aeded9}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries write\+\_\+iters\+\_\+and\+\_\+residuals} (int num\+\_\+subd, int my\+\_\+rank, int iter\+\_\+count, std\+::vector$<$ Value\+Type $>$ \&local\+\_\+res\+\_\+vec\+\_\+out, std\+::vector$<$ Index\+Type $>$ \&local\+\_\+converged\+\_\+iter\+\_\+count, std\+::vector$<$ Value\+Type $>$ \&local\+\_\+converged\+\_\+resnorm, std\+::vector$<$ Value\+Type $>$ \&local\+\_\+timestamp, std\+::string filename)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a6e174da7b0a888de0b361c6ef27ae10a}\label{namespaceschwz_a6e174da7b0a888de0b361c6ef27ae10a}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type , typename Mixed\+Value\+Type $>$ }\\void {\bfseries gather\+\_\+comm\+\_\+data} (int num\+\_\+subdomains, struct \hyperlink{classschwz_1_1Communicate}{Communicate}$<$ Value\+Type, Index\+Type, Mixed\+Value\+Type $>$\+::comm\+\_\+struct \&comm\+\_\+struct, std\+::vector$<$ std\+::tuple$<$ int, std\+::vector$<$ std\+::tuple$<$ int, int $>$$>$, std\+::vector$<$ std\+::tuple$<$ int, int $>$$>$, int, int $>$$>$ \&comm\+\_\+data\+\_\+struct)
+\item 
+\mbox{\Hypertarget{namespaceschwz_a326d36155d6eeccd87f66fdf5200df29}\label{namespaceschwz_a326d36155d6eeccd87f66fdf5200df29}} 
+{\footnotesize template$<$typename Value\+Type $>$ }\\double {\bfseries get\+\_\+relative\+\_\+error} (const gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $\ast$first, const gko\+::matrix\+::\+Dense$<$ Value\+Type $>$ $\ast$second)
+\item 
+\mbox{\Hypertarget{namespaceschwz_aac5839ef31d9d40a6a9c80a8611b6e50}\label{namespaceschwz_aac5839ef31d9d40a6a9c80a8611b6e50}} 
+{\footnotesize template$<$typename Value\+Type , typename Index\+Type $>$ }\\void {\bfseries update\+\_\+diagonals} (std\+::shared\+\_\+ptr$<$ gko\+::matrix\+::\+Csr$<$ Value\+Type, Index\+Type $>$$>$ \&matrix, std\+::vector$<$ Value\+Type $>$ \&diags)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The Schwarz wrappers namespace. 

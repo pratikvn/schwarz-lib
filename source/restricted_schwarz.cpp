@@ -841,7 +841,7 @@ void exchange_boundary_onesided(
                     CommHelpers::pack_buffer(
                         settings, prev_global_solution->get_values(),
                         global_solution->get_values(),
-                        send_buffer->get_values(), global_put, num_put, p);
+                        comm_struct.send_buffer->get_values(), global_put, num_put, p);
 
                     if (settings.use_mixed_precision) {
                         send_buffer->convert_to(gko::lend(mixedt_send_buffer));
@@ -915,7 +915,7 @@ void exchange_boundary_onesided(
 
                             CommHelpers::transfer_buffer(
                                 settings, comm_struct.window_recv_buffer,
-                                send_buffer->get_values(), global_put, num_put,
+                                comm_struct.send_buffer->get_values(), global_put, num_put,
                                 p, neighbors_out, put_displacements);
 
                             if (settings.thres_type == "slope") {
@@ -945,6 +945,8 @@ void exchange_boundary_onesided(
                 }          // end if (global_put[p] > 0)
             }              // end for (iterating over neighbors)
         }                  // end if-else one by one
+
+        if (settings.debug_print) fps << std::endl;
 
         if (settings.use_mixed_precision) {
             mixedt_recv_buffer->convert_to(gko::lend(recv_buffer));
@@ -980,7 +982,7 @@ void exchange_boundary_onesided(
                     CommHelpers::unpack_buffer(
                         settings, prev_global_solution->get_values(),
                         global_solution->get_values(),
-                        recv_buffer->get_values(), global_get, num_get, p);
+                        comm_struct.recv_buffer->get_values(), global_get, num_get, p);
 
                     EventHelpers::compute_receiver_slopes<ValueType, IndexType,
                                                           MixedValueType>(
@@ -1003,7 +1005,7 @@ void exchange_boundary_onesided(
                         fpr << "0, ";
                     }
 
-                    if (metadata.horizon != 0) {
+                    if (metadata.decay_param != 0) {
                         temp_avg = 0.0;  // calculate avg again
 
                         temp_avg = EventHelpers::generate_extrapolated_buffer<

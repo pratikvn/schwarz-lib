@@ -136,8 +136,8 @@ double BoundaryValues<dim>::value(const Point<dim> &p,
 }
 
 
-template <int dim>
-class AdvectionProblem : public BenchBase<double, int> {
+template <int dim, typename IndexType>
+class AdvectionProblem : public BenchBase<double, IndexType> {
 public:
     AdvectionProblem();
     void run();
@@ -218,13 +218,14 @@ private:
 };
 
 
-template <int dim>
-AdvectionProblem<dim>::AdvectionProblem() : dof_handler(triangulation), fe(5)
+template <int dim, typename IndexType>
+AdvectionProblem<dim, IndexType>::AdvectionProblem()
+    : dof_handler(triangulation), fe(5)
 {}
 
 
-template <int dim>
-void AdvectionProblem<dim>::setup_system()
+template <int dim, typename IndexType>
+void AdvectionProblem<dim, IndexType>::setup_system()
 {
     dof_handler.distribute_dofs(fe);
     hanging_node_constraints.clear();
@@ -241,8 +242,8 @@ void AdvectionProblem<dim>::setup_system()
 }
 
 
-template <int dim>
-void AdvectionProblem<dim>::assemble_system()
+template <int dim, typename IndexType>
+void AdvectionProblem<dim, IndexType>::assemble_system()
 {
     WorkStream::run(dof_handler.begin_active(), dof_handler.end(), *this,
                     &AdvectionProblem::local_assemble_system,
@@ -251,8 +252,8 @@ void AdvectionProblem<dim>::assemble_system()
 }
 
 
-template <int dim>
-AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
+template <int dim, typename IndexType>
+AdvectionProblem<dim, IndexType>::AssemblyScratchData::AssemblyScratchData(
     const FiniteElement<dim> &fe)
     : fe_values(fe, QGauss<dim>(fe.degree + 1),
                 update_values | update_gradients | update_quadrature_points |
@@ -267,8 +268,8 @@ AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
 {}
 
 
-template <int dim>
-AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
+template <int dim, typename IndexType>
+AdvectionProblem<dim, IndexType>::AssemblyScratchData::AssemblyScratchData(
     const AssemblyScratchData &scratch_data)
     : fe_values(scratch_data.fe_values.get_fe(),
                 scratch_data.fe_values.get_quadrature(),
@@ -285,8 +286,8 @@ AdvectionProblem<dim>::AssemblyScratchData::AssemblyScratchData(
 {}
 
 
-template <int dim>
-void AdvectionProblem<dim>::local_assemble_system(
+template <int dim, typename IndexType>
+void AdvectionProblem<dim, IndexType>::local_assemble_system(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
     AssemblyScratchData &scratch_data, AssemblyCopyData &copy_data)
 {
@@ -365,8 +366,8 @@ void AdvectionProblem<dim>::local_assemble_system(
 }
 
 
-template <int dim>
-void AdvectionProblem<dim>::copy_local_to_global(
+template <int dim, typename IndexType>
+void AdvectionProblem<dim, IndexType>::copy_local_to_global(
     const AssemblyCopyData &copy_data)
 {
     hanging_node_constraints.distribute_local_to_global(
@@ -375,11 +376,10 @@ void AdvectionProblem<dim>::copy_local_to_global(
 }
 
 
-template <int dim>
-void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
+template <int dim, typename IndexType>
+void AdvectionProblem<dim, IndexType>::solve(MPI_Comm mpi_communicator)
 {
     using ValueType = double;
-    using IndexType = int;
     schwz::Metadata<ValueType, IndexType> metadata;
     schwz::Settings settings(FLAGS_executor);
 
@@ -560,8 +560,8 @@ void AdvectionProblem<dim>::solve(MPI_Comm mpi_communicator)
 }
 
 
-template <int dim>
-void AdvectionProblem<dim>::solve()
+template <int dim, typename IndexType>
+void AdvectionProblem<dim, IndexType>::solve()
 {
     SolverControl solver_control(
         std::max<std::size_t>(1000, system_rhs.size() / 10),
@@ -585,8 +585,8 @@ void AdvectionProblem<dim>::solve()
 }
 
 
-template <int dim>
-void AdvectionProblem<dim>::refine_grid()
+template <int dim, typename IndexType>
+void AdvectionProblem<dim, IndexType>::refine_grid()
 {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
     GradientEstimation::estimate(dof_handler, solution,
@@ -597,8 +597,9 @@ void AdvectionProblem<dim>::refine_grid()
 }
 
 
-template <int dim>
-void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
+template <int dim, typename IndexType>
+void AdvectionProblem<dim, IndexType>::output_results(
+    const unsigned int cycle) const
 {
     {
         GridOut grid_out;
@@ -620,8 +621,8 @@ void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
 }
 
 
-template <int dim>
-void AdvectionProblem<dim>::run(MPI_Comm mpi_communicator)
+template <int dim, typename IndexType>
+void AdvectionProblem<dim, IndexType>::run(MPI_Comm mpi_communicator)
 {
     int num_cycles = FLAGS_num_refine_cycles;
     int mpi_size, mpi_rank;
@@ -653,8 +654,8 @@ void AdvectionProblem<dim>::run(MPI_Comm mpi_communicator)
 }
 
 
-template <int dim>
-void AdvectionProblem<dim>::run()
+template <int dim, typename IndexType>
+void AdvectionProblem<dim, IndexType>::run()
 {
     int num_cycles = FLAGS_num_refine_cycles;
     for (unsigned int cycle = 0; cycle < num_cycles; ++cycle) {
@@ -792,7 +793,7 @@ int main(int argc, char **argv)
     try {
         initialize_argument_parsing(&argc, &argv);
         MultithreadInfo::set_thread_limit();
-        AdvectionProblem<2> advection_problem_2d;
+        AdvectionProblem<2, long int> advection_problem_2d;
         if (FLAGS_num_threads > 1) {
             int req_thread_support = MPI_THREAD_MULTIPLE;
             int prov_thread_support = MPI_THREAD_MULTIPLE;

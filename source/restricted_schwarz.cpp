@@ -298,10 +298,13 @@ void SolverRAS<ValueType, IndexType, MixedValueType>::setup_local_matrices(
     local_matrix_compute->sort_by_column_index();
     interface_matrix_compute->sort_by_column_index();
 
+    auto strat = std::make_shared<typename mtx::classical>();
     local_matrix = mtx::create(settings.executor);
     local_matrix->copy_from(gko::lend(local_matrix_compute));
+    local_matrix->set_strategy(strat);
     interface_matrix = mtx::create(settings.executor);
     interface_matrix->copy_from(gko::lend(interface_matrix_compute));
+    interface_matrix->set_strategy(strat);
 }
 
 
@@ -1041,7 +1044,7 @@ void exchange_boundary_onesided(
                         fpr << "0, ";
                     }
 
-                    if (metadata.horizon != 0) {
+                    if (metadata.decay_param != 0) {
                         temp_avg = 0.0;  // calculate avg again
 
                         temp_avg = EventHelpers::generate_extrapolated_buffer<

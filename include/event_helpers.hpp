@@ -94,7 +94,7 @@ void compute_sender_slopes(
     if (iter_diff != 0) {
         comm_struct.last_sent_slopes_avg
             ->get_values()[i * num_neighbors_out + target_subd] =
-            diff / iter_diff;
+            value_diff / iter_diff;
     }
     temp += comm_struct.last_sent_slopes_avg
                 ->get_values()[i * num_neighbors_out + target_subd];

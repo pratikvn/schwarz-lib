@@ -7,6 +7,7 @@ Schwarz Library
 Performance results
 -------------------
 1. [Paper in IJHPCA](https://journals.sagepub.com/doi/10.1177/1094342020946814); [Alternative arXiv version](https://arxiv.org/abs/2003.05361)
+2. [Two stage update](https://ieeexplore.ieee.org/document/9308758)
 
 
 ## Required components
@@ -97,4 +98,4 @@ Any of the implemented features can be permuted and tested.
 For installing and building, please check the [Installation page](./INSTALL.md)
 
 
-Credits: This code was inspired by (written in C++, with additions and improvements) the code from Ichitaro Yamazaki, ICL, UTK.
+Credits: This code (written in C++, with additions and improvements) was inspired by the code from Ichitaro Yamazaki, ICL, UTK.

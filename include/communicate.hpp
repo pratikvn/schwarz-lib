@@ -77,6 +77,16 @@ public:
         int num_neighbors_out;
 
         /**
+         * The total number of elements received from all neighbors
+         */
+        int num_recv;
+
+        /**
+         * The total number of elements sent to all neighbors
+         */
+        int num_send;
+
+        /**
          * The neighbors this subdomain has to receive data from.
          */
         std::shared_ptr<gko::Array<IndexType>> neighbors_in;
@@ -198,6 +208,70 @@ public:
         std::shared_ptr<gko::matrix::Dense<MixedValueType>> mixedt_recv_buffer;
 
         /**
+         * The extrapolation buffer used for extrapolation of values at the
+         * receiver
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> extra_buffer;
+
+        /**
+         * The last received boundary values for each of the in neighbors for
+         * extrapolation
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> last_recv_bdy;
+
+        /**
+         * Average of values in the send buffer for each of the out neighbors
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> curr_send_avg;
+
+        /**
+         * Average of values in the last send buffer for each of the out
+         * neighbors
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> last_send_avg;
+
+        /**
+         * Average of values in the recv buffer for each of the out neighbors
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> curr_recv_avg;
+
+        /**
+         * Average of values in the last recv buffer for each of the out
+         * neighbors
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> last_recv_avg;
+
+        /**
+         * Number of messages sent
+         */
+        std::shared_ptr<gko::Array<IndexType>> msg_count;
+
+        /**
+         * Iteration stamp of last received values
+         */
+        std::shared_ptr<gko::Array<IndexType>> last_recv_iter;
+
+        /**
+         * Last recv slopes
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> last_recv_slopes;
+
+        /**
+         * Last sent slopes
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> last_sent_slopes_avg;
+
+        /**
+         * Iteration stamp of last received values
+         */
+        std::shared_ptr<gko::Array<IndexType>> last_sent_iter;
+
+        /**
+         * Threshold
+         */
+        std::shared_ptr<gko::matrix::Dense<ValueType>> thres;
+
+        /**
          * The displacements for the receiving of the buffer.
          */
         std::shared_ptr<gko::Array<IndexType>> get_displacements;
@@ -253,7 +327,9 @@ public:
     virtual void exchange_boundary(
         const Settings &settings,
         const Metadata<ValueType, IndexType> &metadata,
-        std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution) = 0;
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &global_solution,
+        std::shared_ptr<gko::matrix::Dense<ValueType>> &prev_event_solution,
+        std::ofstream &fps, std::ofstream &fpr) = 0;
 
     /**
      * Transforms data from a local vector to a global vector

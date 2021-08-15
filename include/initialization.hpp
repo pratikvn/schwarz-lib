@@ -92,6 +92,20 @@ public:
     void generate_rhs(std::vector<ValueType> &rhs);
 
     /**
+     * Generates a dipole right hand side vector
+     *
+     * @param rhs The rhs vector.
+     */
+    void generate_dipole_rhs(std::vector<ValueType> &rhs);
+
+    /**
+     * Generates a sinusoidal right hand side vector
+     *
+     * @param rhs The rhs vector.
+     */
+    void generate_sin_rhs(std::vector<ValueType> &rhs);
+
+    /**
      * Generates the 2D global laplacian matrix.
      *
      * @param oned_laplacian_size  The size of the one d laplacian grid.
